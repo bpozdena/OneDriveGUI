@@ -5,7 +5,6 @@ import subprocess
 import sys
 from configparser import ConfigParser
 
-
 from PySide6.QtCore import QThread, QTimer, QUrl, Signal, QFileInfo
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (QWidget, QApplication, QMainWindow, QMenu, QSystemTrayIcon, QListWidget, QListWidgetItem, QFileIconProvider, QStackedLayout, QVBoxLayout, QLabel)
