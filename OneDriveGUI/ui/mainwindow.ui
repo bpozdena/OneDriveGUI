@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>497</width>
+    <height>808</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>OneDriveGUI</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../../../OneDriveGUI_POC_recovered-multi/icons8-clouds-48.png</normaloff>../../../OneDriveGUI_POC_recovered-multi/icons8-clouds-48.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QComboBox" name="comboBox"/>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>497</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuAdvanced">
+    <property name="title">
+     <string>Advanced</string>
+    </property>
+    <widget class="QMenu" name="menuDebug">
+     <property name="title">
+      <string>Debug</string>
+     </property>
+     <widget class="QMenu" name="menuService">
+      <property name="title">
+       <string>Service</string>
+      </property>
+      <addaction name="actionStart_Service"/>
+      <addaction name="actionStop_Service"/>
+      <addaction name="actionRestart_Service"/>
+     </widget>
+     <widget class="QMenu" name="menuMonitor">
+      <property name="title">
+       <string>Monitor</string>
+      </property>
+      <addaction name="actionStart_Monitor"/>
+      <addaction name="actionStop_Monitor"/>
+      <addaction name="actionForce_Resync"/>
+     </widget>
+     <widget class="QMenu" name="menuStatus">
+      <property name="title">
+       <string>Status</string>
+      </property>
+      <addaction name="actionRefresh_Service_Status"/>
+      <addaction name="actionObtain_Sync_Status"/>
+     </widget>
+     <addaction name="menuService"/>
+     <addaction name="menuMonitor"/>
+     <addaction name="menuStatus"/>
+    </widget>
+    <widget class="QMenu" name="menuaccount2">
+     <property name="title">
+      <string>account2</string>
+     </property>
+     <addaction name="actionstart"/>
+    </widget>
+    <addaction name="menuDebug"/>
+    <addaction name="menuaccount2"/>
+   </widget>
+   <addaction name="menuAdvanced"/>
+  </widget>
+  <action name="actionfghgfh">
+   <property name="text">
+    <string>fghgfh</string>
+   </property>
+  </action>
+  <action name="actionStart_Service">
+   <property name="text">
+    <string>Start Service</string>
+   </property>
+  </action>
+  <action name="actionStop_Service">
+   <property name="text">
+    <string>Stop Service</string>
+   </property>
+  </action>
+  <action name="actionRestart_Service">
+   <property name="text">
+    <string>Restart Service</string>
+   </property>
+  </action>
+  <action name="actionStart_Monitor">
+   <property name="text">
+    <string>Start Monitor</string>
+   </property>
+  </action>
+  <action name="actionStop_Monitor">
+   <property name="text">
+    <string>Stop Monitor</string>
+   </property>
+  </action>
+  <action name="actionForce_Resync">
+   <property name="text">
+    <string>Force Resync</string>
+   </property>
+  </action>
+  <action name="actionRefresh_Service_Status">
+   <property name="text">
+    <string>Refresh Service Status</string>
+   </property>
+  </action>
+  <action name="actionObtain_Sync_Status">
+   <property name="text">
+    <string>Obtain Sync Status</string>
+   </property>
+  </action>
+  <action name="actionTest_Service">
+   <property name="text">
+    <string>Test Service</string>
+   </property>
+  </action>
+  <action name="actionstart">
+   <property name="text">
+    <string>start</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
