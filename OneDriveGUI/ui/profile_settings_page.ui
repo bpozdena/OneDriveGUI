@@ -18,6 +18,12 @@
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QTabWidget" name="tabWidget">
+       <property name="minimumSize">
+        <size>
+         <width>600</width>
+         <height>600</height>
+        </size>
+       </property>
        <property name="currentIndex">
         <number>2</number>
        </property>
@@ -226,7 +232,7 @@
           <rect>
            <x>250</x>
            <y>50</y>
-           <width>71</width>
+           <width>141</width>
            <height>16</height>
           </rect>
          </property>
@@ -245,11 +251,22 @@
     </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButton_13">
-     <property name="text">
-      <string>Save</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>Discard changes</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_13">
+       <property name="text">
+        <string>Save</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
