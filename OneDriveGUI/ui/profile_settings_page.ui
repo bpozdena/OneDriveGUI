@@ -70,17 +70,17 @@
          <item>
           <layout class="QGridLayout" name="gridLayout_6">
            <item row="1" column="0">
-            <widget class="QLineEdit" name="lineEdit_7"/>
+            <widget class="QLineEdit" name="lineEdit_skip_file"/>
            </item>
            <item row="1" column="1">
-            <widget class="QPushButton" name="pushButton_9">
+            <widget class="QPushButton" name="pushButton_add_skip_file">
              <property name="text">
               <string>Add</string>
              </property>
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QPushButton" name="pushButton_10">
+            <widget class="QPushButton" name="pushButton_rm_skip_file">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
                <horstretch>0</horstretch>
@@ -93,7 +93,7 @@
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QListWidget" name="listWidget_3"/>
+            <widget class="QListWidget" name="listWidget_skip_file"/>
            </item>
           </layout>
          </item>

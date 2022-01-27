@@ -68,30 +68,30 @@ class Ui_profile_settings(object):
 
         self.gridLayout_6 = QGridLayout()
         self.gridLayout_6.setObjectName(u"gridLayout_6")
-        self.lineEdit_7 = QLineEdit(self.exemptions_tab_2)
-        self.lineEdit_7.setObjectName(u"lineEdit_7")
+        self.lineEdit_skip_file = QLineEdit(self.exemptions_tab_2)
+        self.lineEdit_skip_file.setObjectName(u"lineEdit_skip_file")
 
-        self.gridLayout_6.addWidget(self.lineEdit_7, 1, 0, 1, 1)
+        self.gridLayout_6.addWidget(self.lineEdit_skip_file, 1, 0, 1, 1)
 
-        self.pushButton_9 = QPushButton(self.exemptions_tab_2)
-        self.pushButton_9.setObjectName(u"pushButton_9")
+        self.pushButton_add_skip_file = QPushButton(self.exemptions_tab_2)
+        self.pushButton_add_skip_file.setObjectName(u"pushButton_add_skip_file")
 
-        self.gridLayout_6.addWidget(self.pushButton_9, 1, 1, 1, 1)
+        self.gridLayout_6.addWidget(self.pushButton_add_skip_file, 1, 1, 1, 1)
 
-        self.pushButton_10 = QPushButton(self.exemptions_tab_2)
-        self.pushButton_10.setObjectName(u"pushButton_10")
+        self.pushButton_rm_skip_file = QPushButton(self.exemptions_tab_2)
+        self.pushButton_rm_skip_file.setObjectName(u"pushButton_rm_skip_file")
         sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pushButton_10.sizePolicy().hasHeightForWidth())
-        self.pushButton_10.setSizePolicy(sizePolicy)
+        sizePolicy.setHeightForWidth(self.pushButton_rm_skip_file.sizePolicy().hasHeightForWidth())
+        self.pushButton_rm_skip_file.setSizePolicy(sizePolicy)
 
-        self.gridLayout_6.addWidget(self.pushButton_10, 0, 1, 1, 1)
+        self.gridLayout_6.addWidget(self.pushButton_rm_skip_file, 0, 1, 1, 1)
 
-        self.listWidget_3 = QListWidget(self.exemptions_tab_2)
-        self.listWidget_3.setObjectName(u"listWidget_3")
+        self.listWidget_skip_file = QListWidget(self.exemptions_tab_2)
+        self.listWidget_skip_file.setObjectName(u"listWidget_skip_file")
 
-        self.gridLayout_6.addWidget(self.listWidget_3, 0, 0, 1, 1)
+        self.gridLayout_6.addWidget(self.listWidget_skip_file, 0, 0, 1, 1)
 
 
         self.verticalLayout_5.addLayout(self.gridLayout_6)
@@ -240,8 +240,8 @@ class Ui_profile_settings(object):
         self.label_7.setText(QCoreApplication.translate("profile_settings", u"Sync Folder:", None))
         self.pushButton_3.setText(QCoreApplication.translate("profile_settings", u"Browse", None))
         self.label_8.setText(QCoreApplication.translate("profile_settings", u"Skip files:", None))
-        self.pushButton_9.setText(QCoreApplication.translate("profile_settings", u"Add", None))
-        self.pushButton_10.setText(QCoreApplication.translate("profile_settings", u"Remove", None))
+        self.pushButton_add_skip_file.setText(QCoreApplication.translate("profile_settings", u"Add", None))
+        self.pushButton_rm_skip_file.setText(QCoreApplication.translate("profile_settings", u"Remove", None))
         self.label_9.setText(QCoreApplication.translate("profile_settings", u"Skip directories:", None))
         self.pushButton_rm_skip_dir.setText(QCoreApplication.translate("profile_settings", u"Remove", None))
         self.pushButton_add_skip_dir.setText(QCoreApplication.translate("profile_settings", u"Add", None))
