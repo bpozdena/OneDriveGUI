@@ -32,6 +32,7 @@ class Ui_settings_window(object):
         self.listWidget = QListWidget(settings_window)
         self.listWidget.setObjectName(u"listWidget")
         self.listWidget.setMinimumSize(QSize(200, 0))
+        self.listWidget.setMaximumSize(QSize(250, 16777215))
 
         self.verticalLayout.addWidget(self.listWidget)
 

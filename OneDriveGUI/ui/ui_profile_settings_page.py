@@ -15,10 +15,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QGridLayout, QLabel,
-    QLineEdit, QListWidget, QListWidgetItem, QPushButton,
-    QSizePolicy, QSpacerItem, QTabWidget, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QGridLayout, QHBoxLayout,
+    QLabel, QLineEdit, QListWidget, QListWidgetItem,
+    QPushButton, QSizePolicy, QSpacerItem, QTabWidget,
+    QVBoxLayout, QWidget)
 
 class Ui_profile_settings(object):
     def setupUi(self, profile_settings):
@@ -31,6 +31,7 @@ class Ui_profile_settings(object):
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.tabWidget = QTabWidget(profile_settings)
         self.tabWidget.setObjectName(u"tabWidget")
+        self.tabWidget.setMinimumSize(QSize(600, 600))
         self.exemptions_tab_2 = QWidget()
         self.exemptions_tab_2.setObjectName(u"exemptions_tab_2")
         self.verticalLayout_5 = QVBoxLayout(self.exemptions_tab_2)
@@ -186,7 +187,7 @@ class Ui_profile_settings(object):
         self.label_11.setGeometry(QRect(10, 50, 101, 16))
         self.label_12 = QLabel(self.tab_5)
         self.label_12.setObjectName(u"label_12")
-        self.label_12.setGeometry(QRect(250, 50, 71, 16))
+        self.label_12.setGeometry(QRect(250, 50, 141, 16))
         self.tabWidget.addTab(self.tab_5, "")
         self.tab_6 = QWidget()
         self.tab_6.setObjectName(u"tab_6")
@@ -197,10 +198,20 @@ class Ui_profile_settings(object):
 
         self.verticalLayout_2.addLayout(self.verticalLayout)
 
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.pushButton = QPushButton(profile_settings)
+        self.pushButton.setObjectName(u"pushButton")
+
+        self.horizontalLayout.addWidget(self.pushButton)
+
         self.pushButton_13 = QPushButton(profile_settings)
         self.pushButton_13.setObjectName(u"pushButton_13")
 
-        self.verticalLayout_2.addWidget(self.pushButton_13)
+        self.horizontalLayout.addWidget(self.pushButton_13)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout)
 
 
         self.retranslateUi(profile_settings)
@@ -231,6 +242,7 @@ class Ui_profile_settings(object):
         self.label_12.setText(QCoreApplication.translate("profile_settings", u"(Mbit/s)", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), QCoreApplication.translate("profile_settings", u"Rate Limit", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), QCoreApplication.translate("profile_settings", u"Page", None))
+        self.pushButton.setText(QCoreApplication.translate("profile_settings", u"Discard changes", None))
         self.pushButton_13.setText(QCoreApplication.translate("profile_settings", u"Save", None))
     # retranslateUi
 

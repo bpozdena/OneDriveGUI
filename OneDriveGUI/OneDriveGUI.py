@@ -29,8 +29,6 @@ class SettingsWindow(QWidget, Ui_settings_window):
         # Set up the user interface from Designer.
         self.setupUi(self)
         
-
-
         self.stackedLayout = QStackedLayout()
 
         for account in global_config:
@@ -85,16 +83,30 @@ class ProfileStatusPage(QWidget, Ui_status_page):
         self.settings_window.show()
 
 
+    # def show_settings_window(self, checked):
+    #     if self.w is None:
+    #         self.w = SettingsWindow()
+    #         self.w.show()
+
+    #     else:
+    #         self.w.close()  # Close window.
+    #         self.w = None  # Discard reference.        
+
+
 class ProfileSettingsPage(QWidget, Ui_profile_settings):
     def __init__(self, profile):
         super(ProfileSettingsPage, self).__init__()
 
+        self.profile = profile
         # Set up the user interface from Designer.
         self.setupUi(self)
 
-        self.lineEdit_6.setText(global_config[profile]['onedrive']['sync_dir'].strip('"'))
-        # self.ui.lineEdit_4.textChanged.connect(
-        #     lambda: settings.set('onedrive', 'sync_dir', f'"{self.ui.lineEdit_4.text()}"'))
+        temp_global_config = global_config
+        self.temp_profile_config = temp_global_config[self.profile]
+
+
+        self.lineEdit_6.setText(self.temp_profile_config['onedrive']['sync_dir'].strip('"'))
+        self.lineEdit_6.textChanged.connect(self.set_sync_dir)
 
         # self.ui.lineEdit.setText(settings['onedrive']['log_dir'].strip('"'))
         # self.ui.lineEdit.textChanged.connect(
@@ -117,12 +129,32 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         # self.ui.pushButton_7.clicked.connect(self.ui.lineEdit_3.clear)
 
         # self.ui.pushButton_4.clicked.connect(lambda: save_config(settings))
+        self.pushButton.hide()
+        # self.pushButton.clicked.connect(self.discart_changes)
+        self.pushButton_13.clicked.connect(self.save_profile_settings)
 
-        # # Rate limit
-        # self.ui.lineEdit_5.setText(settings['onedrive']['rate_limit'].strip('"'))
-        # self.ui.label_6.setText(str(round(int(self.ui.lineEdit_5.text()) * 8 / 1000 / 1000, 2)) + " Mbit/s")
-        # self.ui.lineEdit_5.textChanged.connect(lambda: settings.set('onedrive', 'rate_limit', f'"{self.ui.lineEdit_5.text()}"'))
+        # Rate limit
+        self.lineEdit_10.setText(self.temp_profile_config['onedrive']['rate_limit'].strip('"'))
+        self.label_12.setText(str(round(int(self.lineEdit_10.text()) * 8 / 1000 / 1000, 2)) + " Mbit/s")
+        self.lineEdit_10.textChanged.connect(self.set_rate_limit)
         # self.ui.lineEdit_5.textChanged.connect(lambda: self.ui.label_6.setText(str(round(int(self.ui.lineEdit_5.text()) * 8 / 1000 / 1000, 2)) + " Mbit/s"))
+
+    def set_rate_limit(self):
+        self.temp_profile_config['onedrive']['rate_limit'] = f'"{self.lineEdit_10.text()}"'
+        self.label_12.setText(str(round(int(self.lineEdit_10.text()) * 8 / 1000 / 1000, 2)) + " Mbit/s")
+
+    def set_sync_dir(self):
+        self.temp_profile_config['onedrive']['sync_dir'] = f'"{self.lineEdit_6.text()}"'
+
+
+    def save_profile_settings(self):
+        global_config[self.profile].update(self.temp_profile_config)
+        save_global_config()
+
+    def discart_changes(self):
+        self.temp_profile_config = None
+        self.close()
+
 
 
 
@@ -595,44 +627,107 @@ def read_config(config_file):
     return config
 
 
-def profile_reader():
+def create_global_config():
+    """
+    Creates dict which is used as global config. 
+    EXAMPLE:
+
+    {
+    "bob@live.com": {
+        "config_file": "/home/bob/.config/onedrive/accounts/bob@live.com/config",
+        "enable_debug": "True",
+        "mode": "monitor",
+        "onedrive": {
+            "sync_dir": '"~/OneDrive"',
+            "skip_file": '"~*|.~*|*.tmp|*.txt|*.exe|.testfile"',
+            "monitor_interval": '"15"',
+            ...},
+    "john@live.com": {
+        "config_file": "/home/bob/.config/onedrive/accounts/john@live.com/config",
+        "enable_debug": "True",
+        "mode": "monitor",
+        "onedrive": {
+            "sync_dir": '"~/OneDrive2"',
+            "skip_file": '"~*|.~*|*.tmp|*.txt|*.exe"',
+            "monitor_interval": '"15"', ...}       
+    """
+
     _profiles = ConfigParser()
     _profiles.read(PROFILES_FILE)
     profiles = _profiles._sections 
 
     for profile in profiles:
-        profile_name = profile
         profile_config_file = profiles[profile]['config_file']
         _od_config = read_config(profile_config_file)
         od_config = _od_config._sections
 
         profiles[profile].update(od_config)
 
-
+    print(profiles)
     return profiles
 
 
+def save_global_config():
+    # Save all OneDrive config files after configuration change.
+    for profile in global_config:
+        
+        profile_config_file = os.path.expanduser(global_config[profile]['config_file'].strip('"'))
+
+        print(profile_config_file)
+        print(global_config)
+        print(global_config[profile])
+        print(global_config[profile]['onedrive'])
+
+        # test2 = {}
+        # test = global_config[profile]['onedrive']
+        # test2 = test2['onedrive'].update(test)
+        # print(test2)
+
+        _od_config = {}
+        _od_config['onedrive'] = global_config[profile]['onedrive']     
+
+        od_config = ConfigParser()
+        od_config.read_dict(_od_config)
+           
+        # Backup last config
+        os.system(f'cp {profile_config_file} {profile_config_file}_backup')
+
+        # Save OD config changes.
+        with open(profile_config_file, 'w') as f:
+            od_config.write(f)
+
+        # Remove first line (section) from config file so that OneDrive can read it.
+        with open(profile_config_file, 'r') as input:
+            data = input.read().splitlines(True)
+        with open(profile_config_file, 'w') as output:
+            output.writelines(data[1:])
+
+        print(f"{profile} config saved")
+
+    print("All configs saved")
+    # config = ConfigParser()
+    # config.read(new_settings)   
 
 
 
-def save_config(new_settings):
-    # Save OneDrive config after configuration change.
-    # new_settings.write
-    print(new_settings)
-    print(new_settings['onedrive']['sync_dir'])
-    print('saved')
+# def save_config(new_settings):
+#     # Save OneDrive config after configuration change.
+#     # new_settings.write
+#     print(new_settings)
+#     print(new_settings['onedrive']['sync_dir'])
+#     print('saved')
 
-    with open(CONFIG_FILE, 'w') as configfile:
-        new_settings.write(configfile)
+#     with open(CONFIG_FILE, 'w') as configfile:
+#         new_settings.write(configfile)
 
-    # remove first line (section) from config file
-    with open(CONFIG_FILE, 'r') as fin:
-        data = fin.read().splitlines(True)
-    with open(CONFIG_FILE, 'w') as fout:
-        fout.writelines(data[1:])
+#     # remove first line (section) from config file
+#     with open(CONFIG_FILE, 'r') as fin:
+#         data = fin.read().splitlines(True)
+#     with open(CONFIG_FILE, 'w') as fout:
+#         fout.writelines(data[1:])
 
-    config = ConfigParser()
-    config.read(new_settings)
+#     config = ConfigParser()
+#     config.read(new_settings)
 
 
 def humanize_file_size(num, suffix="B"):
@@ -644,8 +739,8 @@ def humanize_file_size(num, suffix="B"):
 
 
 if __name__ == "__main__":
-    settings = read_config(CONFIG_FILE)
-    global_config = profile_reader()
+    # settings = read_config(CONFIG_FILE)
+    global_config = create_global_config()
 
     app = QApplication(sys.argv)
     window = MainWindow()
