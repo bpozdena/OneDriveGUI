@@ -15,7 +15,24 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
+    <widget class="QLabel" name="label_profile_name">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Profile name</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="minimumSize">
@@ -34,15 +51,15 @@
         <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
           <layout class="QGridLayout" name="gridLayout_5">
-           <item row="1" column="0" colspan="2">
-            <widget class="QCheckBox" name="checkBox_3">
+           <item row="0" column="2">
+            <widget class="QPushButton" name="pushButton_3">
              <property name="text">
-              <string>Skip Hidden Files</string>
+              <string>Browse</string>
              </property>
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QLabel" name="label_7">
+            <widget class="QLabel" name="label_sync_dir">
              <property name="text">
               <string>Sync Folder:</string>
              </property>
@@ -51,136 +68,558 @@
            <item row="0" column="1">
             <widget class="QLineEdit" name="lineEdit_sync_dir"/>
            </item>
-           <item row="0" column="2">
-            <widget class="QPushButton" name="pushButton_3">
-             <property name="text">
-              <string>Browse</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </item>
          <item>
-          <widget class="QLabel" name="label_8">
-           <property name="text">
-            <string>Skip files:</string>
+          <widget class="QGroupBox" name="groupBox_8">
+           <property name="title">
+            <string>Options</string>
            </property>
+           <layout class="QGridLayout" name="gridLayout_9">
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="checkBox_sync_root_files">
+              <property name="text">
+               <string>Sync root files</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
          <item>
-          <layout class="QGridLayout" name="gridLayout_6">
-           <item row="1" column="0">
-            <widget class="QLineEdit" name="lineEdit_skip_file"/>
-           </item>
-           <item row="1" column="1">
-            <widget class="QPushButton" name="pushButton_add_skip_file">
-             <property name="text">
-              <string>Add</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QPushButton" name="pushButton_rm_skip_file">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Remove</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QListWidget" name="listWidget_skip_file"/>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_9">
-           <property name="text">
-            <string>Skip directories:</string>
+          <spacer name="verticalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
            </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QGridLayout" name="gridLayout_7">
-           <item row="0" column="1">
-            <widget class="QPushButton" name="pushButton_rm_skip_dir">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Remove</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QListWidget" name="listWidget_skip_dir">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLineEdit" name="lineEdit_skip_dir"/>
-           </item>
-           <item row="1" column="1">
-            <widget class="QPushButton" name="pushButton_add_skip_dir">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Add</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="logging_tab_2">
+       <widget class="QWidget" name="tab">
+        <attribute name="title">
+         <string>Excluded files</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_7">
+         <item>
+          <widget class="QGroupBox" name="groupBox">
+           <property name="title">
+            <string>Excluded files</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <layout class="QGridLayout" name="gridLayout_6">
+              <item row="1" column="0">
+               <widget class="QLineEdit" name="lineEdit_skip_file"/>
+              </item>
+              <item row="1" column="1">
+               <widget class="QPushButton" name="pushButton_add_skip_file">
+                <property name="text">
+                 <string>Add</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QPushButton" name="pushButton_rm_skip_file">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Remove</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QListWidget" name="listWidget_skip_file"/>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_2">
+           <property name="title">
+            <string>Excluded directories</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <widget class="QCheckBox" name="checkBox_skip_dir_strict_match">
+              <property name="text">
+               <string>Strict match</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QGridLayout" name="gridLayout_7">
+              <item row="0" column="1">
+               <widget class="QPushButton" name="pushButton_rm_skip_dir">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Remove</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QListWidget" name="listWidget_skip_dir">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLineEdit" name="lineEdit_skip_dir"/>
+              </item>
+              <item row="1" column="1">
+               <widget class="QPushButton" name="pushButton_add_skip_dir">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Add</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_3">
+           <property name="title">
+            <string>Others</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="0" column="1">
+             <widget class="QCheckBox" name="checkBox_skip_symlinks">
+              <property name="text">
+               <string>Exclude symlinks</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="checkBox_check_nosync">
+              <property name="text">
+               <string>Check for .nosync</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QCheckBox" name="checkBox_skip_dotfiles">
+              <property name="text">
+               <string>Exclude dotfiles (hidden files)</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_2">
+        <attribute name="title">
+         <string>Sync options</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_8">
+         <item>
+          <widget class="QGroupBox" name="groupBox_4">
+           <property name="title">
+            <string>Advanced properties</string>
+           </property>
+           <layout class="QFormLayout" name="formLayout">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_monitor_interval">
+              <property name="text">
+               <string>Monitor interval:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QSpinBox" name="spinBox_monitor_interval">
+              <property name="maximum">
+               <number>1000000</number>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_classify_as_big_delete">
+              <property name="text">
+               <string>Clasify as big delete</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QSpinBox" name="spinBox_classify_as_big_delete">
+              <property name="maximum">
+               <number>1000000</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_user_agent">
+              <property name="text">
+               <string>User-agent</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLineEdit" name="lineEdit_user_agent"/>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_azure_ad_endpoint">
+              <property name="text">
+               <string>Azure AD endpoint</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLineEdit" name="lineEdit_azure_ad_endpoint"/>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_azure_tenant_id">
+              <property name="text">
+               <string>Azure tenant ID</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QLineEdit" name="lineEdit_azure_tenant_id"/>
+            </item>
+            <item row="5" column="0">
+             <widget class="QLabel" name="label_sync_dir_permissions">
+              <property name="text">
+               <string>Sync dir permissions</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="0">
+             <widget class="QLabel" name="label_sync_file_permissions">
+              <property name="text">
+               <string>Sync file permissions</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QSpinBox" name="spinBox_sync_dir_permissions">
+              <property name="maximum">
+               <number>777</number>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="1">
+             <widget class="QSpinBox" name="spinBox_sync_file_permissions">
+              <property name="maximum">
+               <number>777</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_5">
+           <property name="title">
+            <string>Advanced options</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_4">
+            <item row="2" column="1">
+             <widget class="QCheckBox" name="checkBox_force_http_2">
+              <property name="text">
+               <string>Force HTTP2</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QCheckBox" name="checkBox_no_mount">
+              <property name="text">
+               <string>Check for .nomount</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="2">
+             <widget class="QCheckBox" name="checkBox_resync">
+              <property name="text">
+               <string>Full re-sync</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QCheckBox" name="checkBox_download_only">
+              <property name="text">
+               <string>Download only</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QCheckBox" name="checkBox_local_first">
+              <property name="text">
+               <string>Local first</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QCheckBox" name="checkBox_dry_run">
+              <property name="text">
+               <string>Dry run</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QCheckBox" name="checkBox_disable_upload_validation">
+              <property name="text">
+               <string>Disable upload validation</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="2">
+             <widget class="QCheckBox" name="checkBox_bypass_data_preservation">
+              <property name="text">
+               <string>Bypass data preservation</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QCheckBox" name="checkBox_no_remote_delete">
+              <property name="text">
+               <string>No remote delete</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="2">
+             <widget class="QCheckBox" name="checkBox_remove_source_files">
+              <property name="text">
+               <string>Remove source files</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QCheckBox" name="checkBox_upload_only">
+              <property name="text">
+               <string>Upload only</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="QCheckBox" name="checkBox_sync_business_shared_folders">
+              <property name="text">
+               <string>Sync business shared folders</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_9">
+           <property name="title">
+            <string>Webhook settings</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_10">
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_webhook_public_url">
+              <property name="text">
+               <string>Public URL</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="checkBox_webhook_enabled">
+              <property name="text">
+               <string>Enable webhook</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_webhook_listening_port">
+              <property name="text">
+               <string>Listening port</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="QLabel" name="label_webhook_expiration_interval">
+              <property name="text">
+               <string>Expiration interval</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLineEdit" name="lineEdit_webhook_listening_host"/>
+            </item>
+            <item row="3" column="1">
+             <widget class="QSpinBox" name="spinBox_webhook_listening_port">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>65353</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_webhook_listening_host">
+              <property name="text">
+               <string>Listening host</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="lineEdit_webhook_public_url"/>
+            </item>
+            <item row="1" column="3">
+             <widget class="QSpinBox" name="spinBox_webhook_expiration_interval">
+              <property name="maximum">
+               <number>1000000</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QLabel" name="label_webhook_renewal_interval">
+              <property name="text">
+               <string>Renewal interval</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="3">
+             <widget class="QSpinBox" name="spinBox_webhook_renewal_interval">
+              <property name="maximum">
+               <number>1000000</number>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="2">
+             <widget class="QLabel" name="label_operation_timeout">
+              <property name="text">
+               <string>Operation timeout</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="3">
+             <widget class="QSpinBox" name="spinBox_operation_timeout">
+              <property name="maximum">
+               <number>1000000</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_logging">
         <attribute name="title">
          <string>Logging</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_6">
          <item>
-          <layout class="QGridLayout" name="gridLayout_8">
-           <item row="0" column="0" colspan="2">
-            <widget class="QCheckBox" name="checkBox_4">
-             <property name="text">
-              <string>Enable Logging</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_10">
-             <property name="text">
-              <string>Log location:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="lineEdit_9"/>
-           </item>
-           <item row="1" column="2">
-            <widget class="QPushButton" name="pushButton_4">
-             <property name="text">
-              <string>Browse</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <widget class="QGroupBox" name="groupBox_7">
+           <property name="title">
+            <string>Logging</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_9">
+            <item>
+             <layout class="QGridLayout" name="gridLayout_8">
+              <item row="0" column="0" colspan="2">
+               <widget class="QCheckBox" name="checkBox_enable_logging">
+                <property name="text">
+                 <string>Enable Logging</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="2">
+               <widget class="QPushButton" name="pushButton_log_dir">
+                <property name="text">
+                 <string>Browse</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_log_dir">
+                <property name="text">
+                 <string>Log location:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QCheckBox" name="checkBox_debug_https">
+                <property name="text">
+                 <string>Debug HTTPS</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QSpinBox" name="spinBox_monitor_log_frequency"/>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="lineEdit_log_dir"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_monitor_log_frequency">
+                <property name="text">
+                 <string>Monitor log frequency</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_monitor_fullscan_frequency">
+                <property name="text">
+                 <string>Monitor full-scan frequency</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QSpinBox" name="spinBox_monitor_fullscan_frequency"/>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_6">
+           <property name="title">
+            <string>Notifications</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_min_notify_changes">
+              <property name="text">
+               <string>Minimum notify changes</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QCheckBox" name="checkBox_disable_notifications">
+              <property name="text">
+               <string>Disable notifications</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QSpinBox" name="spinBox_min_notify_changes"/>
+            </item>
+           </layout>
+          </widget>
          </item>
          <item>
           <spacer name="verticalSpacer_2">
@@ -245,10 +684,6 @@
        </widget>
       </widget>
      </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="pushButton_discart">
        <property name="text">
