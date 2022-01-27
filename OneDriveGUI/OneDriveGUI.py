@@ -102,13 +102,14 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         # self.ui.lineEdit.textChanged.connect(
         #     lambda: settings.set('onedrive', 'log_dir', f'"{self.ui.lineEdit.text()}"'))
 
-        # skip_files = settings['onedrive']['skip_file'].strip('"').split('|')
-        # self.ui.listWidget.addItems(skip_files)
-        # self.ui.pushButton_6.clicked.connect(
-        #     lambda: self.add_item_to_qlist(self.ui.lineEdit_2, self.ui.listWidget, skip_files))
-        # self.ui.pushButton_6.clicked.connect(
-        #     lambda: settings.set('onedrive', 'skip_file', '"' + '|'.join(skip_files) + '"'))
-        # self.ui.pushButton_6.clicked.connect(self.ui.lineEdit_2.clear)
+        # Skip_file section
+        self.skip_files = self.temp_profile_config['onedrive']['skip_file'].strip('"').split('|')
+        self.listWidget_skip_file.addItems(self.skip_files)
+        self.listWidget_skip_file.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.pushButton_add_skip_file.clicked.connect(self.add_skip_file)
+        self.pushButton_add_skip_file.clicked.connect(self.lineEdit_skip_file.clear)        
+        self.pushButton_rm_skip_file.clicked.connect(self.remove_skip_file)
+
 
         # Skip_dir section
         self.skip_dirs = self.temp_profile_config['onedrive']['skip_dir'].strip('"').split('|')
@@ -129,6 +130,14 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         # TODO: how to discart unsaved changes and refresh the widgets or close window?
         # self.pushButton_discart.clicked.connect(self.discart_changes)
         self.pushButton_save.clicked.connect(self.save_profile_settings)
+
+    def add_skip_file(self):
+        self.add_item_to_qlist(self.lineEdit_skip_file, self.listWidget_skip_file, self.skip_files)
+        self.temp_profile_config['onedrive']['skip_file'] = '"' + '|'.join(self.skip_files) + '"'
+
+    def remove_skip_file(self):
+        self.remove_item_from_qlist(self.listWidget_skip_file, self.skip_files)
+        self.temp_profile_config['onedrive']['skip_file'] = '"' + '|'.join(self.skip_files) + '"'
 
     def add_skip_dir(self):
         self.add_item_to_qlist(self.lineEdit_skip_dir, self.listWidget_skip_dir, self.skip_dirs)
