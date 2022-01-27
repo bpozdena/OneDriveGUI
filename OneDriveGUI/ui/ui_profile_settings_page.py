@@ -24,7 +24,7 @@ class Ui_profile_settings(object):
     def setupUi(self, profile_settings):
         if not profile_settings.objectName():
             profile_settings.setObjectName(u"profile_settings")
-        profile_settings.resize(588, 785)
+        profile_settings.resize(614, 785)
         self.verticalLayout_2 = QVBoxLayout(profile_settings)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout = QVBoxLayout()
@@ -48,10 +48,10 @@ class Ui_profile_settings(object):
 
         self.gridLayout_5.addWidget(self.label_7, 0, 0, 1, 1)
 
-        self.lineEdit_6 = QLineEdit(self.exemptions_tab_2)
-        self.lineEdit_6.setObjectName(u"lineEdit_6")
+        self.lineEdit_sync_dir = QLineEdit(self.exemptions_tab_2)
+        self.lineEdit_sync_dir.setObjectName(u"lineEdit_sync_dir")
 
-        self.gridLayout_5.addWidget(self.lineEdit_6, 0, 1, 1, 1)
+        self.gridLayout_5.addWidget(self.lineEdit_sync_dir, 0, 1, 1, 1)
 
         self.pushButton_3 = QPushButton(self.exemptions_tab_2)
         self.pushButton_3.setObjectName(u"pushButton_3")
@@ -103,40 +103,40 @@ class Ui_profile_settings(object):
 
         self.gridLayout_7 = QGridLayout()
         self.gridLayout_7.setObjectName(u"gridLayout_7")
-        self.pushButton_11 = QPushButton(self.exemptions_tab_2)
-        self.pushButton_11.setObjectName(u"pushButton_11")
+        self.pushButton_rm_skip_dir = QPushButton(self.exemptions_tab_2)
+        self.pushButton_rm_skip_dir.setObjectName(u"pushButton_rm_skip_dir")
         sizePolicy1 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Minimum)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.pushButton_11.sizePolicy().hasHeightForWidth())
-        self.pushButton_11.setSizePolicy(sizePolicy1)
+        sizePolicy1.setHeightForWidth(self.pushButton_rm_skip_dir.sizePolicy().hasHeightForWidth())
+        self.pushButton_rm_skip_dir.setSizePolicy(sizePolicy1)
 
-        self.gridLayout_7.addWidget(self.pushButton_11, 0, 1, 1, 1)
+        self.gridLayout_7.addWidget(self.pushButton_rm_skip_dir, 0, 1, 1, 1)
 
-        self.listWidget_4 = QListWidget(self.exemptions_tab_2)
-        self.listWidget_4.setObjectName(u"listWidget_4")
+        self.listWidget_skip_dir = QListWidget(self.exemptions_tab_2)
+        self.listWidget_skip_dir.setObjectName(u"listWidget_skip_dir")
         sizePolicy2 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.listWidget_4.sizePolicy().hasHeightForWidth())
-        self.listWidget_4.setSizePolicy(sizePolicy2)
+        sizePolicy2.setHeightForWidth(self.listWidget_skip_dir.sizePolicy().hasHeightForWidth())
+        self.listWidget_skip_dir.setSizePolicy(sizePolicy2)
 
-        self.gridLayout_7.addWidget(self.listWidget_4, 0, 0, 1, 1)
+        self.gridLayout_7.addWidget(self.listWidget_skip_dir, 0, 0, 1, 1)
 
-        self.lineEdit_8 = QLineEdit(self.exemptions_tab_2)
-        self.lineEdit_8.setObjectName(u"lineEdit_8")
+        self.lineEdit_skip_dir = QLineEdit(self.exemptions_tab_2)
+        self.lineEdit_skip_dir.setObjectName(u"lineEdit_skip_dir")
 
-        self.gridLayout_7.addWidget(self.lineEdit_8, 1, 0, 1, 1)
+        self.gridLayout_7.addWidget(self.lineEdit_skip_dir, 1, 0, 1, 1)
 
-        self.pushButton_12 = QPushButton(self.exemptions_tab_2)
-        self.pushButton_12.setObjectName(u"pushButton_12")
+        self.pushButton_add_skip_dir = QPushButton(self.exemptions_tab_2)
+        self.pushButton_add_skip_dir.setObjectName(u"pushButton_add_skip_dir")
         sizePolicy3 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy3.setHorizontalStretch(0)
         sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.pushButton_12.sizePolicy().hasHeightForWidth())
-        self.pushButton_12.setSizePolicy(sizePolicy3)
+        sizePolicy3.setHeightForWidth(self.pushButton_add_skip_dir.sizePolicy().hasHeightForWidth())
+        self.pushButton_add_skip_dir.setSizePolicy(sizePolicy3)
 
-        self.gridLayout_7.addWidget(self.pushButton_12, 1, 1, 1, 1)
+        self.gridLayout_7.addWidget(self.pushButton_add_skip_dir, 1, 1, 1, 1)
 
 
         self.verticalLayout_5.addLayout(self.gridLayout_7)
@@ -178,16 +178,28 @@ class Ui_profile_settings(object):
         self.tabWidget.addTab(self.logging_tab_2, "")
         self.tab_5 = QWidget()
         self.tab_5.setObjectName(u"tab_5")
-        self.lineEdit_10 = QLineEdit(self.tab_5)
-        self.lineEdit_10.setObjectName(u"lineEdit_10")
-        self.lineEdit_10.setGeometry(QRect(110, 50, 113, 22))
-        self.lineEdit_10.setInputMethodHints(Qt.ImhDigitsOnly)
-        self.label_11 = QLabel(self.tab_5)
-        self.label_11.setObjectName(u"label_11")
-        self.label_11.setGeometry(QRect(10, 50, 101, 16))
-        self.label_12 = QLabel(self.tab_5)
-        self.label_12.setObjectName(u"label_12")
-        self.label_12.setGeometry(QRect(250, 50, 141, 16))
+        self.gridLayout = QGridLayout(self.tab_5)
+        self.gridLayout.setObjectName(u"gridLayout")
+        self.label_rate_limit = QLabel(self.tab_5)
+        self.label_rate_limit.setObjectName(u"label_rate_limit")
+
+        self.gridLayout.addWidget(self.label_rate_limit, 0, 0, 1, 1)
+
+        self.lineEdit_rate_limit = QLineEdit(self.tab_5)
+        self.lineEdit_rate_limit.setObjectName(u"lineEdit_rate_limit")
+        self.lineEdit_rate_limit.setInputMethodHints(Qt.ImhDigitsOnly)
+
+        self.gridLayout.addWidget(self.lineEdit_rate_limit, 0, 1, 1, 1)
+
+        self.label_rate_limit_mbps = QLabel(self.tab_5)
+        self.label_rate_limit_mbps.setObjectName(u"label_rate_limit_mbps")
+
+        self.gridLayout.addWidget(self.label_rate_limit_mbps, 0, 2, 1, 1)
+
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.gridLayout.addItem(self.verticalSpacer, 1, 1, 1, 1)
+
         self.tabWidget.addTab(self.tab_5, "")
         self.tab_6 = QWidget()
         self.tab_6.setObjectName(u"tab_6")
@@ -200,15 +212,15 @@ class Ui_profile_settings(object):
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.pushButton = QPushButton(profile_settings)
-        self.pushButton.setObjectName(u"pushButton")
+        self.pushButton_discart = QPushButton(profile_settings)
+        self.pushButton_discart.setObjectName(u"pushButton_discart")
 
-        self.horizontalLayout.addWidget(self.pushButton)
+        self.horizontalLayout.addWidget(self.pushButton_discart)
 
-        self.pushButton_13 = QPushButton(profile_settings)
-        self.pushButton_13.setObjectName(u"pushButton_13")
+        self.pushButton_save = QPushButton(profile_settings)
+        self.pushButton_save.setObjectName(u"pushButton_save")
 
-        self.horizontalLayout.addWidget(self.pushButton_13)
+        self.horizontalLayout.addWidget(self.pushButton_save)
 
 
         self.verticalLayout_2.addLayout(self.horizontalLayout)
@@ -216,7 +228,7 @@ class Ui_profile_settings(object):
 
         self.retranslateUi(profile_settings)
 
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(profile_settings)
@@ -231,18 +243,18 @@ class Ui_profile_settings(object):
         self.pushButton_9.setText(QCoreApplication.translate("profile_settings", u"Add", None))
         self.pushButton_10.setText(QCoreApplication.translate("profile_settings", u"Remove", None))
         self.label_9.setText(QCoreApplication.translate("profile_settings", u"Skip directories:", None))
-        self.pushButton_11.setText(QCoreApplication.translate("profile_settings", u"Remove", None))
-        self.pushButton_12.setText(QCoreApplication.translate("profile_settings", u"Add", None))
+        self.pushButton_rm_skip_dir.setText(QCoreApplication.translate("profile_settings", u"Remove", None))
+        self.pushButton_add_skip_dir.setText(QCoreApplication.translate("profile_settings", u"Add", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.exemptions_tab_2), QCoreApplication.translate("profile_settings", u"Monitored Files", None))
         self.checkBox_4.setText(QCoreApplication.translate("profile_settings", u"Enable Logging", None))
         self.label_10.setText(QCoreApplication.translate("profile_settings", u"Log location:", None))
         self.pushButton_4.setText(QCoreApplication.translate("profile_settings", u"Browse", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.logging_tab_2), QCoreApplication.translate("profile_settings", u"Logging", None))
-        self.label_11.setText(QCoreApplication.translate("profile_settings", u"Rate Limit [B/s]", None))
-        self.label_12.setText(QCoreApplication.translate("profile_settings", u"(Mbit/s)", None))
+        self.label_rate_limit.setText(QCoreApplication.translate("profile_settings", u"Rate Limit [B/s]", None))
+        self.label_rate_limit_mbps.setText(QCoreApplication.translate("profile_settings", u"(Mbit/s)", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), QCoreApplication.translate("profile_settings", u"Rate Limit", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), QCoreApplication.translate("profile_settings", u"Page", None))
-        self.pushButton.setText(QCoreApplication.translate("profile_settings", u"Discard changes", None))
-        self.pushButton_13.setText(QCoreApplication.translate("profile_settings", u"Save", None))
+        self.pushButton_discart.setText(QCoreApplication.translate("profile_settings", u"Discard changes", None))
+        self.pushButton_save.setText(QCoreApplication.translate("profile_settings", u"Save", None))
     # retranslateUi
 

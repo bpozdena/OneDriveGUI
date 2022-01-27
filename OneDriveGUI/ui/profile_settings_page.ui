@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>588</width>
+    <width>614</width>
     <height>785</height>
    </rect>
   </property>
@@ -25,7 +25,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="exemptions_tab_2">
         <attribute name="title">
@@ -49,7 +49,7 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLineEdit" name="lineEdit_6"/>
+            <widget class="QLineEdit" name="lineEdit_sync_dir"/>
            </item>
            <item row="0" column="2">
             <widget class="QPushButton" name="pushButton_3">
@@ -107,7 +107,7 @@
          <item>
           <layout class="QGridLayout" name="gridLayout_7">
            <item row="0" column="1">
-            <widget class="QPushButton" name="pushButton_11">
+            <widget class="QPushButton" name="pushButton_rm_skip_dir">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
                <horstretch>0</horstretch>
@@ -120,7 +120,7 @@
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QListWidget" name="listWidget_4">
+            <widget class="QListWidget" name="listWidget_skip_dir">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
                <horstretch>0</horstretch>
@@ -130,10 +130,10 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QLineEdit" name="lineEdit_8"/>
+            <widget class="QLineEdit" name="lineEdit_skip_dir"/>
            </item>
            <item row="1" column="1">
-            <widget class="QPushButton" name="pushButton_12">
+            <widget class="QPushButton" name="pushButton_add_skip_dir">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -201,45 +201,42 @@
         <attribute name="title">
          <string>Rate Limit</string>
         </attribute>
-        <widget class="QLineEdit" name="lineEdit_10">
-         <property name="geometry">
-          <rect>
-           <x>110</x>
-           <y>50</y>
-           <width>113</width>
-           <height>22</height>
-          </rect>
-         </property>
-         <property name="inputMethodHints">
-          <set>Qt::ImhDigitsOnly</set>
-         </property>
-        </widget>
-        <widget class="QLabel" name="label_11">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>50</y>
-           <width>101</width>
-           <height>16</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Rate Limit [B/s]</string>
-         </property>
-        </widget>
-        <widget class="QLabel" name="label_12">
-         <property name="geometry">
-          <rect>
-           <x>250</x>
-           <y>50</y>
-           <width>141</width>
-           <height>16</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>(Mbit/s)</string>
-         </property>
-        </widget>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_rate_limit">
+           <property name="text">
+            <string>Rate Limit [B/s]</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="lineEdit_rate_limit">
+           <property name="inputMethodHints">
+            <set>Qt::ImhDigitsOnly</set>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLabel" name="label_rate_limit_mbps">
+           <property name="text">
+            <string>(Mbit/s)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="tab_6">
         <attribute name="title">
@@ -253,14 +250,14 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="pushButton_discart">
        <property name="text">
         <string>Discard changes</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_13">
+      <widget class="QPushButton" name="pushButton_save">
        <property name="text">
         <string>Save</string>
        </property>
