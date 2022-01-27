@@ -7,7 +7,9 @@ from configparser import ConfigParser
 
 from PySide6.QtCore import QThread, QTimer, QUrl, Signal, QFileInfo
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (QWidget, QApplication, QMainWindow, QMenu, QSystemTrayIcon, QListWidget, QListWidgetItem, QFileIconProvider, QStackedLayout, QVBoxLayout, QLabel)
+from PySide6.QtWidgets import ( QWidget, QApplication, QMainWindow, QMenu, QSystemTrayIcon, 
+                                QListWidget, QListWidgetItem, QFileIconProvider, QStackedLayout, 
+                                QVBoxLayout, QLabel, QAbstractItemView)
 
 from ui.ui_login import Ui_LoginWindow
 from ui.ui_settings import Ui_settings_window
@@ -45,20 +47,7 @@ class SettingsWindow(QWidget, Ui_settings_window):
         self.stackedLayout.setCurrentIndex(self.listWidget.currentRow())
 
 
-    def add_item_to_qlist(self, source_widget, destination_widget, list):
-        if source_widget.text() == "":
-            print("Inoring empty value.")
-        elif source_widget.text() in list:
-            print("Item already in exemption list.")
-        else:
-            list.append(source_widget.text())
-            destination_widget.addItem(source_widget.text())
 
-    def remove_item_from_qlist(self, qlistwidget_name):
-        for item in qlistwidget_name.selectedItems():
-            print("Removing: " + item.text())
-            # items.remove(item.text())
-            qlistwidget_name.takeItem(qlistwidget_name.row(item))
 
 
 class ProfileStatusPage(QWidget, Ui_status_page):
@@ -98,6 +87,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         super(ProfileSettingsPage, self).__init__()
 
         self.profile = profile
+
         # Set up the user interface from Designer.
         self.setupUi(self)
 
@@ -105,8 +95,8 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.temp_profile_config = temp_global_config[self.profile]
 
 
-        self.lineEdit_6.setText(self.temp_profile_config['onedrive']['sync_dir'].strip('"'))
-        self.lineEdit_6.textChanged.connect(self.set_sync_dir)
+        self.lineEdit_sync_dir.setText(self.temp_profile_config['onedrive']['sync_dir'].strip('"'))
+        self.lineEdit_sync_dir.textChanged.connect(self.set_sync_dir)
 
         # self.ui.lineEdit.setText(settings['onedrive']['log_dir'].strip('"'))
         # self.ui.lineEdit.textChanged.connect(
@@ -120,32 +110,58 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         #     lambda: settings.set('onedrive', 'skip_file', '"' + '|'.join(skip_files) + '"'))
         # self.ui.pushButton_6.clicked.connect(self.ui.lineEdit_2.clear)
 
-        # skip_dirs = settings['onedrive']['skip_dir'].strip('"').split('|')
-        # self.ui.listWidget_2.addItems(skip_dirs)
-        # self.ui.pushButton_7.clicked.connect(
-        #     lambda: self.add_item_to_qlist(self.ui.lineEdit_3, self.ui.listWidget_2, skip_dirs))
-        # self.ui.pushButton_7.clicked.connect(
-        #     lambda: settings.set('onedrive', 'skip_dir', '"' + '|'.join(skip_dirs) + '"'))
-        # self.ui.pushButton_7.clicked.connect(self.ui.lineEdit_3.clear)
+        # Skip_dir section
+        self.skip_dirs = self.temp_profile_config['onedrive']['skip_dir'].strip('"').split('|')
+        self.listWidget_skip_dir.addItems(self.skip_dirs)
+        self.listWidget_skip_dir.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.pushButton_add_skip_dir.clicked.connect(self.add_skip_dir)
+        self.pushButton_add_skip_dir.clicked.connect(self.lineEdit_skip_dir.clear)
+        self.pushButton_rm_skip_dir.clicked.connect(self.remove_skip_dir)
 
-        # self.ui.pushButton_4.clicked.connect(lambda: save_config(settings))
-        self.pushButton.hide()
-        # self.pushButton.clicked.connect(self.discart_changes)
-        self.pushButton_13.clicked.connect(self.save_profile_settings)
 
         # Rate limit
-        self.lineEdit_10.setText(self.temp_profile_config['onedrive']['rate_limit'].strip('"'))
-        self.label_12.setText(str(round(int(self.lineEdit_10.text()) * 8 / 1000 / 1000, 2)) + " Mbit/s")
-        self.lineEdit_10.textChanged.connect(self.set_rate_limit)
-        # self.ui.lineEdit_5.textChanged.connect(lambda: self.ui.label_6.setText(str(round(int(self.ui.lineEdit_5.text()) * 8 / 1000 / 1000, 2)) + " Mbit/s"))
+        self.lineEdit_rate_limit.setText(self.temp_profile_config['onedrive']['rate_limit'].strip('"'))
+        self.label_rate_limit_mbps.setText(str(round(int(self.lineEdit_rate_limit.text()) * 8 / 1000 / 1000, 2)) + " Mbit/s")
+        self.lineEdit_rate_limit.textChanged.connect(self.set_rate_limit)        
+
+        # buttons
+        self.pushButton_discart.hide()
+        # TODO: how to discart unsaved changes and refresh the widgets or close window?
+        # self.pushButton_discart.clicked.connect(self.discart_changes)
+        self.pushButton_save.clicked.connect(self.save_profile_settings)
+
+    def add_skip_dir(self):
+        self.add_item_to_qlist(self.lineEdit_skip_dir, self.listWidget_skip_dir, self.skip_dirs)
+        self.temp_profile_config['onedrive']['skip_dir'] = '"' + '|'.join(self.skip_dirs) + '"'
+
+    def remove_skip_dir(self):
+        self.remove_item_from_qlist(self.listWidget_skip_dir, self.skip_dirs)
+        self.temp_profile_config['onedrive']['skip_dir'] = '"' + '|'.join(self.skip_dirs) + '"'
+
 
     def set_rate_limit(self):
-        self.temp_profile_config['onedrive']['rate_limit'] = f'"{self.lineEdit_10.text()}"'
-        self.label_12.setText(str(round(int(self.lineEdit_10.text()) * 8 / 1000 / 1000, 2)) + " Mbit/s")
+        self.temp_profile_config['onedrive']['rate_limit'] = f'"{self.lineEdit_rate_limit.text()}"'
+        self.label_rate_limit_mbps.setText(str(round(int(self.lineEdit_rate_limit.text()) * 8 / 1000 / 1000, 2)) + " Mbit/s")
 
     def set_sync_dir(self):
-        self.temp_profile_config['onedrive']['sync_dir'] = f'"{self.lineEdit_6.text()}"'
+        self.temp_profile_config['onedrive']['sync_dir'] = f'"{self.lineEdit_sync_dir.text()}"'
 
+    def add_item_to_qlist(self, source_widget, destination_widget, list):
+        if source_widget.text() == "":
+            print("Inoring empty value.")
+        elif source_widget.text() in list:
+            print("Item already in exemption list.")
+        else:
+            list.append(source_widget.text())
+            destination_widget.addItem(source_widget.text())
+
+    def remove_item_from_qlist(self, qlistwidget_name, list):
+        for item in qlistwidget_name.selectedItems():
+            print("Removing: " + item.text())
+            # items.remove(item.text())
+            qlistwidget_name.takeItem(qlistwidget_name.row(item))
+            print(list)
+            list.remove(item.text())
 
     def save_profile_settings(self):
         global_config[self.profile].update(self.temp_profile_config)
