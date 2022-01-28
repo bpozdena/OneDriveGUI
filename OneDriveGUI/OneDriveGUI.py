@@ -95,6 +95,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.temp_profile_config = temp_global_config[self.profile]['onedrive']
 
         self.label_profile_name.setText(self.profile)
+        self.tabWidget.setCurrentIndex(0)
 
         #
         # Monitored files tab
@@ -102,8 +103,8 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.lineEdit_sync_dir.setText(self.temp_profile_config['sync_dir'].strip('"'))
         self.lineEdit_sync_dir.textChanged.connect(self.set_sync_dir)
 
-        self.checkBox_sync_root_files.setChecked(self.get_toggle_state('sync_root_files'))   
-        self.checkBox_sync_root_files.stateChanged.connect(self.set_check_state)    
+        self.checkBox_sync_root_files.setChecked(self.get_check_box_state('sync_root_files'))   
+        self.checkBox_sync_root_files.stateChanged.connect(self.set_check_box_state)    
 
 
 
@@ -132,82 +133,135 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.pushButton_add_skip_dir.clicked.connect(self.lineEdit_skip_dir.clear)
         self.pushButton_rm_skip_dir.clicked.connect(self.remove_skip_dir)
 
-        self.checkBox_skip_dir_strict_match.setChecked(self.get_toggle_state('skip_dir_strict_match'))       
-        self.checkBox_skip_dir_strict_match.stateChanged.connect(self.set_check_state)    
+        self.checkBox_skip_dir_strict_match.setChecked(self.get_check_box_state('skip_dir_strict_match'))       
+        self.checkBox_skip_dir_strict_match.stateChanged.connect(self.set_check_box_state)    
 
-        self.checkBox_check_nosync.setChecked(self.get_toggle_state('check_nosync'))        
-        self.checkBox_check_nosync.stateChanged.connect(self.set_check_state)    
+        self.checkBox_check_nosync.setChecked(self.get_check_box_state('check_nosync'))        
+        self.checkBox_check_nosync.stateChanged.connect(self.set_check_box_state)    
 
-        self.checkBox_skip_symlinks.setChecked(self.get_toggle_state('skip_symlinks'))        
-        self.checkBox_skip_symlinks.stateChanged.connect(self.set_check_state)    
+        self.checkBox_skip_symlinks.setChecked(self.get_check_box_state('skip_symlinks'))        
+        self.checkBox_skip_symlinks.stateChanged.connect(self.set_check_box_state)    
 
-        self.checkBox_skip_dotfiles.setChecked(self.get_toggle_state('skip_dotfiles'))        
-        self.checkBox_skip_dotfiles.stateChanged.connect(self.set_check_state)    
+        self.checkBox_skip_dotfiles.setChecked(self.get_check_box_state('skip_dotfiles'))        
+        self.checkBox_skip_dotfiles.stateChanged.connect(self.set_check_box_state)    
 
         #
         # Sync Options tab
         #
-        self.checkBox_download_only.setChecked(self.get_toggle_state('download_only'))        
-        self.checkBox_download_only.stateChanged.connect(self.set_check_state)    
+        self.spinBox_monitor_interval.setValue(int(self.temp_profile_config['monitor_interval'].strip('"')))
+        self.spinBox_monitor_interval.valueChanged.connect(self.set_spin_box_value)   
 
-        self.checkBox_upload_only.setChecked(self.get_toggle_state('upload_only'))        
-        self.checkBox_upload_only.stateChanged.connect(self.set_check_state) 
+        self.spinBox_monitor_fullscan_frequency.setValue(int(self.temp_profile_config['monitor_fullscan_frequency'].strip('"')))
+        self.spinBox_monitor_fullscan_frequency.valueChanged.connect(self.set_spin_box_value)                  
 
-        self.checkBox_force_http_2.setChecked(self.get_toggle_state('force_http_2'))        
-        self.checkBox_force_http_2.stateChanged.connect(self.set_check_state) 
+        self.spinBox_classify_as_big_delete.setValue(int(self.temp_profile_config['classify_as_big_delete'].strip('"')))
+        self.spinBox_classify_as_big_delete.valueChanged.connect(self.set_spin_box_value)          
 
-        self.checkBox_disable_upload_validation.setChecked(self.get_toggle_state('disable_upload_validation'))        
-        self.checkBox_disable_upload_validation.stateChanged.connect(self.set_check_state) 
+        self.spinBox_sync_dir_permissions.setValue(int(self.temp_profile_config['sync_dir_permissions'].strip('"')))
+        self.spinBox_sync_dir_permissions.valueChanged.connect(self.set_spin_box_value)          
 
-        self.checkBox_check_nomount.setChecked(self.get_toggle_state('check_nomount'))        
-        self.checkBox_check_nomount.stateChanged.connect(self.set_check_state) 
+        self.spinBox_sync_file_permissions.setValue(int(self.temp_profile_config['sync_file_permissions'].strip('"')))
+        self.spinBox_sync_file_permissions.valueChanged.connect(self.set_spin_box_value)          
 
-        self.checkBox_local_first.setChecked(self.get_toggle_state('local_first'))        
-        self.checkBox_local_first.stateChanged.connect(self.set_check_state) 
+        self.spinBox_operation_timeout.setValue(int(self.temp_profile_config['operation_timeout'].strip('"')))
+        self.spinBox_operation_timeout.valueChanged.connect(self.set_spin_box_value)              
 
-        self.checkBox_no_remote_delete.setChecked(self.get_toggle_state('no_remote_delete'))        
-        self.checkBox_no_remote_delete.stateChanged.connect(self.set_check_state) 
+ 
+            
 
-        self.checkBox_sync_business_shared_folders.setChecked(self.get_toggle_state('sync_business_shared_folders'))        
-        self.checkBox_sync_business_shared_folders.stateChanged.connect(self.set_check_state) 
+        self.checkBox_download_only.setChecked(self.get_check_box_state('download_only'))        
+        self.checkBox_download_only.stateChanged.connect(self.set_check_box_state)    
 
-        self.checkBox_dry_run.setChecked(self.get_toggle_state('dry_run'))        
-        self.checkBox_dry_run.stateChanged.connect(self.set_check_state) 
+        self.checkBox_upload_only.setChecked(self.get_check_box_state('upload_only'))        
+        self.checkBox_upload_only.stateChanged.connect(self.set_check_box_state) 
 
-        self.checkBox_remove_source_files.setChecked(self.get_toggle_state('remove_source_files'))        
-        self.checkBox_remove_source_files.stateChanged.connect(self.set_check_state) 
+        self.checkBox_force_http_2.setChecked(self.get_check_box_state('force_http_2'))        
+        self.checkBox_force_http_2.stateChanged.connect(self.set_check_box_state) 
+
+        self.checkBox_disable_upload_validation.setChecked(self.get_check_box_state('disable_upload_validation'))        
+        self.checkBox_disable_upload_validation.stateChanged.connect(self.set_check_box_state) 
+
+        self.checkBox_check_nomount.setChecked(self.get_check_box_state('check_nomount'))        
+        self.checkBox_check_nomount.stateChanged.connect(self.set_check_box_state) 
+
+        self.checkBox_local_first.setChecked(self.get_check_box_state('local_first'))        
+        self.checkBox_local_first.stateChanged.connect(self.set_check_box_state) 
+
+        self.checkBox_no_remote_delete.setChecked(self.get_check_box_state('no_remote_delete'))        
+        self.checkBox_no_remote_delete.stateChanged.connect(self.set_check_box_state) 
+
+        self.checkBox_sync_business_shared_folders.setChecked(self.get_check_box_state('sync_business_shared_folders'))        
+        self.checkBox_sync_business_shared_folders.stateChanged.connect(self.set_check_box_state) 
+
+        self.checkBox_dry_run.setChecked(self.get_check_box_state('dry_run'))        
+        self.checkBox_dry_run.stateChanged.connect(self.set_check_box_state) 
+
+        self.checkBox_remove_source_files.setChecked(self.get_check_box_state('remove_source_files'))        
+        self.checkBox_remove_source_files.stateChanged.connect(self.set_check_box_state) 
         
-        self.checkBox_resync.setChecked(self.get_toggle_state('resync'))        
-        self.checkBox_resync.stateChanged.connect(self.set_check_state) 
+        self.checkBox_resync.setChecked(self.get_check_box_state('resync'))        
+        self.checkBox_resync.stateChanged.connect(self.set_check_box_state) 
         
-        self.checkBox_bypass_data_preservation.setChecked(self.get_toggle_state('bypass_data_preservation'))        
-        self.checkBox_bypass_data_preservation.stateChanged.connect(self.set_check_state) 
+        self.checkBox_bypass_data_preservation.setChecked(self.get_check_box_state('bypass_data_preservation'))        
+        self.checkBox_bypass_data_preservation.stateChanged.connect(self.set_check_box_state) 
 
-        self.checkBox_webhook_enabled.setChecked(self.get_toggle_state('webhook_enabled'))        
-        self.checkBox_webhook_enabled.stateChanged.connect(self.set_check_state) 
+
+
+        # Rate limit tab
+        self.spinBox_rate_limit.setValue(int(self.temp_profile_config['rate_limit'].strip('"')))
+        self.horizontalSlider_rate_limit.setValue(int(self.temp_profile_config['rate_limit'].strip('"')))
+        self.label_rate_limit_mbps.setText(str(round(self.spinBox_rate_limit.value() * 8 / 1024 / 1024, 2)) + " Mbit/s")
+        self.spinBox_rate_limit.valueChanged.connect(self.set_spin_box_value)
+        self.spinBox_rate_limit.valueChanged.connect(self.horizontalSlider_rate_limit.setValue)
+        self.spinBox_rate_limit.valueChanged.connect(lambda:self.label_rate_limit_mbps.setText(
+                                            str(round(self.spinBox_rate_limit.value() * 8 / 1024 / 1024, 2)) + " Mbit/s"))           
+        self.horizontalSlider_rate_limit.valueChanged.connect(self.spinBox_rate_limit.setValue)
+
+        #
+        # Webhooks tab
+        #
+        self.checkBox_webhook_enabled.setChecked(self.get_check_box_state('webhook_enabled'))        
+        self.checkBox_webhook_enabled.stateChanged.connect(self.set_check_box_state) 
+
+        self.spinBox_webhook_expiration_interval.setValue(int(self.temp_profile_config['webhook_expiration_interval'].strip('"')))
+        self.spinBox_webhook_expiration_interval.valueChanged.connect(self.set_spin_box_value)          
+
+        self.spinBox_webhook_renewal_interval.setValue(int(self.temp_profile_config['webhook_renewal_interval'].strip('"')))
+        self.spinBox_webhook_renewal_interval.valueChanged.connect(self.set_spin_box_value)      
+
+        self.spinBox_webhook_listening_port.setValue(int(self.temp_profile_config['webhook_listening_port'].strip('"')))
+        self.spinBox_webhook_listening_port.valueChanged.connect(self.set_spin_box_value)             
+
 
         #
         # Logging tab
         #
 
-        self.checkBox_enable_logging.setChecked(self.get_toggle_state('enable_logging'))        
-        self.checkBox_enable_logging.stateChanged.connect(self.set_check_state) 
+        self.checkBox_enable_logging.setChecked(self.get_check_box_state('enable_logging'))        
+        self.checkBox_enable_logging.stateChanged.connect(self.set_check_box_state) 
 
-        self.checkBox_debug_https.setChecked(self.get_toggle_state('debug_https'))        
-        self.checkBox_debug_https.stateChanged.connect(self.set_check_state) 
+        self.checkBox_debug_https.setChecked(self.get_check_box_state('debug_https'))        
+        self.checkBox_debug_https.stateChanged.connect(self.set_check_box_state) 
 
-        self.checkBox_disable_notifications.setChecked(self.get_toggle_state('disable_notifications'))        
-        self.checkBox_disable_notifications.stateChanged.connect(self.set_check_state)                 
+        self.checkBox_disable_notifications.setChecked(self.get_check_box_state('disable_notifications'))        
+        self.checkBox_disable_notifications.stateChanged.connect(self.set_check_box_state)                 
+
+
+        self.spinBox_monitor_log_frequency.setValue(int(self.temp_profile_config['monitor_log_frequency'].strip('"')))
+        self.spinBox_monitor_log_frequency.valueChanged.connect(self.set_spin_box_value)   
+
+        self.spinBox_min_notify_changes.setValue(int(self.temp_profile_config['min_notify_changes'].strip('"')))
+        self.spinBox_min_notify_changes.valueChanged.connect(self.set_spin_box_value)                   
+
+
+
+
+
 
 
         #
-        # Rate limit tab
-        #
-        self.lineEdit_rate_limit.setText(self.temp_profile_config['rate_limit'].strip('"'))
-        self.label_rate_limit_mbps.setText(str(round(int(self.lineEdit_rate_limit.text()) * 8 / 1000 / 1000, 2)) + " Mbit/s")
-        self.lineEdit_rate_limit.textChanged.connect(self.set_rate_limit)        
-
         # Buttons
+        #
         self.pushButton_discart.hide()
         # TODO: How to discart unsaved changes and refresh the widgets or close window?
         # self.pushButton_discart.clicked.connect(self.discart_changes)
@@ -224,21 +278,27 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         # self.checkBox_sync_root_files.stateChanged.connect(lambda: )
 
 
-        # self.checkBox_sync_root_files.toggled.connect(lambda: self.set_check_state(self.checkBox_sync_root_files))
+        # self.checkBox_sync_root_files.toggled.connect(lambda: self.set_check_box_state(self.checkBox_sync_root_files))
 
 
-        # self.checkBox_sync_root_files.setChecked(lambda: self.get_toggle_state())
+        # self.checkBox_sync_root_files.setChecked(lambda: self.get_check_box_state())
 
         # self.checkBox_sync_root_files.setChecked(self.str2bool(self.temp_profile_config['sync_root_files'].strip('"')))   
 
 
-                      
 
 
     def str2bool(self, value):
         return value.lower() in "true"
 
-    def set_check_state(self, state):
+
+    def set_spin_box_value(self, value):
+        _property = self.sender().objectName()
+        property = re.search(r"spinBox_(.+)", _property).group(1)
+        self.temp_profile_config[f'{property}'] = f'"{value}"'
+
+
+    def set_check_box_state(self, state):
         _property = self.sender().objectName()
         property = re.search(r"checkBox_(.+)", _property).group(1)
         print(property)
@@ -249,7 +309,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
             print("is unchecked")
             self.temp_profile_config[f'{property}'] = '"false"'
 
-    def get_toggle_state(self, property):
+    def get_check_box_state(self, property):
         return self.temp_profile_config[f'{property}'].strip('"') in 'true'
 
 
@@ -494,7 +554,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
         # Start OneDrive monitoring
-        self.actionStart_Monitor.triggered.connect(lambda: self.start_onedrive_monitor('boris@pozdena.eu'))
+        self.actionStart_Monitor.triggered.connect(lambda: self.start_onedrive_monitor('bpozdena@my-business'))
 
 
         # Stop OneDrive monitoring
