@@ -20,7 +20,7 @@ from ui.ui_process_status_page import Ui_status_page
 
 from ui.ui_profile_settings_page import Ui_profile_settings
 
-CONFIG_FILE = os.path.expanduser('/home/bob/.config/onedrive/accounts/boris@pozdena.eu/config')
+
 PROFILES_FILE = os.path.expanduser('~/.config/onedrive-gui/profiles')
 
 
@@ -30,6 +30,7 @@ class SettingsWindow(QWidget, Ui_settings_window):
 
         # Set up the user interface from Designer.
         self.setupUi(self)
+        self.setWindowIcon(QIcon("resources/images/icons8-clouds-48.png"))
         
         self.stackedLayout = QStackedLayout()
 
@@ -45,9 +46,6 @@ class SettingsWindow(QWidget, Ui_settings_window):
         
     def switch_account_settings_page(self):
         self.stackedLayout.setCurrentIndex(self.listWidget.currentRow())
-
-
-
 
 
 class ProfileStatusPage(QWidget, Ui_status_page):
@@ -70,16 +68,6 @@ class ProfileStatusPage(QWidget, Ui_status_page):
     def show_settings_window(self):
         self.settings_window = SettingsWindow()
         self.settings_window.show()
-
-
-    # def show_settings_window(self, checked):
-    #     if self.w is None:
-    #         self.w = SettingsWindow()
-    #         self.w.show()
-
-    #     else:
-    #         self.w.close()  # Close window.
-    #         self.w = None  # Discard reference.        
 
 
 class ProfileSettingsPage(QWidget, Ui_profile_settings):
@@ -106,12 +94,6 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_sync_root_files.setChecked(self.get_check_box_state('sync_root_files'))   
         self.checkBox_sync_root_files.stateChanged.connect(self.set_check_box_state)    
 
-
-
-        # self.ui.lineEdit.setText(settings['onedrive']['log_dir'].strip('"'))
-        # self.ui.lineEdit.textChanged.connect(
-        #     lambda: settings.set('onedrive', 'log_dir', f'"{self.ui.lineEdit.text()}"'))
-
         #
         # Excluded files tab
         #
@@ -123,7 +105,6 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.pushButton_add_skip_file.clicked.connect(self.add_skip_file)
         self.pushButton_add_skip_file.clicked.connect(self.lineEdit_skip_file.clear)        
         self.pushButton_rm_skip_file.clicked.connect(self.remove_skip_file)
-
 
         # Skip_dir section
         self.skip_dirs = self.temp_profile_config['skip_dir'].strip('"').split('|')
@@ -167,8 +148,6 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.spinBox_operation_timeout.valueChanged.connect(self.set_spin_box_value)              
 
  
-            
-
         self.checkBox_download_only.setChecked(self.get_check_box_state('download_only'))        
         self.checkBox_download_only.stateChanged.connect(self.set_check_box_state)    
 
@@ -206,7 +185,6 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_bypass_data_preservation.stateChanged.connect(self.set_check_box_state) 
 
 
-
         # Rate limit tab
         self.spinBox_rate_limit.setValue(int(self.temp_profile_config['rate_limit'].strip('"')))
         self.horizontalSlider_rate_limit.setValue(int(self.temp_profile_config['rate_limit'].strip('"')))
@@ -232,10 +210,11 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.spinBox_webhook_listening_port.setValue(int(self.temp_profile_config['webhook_listening_port'].strip('"')))
         self.spinBox_webhook_listening_port.valueChanged.connect(self.set_spin_box_value)             
 
-
         #
         # Logging tab
         #
+        self.lineEdit_log_dir.setText(self.temp_profile_config['log_dir'].strip('"'))
+        self.lineEdit_log_dir.textChanged.connect(self.set_log_dir)
 
         self.checkBox_enable_logging.setChecked(self.get_check_box_state('enable_logging'))        
         self.checkBox_enable_logging.stateChanged.connect(self.set_check_box_state) 
@@ -246,18 +225,11 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_disable_notifications.setChecked(self.get_check_box_state('disable_notifications'))        
         self.checkBox_disable_notifications.stateChanged.connect(self.set_check_box_state)                 
 
-
         self.spinBox_monitor_log_frequency.setValue(int(self.temp_profile_config['monitor_log_frequency'].strip('"')))
         self.spinBox_monitor_log_frequency.valueChanged.connect(self.set_spin_box_value)   
 
         self.spinBox_min_notify_changes.setValue(int(self.temp_profile_config['min_notify_changes'].strip('"')))
         self.spinBox_min_notify_changes.valueChanged.connect(self.set_spin_box_value)                   
-
-
-
-
-
-
 
         #
         # Buttons
@@ -268,35 +240,13 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.pushButton_save.clicked.connect(self.save_profile_settings)
 
 
-        
-
-        # if self.temp_profile_config['sync_root_files'].strip('"') == 'true':
-        #     self.checkBox_sync_root_files.setCheckState(Qt.Checked)
-        # else:
-        #     self.checkBox_sync_root_files.setCheckState(Qt.Unchecked)
-
-        # self.checkBox_sync_root_files.stateChanged.connect(lambda: )
-
-
-        # self.checkBox_sync_root_files.toggled.connect(lambda: self.set_check_box_state(self.checkBox_sync_root_files))
-
-
-        # self.checkBox_sync_root_files.setChecked(lambda: self.get_check_box_state())
-
-        # self.checkBox_sync_root_files.setChecked(self.str2bool(self.temp_profile_config['sync_root_files'].strip('"')))   
-
-
-
-
     def str2bool(self, value):
         return value.lower() in "true"
-
 
     def set_spin_box_value(self, value):
         _property = self.sender().objectName()
         property = re.search(r"spinBox_(.+)", _property).group(1)
         self.temp_profile_config[f'{property}'] = f'"{value}"'
-
 
     def set_check_box_state(self, state):
         _property = self.sender().objectName()
@@ -311,7 +261,6 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
 
     def get_check_box_state(self, property):
         return self.temp_profile_config[f'{property}'].strip('"') in 'true'
-
 
     def add_skip_file(self):
         self.add_item_to_qlist(self.lineEdit_skip_file, self.listWidget_skip_file, self.skip_files)
@@ -329,13 +278,15 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.remove_item_from_qlist(self.listWidget_skip_dir, self.skip_dirs)
         self.temp_profile_config['skip_dir'] = '"' + '|'.join(self.skip_dirs) + '"'
 
-
     def set_rate_limit(self):
         self.temp_profile_config['rate_limit'] = f'"{self.lineEdit_rate_limit.text()}"'
         self.label_rate_limit_mbps.setText(str(round(int(self.lineEdit_rate_limit.text()) * 8 / 1000 / 1000, 2)) + " Mbit/s")
 
     def set_sync_dir(self):
         self.temp_profile_config['sync_dir'] = f'"{self.lineEdit_sync_dir.text()}"'
+
+    def set_log_dir(self):
+        self.temp_profile_config['log_dir'] = f'"{self.lineEdit_log_dir.text()}"'        
 
     def add_item_to_qlist(self, source_widget, destination_widget, list):
         if source_widget.text() == "":
@@ -363,17 +314,12 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.close()
 
 
-
-
-
 class TaskList(QWidget, Ui_list_item_widget):
     def __init__(self):
         super(TaskList, self).__init__()
 
         # Set up the user interface from Designer.
         self.setupUi(self)
-
-
 
     def set_icon (self, file_path):
         self.fileInfo = QFileInfo(file_path)
@@ -534,32 +480,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         super(MainWindow, self).__init__()
         self.setupUi(self)
+        self.setWindowIcon(QIcon("resources/images/icons8-clouds-48.png"))
+
         #
         # Menu
         # 
-
         # Update OneDrive Status
         self.actionRefresh_Service_Status.triggered.connect(lambda: self.onedrive_process_status())
 
         # Start OneDrive service
         self.actionStart_Service.triggered.connect(lambda: os.system('systemctl --user start onedrive'))
 
-
         # Stop OneDrive service
         self.actionStop_Service.triggered.connect(lambda: os.system('systemctl --user stop onedrive'))
-
 
         # Restart OneDrive service
         self.actionRestart_Service.triggered.connect(lambda: os.system('systemctl --user restart onedrive'))
 
-
         # Start OneDrive monitoring
         self.actionStart_Monitor.triggered.connect(lambda: self.start_onedrive_monitor('bpozdena@my-business'))
 
-
         # Stop OneDrive monitoring
         self.actionStop_Monitor.triggered.connect(lambda: os.system('pkill onedrive'))
-
 
         # Refresh Sync Status
         self.actionObtain_Sync_Status.triggered.connect(lambda: self.label_4.setText("Retreiving status..."))
@@ -579,17 +521,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.stackedLayout.addWidget(self.profile_status_pages[profile])
         
         self.verticalLayout_2.addLayout(self.stackedLayout)
-
-
-
-        # self.label_5.hide()
-        # self.progressBar.hide()
-        # self.progressBar.setValue(0)
-
-        # self.refresh_process_status = QTimer()
-        # self.refresh_process_status.setSingleShot(False)
-        # self.refresh_process_status.timeout.connect(lambda: self.onedrive_process_status())
-        # self.refresh_process_status.start(1000)
 
 
         # System Tray
@@ -643,10 +574,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return False
 
 
-
     def start_onedrive_monitor(self, profile_name):
-
-
         # for profile in global_config:
         self.workers[profile_name] = WorkerThread(profile_name)
         self.workers[profile_name].start()
@@ -773,7 +701,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.profile_status_pages[profile].listWidget.insertItem(0, myQListWidgetItem)
             self.profile_status_pages[profile].listWidget.setItemWidget(myQListWidgetItem, myQCustomQWidget)
 
-
         else:
             self.profile_status_pages[profile].listWidget.takeItem(0)
 
@@ -794,11 +721,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.profile_status_pages[profile].listWidget.setItemWidget(myQListWidgetItem, myQCustomQWidget)
 
 
-
-
     def show_login(self):
         # Show login window
         self.window1 = QWidget()
+        self.window1.setWindowIcon(QIcon("resources/images/icons8-clouds-48.png"))
         self.lw = Ui_LoginWindow()
         self.lw.setupUi(self.window1)
         self.window1.show()
@@ -821,7 +747,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.window1.hide()
         else:
             pass
-
 
 
 def read_config(config_file):
@@ -885,11 +810,6 @@ def save_global_config():
         print(global_config[profile])
         print(global_config[profile]['onedrive'])
 
-        # test2 = {}
-        # test = global_config[profile]['onedrive']
-        # test2 = test2['onedrive'].update(test)
-        # print(test2)
-
         _od_config = {}
         _od_config['onedrive'] = global_config[profile]['onedrive']     
 
@@ -912,29 +832,6 @@ def save_global_config():
         print(f"{profile} config saved")
 
     print("All configs saved")
-    # config = ConfigParser()
-    # config.read(new_settings)   
-
-
-
-# def save_config(new_settings):
-#     # Save OneDrive config after configuration change.
-#     # new_settings.write
-#     print(new_settings)
-#     print(new_settings['onedrive']['sync_dir'])
-#     print('saved')
-
-#     with open(CONFIG_FILE, 'w') as configfile:
-#         new_settings.write(configfile)
-
-#     # remove first line (section) from config file
-#     with open(CONFIG_FILE, 'r') as fin:
-#         data = fin.read().splitlines(True)
-#     with open(CONFIG_FILE, 'w') as fout:
-#         fout.writelines(data[1:])
-
-#     config = ConfigParser()
-#     config.read(new_settings)
 
 
 def humanize_file_size(num, suffix="B"):
@@ -946,7 +843,6 @@ def humanize_file_size(num, suffix="B"):
 
 
 if __name__ == "__main__":
-    # settings = read_config(CONFIG_FILE)
     global_config = create_global_config()
 
     app = QApplication(sys.argv)
