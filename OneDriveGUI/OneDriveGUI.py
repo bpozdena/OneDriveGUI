@@ -5,7 +5,7 @@ import subprocess
 import sys
 from configparser import ConfigParser
 
-from PySide6.QtCore import QThread, QTimer, QUrl, Signal, QFileInfo
+from PySide6.QtCore import QThread, QTimer, QUrl, Signal, QFileInfo, Qt 
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import ( QWidget, QApplication, QMainWindow, QMenu, QSystemTrayIcon, 
                                 QListWidget, QListWidgetItem, QFileIconProvider, QStackedLayout, 
@@ -92,18 +92,31 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.setupUi(self)
 
         temp_global_config = global_config
-        self.temp_profile_config = temp_global_config[self.profile]
+        self.temp_profile_config = temp_global_config[self.profile]['onedrive']
 
+        self.label_profile_name.setText(self.profile)
 
-        self.lineEdit_sync_dir.setText(self.temp_profile_config['onedrive']['sync_dir'].strip('"'))
+        #
+        # Monitored files tab
+        #
+        self.lineEdit_sync_dir.setText(self.temp_profile_config['sync_dir'].strip('"'))
         self.lineEdit_sync_dir.textChanged.connect(self.set_sync_dir)
+
+        self.checkBox_sync_root_files.setChecked(self.get_toggle_state('sync_root_files'))   
+        self.checkBox_sync_root_files.stateChanged.connect(self.set_check_state)    
+
+
 
         # self.ui.lineEdit.setText(settings['onedrive']['log_dir'].strip('"'))
         # self.ui.lineEdit.textChanged.connect(
         #     lambda: settings.set('onedrive', 'log_dir', f'"{self.ui.lineEdit.text()}"'))
 
+        #
+        # Excluded files tab
+        #
+
         # Skip_file section
-        self.skip_files = self.temp_profile_config['onedrive']['skip_file'].strip('"').split('|')
+        self.skip_files = self.temp_profile_config['skip_file'].strip('"').split('|')
         self.listWidget_skip_file.addItems(self.skip_files)
         self.listWidget_skip_file.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.pushButton_add_skip_file.clicked.connect(self.add_skip_file)
@@ -112,48 +125,157 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
 
 
         # Skip_dir section
-        self.skip_dirs = self.temp_profile_config['onedrive']['skip_dir'].strip('"').split('|')
+        self.skip_dirs = self.temp_profile_config['skip_dir'].strip('"').split('|')
         self.listWidget_skip_dir.addItems(self.skip_dirs)
         self.listWidget_skip_dir.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.pushButton_add_skip_dir.clicked.connect(self.add_skip_dir)
         self.pushButton_add_skip_dir.clicked.connect(self.lineEdit_skip_dir.clear)
         self.pushButton_rm_skip_dir.clicked.connect(self.remove_skip_dir)
 
+        self.checkBox_skip_dir_strict_match.setChecked(self.get_toggle_state('skip_dir_strict_match'))       
+        self.checkBox_skip_dir_strict_match.stateChanged.connect(self.set_check_state)    
 
-        # Rate limit
-        self.lineEdit_rate_limit.setText(self.temp_profile_config['onedrive']['rate_limit'].strip('"'))
+        self.checkBox_check_nosync.setChecked(self.get_toggle_state('check_nosync'))        
+        self.checkBox_check_nosync.stateChanged.connect(self.set_check_state)    
+
+        self.checkBox_skip_symlinks.setChecked(self.get_toggle_state('skip_symlinks'))        
+        self.checkBox_skip_symlinks.stateChanged.connect(self.set_check_state)    
+
+        self.checkBox_skip_dotfiles.setChecked(self.get_toggle_state('skip_dotfiles'))        
+        self.checkBox_skip_dotfiles.stateChanged.connect(self.set_check_state)    
+
+        #
+        # Sync Options tab
+        #
+        self.checkBox_download_only.setChecked(self.get_toggle_state('download_only'))        
+        self.checkBox_download_only.stateChanged.connect(self.set_check_state)    
+
+        self.checkBox_upload_only.setChecked(self.get_toggle_state('upload_only'))        
+        self.checkBox_upload_only.stateChanged.connect(self.set_check_state) 
+
+        self.checkBox_force_http_2.setChecked(self.get_toggle_state('force_http_2'))        
+        self.checkBox_force_http_2.stateChanged.connect(self.set_check_state) 
+
+        self.checkBox_disable_upload_validation.setChecked(self.get_toggle_state('disable_upload_validation'))        
+        self.checkBox_disable_upload_validation.stateChanged.connect(self.set_check_state) 
+
+        self.checkBox_check_nomount.setChecked(self.get_toggle_state('check_nomount'))        
+        self.checkBox_check_nomount.stateChanged.connect(self.set_check_state) 
+
+        self.checkBox_local_first.setChecked(self.get_toggle_state('local_first'))        
+        self.checkBox_local_first.stateChanged.connect(self.set_check_state) 
+
+        self.checkBox_no_remote_delete.setChecked(self.get_toggle_state('no_remote_delete'))        
+        self.checkBox_no_remote_delete.stateChanged.connect(self.set_check_state) 
+
+        self.checkBox_sync_business_shared_folders.setChecked(self.get_toggle_state('sync_business_shared_folders'))        
+        self.checkBox_sync_business_shared_folders.stateChanged.connect(self.set_check_state) 
+
+        self.checkBox_dry_run.setChecked(self.get_toggle_state('dry_run'))        
+        self.checkBox_dry_run.stateChanged.connect(self.set_check_state) 
+
+        self.checkBox_remove_source_files.setChecked(self.get_toggle_state('remove_source_files'))        
+        self.checkBox_remove_source_files.stateChanged.connect(self.set_check_state) 
+        
+        self.checkBox_resync.setChecked(self.get_toggle_state('resync'))        
+        self.checkBox_resync.stateChanged.connect(self.set_check_state) 
+        
+        self.checkBox_bypass_data_preservation.setChecked(self.get_toggle_state('bypass_data_preservation'))        
+        self.checkBox_bypass_data_preservation.stateChanged.connect(self.set_check_state) 
+
+        self.checkBox_webhook_enabled.setChecked(self.get_toggle_state('webhook_enabled'))        
+        self.checkBox_webhook_enabled.stateChanged.connect(self.set_check_state) 
+
+        #
+        # Logging tab
+        #
+
+        self.checkBox_enable_logging.setChecked(self.get_toggle_state('enable_logging'))        
+        self.checkBox_enable_logging.stateChanged.connect(self.set_check_state) 
+
+        self.checkBox_debug_https.setChecked(self.get_toggle_state('debug_https'))        
+        self.checkBox_debug_https.stateChanged.connect(self.set_check_state) 
+
+        self.checkBox_disable_notifications.setChecked(self.get_toggle_state('disable_notifications'))        
+        self.checkBox_disable_notifications.stateChanged.connect(self.set_check_state)                 
+
+
+        #
+        # Rate limit tab
+        #
+        self.lineEdit_rate_limit.setText(self.temp_profile_config['rate_limit'].strip('"'))
         self.label_rate_limit_mbps.setText(str(round(int(self.lineEdit_rate_limit.text()) * 8 / 1000 / 1000, 2)) + " Mbit/s")
         self.lineEdit_rate_limit.textChanged.connect(self.set_rate_limit)        
 
-        # buttons
+        # Buttons
         self.pushButton_discart.hide()
-        # TODO: how to discart unsaved changes and refresh the widgets or close window?
+        # TODO: How to discart unsaved changes and refresh the widgets or close window?
         # self.pushButton_discart.clicked.connect(self.discart_changes)
         self.pushButton_save.clicked.connect(self.save_profile_settings)
 
+
+        
+
+        # if self.temp_profile_config['sync_root_files'].strip('"') == 'true':
+        #     self.checkBox_sync_root_files.setCheckState(Qt.Checked)
+        # else:
+        #     self.checkBox_sync_root_files.setCheckState(Qt.Unchecked)
+
+        # self.checkBox_sync_root_files.stateChanged.connect(lambda: )
+
+
+        # self.checkBox_sync_root_files.toggled.connect(lambda: self.set_check_state(self.checkBox_sync_root_files))
+
+
+        # self.checkBox_sync_root_files.setChecked(lambda: self.get_toggle_state())
+
+        # self.checkBox_sync_root_files.setChecked(self.str2bool(self.temp_profile_config['sync_root_files'].strip('"')))   
+
+
+                      
+
+
+    def str2bool(self, value):
+        return value.lower() in "true"
+
+    def set_check_state(self, state):
+        _property = self.sender().objectName()
+        property = re.search(r"checkBox_(.+)", _property).group(1)
+        print(property)
+        if state == Qt.Checked:
+            print("is checked")
+            self.temp_profile_config[f'{property}'] = '"true"'
+        else:
+            print("is unchecked")
+            self.temp_profile_config[f'{property}'] = '"false"'
+
+    def get_toggle_state(self, property):
+        return self.temp_profile_config[f'{property}'].strip('"') in 'true'
+
+
     def add_skip_file(self):
         self.add_item_to_qlist(self.lineEdit_skip_file, self.listWidget_skip_file, self.skip_files)
-        self.temp_profile_config['onedrive']['skip_file'] = '"' + '|'.join(self.skip_files) + '"'
+        self.temp_profile_config['skip_file'] = '"' + '|'.join(self.skip_files) + '"'
 
     def remove_skip_file(self):
         self.remove_item_from_qlist(self.listWidget_skip_file, self.skip_files)
-        self.temp_profile_config['onedrive']['skip_file'] = '"' + '|'.join(self.skip_files) + '"'
+        self.temp_profile_config['skip_file'] = '"' + '|'.join(self.skip_files) + '"'
 
     def add_skip_dir(self):
         self.add_item_to_qlist(self.lineEdit_skip_dir, self.listWidget_skip_dir, self.skip_dirs)
-        self.temp_profile_config['onedrive']['skip_dir'] = '"' + '|'.join(self.skip_dirs) + '"'
+        self.temp_profile_config['skip_dir'] = '"' + '|'.join(self.skip_dirs) + '"'
 
     def remove_skip_dir(self):
         self.remove_item_from_qlist(self.listWidget_skip_dir, self.skip_dirs)
-        self.temp_profile_config['onedrive']['skip_dir'] = '"' + '|'.join(self.skip_dirs) + '"'
+        self.temp_profile_config['skip_dir'] = '"' + '|'.join(self.skip_dirs) + '"'
 
 
     def set_rate_limit(self):
-        self.temp_profile_config['onedrive']['rate_limit'] = f'"{self.lineEdit_rate_limit.text()}"'
+        self.temp_profile_config['rate_limit'] = f'"{self.lineEdit_rate_limit.text()}"'
         self.label_rate_limit_mbps.setText(str(round(int(self.lineEdit_rate_limit.text()) * 8 / 1000 / 1000, 2)) + " Mbit/s")
 
     def set_sync_dir(self):
-        self.temp_profile_config['onedrive']['sync_dir'] = f'"{self.lineEdit_sync_dir.text()}"'
+        self.temp_profile_config['sync_dir'] = f'"{self.lineEdit_sync_dir.text()}"'
 
     def add_item_to_qlist(self, source_widget, destination_widget, list):
         if source_widget.text() == "":

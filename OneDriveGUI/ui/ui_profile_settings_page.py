@@ -25,7 +25,7 @@ class Ui_profile_settings(object):
     def setupUi(self, profile_settings):
         if not profile_settings.objectName():
             profile_settings.setObjectName(u"profile_settings")
-        profile_settings.resize(614, 785)
+        profile_settings.resize(751, 718)
         self.verticalLayout_2 = QVBoxLayout(profile_settings)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.label_profile_name = QLabel(profile_settings)
@@ -47,34 +47,34 @@ class Ui_profile_settings(object):
         self.exemptions_tab_2.setObjectName(u"exemptions_tab_2")
         self.verticalLayout_5 = QVBoxLayout(self.exemptions_tab_2)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.groupBox_8 = QGroupBox(self.exemptions_tab_2)
+        self.groupBox_8.setObjectName(u"groupBox_8")
+        self.gridLayout_9 = QGridLayout(self.groupBox_8)
+        self.gridLayout_9.setObjectName(u"gridLayout_9")
         self.gridLayout_5 = QGridLayout()
         self.gridLayout_5.setObjectName(u"gridLayout_5")
-        self.pushButton_3 = QPushButton(self.exemptions_tab_2)
+        self.pushButton_3 = QPushButton(self.groupBox_8)
         self.pushButton_3.setObjectName(u"pushButton_3")
 
         self.gridLayout_5.addWidget(self.pushButton_3, 0, 2, 1, 1)
 
-        self.label_sync_dir = QLabel(self.exemptions_tab_2)
+        self.label_sync_dir = QLabel(self.groupBox_8)
         self.label_sync_dir.setObjectName(u"label_sync_dir")
 
         self.gridLayout_5.addWidget(self.label_sync_dir, 0, 0, 1, 1)
 
-        self.lineEdit_sync_dir = QLineEdit(self.exemptions_tab_2)
+        self.lineEdit_sync_dir = QLineEdit(self.groupBox_8)
         self.lineEdit_sync_dir.setObjectName(u"lineEdit_sync_dir")
 
         self.gridLayout_5.addWidget(self.lineEdit_sync_dir, 0, 1, 1, 1)
 
 
-        self.verticalLayout_5.addLayout(self.gridLayout_5)
+        self.gridLayout_9.addLayout(self.gridLayout_5, 1, 0, 1, 1)
 
-        self.groupBox_8 = QGroupBox(self.exemptions_tab_2)
-        self.groupBox_8.setObjectName(u"groupBox_8")
-        self.gridLayout_9 = QGridLayout(self.groupBox_8)
-        self.gridLayout_9.setObjectName(u"gridLayout_9")
         self.checkBox_sync_root_files = QCheckBox(self.groupBox_8)
         self.checkBox_sync_root_files.setObjectName(u"checkBox_sync_root_files")
 
-        self.gridLayout_9.addWidget(self.checkBox_sync_root_files, 0, 0, 1, 1)
+        self.gridLayout_9.addWidget(self.checkBox_sync_root_files, 2, 0, 1, 1)
 
 
         self.verticalLayout_5.addWidget(self.groupBox_8)
@@ -294,10 +294,10 @@ class Ui_profile_settings(object):
 
         self.gridLayout_4.addWidget(self.checkBox_force_http_2, 2, 1, 1, 1)
 
-        self.checkBox_no_mount = QCheckBox(self.groupBox_5)
-        self.checkBox_no_mount.setObjectName(u"checkBox_no_mount")
+        self.checkBox_check_nomount = QCheckBox(self.groupBox_5)
+        self.checkBox_check_nomount.setObjectName(u"checkBox_check_nomount")
 
-        self.gridLayout_4.addWidget(self.checkBox_no_mount, 4, 1, 1, 1)
+        self.gridLayout_4.addWidget(self.checkBox_check_nomount, 4, 1, 1, 1)
 
         self.checkBox_resync = QCheckBox(self.groupBox_5)
         self.checkBox_resync.setObjectName(u"checkBox_resync")
@@ -549,18 +549,18 @@ class Ui_profile_settings(object):
 
         self.horizontalLayout.addWidget(self.tabWidget)
 
-        self.pushButton_discart = QPushButton(profile_settings)
-        self.pushButton_discart.setObjectName(u"pushButton_discart")
 
-        self.horizontalLayout.addWidget(self.pushButton_discart)
+        self.verticalLayout_2.addLayout(self.horizontalLayout)
 
         self.pushButton_save = QPushButton(profile_settings)
         self.pushButton_save.setObjectName(u"pushButton_save")
 
-        self.horizontalLayout.addWidget(self.pushButton_save)
+        self.verticalLayout_2.addWidget(self.pushButton_save)
 
+        self.pushButton_discart = QPushButton(profile_settings)
+        self.pushButton_discart.setObjectName(u"pushButton_discart")
 
-        self.verticalLayout_2.addLayout(self.horizontalLayout)
+        self.verticalLayout_2.addWidget(self.pushButton_discart)
 
 
         self.retranslateUi(profile_settings)
@@ -574,9 +574,9 @@ class Ui_profile_settings(object):
     def retranslateUi(self, profile_settings):
         profile_settings.setWindowTitle(QCoreApplication.translate("profile_settings", u"Form", None))
         self.label_profile_name.setText(QCoreApplication.translate("profile_settings", u"Profile name", None))
+        self.groupBox_8.setTitle(QCoreApplication.translate("profile_settings", u"Monitored directory", None))
         self.pushButton_3.setText(QCoreApplication.translate("profile_settings", u"Browse", None))
         self.label_sync_dir.setText(QCoreApplication.translate("profile_settings", u"Sync Folder:", None))
-        self.groupBox_8.setTitle(QCoreApplication.translate("profile_settings", u"Options", None))
         self.checkBox_sync_root_files.setText(QCoreApplication.translate("profile_settings", u"Sync root files", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.exemptions_tab_2), QCoreApplication.translate("profile_settings", u"Monitored Files", None))
         self.groupBox.setTitle(QCoreApplication.translate("profile_settings", u"Excluded files", None))
@@ -601,7 +601,7 @@ class Ui_profile_settings(object):
         self.label_sync_file_permissions.setText(QCoreApplication.translate("profile_settings", u"Sync file permissions", None))
         self.groupBox_5.setTitle(QCoreApplication.translate("profile_settings", u"Advanced options", None))
         self.checkBox_force_http_2.setText(QCoreApplication.translate("profile_settings", u"Force HTTP2", None))
-        self.checkBox_no_mount.setText(QCoreApplication.translate("profile_settings", u"Check for .nomount", None))
+        self.checkBox_check_nomount.setText(QCoreApplication.translate("profile_settings", u"Check for .nomount", None))
         self.checkBox_resync.setText(QCoreApplication.translate("profile_settings", u"Full re-sync", None))
         self.checkBox_download_only.setText(QCoreApplication.translate("profile_settings", u"Download only", None))
         self.checkBox_local_first.setText(QCoreApplication.translate("profile_settings", u"Local first", None))
@@ -620,7 +620,7 @@ class Ui_profile_settings(object):
         self.label_webhook_listening_host.setText(QCoreApplication.translate("profile_settings", u"Listening host", None))
         self.label_webhook_renewal_interval.setText(QCoreApplication.translate("profile_settings", u"Renewal interval", None))
         self.label_operation_timeout.setText(QCoreApplication.translate("profile_settings", u"Operation timeout", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("profile_settings", u"Sync options", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("profile_settings", u"Sync Options", None))
         self.groupBox_7.setTitle(QCoreApplication.translate("profile_settings", u"Logging", None))
         self.checkBox_enable_logging.setText(QCoreApplication.translate("profile_settings", u"Enable Logging", None))
         self.pushButton_log_dir.setText(QCoreApplication.translate("profile_settings", u"Browse", None))
@@ -635,8 +635,8 @@ class Ui_profile_settings(object):
         self.label_rate_limit.setText(QCoreApplication.translate("profile_settings", u"Rate Limit [B/s]", None))
         self.label_rate_limit_mbps.setText(QCoreApplication.translate("profile_settings", u"(Mbit/s)", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), QCoreApplication.translate("profile_settings", u"Rate Limit", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), QCoreApplication.translate("profile_settings", u"Page", None))
-        self.pushButton_discart.setText(QCoreApplication.translate("profile_settings", u"Discard changes", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), QCoreApplication.translate("profile_settings", u"GUI Behaviour", None))
         self.pushButton_save.setText(QCoreApplication.translate("profile_settings", u"Save", None))
+        self.pushButton_discart.setText(QCoreApplication.translate("profile_settings", u"Discard changes", None))
     # retranslateUi
 
