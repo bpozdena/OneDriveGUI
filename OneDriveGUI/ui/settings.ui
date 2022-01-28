@@ -19,7 +19,14 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QListWidget" name="listWidget">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Profiles:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="listWidget_profiles">
          <property name="minimumSize">
           <size>
            <width>200</width>
@@ -35,21 +42,21 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_3">
+        <widget class="QPushButton" name="pushButton_remove">
          <property name="text">
           <string>Remove profile</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="pushButton_open_create">
          <property name="text">
           <string>Create new profile</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="pushButton_open_import">
          <property name="text">
           <string>Import existing profile</string>
          </property>
