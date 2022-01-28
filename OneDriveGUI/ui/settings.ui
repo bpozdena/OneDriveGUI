@@ -19,6 +19,13 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Profiles:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QListWidget" name="listWidget">
          <property name="minimumSize">
           <size>
