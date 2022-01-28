@@ -18,8 +18,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QCheckBox, QFormLayout, QGridLayout,
     QGroupBox, QHBoxLayout, QLabel, QLineEdit,
     QListWidget, QListWidgetItem, QPushButton, QSizePolicy,
-    QSpacerItem, QSpinBox, QTabWidget, QVBoxLayout,
-    QWidget)
+    QSlider, QSpacerItem, QSpinBox, QTabWidget,
+    QVBoxLayout, QWidget)
 
 class Ui_profile_settings(object):
     def setupUi(self, profile_settings):
@@ -222,65 +222,87 @@ class Ui_profile_settings(object):
         self.label_classify_as_big_delete = QLabel(self.groupBox_4)
         self.label_classify_as_big_delete.setObjectName(u"label_classify_as_big_delete")
 
-        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.label_classify_as_big_delete)
+        self.formLayout.setWidget(2, QFormLayout.LabelRole, self.label_classify_as_big_delete)
 
         self.spinBox_classify_as_big_delete = QSpinBox(self.groupBox_4)
         self.spinBox_classify_as_big_delete.setObjectName(u"spinBox_classify_as_big_delete")
         self.spinBox_classify_as_big_delete.setMaximum(1000000)
 
-        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.spinBox_classify_as_big_delete)
+        self.formLayout.setWidget(2, QFormLayout.FieldRole, self.spinBox_classify_as_big_delete)
 
         self.label_user_agent = QLabel(self.groupBox_4)
         self.label_user_agent.setObjectName(u"label_user_agent")
 
-        self.formLayout.setWidget(2, QFormLayout.LabelRole, self.label_user_agent)
+        self.formLayout.setWidget(3, QFormLayout.LabelRole, self.label_user_agent)
 
         self.lineEdit_user_agent = QLineEdit(self.groupBox_4)
         self.lineEdit_user_agent.setObjectName(u"lineEdit_user_agent")
 
-        self.formLayout.setWidget(2, QFormLayout.FieldRole, self.lineEdit_user_agent)
+        self.formLayout.setWidget(3, QFormLayout.FieldRole, self.lineEdit_user_agent)
 
         self.label_azure_ad_endpoint = QLabel(self.groupBox_4)
         self.label_azure_ad_endpoint.setObjectName(u"label_azure_ad_endpoint")
 
-        self.formLayout.setWidget(3, QFormLayout.LabelRole, self.label_azure_ad_endpoint)
+        self.formLayout.setWidget(4, QFormLayout.LabelRole, self.label_azure_ad_endpoint)
 
         self.lineEdit_azure_ad_endpoint = QLineEdit(self.groupBox_4)
         self.lineEdit_azure_ad_endpoint.setObjectName(u"lineEdit_azure_ad_endpoint")
 
-        self.formLayout.setWidget(3, QFormLayout.FieldRole, self.lineEdit_azure_ad_endpoint)
+        self.formLayout.setWidget(4, QFormLayout.FieldRole, self.lineEdit_azure_ad_endpoint)
 
         self.label_azure_tenant_id = QLabel(self.groupBox_4)
         self.label_azure_tenant_id.setObjectName(u"label_azure_tenant_id")
 
-        self.formLayout.setWidget(4, QFormLayout.LabelRole, self.label_azure_tenant_id)
+        self.formLayout.setWidget(5, QFormLayout.LabelRole, self.label_azure_tenant_id)
 
         self.lineEdit_azure_tenant_id = QLineEdit(self.groupBox_4)
         self.lineEdit_azure_tenant_id.setObjectName(u"lineEdit_azure_tenant_id")
 
-        self.formLayout.setWidget(4, QFormLayout.FieldRole, self.lineEdit_azure_tenant_id)
+        self.formLayout.setWidget(5, QFormLayout.FieldRole, self.lineEdit_azure_tenant_id)
 
         self.label_sync_dir_permissions = QLabel(self.groupBox_4)
         self.label_sync_dir_permissions.setObjectName(u"label_sync_dir_permissions")
 
-        self.formLayout.setWidget(5, QFormLayout.LabelRole, self.label_sync_dir_permissions)
+        self.formLayout.setWidget(6, QFormLayout.LabelRole, self.label_sync_dir_permissions)
 
         self.label_sync_file_permissions = QLabel(self.groupBox_4)
         self.label_sync_file_permissions.setObjectName(u"label_sync_file_permissions")
 
-        self.formLayout.setWidget(6, QFormLayout.LabelRole, self.label_sync_file_permissions)
+        self.formLayout.setWidget(7, QFormLayout.LabelRole, self.label_sync_file_permissions)
 
         self.spinBox_sync_dir_permissions = QSpinBox(self.groupBox_4)
         self.spinBox_sync_dir_permissions.setObjectName(u"spinBox_sync_dir_permissions")
         self.spinBox_sync_dir_permissions.setMaximum(777)
 
-        self.formLayout.setWidget(5, QFormLayout.FieldRole, self.spinBox_sync_dir_permissions)
+        self.formLayout.setWidget(6, QFormLayout.FieldRole, self.spinBox_sync_dir_permissions)
 
         self.spinBox_sync_file_permissions = QSpinBox(self.groupBox_4)
         self.spinBox_sync_file_permissions.setObjectName(u"spinBox_sync_file_permissions")
         self.spinBox_sync_file_permissions.setMaximum(777)
 
-        self.formLayout.setWidget(6, QFormLayout.FieldRole, self.spinBox_sync_file_permissions)
+        self.formLayout.setWidget(7, QFormLayout.FieldRole, self.spinBox_sync_file_permissions)
+
+        self.label_operation_timeout = QLabel(self.groupBox_4)
+        self.label_operation_timeout.setObjectName(u"label_operation_timeout")
+
+        self.formLayout.setWidget(8, QFormLayout.LabelRole, self.label_operation_timeout)
+
+        self.spinBox_operation_timeout = QSpinBox(self.groupBox_4)
+        self.spinBox_operation_timeout.setObjectName(u"spinBox_operation_timeout")
+        self.spinBox_operation_timeout.setMaximum(1000000)
+
+        self.formLayout.setWidget(8, QFormLayout.FieldRole, self.spinBox_operation_timeout)
+
+        self.label_monitor_fullscan_frequency = QLabel(self.groupBox_4)
+        self.label_monitor_fullscan_frequency.setObjectName(u"label_monitor_fullscan_frequency")
+
+        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.label_monitor_fullscan_frequency)
+
+        self.spinBox_monitor_fullscan_frequency = QSpinBox(self.groupBox_4)
+        self.spinBox_monitor_fullscan_frequency.setObjectName(u"spinBox_monitor_fullscan_frequency")
+        self.spinBox_monitor_fullscan_frequency.setMaximum(1000000)
+
+        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.spinBox_monitor_fullscan_frequency)
 
 
         self.verticalLayout_8.addWidget(self.groupBox_4)
@@ -415,17 +437,6 @@ class Ui_profile_settings(object):
 
         self.gridLayout_10.addWidget(self.spinBox_webhook_renewal_interval, 2, 3, 1, 1)
 
-        self.label_operation_timeout = QLabel(self.groupBox_9)
-        self.label_operation_timeout.setObjectName(u"label_operation_timeout")
-
-        self.gridLayout_10.addWidget(self.label_operation_timeout, 3, 2, 1, 1)
-
-        self.spinBox_operation_timeout = QSpinBox(self.groupBox_9)
-        self.spinBox_operation_timeout.setObjectName(u"spinBox_operation_timeout")
-        self.spinBox_operation_timeout.setMaximum(1000000)
-
-        self.gridLayout_10.addWidget(self.spinBox_operation_timeout, 3, 3, 1, 1)
-
 
         self.verticalLayout_8.addWidget(self.groupBox_9)
 
@@ -448,12 +459,12 @@ class Ui_profile_settings(object):
         self.pushButton_log_dir = QPushButton(self.groupBox_7)
         self.pushButton_log_dir.setObjectName(u"pushButton_log_dir")
 
-        self.gridLayout_8.addWidget(self.pushButton_log_dir, 4, 2, 1, 1)
+        self.gridLayout_8.addWidget(self.pushButton_log_dir, 3, 2, 1, 1)
 
         self.label_log_dir = QLabel(self.groupBox_7)
         self.label_log_dir.setObjectName(u"label_log_dir")
 
-        self.gridLayout_8.addWidget(self.label_log_dir, 4, 0, 1, 1)
+        self.gridLayout_8.addWidget(self.label_log_dir, 3, 0, 1, 1)
 
         self.checkBox_debug_https = QCheckBox(self.groupBox_7)
         self.checkBox_debug_https.setObjectName(u"checkBox_debug_https")
@@ -468,22 +479,12 @@ class Ui_profile_settings(object):
         self.lineEdit_log_dir = QLineEdit(self.groupBox_7)
         self.lineEdit_log_dir.setObjectName(u"lineEdit_log_dir")
 
-        self.gridLayout_8.addWidget(self.lineEdit_log_dir, 4, 1, 1, 1)
+        self.gridLayout_8.addWidget(self.lineEdit_log_dir, 3, 1, 1, 1)
 
         self.label_monitor_log_frequency = QLabel(self.groupBox_7)
         self.label_monitor_log_frequency.setObjectName(u"label_monitor_log_frequency")
 
         self.gridLayout_8.addWidget(self.label_monitor_log_frequency, 2, 0, 1, 1)
-
-        self.label_monitor_fullscan_frequency = QLabel(self.groupBox_7)
-        self.label_monitor_fullscan_frequency.setObjectName(u"label_monitor_fullscan_frequency")
-
-        self.gridLayout_8.addWidget(self.label_monitor_fullscan_frequency, 3, 0, 1, 1)
-
-        self.spinBox_monitor_fullscan_frequency = QSpinBox(self.groupBox_7)
-        self.spinBox_monitor_fullscan_frequency.setObjectName(u"spinBox_monitor_fullscan_frequency")
-
-        self.gridLayout_8.addWidget(self.spinBox_monitor_fullscan_frequency, 3, 1, 1, 1)
 
 
         self.verticalLayout_9.addLayout(self.gridLayout_8)
@@ -522,25 +523,48 @@ class Ui_profile_settings(object):
         self.tab_5.setObjectName(u"tab_5")
         self.gridLayout = QGridLayout(self.tab_5)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.label_rate_limit = QLabel(self.tab_5)
-        self.label_rate_limit.setObjectName(u"label_rate_limit")
-
-        self.gridLayout.addWidget(self.label_rate_limit, 0, 0, 1, 1)
-
-        self.lineEdit_rate_limit = QLineEdit(self.tab_5)
-        self.lineEdit_rate_limit.setObjectName(u"lineEdit_rate_limit")
-        self.lineEdit_rate_limit.setInputMethodHints(Qt.ImhDigitsOnly)
-
-        self.gridLayout.addWidget(self.lineEdit_rate_limit, 0, 1, 1, 1)
-
         self.label_rate_limit_mbps = QLabel(self.tab_5)
         self.label_rate_limit_mbps.setObjectName(u"label_rate_limit_mbps")
 
-        self.gridLayout.addWidget(self.label_rate_limit_mbps, 0, 2, 1, 1)
+        self.gridLayout.addWidget(self.label_rate_limit_mbps, 1, 1, 1, 1)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.gridLayout.addItem(self.verticalSpacer, 1, 1, 1, 1)
+        self.gridLayout.addItem(self.verticalSpacer, 2, 1, 1, 1)
+
+        self.groupBox_10 = QGroupBox(self.tab_5)
+        self.groupBox_10.setObjectName(u"groupBox_10")
+        self.gridLayout_11 = QGridLayout(self.groupBox_10)
+        self.gridLayout_11.setObjectName(u"gridLayout_11")
+        self.spinBox_rate_limit = QSpinBox(self.groupBox_10)
+        self.spinBox_rate_limit.setObjectName(u"spinBox_rate_limit")
+        self.spinBox_rate_limit.setMinimum(131072)
+        self.spinBox_rate_limit.setMaximum(134217728)
+        self.spinBox_rate_limit.setSingleStep(32768)
+
+        self.gridLayout_11.addWidget(self.spinBox_rate_limit, 0, 1, 1, 1)
+
+        self.label_rate_limit = QLabel(self.groupBox_10)
+        self.label_rate_limit.setObjectName(u"label_rate_limit")
+
+        self.gridLayout_11.addWidget(self.label_rate_limit, 0, 0, 1, 1)
+
+        self.horizontalSlider_rate_limit = QSlider(self.groupBox_10)
+        self.horizontalSlider_rate_limit.setObjectName(u"horizontalSlider_rate_limit")
+        self.horizontalSlider_rate_limit.setMinimum(131072)
+        self.horizontalSlider_rate_limit.setMaximum(134217728)
+        self.horizontalSlider_rate_limit.setSingleStep(32768)
+        self.horizontalSlider_rate_limit.setPageStep(32768)
+        self.horizontalSlider_rate_limit.setOrientation(Qt.Horizontal)
+
+        self.gridLayout_11.addWidget(self.horizontalSlider_rate_limit, 1, 0, 1, 3)
+
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.gridLayout_11.addItem(self.horizontalSpacer, 0, 2, 1, 1)
+
+
+        self.gridLayout.addWidget(self.groupBox_10, 0, 0, 1, 2)
 
         self.tabWidget.addTab(self.tab_5, "")
         self.tab_6 = QWidget()
@@ -565,7 +589,7 @@ class Ui_profile_settings(object):
 
         self.retranslateUi(profile_settings)
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(4)
 
 
         QMetaObject.connectSlotsByName(profile_settings)
@@ -599,6 +623,8 @@ class Ui_profile_settings(object):
         self.label_azure_tenant_id.setText(QCoreApplication.translate("profile_settings", u"Azure tenant ID", None))
         self.label_sync_dir_permissions.setText(QCoreApplication.translate("profile_settings", u"Sync dir permissions", None))
         self.label_sync_file_permissions.setText(QCoreApplication.translate("profile_settings", u"Sync file permissions", None))
+        self.label_operation_timeout.setText(QCoreApplication.translate("profile_settings", u"Operation timeout", None))
+        self.label_monitor_fullscan_frequency.setText(QCoreApplication.translate("profile_settings", u"Monitor full-scan frequency", None))
         self.groupBox_5.setTitle(QCoreApplication.translate("profile_settings", u"Advanced options", None))
         self.checkBox_force_http_2.setText(QCoreApplication.translate("profile_settings", u"Force HTTP2", None))
         self.checkBox_check_nomount.setText(QCoreApplication.translate("profile_settings", u"Check for .nomount", None))
@@ -619,7 +645,6 @@ class Ui_profile_settings(object):
         self.label_webhook_expiration_interval.setText(QCoreApplication.translate("profile_settings", u"Expiration interval", None))
         self.label_webhook_listening_host.setText(QCoreApplication.translate("profile_settings", u"Listening host", None))
         self.label_webhook_renewal_interval.setText(QCoreApplication.translate("profile_settings", u"Renewal interval", None))
-        self.label_operation_timeout.setText(QCoreApplication.translate("profile_settings", u"Operation timeout", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("profile_settings", u"Sync Options", None))
         self.groupBox_7.setTitle(QCoreApplication.translate("profile_settings", u"Logging", None))
         self.checkBox_enable_logging.setText(QCoreApplication.translate("profile_settings", u"Enable Logging", None))
@@ -627,13 +652,13 @@ class Ui_profile_settings(object):
         self.label_log_dir.setText(QCoreApplication.translate("profile_settings", u"Log location:", None))
         self.checkBox_debug_https.setText(QCoreApplication.translate("profile_settings", u"Debug HTTPS", None))
         self.label_monitor_log_frequency.setText(QCoreApplication.translate("profile_settings", u"Monitor log frequency", None))
-        self.label_monitor_fullscan_frequency.setText(QCoreApplication.translate("profile_settings", u"Monitor full-scan frequency", None))
         self.groupBox_6.setTitle(QCoreApplication.translate("profile_settings", u"Notifications", None))
         self.label_min_notify_changes.setText(QCoreApplication.translate("profile_settings", u"Minimum notify changes", None))
         self.checkBox_disable_notifications.setText(QCoreApplication.translate("profile_settings", u"Disable notifications", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_logging), QCoreApplication.translate("profile_settings", u"Logging", None))
-        self.label_rate_limit.setText(QCoreApplication.translate("profile_settings", u"Rate Limit [B/s]", None))
         self.label_rate_limit_mbps.setText(QCoreApplication.translate("profile_settings", u"(Mbit/s)", None))
+        self.groupBox_10.setTitle(QCoreApplication.translate("profile_settings", u"Rate limit", None))
+        self.label_rate_limit.setText(QCoreApplication.translate("profile_settings", u"Rate Limit [B/s]", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), QCoreApplication.translate("profile_settings", u"Rate Limit", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), QCoreApplication.translate("profile_settings", u"GUI Behaviour", None))
         self.pushButton_save.setText(QCoreApplication.translate("profile_settings", u"Save", None))
