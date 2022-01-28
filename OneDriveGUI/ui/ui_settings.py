@@ -35,27 +35,27 @@ class Ui_settings_window(object):
 
         self.verticalLayout.addWidget(self.label)
 
-        self.listWidget = QListWidget(settings_window)
-        self.listWidget.setObjectName(u"listWidget")
-        self.listWidget.setMinimumSize(QSize(200, 0))
-        self.listWidget.setMaximumSize(QSize(250, 16777215))
+        self.listWidget_profiles = QListWidget(settings_window)
+        self.listWidget_profiles.setObjectName(u"listWidget_profiles")
+        self.listWidget_profiles.setMinimumSize(QSize(200, 0))
+        self.listWidget_profiles.setMaximumSize(QSize(250, 16777215))
 
-        self.verticalLayout.addWidget(self.listWidget)
+        self.verticalLayout.addWidget(self.listWidget_profiles)
 
-        self.pushButton_3 = QPushButton(settings_window)
-        self.pushButton_3.setObjectName(u"pushButton_3")
+        self.pushButton_remove = QPushButton(settings_window)
+        self.pushButton_remove.setObjectName(u"pushButton_remove")
 
-        self.verticalLayout.addWidget(self.pushButton_3)
+        self.verticalLayout.addWidget(self.pushButton_remove)
 
-        self.pushButton_2 = QPushButton(settings_window)
-        self.pushButton_2.setObjectName(u"pushButton_2")
+        self.pushButton_open_create = QPushButton(settings_window)
+        self.pushButton_open_create.setObjectName(u"pushButton_open_create")
 
-        self.verticalLayout.addWidget(self.pushButton_2)
+        self.verticalLayout.addWidget(self.pushButton_open_create)
 
-        self.pushButton = QPushButton(settings_window)
-        self.pushButton.setObjectName(u"pushButton")
+        self.pushButton_open_import = QPushButton(settings_window)
+        self.pushButton_open_import.setObjectName(u"pushButton_open_import")
 
-        self.verticalLayout.addWidget(self.pushButton)
+        self.verticalLayout.addWidget(self.pushButton_open_import)
 
 
         self.horizontalLayout.addLayout(self.verticalLayout)
@@ -72,8 +72,8 @@ class Ui_settings_window(object):
     def retranslateUi(self, settings_window):
         settings_window.setWindowTitle(QCoreApplication.translate("settings_window", u"Form", None))
         self.label.setText(QCoreApplication.translate("settings_window", u"Profiles:", None))
-        self.pushButton_3.setText(QCoreApplication.translate("settings_window", u"Remove profile", None))
-        self.pushButton_2.setText(QCoreApplication.translate("settings_window", u"Create new profile", None))
-        self.pushButton.setText(QCoreApplication.translate("settings_window", u"Import existing profile", None))
+        self.pushButton_remove.setText(QCoreApplication.translate("settings_window", u"Remove profile", None))
+        self.pushButton_open_create.setText(QCoreApplication.translate("settings_window", u"Create new profile", None))
+        self.pushButton_open_import.setText(QCoreApplication.translate("settings_window", u"Import existing profile", None))
     # retranslateUi
 

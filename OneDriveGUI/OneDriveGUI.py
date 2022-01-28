@@ -11,14 +11,22 @@ from PySide6.QtWidgets import ( QWidget, QApplication, QMainWindow, QMenu, QSyst
                                 QListWidget, QListWidgetItem, QFileIconProvider, QStackedLayout, 
                                 QVBoxLayout, QLabel, QAbstractItemView)
 
-from ui.ui_login import Ui_LoginWindow
-from ui.ui_settings import Ui_settings_window
-from ui.ui_list_item_widget import Ui_list_item_widget
+# TODO: Split into multiple files once all main features are implemented. 
 
+# Import for login window.
+from ui.ui_login import Ui_LoginWindow
+
+# Imports for main window.
 from ui.ui_mainwindow import Ui_MainWindow
+from ui.ui_list_item_widget import Ui_list_item_widget
 from ui.ui_process_status_page import Ui_status_page
 
+
+# Imports for Setting windows.
+from ui.ui_settings import Ui_settings_window
 from ui.ui_profile_settings_page import Ui_profile_settings
+from ui.ui_import_existing_profile import Ui_import_profile
+from ui.ui_create_new_profile import Ui_create_new_profile
 
 
 PROFILES_FILE = os.path.expanduser('~/.config/onedrive-gui/profiles')
@@ -34,18 +42,154 @@ class SettingsWindow(QWidget, Ui_settings_window):
         
         self.stackedLayout = QStackedLayout()
 
-        for account in global_config:
-            print(account)
-            self.listWidget.addItem(account)
-            self.page = ProfileSettingsPage(account)
+        for profile in global_config:
+            print(profile)
+            self.listWidget_profiles.addItem(profile)
+            self.page = ProfileSettingsPage(profile)
             self.stackedLayout.addWidget(self.page)
 
         self.horizontalLayout.addLayout(self.stackedLayout)
-        self.listWidget.itemSelectionChanged.connect(self.switch_account_settings_page)
+        self.listWidget_profiles.itemSelectionChanged.connect(self.switch_account_settings_page)
+        self.pushButton_open_create.clicked.connect(self.create_new_profile_window)
+        self.pushButton_open_import.clicked.connect(self.import_profile_window)
         self.show()
         
     def switch_account_settings_page(self):
-        self.stackedLayout.setCurrentIndex(self.listWidget.currentRow())
+        self.stackedLayout.setCurrentIndex(self.listWidget_profiles.currentRow())
+
+    def create_new_profile_window(self):
+        # Show profile creation window
+        self.create_window = QWidget()
+        self.create_window.setWindowIcon(QIcon("resources/images/icons8-clouds-48.png"))
+        self.create_ui = Ui_create_new_profile()
+        self.create_ui.setupUi(self.create_window)
+        self.create_window.show()
+
+        self.create_ui.pushButton_create.clicked.connect(self.create_profile)
+
+        # Hide window once account is created.  
+        self.create_ui.pushButton_create.clicked.connect(self.create_window.hide)
+
+
+    def import_profile_window(self):
+        # Show profile import window
+        self.import_window = QWidget()
+        self.import_window.setWindowIcon(QIcon("resources/images/icons8-clouds-48.png"))
+        self.import_ui = Ui_import_profile()
+        self.import_ui.setupUi(self.import_window)
+        self.import_window.show()
+
+        self.import_ui.pushButton_import.clicked.connect(self.import_profile)   
+
+        # Hide window once account is created
+        self.import_ui.pushButton_import.clicked.connect(self.import_window.hide)  
+
+
+    def create_profile(self):
+        """
+        Creates new profile and loads default settings.
+        TODO: Consolidate with import_profile()
+        """
+        profile_name = self.create_ui.lineEdit_new_profile_name.text()
+        sync_dir = self.create_ui.lineEdit_sync_dir.text()
+        config_path = os.path.expanduser(f"~/.config/onedrive/accounts/{profile_name}/config")
+
+        # Load all default values.
+        _default_od_config = read_config("resources/default_config")
+        default_od_config = _default_od_config._sections
+
+        # Construct dict with user profile settings.
+        new_profile = {
+                            profile_name: {
+                                "config_file": config_path,
+                                "enable_debug": False,
+                                "mode": "monitor"
+                            }
+                        }        
+
+        # Load existing user profiles and add the new profile.
+        _profiles = ConfigParser()
+        _profiles.read(PROFILES_FILE)
+        _profiles[profile_name] = new_profile[profile_name]
+
+        with open(PROFILES_FILE, 'w') as configfile:
+            _profiles.write(configfile)        
+
+
+        # Append default OD config
+        new_profile[profile_name].update(default_od_config)
+
+        # Configure sync directory
+        new_profile[profile_name]['onedrive']['sync_dir'] = sync_dir
+
+        # Append new profile into running global profile
+        global_config.update(new_profile)
+
+        # Add Setting page widget for new profile
+        self.listWidget_profiles.addItem(profile_name)
+        self.page = ProfileSettingsPage(profile_name)
+        self.stackedLayout.addWidget(self.page)
+
+        # Add status page widget for new profile
+        main_window.comboBox.addItem(profile_name)
+        main_window.profile_status_pages[profile_name] = ProfileStatusPage(profile_name)
+        main_window.stackedLayout.addWidget(main_window.profile_status_pages[profile_name])        
+
+       
+
+
+    def import_profile(self):
+        """ 
+        Imports pre-existing OneDrive profile. 
+        Loads default values firt, then overwrite them with user settings. 
+        This is to handle cases where imported config contains only some properties.
+        """
+
+        profile_name = self.import_ui.lineEdit_profile_name.text()
+        config_path = os.path.expanduser(self.import_ui.lineEdit_config_path.text())
+
+        # Load all default values.
+        _default_od_config = read_config("resources/default_config")
+        default_od_config = _default_od_config._sections
+
+        # Load user's settings.
+        _new_od_config = read_config(config_path)
+        new_od_config = _new_od_config._sections        
+
+        # Construct dict with user profile settings.
+        new_profile = {
+                            profile_name: {
+                                "config_file": config_path,
+                                "enable_debug": False,
+                                "mode": "monitor"
+                            }
+                        }
+
+
+        # Load existing user profiles and add the new profile.
+        _profiles = ConfigParser()
+        _profiles.read(PROFILES_FILE)
+        _profiles[profile_name] = new_profile[profile_name]
+
+        with open(PROFILES_FILE, 'w') as configfile:
+            _profiles.write(configfile)
+
+
+        # Append OD config
+        new_profile[profile_name].update(default_od_config)
+        new_profile[profile_name].update(new_od_config)
+
+        # Append new profile into running global profile
+        global_config.update(new_profile)
+        # print(new_profile)      
+        # print(global_config)
+
+
+        self.listWidget_profiles.addItem(profile_name)
+        self.page = ProfileSettingsPage(profile_name)
+        self.stackedLayout.addWidget(self.page)
+
+       
 
 
 class ProfileStatusPage(QWidget, Ui_status_page):
@@ -184,15 +328,24 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_bypass_data_preservation.setChecked(self.get_check_box_state('bypass_data_preservation'))        
         self.checkBox_bypass_data_preservation.stateChanged.connect(self.set_check_box_state) 
 
+        self.lineEdit_user_agent.setText(self.temp_profile_config['user_agent'].strip('"'))
+        self.lineEdit_user_agent.textChanged.connect(self.set_line_edit_value)
+
+        self.lineEdit_azure_ad_endpoint.setText(self.temp_profile_config['azure_ad_endpoint'].strip('"'))
+        self.lineEdit_azure_ad_endpoint.textChanged.connect(self.set_line_edit_value)
+
+        self.lineEdit_azure_tenant_id.setText(self.temp_profile_config['azure_tenant_id'].strip('"'))
+        self.lineEdit_azure_tenant_id.textChanged.connect(self.set_line_edit_value)
+
 
         # Rate limit tab
         self.spinBox_rate_limit.setValue(int(self.temp_profile_config['rate_limit'].strip('"')))
         self.horizontalSlider_rate_limit.setValue(int(self.temp_profile_config['rate_limit'].strip('"')))
-        self.label_rate_limit_mbps.setText(str(round(self.spinBox_rate_limit.value() * 8 / 1024 / 1024, 2)) + " Mbit/s")
+        self.label_rate_limit_mbps.setText(str(round(self.spinBox_rate_limit.value() * 8 / 1000 / 1000, 2)) + " Mbit/s")
         self.spinBox_rate_limit.valueChanged.connect(self.set_spin_box_value)
         self.spinBox_rate_limit.valueChanged.connect(self.horizontalSlider_rate_limit.setValue)
         self.spinBox_rate_limit.valueChanged.connect(lambda:self.label_rate_limit_mbps.setText(
-                                            str(round(self.spinBox_rate_limit.value() * 8 / 1024 / 1024, 2)) + " Mbit/s"))           
+                                            str(round(self.spinBox_rate_limit.value() * 8 / 1000 / 1000, 2)) + " Mbit/s"))           
         self.horizontalSlider_rate_limit.valueChanged.connect(self.spinBox_rate_limit.setValue)
 
         #
@@ -208,7 +361,13 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.spinBox_webhook_renewal_interval.valueChanged.connect(self.set_spin_box_value)      
 
         self.spinBox_webhook_listening_port.setValue(int(self.temp_profile_config['webhook_listening_port'].strip('"')))
-        self.spinBox_webhook_listening_port.valueChanged.connect(self.set_spin_box_value)             
+        self.spinBox_webhook_listening_port.valueChanged.connect(self.set_spin_box_value)            
+
+        self.lineEdit_webhook_public_url.setText(self.temp_profile_config['webhook_public_url'].strip('"'))
+        self.lineEdit_webhook_public_url.textChanged.connect(self.set_line_edit_value)
+
+        self.lineEdit_webhook_listening_host.setText(self.temp_profile_config['webhook_listening_host'].strip('"'))
+        self.lineEdit_webhook_listening_host.textChanged.connect(self.set_line_edit_value)                
 
         #
         # Logging tab
@@ -242,6 +401,11 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
 
     def str2bool(self, value):
         return value.lower() in "true"
+
+    def set_line_edit_value(self, value):
+        _property = self.sender().objectName()
+        property = re.search(r"lineEdit_(.+)", _property).group(1)
+        self.temp_profile_config[f'{property}'] = f'"{value}"'
 
     def set_spin_box_value(self, value):
         _property = self.sender().objectName()
@@ -365,12 +529,13 @@ class WorkerThread(QThread):
     def __init__(self, profile):
         super(WorkerThread, self).__init__()
         print(f"starting worker for profile {profile}")
-        print(global_config[profile])
+        # print(global_config)
+        # print(global_config[profile])
         self.config_file = global_config[profile]['config_file']
         self.config_folder = re.search(r"(.+)/.+$", self.config_file)
-        print(self.config_file)
+        # print(self.config_file)
         self._command = f"onedrive --confdir='{self.config_folder.group(1)}' --monitor -v"
-        print(f"command is: {self._command}")
+        # print(f"command is: {self._command}")
         self._profile_name = profile
 
     def run(self, resync=False):
@@ -498,7 +663,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionRestart_Service.triggered.connect(lambda: os.system('systemctl --user restart onedrive'))
 
         # Start OneDrive monitoring
-        self.actionStart_Monitor.triggered.connect(lambda: self.start_onedrive_monitor('bpozdena@my-business'))
+        self.actionStart_Monitor.triggered.connect(lambda: self.start_onedrive_monitor('boris@pozdena.eu'))
 
         # Stop OneDrive monitoring
         self.actionStop_Monitor.triggered.connect(lambda: os.system('pkill onedrive'))
@@ -508,7 +673,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionObtain_Sync_Status.triggered.connect(lambda: self.onedrive_sync_status())
 
         # Start second account
-        self.actionstart.triggered.connect(lambda: self.start_onedrive_monitor('bpozdena@gmail.com'))
+        self.actionstart.triggered.connect(lambda: self.start_onedrive_monitor('pozdenab'))
 
 
         self.comboBox.activated.connect(self.switch_account_status_page)
@@ -752,6 +917,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 def read_config(config_file):
     with open(config_file, 'r') as f:
         config_string = '[onedrive]\n' + f.read()
+ 
 
     config = ConfigParser()
     config.read_string(config_string)
@@ -761,7 +927,7 @@ def read_config(config_file):
 
 def create_global_config():
     """
-    Creates dict which is used as global config. 
+    Creates dict which is used as running global config. 
     EXAMPLE:
 
     {
@@ -784,6 +950,11 @@ def create_global_config():
             "monitor_interval": '"15"', ...}       
     """
 
+    # Load all default values. Needed for cases wher customer's config does not contain all properties. 
+    _default_od_config = read_config("resources/default_config")
+    default_od_config = _default_od_config._sections   
+
+    # Load existing user profiles.
     _profiles = ConfigParser()
     _profiles.read(PROFILES_FILE)
     profiles = _profiles._sections 
@@ -793,9 +964,10 @@ def create_global_config():
         _od_config = read_config(profile_config_file)
         od_config = _od_config._sections
 
+        profiles[profile].update(default_od_config)
         profiles[profile].update(od_config)
 
-    print(profiles)
+    # print(profiles)
     return profiles
 
 
@@ -805,10 +977,10 @@ def save_global_config():
         
         profile_config_file = os.path.expanduser(global_config[profile]['config_file'].strip('"'))
 
-        print(profile_config_file)
-        print(global_config)
-        print(global_config[profile])
-        print(global_config[profile]['onedrive'])
+        # print(profile_config_file)
+        # print(global_config)
+        # print(global_config[profile])
+        # print(global_config[profile]['onedrive'])
 
         _od_config = {}
         _od_config['onedrive'] = global_config[profile]['onedrive']     
@@ -820,6 +992,10 @@ def save_global_config():
         os.system(f'cp {profile_config_file} {profile_config_file}_backup')
 
         # Save OD config changes.
+        directory = re.search(r"(.+)/.+$", profile_config_file).group(1)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
         with open(profile_config_file, 'w') as f:
             od_config.write(f)
 
@@ -846,7 +1022,7 @@ if __name__ == "__main__":
     global_config = create_global_config()
 
     app = QApplication(sys.argv)
-    window = MainWindow()
+    main_window = MainWindow()
 
-    window.show()
+    main_window.show()
     app.exec()

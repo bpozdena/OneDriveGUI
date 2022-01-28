@@ -250,13 +250,13 @@
             <item row="0" column="1">
              <widget class="QSpinBox" name="spinBox_rate_limit">
               <property name="minimum">
-               <number>131072</number>
+               <number>125000</number>
               </property>
               <property name="maximum">
-               <number>134217728</number>
+               <number>125000000</number>
               </property>
               <property name="singleStep">
-               <number>32768</number>
+               <number>12500</number>
               </property>
              </widget>
             </item>
@@ -270,16 +270,16 @@
             <item row="1" column="0" colspan="4">
              <widget class="QSlider" name="horizontalSlider_rate_limit">
               <property name="minimum">
-               <number>131072</number>
+               <number>125000</number>
               </property>
               <property name="maximum">
-               <number>134217728</number>
+               <number>125000000</number>
               </property>
               <property name="singleStep">
-               <number>32768</number>
+               <number>12500</number>
               </property>
               <property name="pageStep">
-               <number>32768</number>
+               <number>12500</number>
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -302,7 +302,7 @@
             <item row="0" column="2">
              <widget class="QLabel" name="label_rate_limit_mbps">
               <property name="text">
-               <string>(Mbit/s)</string>
+               <string>(Mibit/s)</string>
               </property>
              </widget>
             </item>
@@ -628,23 +628,23 @@
            <property name="title">
             <string>Notifications</string>
            </property>
-           <layout class="QGridLayout" name="gridLayout_3">
-            <item row="0" column="0">
+           <layout class="QFormLayout" name="formLayout_3">
+            <item row="1" column="0">
              <widget class="QLabel" name="label_min_notify_changes">
               <property name="text">
                <string>Minimum notify changes</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
+            <item row="1" column="1">
+             <widget class="QSpinBox" name="spinBox_min_notify_changes"/>
+            </item>
+            <item row="0" column="0">
              <widget class="QCheckBox" name="checkBox_disable_notifications">
               <property name="text">
                <string>Disable notifications</string>
               </property>
              </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QSpinBox" name="spinBox_min_notify_changes"/>
             </item>
            </layout>
           </widget>

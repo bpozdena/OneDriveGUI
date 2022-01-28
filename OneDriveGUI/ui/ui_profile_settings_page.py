@@ -210,9 +210,9 @@ class Ui_profile_settings(object):
         self.gridLayout_11.setObjectName(u"gridLayout_11")
         self.spinBox_rate_limit = QSpinBox(self.groupBox_10)
         self.spinBox_rate_limit.setObjectName(u"spinBox_rate_limit")
-        self.spinBox_rate_limit.setMinimum(131072)
-        self.spinBox_rate_limit.setMaximum(134217728)
-        self.spinBox_rate_limit.setSingleStep(32768)
+        self.spinBox_rate_limit.setMinimum(125000)
+        self.spinBox_rate_limit.setMaximum(125000000)
+        self.spinBox_rate_limit.setSingleStep(12500)
 
         self.gridLayout_11.addWidget(self.spinBox_rate_limit, 0, 1, 1, 1)
 
@@ -223,10 +223,10 @@ class Ui_profile_settings(object):
 
         self.horizontalSlider_rate_limit = QSlider(self.groupBox_10)
         self.horizontalSlider_rate_limit.setObjectName(u"horizontalSlider_rate_limit")
-        self.horizontalSlider_rate_limit.setMinimum(131072)
-        self.horizontalSlider_rate_limit.setMaximum(134217728)
-        self.horizontalSlider_rate_limit.setSingleStep(32768)
-        self.horizontalSlider_rate_limit.setPageStep(32768)
+        self.horizontalSlider_rate_limit.setMinimum(125000)
+        self.horizontalSlider_rate_limit.setMaximum(125000000)
+        self.horizontalSlider_rate_limit.setSingleStep(12500)
+        self.horizontalSlider_rate_limit.setPageStep(12500)
         self.horizontalSlider_rate_limit.setOrientation(Qt.Horizontal)
 
         self.gridLayout_11.addWidget(self.horizontalSlider_rate_limit, 1, 0, 1, 4)
@@ -475,22 +475,22 @@ class Ui_profile_settings(object):
 
         self.groupBox_6 = QGroupBox(self.tab_logging)
         self.groupBox_6.setObjectName(u"groupBox_6")
-        self.gridLayout_3 = QGridLayout(self.groupBox_6)
-        self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.formLayout_3 = QFormLayout(self.groupBox_6)
+        self.formLayout_3.setObjectName(u"formLayout_3")
         self.label_min_notify_changes = QLabel(self.groupBox_6)
         self.label_min_notify_changes.setObjectName(u"label_min_notify_changes")
 
-        self.gridLayout_3.addWidget(self.label_min_notify_changes, 0, 0, 1, 1)
-
-        self.checkBox_disable_notifications = QCheckBox(self.groupBox_6)
-        self.checkBox_disable_notifications.setObjectName(u"checkBox_disable_notifications")
-
-        self.gridLayout_3.addWidget(self.checkBox_disable_notifications, 1, 0, 1, 1)
+        self.formLayout_3.setWidget(1, QFormLayout.LabelRole, self.label_min_notify_changes)
 
         self.spinBox_min_notify_changes = QSpinBox(self.groupBox_6)
         self.spinBox_min_notify_changes.setObjectName(u"spinBox_min_notify_changes")
 
-        self.gridLayout_3.addWidget(self.spinBox_min_notify_changes, 0, 1, 1, 1)
+        self.formLayout_3.setWidget(1, QFormLayout.FieldRole, self.spinBox_min_notify_changes)
+
+        self.checkBox_disable_notifications = QCheckBox(self.groupBox_6)
+        self.checkBox_disable_notifications.setObjectName(u"checkBox_disable_notifications")
+
+        self.formLayout_3.setWidget(0, QFormLayout.LabelRole, self.checkBox_disable_notifications)
 
 
         self.verticalLayout_6.addWidget(self.groupBox_6)
@@ -625,7 +625,7 @@ class Ui_profile_settings(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("profile_settings", u"Excluded files", None))
         self.groupBox_10.setTitle(QCoreApplication.translate("profile_settings", u"Account Rate Limit", None))
         self.label_rate_limit.setText(QCoreApplication.translate("profile_settings", u"Rate Limit [B/s]", None))
-        self.label_rate_limit_mbps.setText(QCoreApplication.translate("profile_settings", u"(Mbit/s)", None))
+        self.label_rate_limit_mbps.setText(QCoreApplication.translate("profile_settings", u"(Mibit/s)", None))
         self.groupBox_4.setTitle(QCoreApplication.translate("profile_settings", u"Advanced Properties", None))
         self.label_monitor_interval.setText(QCoreApplication.translate("profile_settings", u"Monitor interval", None))
         self.label_monitor_fullscan_frequency.setText(QCoreApplication.translate("profile_settings", u"Monitor full-scan frequency", None))
