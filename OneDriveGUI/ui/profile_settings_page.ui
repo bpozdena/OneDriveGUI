@@ -6,14 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>614</width>
+    <width>664</width>
     <height>723</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>OneDriveGUI - Profile Settings</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QLabel" name="label_profile_name">
      <property name="font">
@@ -37,7 +43,7 @@
       <widget class="QTabWidget" name="tabWidget">
        <property name="minimumSize">
         <size>
-         <width>600</width>
+         <width>650</width>
          <height>600</height>
         </size>
        </property>
@@ -767,7 +773,7 @@
        </widget>
        <widget class="QWidget" name="tab_6">
         <attribute name="title">
-         <string>GUI Behaviour</string>
+         <string>Account</string>
         </attribute>
        </widget>
       </widget>
