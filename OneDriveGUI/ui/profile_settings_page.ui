@@ -48,7 +48,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>5</number>
        </property>
        <widget class="QWidget" name="exemptions_tab_2">
         <attribute name="title">
@@ -583,14 +583,31 @@
            <layout class="QVBoxLayout" name="verticalLayout_9">
             <item>
              <layout class="QGridLayout" name="gridLayout_8">
-              <item row="0" column="0" colspan="2">
+              <item row="0" column="0">
                <widget class="QCheckBox" name="checkBox_enable_logging">
                 <property name="text">
                  <string>Enable Logging</string>
                 </property>
                </widget>
               </item>
-              <item row="3" column="2">
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_log_dir">
+                <property name="text">
+                 <string>Log location:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QCheckBox" name="checkBox_debug_https">
+                <property name="text">
+                 <string>Debug HTTPS</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="lineEdit_log_dir"/>
+              </item>
+              <item row="1" column="2">
                <widget class="QPushButton" name="pushButton_log_dir">
                 <property name="text">
                  <string>Browse</string>
@@ -598,31 +615,14 @@
                </widget>
               </item>
               <item row="3" column="0">
-               <widget class="QLabel" name="label_log_dir">
-                <property name="text">
-                 <string>Log location:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QCheckBox" name="checkBox_debug_https">
-                <property name="text">
-                 <string>Debug HTTPS</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QSpinBox" name="spinBox_monitor_log_frequency"/>
-              </item>
-              <item row="3" column="1">
-               <widget class="QLineEdit" name="lineEdit_log_dir"/>
-              </item>
-              <item row="2" column="0">
                <widget class="QLabel" name="label_monitor_log_frequency">
                 <property name="text">
                  <string>Monitor log frequency</string>
                 </property>
                </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QSpinBox" name="spinBox_monitor_log_frequency"/>
               </item>
              </layout>
             </item>
@@ -775,6 +775,22 @@
         <attribute name="title">
          <string>Account</string>
         </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QPushButton" name="pushButton_login">
+           <property name="text">
+            <string>Login</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_logout">
+           <property name="text">
+            <string>Logout</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
      </item>
