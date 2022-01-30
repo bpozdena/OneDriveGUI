@@ -5,6 +5,7 @@ import psutil
 import re
 import subprocess
 import sys
+import time
 from configparser import ConfigParser
 
 from PySide6.QtCore import QThread, QTimer, QUrl, Signal, QFileInfo, Qt 
@@ -54,6 +55,7 @@ class SettingsWindow(QWidget, Ui_settings_window):
         self.listWidget_profiles.itemSelectionChanged.connect(self.switch_account_settings_page)
         self.pushButton_open_create.clicked.connect(self.create_new_profile_window)
         self.pushButton_open_import.clicked.connect(self.import_profile_window)
+        self.pushButton_remove.clicked.connect(self.remove_profile)
         self.show()
         
     def switch_account_settings_page(self):
@@ -84,8 +86,33 @@ class SettingsWindow(QWidget, Ui_settings_window):
         self.import_ui.pushButton_import.clicked.connect(self.import_profile)   
 
         # Hide window once account is created
-        self.import_ui.pushButton_import.clicked.connect(self.import_window.hide)  
+        self.import_ui.pushButton_import.clicked.connect(self.import_window.hide)
 
+
+    def remove_profile(self):
+        # Remove profile from settings window.
+        selected_profile_name = self.listWidget_profiles.currentItem().text()
+        selected_profile_index = self.listWidget_profiles.currentRow()
+        selected_profile_widget = self.stackedLayout.currentWidget()
+        self.listWidget_profiles.takeItem(selected_profile_index)
+        self.stackedLayout.removeWidget(selected_profile_widget)
+
+        # Remove profile from main window.
+        combo_box_index = main_window.comboBox.findText(selected_profile_name)
+        main_window.comboBox.removeItem(combo_box_index)
+        main_window.profile_status_pages.pop(selected_profile_name, None)
+        global_config.pop(selected_profile_name, None)
+        print(global_config)
+
+        # Load existing user profiles and remove the new profile.
+        _profiles = ConfigParser()
+        _profiles.read(PROFILES_FILE)
+        _profiles.remove_section(selected_profile_name)
+
+        # Save the new profile. 
+        with open(PROFILES_FILE, 'w') as profilefile:
+            _profiles.write(profilefile)        
+   
 
     def create_profile(self):
         """
@@ -114,18 +141,27 @@ class SettingsWindow(QWidget, Ui_settings_window):
         _profiles.read(PROFILES_FILE)
         _profiles[profile_name] = new_profile[profile_name]
 
-        with open(PROFILES_FILE, 'w') as configfile:
-            _profiles.write(configfile)        
+        # Create profile config file if it does not exist.
+        profiles_dir = re.search(r"(.+)/profiles$", PROFILES_FILE).group(1)
+        if not os.path.exists(profiles_dir):
+            os.makedirs(profiles_dir)
+
+        # Save the new profile. 
+        with open(PROFILES_FILE, 'w') as profilefile:
+            _profiles.write(profilefile)        
 
 
         # Append default OD config
         new_profile[profile_name].update(default_od_config)
 
         # Configure sync directory
-        new_profile[profile_name]['onedrive']['sync_dir'] = sync_dir
+        new_profile[profile_name]['onedrive']['sync_dir'] = f'"{sync_dir}"'
 
         # Append new profile into running global profile
         global_config.update(new_profile)
+
+        # Automatically save global config to prevent loss if user does not press 'Save' button.
+        save_global_config()
 
         # Add Setting page widget for new profile
         self.listWidget_profiles.addItem(profile_name)
@@ -135,8 +171,10 @@ class SettingsWindow(QWidget, Ui_settings_window):
         # Add status page widget for new profile
         main_window.comboBox.addItem(profile_name)
         main_window.profile_status_pages[profile_name] = ProfileStatusPage(profile_name)
-        main_window.stackedLayout.addWidget(main_window.profile_status_pages[profile_name])        
+        main_window.stackedLayout.addWidget(main_window.profile_status_pages[profile_name])      
 
+        # Hide "Create profile" push button from main windows.         
+        main_window.pushButton_new_profile.hide() 
        
 
 
@@ -173,6 +211,12 @@ class SettingsWindow(QWidget, Ui_settings_window):
         _profiles.read(PROFILES_FILE)
         _profiles[profile_name] = new_profile[profile_name]
 
+        # Create profile config file if it does not exist.
+        profiles_dir = re.search(r"(.+)/profiles$", PROFILES_FILE).group(1)
+        if not os.path.exists(profiles_dir):
+            os.makedirs(profiles_dir)
+
+        # Save the new profile. 
         with open(PROFILES_FILE, 'w') as configfile:
             _profiles.write(configfile)
 
@@ -191,7 +235,8 @@ class SettingsWindow(QWidget, Ui_settings_window):
         self.page = ProfileSettingsPage(profile_name)
         self.stackedLayout.addWidget(self.page)
 
-       
+        # Hide "Create profile" push button from main windows.         
+        main_window.pushButton_new_profile.hide()        
 
 
 class ProfileStatusPage(QWidget, Ui_status_page):
@@ -204,6 +249,15 @@ class ProfileStatusPage(QWidget, Ui_status_page):
         # Show selected profile name
         self.label_4.setText(profile)
 
+        # Temporary start/stop buttons
+        self.toolButton_start.clicked.connect(lambda: main_window.start_onedrive_monitor(profile))
+        self.toolButton_stop.clicked.connect(lambda: main_window.workers[profile].stop_worker())
+        # self.toolButton_stop.clicked.connect(lambda: main_window.workers[profile].exit())
+        # self.toolButton_stop.clicked.connect(lambda: main_window.workers[profile].quit())
+        # self.toolButton_stop.clicked.connect(lambda: main_window.workers[profile].terminate())
+        # self.toolButton_stop.clicked.connect(lambda: main_window.workers.pop(profile, None))
+
+
         # # Open Settings window
         self.pushButton_settings.clicked.connect(self.show_settings_window)     
 
@@ -214,6 +268,9 @@ class ProfileStatusPage(QWidget, Ui_status_page):
     def show_settings_window(self):
         self.settings_window = SettingsWindow()
         self.settings_window.show()
+
+    # def stop_worker(self, profile):
+    #     main_window.workers[profile].onedrive_process.kill()
 
 
 class ProfileSettingsPage(QWidget, Ui_profile_settings):
@@ -393,6 +450,16 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.spinBox_min_notify_changes.valueChanged.connect(self.set_spin_box_value)                   
 
         #
+        # Account tab
+        #
+        self.config_file = global_config[self.profile]['config_file'].strip('"')
+        self.config_dir = re.search(r"(.+)/.+$", self.config_file).group(1)
+
+        self.pushButton_login.clicked.connect(lambda: main_window.show_login(self.profile))
+        self.pushButton_logout.clicked.connect(lambda: os.system(f"onedrive --confdir='{self.config_dir}' --logout"))
+        self.pushButton_logout.clicked.connect(lambda: print(f"Profile {self.profile} has been logged out."))
+
+        #
         # Buttons
         #
         self.pushButton_discart.hide()
@@ -523,7 +590,7 @@ class TaskList(QWidget, Ui_list_item_widget):
 
 
 class WorkerThread(QThread):
-    update_credentials = Signal()
+    update_credentials = Signal(str)
     update_progress = Signal(dict)
     update_progress_new = Signal(dict, str)
     trigger_resync = Signal()
@@ -539,6 +606,23 @@ class WorkerThread(QThread):
         self._command = f"onedrive --confdir='{self.config_folder.group(1)}' --monitor -v"
         # print(f"command is: {self._command}")
         self._profile_name = profile
+
+    def stop_worker(self):
+        print(f"[{self._profile_name}] Waiting for worker to finish...")
+        while self.onedrive_process.poll() is None:
+            self.onedrive_process.kill()
+            time.sleep(1)
+
+        print(f"[{self._profile_name}] Quiting thread")            
+        self.quit()
+        self.wait()
+        print(f"[{self._profile_name}] Removing thread info")
+        main_window.workers.pop(self._profile_name, None)
+        print(f"Remaining running workers: {main_window.workers}")
+
+        
+
+
 
     def run(self, resync=False):
         matches = ['Downloading file', 'Downloading new file', 'Uploading file', 'Uploading new file',
@@ -562,7 +646,7 @@ class WorkerThread(QThread):
 
                 if 'Authorize this app visiting' in stdout:
                     self.onedrive_process.kill()
-                    self.update_credentials.emit()
+                    self.update_credentials.emit(self._profile_name)
 
                 elif any(x in stdout for x in matches):  # capture file uploads and downloads
                     # self.tray.setIcon(QIcon("resources/images/icons8-cloud-sync-40_2.png")) 
@@ -640,6 +724,8 @@ class WorkerThread(QThread):
                     print('@@ERROR' + stderr)
 
 
+
+
 class MainWindow(QMainWindow, Ui_MainWindow):
     
     def __init__(self):
@@ -649,9 +735,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.setWindowIcon(QIcon("resources/images/icons8-clouds-48.png"))
 
+        if len(global_config) == 0: 
+            # self.pushButton_new_profile.clicked.connect(self.show_settings_window)
+            # self.pushButton_new_profile.show()
+            self.show_settings_window()
+            
+        # else:
+        self.pushButton_new_profile.hide()
+
         #
         # Menu
         # 
+
+        self.menubar.hide()
         # Update OneDrive Status
         self.actionRefresh_Service_Status.triggered.connect(lambda: self.onedrive_process_status())
 
@@ -712,6 +808,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.tray = None
 
+    def show_settings_window(self):
+        self.settings_window = SettingsWindow()
+        self.settings_window.show()            
+
     def switch_account_status_page(self):
         self.stackedLayout.setCurrentIndex(self.comboBox.currentIndex())
 
@@ -743,12 +843,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def start_onedrive_monitor(self, profile_name):
         # for profile in global_config:
-        self.workers[profile_name] = WorkerThread(profile_name)
-        self.workers[profile_name].start()
+
+        if profile_name not in self.workers:
+            self.workers[profile_name] = WorkerThread(profile_name)
+            self.workers[profile_name].start()
+        else:
+            print(f"Worker for profile {profile_name} is already running. Please stop it first.")
+            print(f"Running workers: {main_window.workers}")
 
         # self.worker = WorkerThread()
         # self.worker.start()
-        # self.worker.update_credentials.connect(self.show_login)
+        self.workers[profile_name].update_credentials.connect(self.show_login)
         # self.worker.update_progress.connect(self.event_update_progress)
         # self.worker.trigger_resync.connect(self.show_login)
         self.workers[profile_name].update_progress_new.connect(self.event_update_progress_new)
@@ -795,7 +900,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         print(data)        
         file_path = f'{_sync_dir}' + "/" + data['file_path']
-        absolute_path = QFileInfo(file_path).absolutePath()
+        absolute_path = QFileInfo(file_path).absolutePath().replace(' ','%20')
         parent_dir = re.search(r".+/([^/]+)/.+$", file_path)
         file_size = QFileInfo(file_path).size()
         file_size_human = humanize_file_size(file_size)
@@ -888,13 +993,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.profile_status_pages[profile].listWidget.setItemWidget(myQListWidgetItem, myQCustomQWidget)
 
 
-    def show_login(self):
+    def show_login(self, profile):
         # Show login window
         self.window1 = QWidget()
         self.window1.setWindowIcon(QIcon("resources/images/icons8-clouds-48.png"))
         self.lw = Ui_LoginWindow()
         self.lw.setupUi(self.window1)
         self.window1.show()
+
+        self.config_file = global_config[profile]['config_file'].strip('"')
+        self.config_dir = re.search(r"(.+)/.+$", self.config_file).group(1)
 
         # use static URL for now. TODO: use auth files in the future
         url = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=d50ca740-c83f-4d1b-b616' \
@@ -904,16 +1012,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lw.loginFrame.setUrl(QUrl(url))
 
         # Wait for user to login and obtain response URL
-        self.lw.loginFrame.urlChanged.connect(lambda: self.get_response_url(self.lw.loginFrame.url().toString()))
+        self.lw.loginFrame.urlChanged.connect(lambda: self.get_response_url(self.lw.loginFrame.url().toString(), self.config_dir, profile))
 
-    def get_response_url(self, response_url):
+    def get_response_url(self, response_url, config_dir, profile):
         # Get response URL from OneDrive OAuth2
         if 'nativeclient?code=' in response_url:
-            os.system(f'onedrive --auth-response "{response_url}"')
+            print(f'onedrive --confdir="{config_dir}" --auth-response "{response_url}"')
+            os.system(f'onedrive --confdir="{config_dir}" --auth-response "{response_url}"')
             print("Login performed")
             self.window1.hide()
+            main_window.workers[profile].onedrive_process.kill()
         else:
             pass
+
 
 
 def read_config(config_file):
