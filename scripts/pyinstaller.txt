@@ -1,0 +1,2 @@
+# First test
+pyinstaller --onefile --icon=OneDriveGUI.ico OneDriveGUI.py
