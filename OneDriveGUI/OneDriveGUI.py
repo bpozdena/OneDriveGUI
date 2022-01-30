@@ -5,6 +5,7 @@ import psutil
 import re
 import subprocess
 import sys
+import time
 from configparser import ConfigParser
 
 from PySide6.QtCore import QThread, QTimer, QUrl, Signal, QFileInfo, Qt 
@@ -54,6 +55,7 @@ class SettingsWindow(QWidget, Ui_settings_window):
         self.listWidget_profiles.itemSelectionChanged.connect(self.switch_account_settings_page)
         self.pushButton_open_create.clicked.connect(self.create_new_profile_window)
         self.pushButton_open_import.clicked.connect(self.import_profile_window)
+        self.pushButton_remove.clicked.connect(self.remove_profile)
         self.show()
         
     def switch_account_settings_page(self):
@@ -86,6 +88,30 @@ class SettingsWindow(QWidget, Ui_settings_window):
         # Hide window once account is created
         self.import_ui.pushButton_import.clicked.connect(self.import_window.hide)
 
+
+    def remove_profile(self):
+        # Remove profile from settings window.
+        selected_profile_name = self.listWidget_profiles.currentItem().text()
+        selected_profile_index = self.listWidget_profiles.currentRow()
+        selected_profile_widget = self.stackedLayout.currentWidget()
+        self.listWidget_profiles.takeItem(selected_profile_index)
+        self.stackedLayout.removeWidget(selected_profile_widget)
+
+        # Remove profile from main window.
+        combo_box_index = main_window.comboBox.findText(selected_profile_name)
+        main_window.comboBox.removeItem(combo_box_index)
+        main_window.profile_status_pages.pop(selected_profile_name, None)
+        global_config.pop(selected_profile_name, None)
+        print(global_config)
+
+        # Load existing user profiles and remove the new profile.
+        _profiles = ConfigParser()
+        _profiles.read(PROFILES_FILE)
+        _profiles.remove_section(selected_profile_name)
+
+        # Save the new profile. 
+        with open(PROFILES_FILE, 'w') as profilefile:
+            _profiles.write(profilefile)        
    
 
     def create_profile(self):
@@ -121,8 +147,8 @@ class SettingsWindow(QWidget, Ui_settings_window):
             os.makedirs(profiles_dir)
 
         # Save the new profile. 
-        with open(PROFILES_FILE, 'w') as configfile:
-            _profiles.write(configfile)        
+        with open(PROFILES_FILE, 'w') as profilefile:
+            _profiles.write(profilefile)        
 
 
         # Append default OD config
@@ -225,11 +251,11 @@ class ProfileStatusPage(QWidget, Ui_status_page):
 
         # Temporary start/stop buttons
         self.toolButton_start.clicked.connect(lambda: main_window.start_onedrive_monitor(profile))
-        self.toolButton_stop.clicked.connect(lambda: main_window.workers[profile].onedrive_process.kill())
-        self.toolButton_stop.clicked.connect(lambda: main_window.workers[profile].exit())
-        self.toolButton_stop.clicked.connect(lambda: main_window.workers[profile].quit())
-        self.toolButton_stop.clicked.connect(lambda: main_window.workers[profile].terminate())
-        self.toolButton_stop.clicked.connect(lambda: main_window.workers.pop(profile, None))
+        self.toolButton_stop.clicked.connect(lambda: main_window.workers[profile].stop_worker())
+        # self.toolButton_stop.clicked.connect(lambda: main_window.workers[profile].exit())
+        # self.toolButton_stop.clicked.connect(lambda: main_window.workers[profile].quit())
+        # self.toolButton_stop.clicked.connect(lambda: main_window.workers[profile].terminate())
+        # self.toolButton_stop.clicked.connect(lambda: main_window.workers.pop(profile, None))
 
 
         # # Open Settings window
@@ -242,6 +268,9 @@ class ProfileStatusPage(QWidget, Ui_status_page):
     def show_settings_window(self):
         self.settings_window = SettingsWindow()
         self.settings_window.show()
+
+    # def stop_worker(self, profile):
+    #     main_window.workers[profile].onedrive_process.kill()
 
 
 class ProfileSettingsPage(QWidget, Ui_profile_settings):
@@ -421,6 +450,16 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.spinBox_min_notify_changes.valueChanged.connect(self.set_spin_box_value)                   
 
         #
+        # Account tab
+        #
+        self.config_file = global_config[self.profile]['config_file'].strip('"')
+        self.config_dir = re.search(r"(.+)/.+$", self.config_file).group(1)
+
+        self.pushButton_login.clicked.connect(lambda: main_window.show_login(self.profile))
+        self.pushButton_logout.clicked.connect(lambda: os.system(f"onedrive --confdir='{self.config_dir}' --logout"))
+        self.pushButton_logout.clicked.connect(lambda: print(f"Profile {self.profile} has been logged out."))
+
+        #
         # Buttons
         #
         self.pushButton_discart.hide()
@@ -568,6 +607,23 @@ class WorkerThread(QThread):
         # print(f"command is: {self._command}")
         self._profile_name = profile
 
+    def stop_worker(self):
+        print(f"[{self._profile_name}] Waiting for worker to finish...")
+        while self.onedrive_process.poll() is None:
+            self.onedrive_process.kill()
+            time.sleep(1)
+
+        print(f"[{self._profile_name}] Quiting thread")            
+        self.quit()
+        self.wait()
+        print(f"[{self._profile_name}] Removing thread info")
+        main_window.workers.pop(self._profile_name, None)
+        print(f"Remaining running workers: {main_window.workers}")
+
+        
+
+
+
     def run(self, resync=False):
         matches = ['Downloading file', 'Downloading new file', 'Uploading file', 'Uploading new file',
                    'Uploading modified file', 'Downloading modified file']
@@ -666,6 +722,8 @@ class WorkerThread(QThread):
                     self.run(resync=True)
                 else:
                     print('@@ERROR' + stderr)
+
+
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -790,8 +848,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.workers[profile_name] = WorkerThread(profile_name)
             self.workers[profile_name].start()
         else:
-            print("Worker for this account is already running. Please stop it first.")
-            print(main_window.workers)
+            print(f"Worker for profile {profile_name} is already running. Please stop it first.")
+            print(f"Running workers: {main_window.workers}")
 
         # self.worker = WorkerThread()
         # self.worker.start()
