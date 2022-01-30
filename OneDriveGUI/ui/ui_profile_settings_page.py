@@ -25,9 +25,10 @@ class Ui_profile_settings(object):
     def setupUi(self, profile_settings):
         if not profile_settings.objectName():
             profile_settings.setObjectName(u"profile_settings")
-        profile_settings.resize(614, 723)
+        profile_settings.resize(664, 723)
         self.verticalLayout_2 = QVBoxLayout(profile_settings)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout_2.setContentsMargins(-1, 0, -1, 0)
         self.label_profile_name = QLabel(profile_settings)
         self.label_profile_name.setObjectName(u"label_profile_name")
         font = QFont()
@@ -42,7 +43,7 @@ class Ui_profile_settings(object):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.tabWidget = QTabWidget(profile_settings)
         self.tabWidget.setObjectName(u"tabWidget")
-        self.tabWidget.setMinimumSize(QSize(600, 600))
+        self.tabWidget.setMinimumSize(QSize(650, 600))
         self.exemptions_tab_2 = QWidget()
         self.exemptions_tab_2.setObjectName(u"exemptions_tab_2")
         self.verticalLayout_5 = QVBoxLayout(self.exemptions_tab_2)
@@ -604,7 +605,7 @@ class Ui_profile_settings(object):
     # setupUi
 
     def retranslateUi(self, profile_settings):
-        profile_settings.setWindowTitle(QCoreApplication.translate("profile_settings", u"Form", None))
+        profile_settings.setWindowTitle(QCoreApplication.translate("profile_settings", u"OneDriveGUI - Profile Settings", None))
         self.label_profile_name.setText(QCoreApplication.translate("profile_settings", u"Profile name", None))
         self.groupBox_8.setTitle(QCoreApplication.translate("profile_settings", u"Monitored directory", None))
         self.pushButton_3.setText(QCoreApplication.translate("profile_settings", u"Browse", None))
@@ -668,7 +669,7 @@ class Ui_profile_settings(object):
         self.label_webhook_renewal_interval.setText(QCoreApplication.translate("profile_settings", u"Renewal interval", None))
         self.checkBox_webhook_enabled.setText(QCoreApplication.translate("profile_settings", u"Enable webhook", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), QCoreApplication.translate("profile_settings", u"Webhooks", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), QCoreApplication.translate("profile_settings", u"GUI Behaviour", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), QCoreApplication.translate("profile_settings", u"Account", None))
         self.pushButton_discart.setText(QCoreApplication.translate("profile_settings", u"Discard changes", None))
         self.pushButton_save.setText(QCoreApplication.translate("profile_settings", u"Save", None))
     # retranslateUi

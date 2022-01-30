@@ -17,13 +17,14 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
 from PySide6.QtWidgets import (QApplication, QComboBox, QMainWindow, QMenu,
-    QMenuBar, QSizePolicy, QVBoxLayout, QWidget)
+    QMenuBar, QPushButton, QSizePolicy, QVBoxLayout,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(497, 808)
+        MainWindow.resize(420, 807)
         icon = QIcon()
         icon.addFile(u"../../../OneDriveGUI_POC_recovered-multi/icons8-clouds-48.png", QSize(), QIcon.Normal, QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -56,11 +57,33 @@ class Ui_MainWindow(object):
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_2 = QVBoxLayout()
+        self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.comboBox = QComboBox(self.centralwidget)
         self.comboBox.setObjectName(u"comboBox")
+        font = QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        self.comboBox.setFont(font)
+        self.comboBox.setContextMenuPolicy(Qt.DefaultContextMenu)
+        self.comboBox.setStyleSheet(u"background-color: rgb(0, 120, 212);\n"
+"color: rgb(255, 255, 255);")
 
         self.verticalLayout_2.addWidget(self.comboBox)
+
+        self.verticalLayout_3 = QVBoxLayout()
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.pushButton_new_profile = QPushButton(self.centralwidget)
+        self.pushButton_new_profile.setObjectName(u"pushButton_new_profile")
+        self.pushButton_new_profile.setMaximumSize(QSize(9999, 9999))
+        self.pushButton_new_profile.setLayoutDirection(Qt.LeftToRight)
+        self.pushButton_new_profile.setStyleSheet(u"alignment=Qt.AlignCenter\n"
+"")
+
+        self.verticalLayout_3.addWidget(self.pushButton_new_profile)
+
+
+        self.verticalLayout_2.addLayout(self.verticalLayout_3)
 
 
         self.verticalLayout.addLayout(self.verticalLayout_2)
@@ -68,7 +91,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 497, 30))
+        self.menubar.setGeometry(QRect(0, 0, 420, 30))
         self.menuAdvanced = QMenu(self.menubar)
         self.menuAdvanced.setObjectName(u"menuAdvanced")
         self.menuDebug = QMenu(self.menuAdvanced)
@@ -117,6 +140,7 @@ class Ui_MainWindow(object):
         self.actionObtain_Sync_Status.setText(QCoreApplication.translate("MainWindow", u"Obtain Sync Status", None))
         self.actionTest_Service.setText(QCoreApplication.translate("MainWindow", u"Test Service", None))
         self.actionstart.setText(QCoreApplication.translate("MainWindow", u"start", None))
+        self.pushButton_new_profile.setText(QCoreApplication.translate("MainWindow", u"Create/ Import OneDrive profile", None))
         self.menuAdvanced.setTitle(QCoreApplication.translate("MainWindow", u"Advanced", None))
         self.menuDebug.setTitle(QCoreApplication.translate("MainWindow", u"Debug", None))
         self.menuService.setTitle(QCoreApplication.translate("MainWindow", u"Service", None))

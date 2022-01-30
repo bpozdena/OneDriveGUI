@@ -17,7 +17,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QGridLayout,
     QHBoxLayout, QLabel, QListWidget, QListWidgetItem,
-    QPushButton, QSizePolicy, QVBoxLayout, QWidget)
+    QPushButton, QSizePolicy, QToolButton, QVBoxLayout,
+    QWidget)
 
 class Ui_status_page(object):
     def setupUi(self, status_page):
@@ -30,28 +31,47 @@ class Ui_status_page(object):
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.frame = QFrame(status_page)
         self.frame.setObjectName(u"frame")
-        self.frame.setMinimumSize(QSize(0, 100))
+        self.frame.setMinimumSize(QSize(0, 80))
         self.frame.setStyleSheet(u"background-color: rgb(0, 120, 212);")
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
         self.gridLayout = QGridLayout(self.frame)
+        self.gridLayout.setSpacing(2)
         self.gridLayout.setObjectName(u"gridLayout")
+        self.gridLayout.setContentsMargins(2, 2, 2, 2)
+        self.toolButton_start = QToolButton(self.frame)
+        self.toolButton_start.setObjectName(u"toolButton_start")
+
+        self.gridLayout.addWidget(self.toolButton_start, 2, 1, 1, 1)
+
         self.label_4 = QLabel(self.frame)
         self.label_4.setObjectName(u"label_4")
+        self.label_4.setStyleSheet(u"color: rgb(255, 255, 255);")
 
         self.gridLayout.addWidget(self.label_4, 2, 0, 1, 1)
 
-        self.label_3 = QLabel(self.frame)
-        self.label_3.setObjectName(u"label_3")
-        self.label_3.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        self.gridLayout.addWidget(self.label_3, 2, 2, 1, 1)
-
         self.label_6 = QLabel(self.frame)
         self.label_6.setObjectName(u"label_6")
+        font = QFont()
+        font.setPointSize(11)
+        font.setBold(True)
+        self.label_6.setFont(font)
+        self.label_6.setStyleSheet(u"color: rgb(255, 255, 255);")
         self.label_6.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout.addWidget(self.label_6, 1, 0, 1, 3)
+        self.gridLayout.addWidget(self.label_6, 1, 0, 1, 4)
+
+        self.label_3 = QLabel(self.frame)
+        self.label_3.setObjectName(u"label_3")
+        self.label_3.setStyleSheet(u"color: rgb(255, 255, 255);")
+        self.label_3.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.gridLayout.addWidget(self.label_3, 2, 3, 1, 1)
+
+        self.toolButton_stop = QToolButton(self.frame)
+        self.toolButton_stop.setObjectName(u"toolButton_stop")
+
+        self.gridLayout.addWidget(self.toolButton_stop, 2, 2, 1, 1)
 
 
         self.verticalLayout.addWidget(self.frame)
@@ -99,10 +119,12 @@ class Ui_status_page(object):
     # setupUi
 
     def retranslateUi(self, status_page):
-        status_page.setWindowTitle(QCoreApplication.translate("status_page", u"Form", None))
+        status_page.setWindowTitle(QCoreApplication.translate("status_page", u"OneDriveGUI - Process Status", None))
+        self.toolButton_start.setText(QCoreApplication.translate("status_page", u"Start", None))
         self.label_4.setText(QCoreApplication.translate("status_page", u"...", None))
-        self.label_3.setText(QCoreApplication.translate("status_page", u"...", None))
         self.label_6.setText(QCoreApplication.translate("status_page", u"Onedrive is ...", None))
+        self.label_3.setText(QCoreApplication.translate("status_page", u"...", None))
+        self.toolButton_stop.setText(QCoreApplication.translate("status_page", u"Stop", None))
         self.pushButton.setText(QCoreApplication.translate("status_page", u"Open Folder", None))
         self.pushButton_2.setText(QCoreApplication.translate("status_page", u"Sync", None))
         self.pushButton_settings.setText(QCoreApplication.translate("status_page", u"Settings", None))
