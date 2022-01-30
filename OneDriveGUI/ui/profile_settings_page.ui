@@ -6,14 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>614</width>
+    <width>664</width>
     <height>723</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>OneDriveGUI - Profile Settings</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QLabel" name="label_profile_name">
      <property name="font">
@@ -37,12 +43,12 @@
       <widget class="QTabWidget" name="tabWidget">
        <property name="minimumSize">
         <size>
-         <width>600</width>
+         <width>650</width>
          <height>600</height>
         </size>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>5</number>
        </property>
        <widget class="QWidget" name="exemptions_tab_2">
         <attribute name="title">
@@ -577,14 +583,31 @@
            <layout class="QVBoxLayout" name="verticalLayout_9">
             <item>
              <layout class="QGridLayout" name="gridLayout_8">
-              <item row="0" column="0" colspan="2">
+              <item row="0" column="0">
                <widget class="QCheckBox" name="checkBox_enable_logging">
                 <property name="text">
                  <string>Enable Logging</string>
                 </property>
                </widget>
               </item>
-              <item row="3" column="2">
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_log_dir">
+                <property name="text">
+                 <string>Log location:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QCheckBox" name="checkBox_debug_https">
+                <property name="text">
+                 <string>Debug HTTPS</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="lineEdit_log_dir"/>
+              </item>
+              <item row="1" column="2">
                <widget class="QPushButton" name="pushButton_log_dir">
                 <property name="text">
                  <string>Browse</string>
@@ -592,31 +615,14 @@
                </widget>
               </item>
               <item row="3" column="0">
-               <widget class="QLabel" name="label_log_dir">
-                <property name="text">
-                 <string>Log location:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QCheckBox" name="checkBox_debug_https">
-                <property name="text">
-                 <string>Debug HTTPS</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QSpinBox" name="spinBox_monitor_log_frequency"/>
-              </item>
-              <item row="3" column="1">
-               <widget class="QLineEdit" name="lineEdit_log_dir"/>
-              </item>
-              <item row="2" column="0">
                <widget class="QLabel" name="label_monitor_log_frequency">
                 <property name="text">
                  <string>Monitor log frequency</string>
                 </property>
                </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QSpinBox" name="spinBox_monitor_log_frequency"/>
               </item>
              </layout>
             </item>
@@ -767,8 +773,24 @@
        </widget>
        <widget class="QWidget" name="tab_6">
         <attribute name="title">
-         <string>GUI Behaviour</string>
+         <string>Account</string>
         </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QPushButton" name="pushButton_login">
+           <property name="text">
+            <string>Login</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_logout">
+           <property name="text">
+            <string>Logout</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
      </item>

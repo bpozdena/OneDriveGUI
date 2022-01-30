@@ -23,17 +23,18 @@ class Ui_settings_window(object):
     def setupUi(self, settings_window):
         if not settings_window.objectName():
             settings_window.setObjectName(u"settings_window")
-        settings_window.resize(601, 817)
+        settings_window.resize(272, 765)
         self.verticalLayout_2 = QVBoxLayout(settings_window)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.label = QLabel(settings_window)
-        self.label.setObjectName(u"label")
+        self.verticalLayout.setContentsMargins(-1, 6, -1, -1)
+        self.label_profiles = QLabel(settings_window)
+        self.label_profiles.setObjectName(u"label_profiles")
 
-        self.verticalLayout.addWidget(self.label)
+        self.verticalLayout.addWidget(self.label_profiles)
 
         self.listWidget_profiles = QListWidget(settings_window)
         self.listWidget_profiles.setObjectName(u"listWidget_profiles")
@@ -70,8 +71,8 @@ class Ui_settings_window(object):
     # setupUi
 
     def retranslateUi(self, settings_window):
-        settings_window.setWindowTitle(QCoreApplication.translate("settings_window", u"Form", None))
-        self.label.setText(QCoreApplication.translate("settings_window", u"Profiles:", None))
+        settings_window.setWindowTitle(QCoreApplication.translate("settings_window", u"OneDriveGUI - Settings", None))
+        self.label_profiles.setText(QCoreApplication.translate("settings_window", u"Profiles:", None))
         self.pushButton_remove.setText(QCoreApplication.translate("settings_window", u"Remove profile", None))
         self.pushButton_open_create.setText(QCoreApplication.translate("settings_window", u"Create new profile", None))
         self.pushButton_open_import.setText(QCoreApplication.translate("settings_window", u"Import existing profile", None))
