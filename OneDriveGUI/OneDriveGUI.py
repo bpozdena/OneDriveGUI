@@ -590,6 +590,10 @@ class TaskList(QWidget, Ui_list_item_widget):
 
 
 class WorkerThread(QThread):
+    '''
+    Constructs a thread, which can start, monitor and stop OneDrive process. 
+    '''
+
     update_credentials = Signal(str)
     # update_progress = Signal(dict)
     update_progress_new = Signal(dict, str)
@@ -598,9 +602,8 @@ class WorkerThread(QThread):
 
     def __init__(self, profile):
         super(WorkerThread, self).__init__()
-        print(f"starting worker for profile {profile}")
-        # print(global_config)
-        # print(global_config[profile])
+        print(f"Starting worker for profile {profile}")
+
         self.config_file = global_config[profile]['config_file']
         self.config_folder = re.search(r"(.+)/.+$", self.config_file)
         # print(self.config_file)
@@ -623,9 +626,15 @@ class WorkerThread(QThread):
 
 
     def run(self, resync=False):
-        matches = ['Downloading file', 'Downloading new file', 'Uploading file', 'Uploading new file',
-                   'Uploading modified file', 'Downloading modified file']
+        """
+        Starts OneDrive and sends signals to GUI based on parsed information. 
+        """
+
         file_name = None
+    
+        tasks = ['Downloading file', 'Downloading new file', 'Uploading file', 'Uploading new file',
+                   'Uploading modified file', 'Downloading modified file', 'Deleting item']
+
         self.profile_status = {
             "status_message": "",
             "free_space": "",
@@ -644,57 +653,22 @@ class WorkerThread(QThread):
                 stdout = self.onedrive_process.stdout.readline()
                 if stdout == '':
                     continue
-
+                
+                # print(bytes(stdout, 'utf-8'))
                 print(f'[{self.profile_name}] ' + stdout.strip())
 
                 if 'Authorize this app visiting' in stdout:
                     self.onedrive_process.kill()
                     self.update_credentials.emit(self.profile_name)
 
-                elif any(_ in stdout for _ in matches):  # capture file uploads and downloads
-                    # self.tray.setIcon(QIcon("resources/images/icons8-cloud-sync-40_2.png")) 
-                    # print('# ' + stdout)
-                    file_operation = re.search(r'\b([Uploading|Downloading]+)*', stdout)
-                    file_name = re.search(r".*/(.+)\s+\.+", stdout)
-                    file_path = re.search(r"\b[file]+\s(.+)\s+\.\.\.", stdout)
-                    transfer_complete = 'done' in stdout
-                    progress = '0' # if transfer_complete else '0'
-
-
-                    transfer_progress_new = {
-                        "file_operation": file_operation.group(1),
-                        "file_path": 'unknown file name' if file_path is None else file_path.group(1),
-                        "progress": progress,
-                        "transfer_complete": transfer_complete}                        
-    
-                    if transfer_complete:
-                        # self.update_progress.emit(transfer_progress)
-                        self.update_progress_new.emit(transfer_progress_new, self.profile_name)
-
-                elif '% |' in stdout and file_name is not None:  # capture upload/download progress
-                    file_operation = re.search(r'\b([Uploading|Downloading]+)*', stdout)
-                    progress = re.search(r'\s([0-9]+)%', stdout)
-                    transfer_complete = progress.group(1) == '100'
-
-                    transfer_progress_new = {
-                        "file_operation": file_operation.group(1),
-                        "file_path": 'unknown file name' if file_path is None else file_path.group(1),
-                        "progress": progress.group(1),
-                        "transfer_complete": transfer_complete}                         
-
-                    # self.update_progress.emit(transfer_progress)
-                    self.update_progress_new.emit(transfer_progress_new, self.profile_name)
-
                 elif 'Sync with OneDrive is complete' in stdout:
                     self.profile_status["status_message"] = "OneDrive sync is complete"
                     self.update_profile_status.emit(self.profile_status, self.profile_name)
-                    # print(self.profile_status)
-                    # self.tray.setIcon(QIcon("resources/images/icons8-cloud-done-40_2.png"))        
-
+  
                 elif 'Remaining Free Space' in stdout:
                     self.free_space_bytes = re.search(r"([0-9]+)", stdout).group(1)
                     self.free_space_human = str(humanize_file_size(int(self.free_space_bytes)))
-                    # print(self.free_space_bytes)
+
                     print(f"[{self.profile_name}] Free Space: {self.free_space_human}")
                     self.profile_status["free_space"] = f"Free Space: {self.free_space_human}"
                     self.update_profile_status.emit(self.profile_status, self.profile_name)
@@ -711,15 +685,54 @@ class WorkerThread(QThread):
 
                 elif 'Processing' in stdout:
                     self.profile_status["status_message"] = "OneDrive is processing files..."
-                    self.update_profile_status.emit(self.profile_status, self.profile_name)
-                    # print(self.profile_status)
-                    # self.tray.setIcon(QIcon("resources/images/icons8-cloud-sync-40_2.png")) 
+                    self.update_profile_status.emit(self.profile_status, self.profile_name)                    
+
+                elif any(_ in stdout for _ in tasks):  
+                    # Capture information abouth file that is being uploaded/downloaded/deleted by OneDrive.
+                    file_operation = re.search(r'\b([Uploading|Downloading|Deleting]+)*', stdout).group(1)
+
+                    if file_operation == 'Deleting':
+                        file_name = re.search(r".*/(.+)$", stdout)
+                        file_path = re.search(r"\b[item|OneDrive:]+\s(.+)$", stdout)
+                        
+                    else:
+                        file_name = re.search(r".*/(.+)\s+\.+", stdout)
+                        file_path = re.search(r"\b[file]+\s(.+)\s+\.\.\.", stdout)
+
+                    transfer_complete = any(['done' in stdout, 'Deleting' in stdout])
+                    progress = '0' 
+
+                    transfer_progress_new = {
+                        "file_operation": file_operation,
+                        "file_path": 'unknown file name' if file_path is None else file_path.group(1),
+                        "progress": progress,
+                        "transfer_complete": transfer_complete}                        
+
+                    print(transfer_progress_new)
+                    self.update_progress_new.emit(transfer_progress_new, self.profile_name)
+
+                elif '% |' in stdout and file_name is not None:  
+                    # Capture upload/download progress status
+
+                    file_operation = re.search(r'\b([Uploading|Downloading]+)*', stdout).group(1)
+                    progress = re.search(r'\s([0-9]+)%', stdout).group(1)
+                    transfer_complete = progress == '100'
+
+                    transfer_progress_new = {
+                        "file_operation": file_operation,
+                        "file_path": 'unknown file name' if file_path is None else file_path.group(1),
+                        "progress": progress,
+                        "transfer_complete": transfer_complete}                         
+
+                    print(transfer_progress_new)
+                    self.update_progress_new.emit(transfer_progress_new, self.profile_name)
 
                 else:
                     pass
-                    # print('@@ no match')
 
         if self.onedrive_process.stderr:
+            # Capture stderr from OneDrive process.
+
             stderr = self.onedrive_process.stderr.readline()
             if stderr != '':
                 if 'command not found' in stderr:
@@ -732,7 +745,7 @@ class WorkerThread(QThread):
 
                     self.run(resync=True)
                 else:
-                    print('@@ERROR' + stderr)
+                    print('@ERROR ' + stderr)
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -900,6 +913,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         progress = data['progress']
         progress_data = file_size / 100 * int(progress)
         progress_data_human = humanize_file_size(progress_data)
+        file_operation = data['file_operation']
+        transfer_complete = data['transfer_complete']
 
         print("absolute path " + absolute_path)
 
@@ -915,29 +930,32 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #     if int(data['progress']) == 100:
         #         self.profile_status_pages[profile].listWidget.takeItem(0)
 
-        if self.profile_status_pages[profile].listWidget.item(0) != None:
-            last_item = self.profile_status_pages[profile].listWidget.item(0) #.itemWidget() #.get_file_name() #.ls_label_file_name.text()
-            print(last_item)
+        # Delete last item list if it has the same file name.
+        if self.profile_status_pages[profile].listWidget.item(0) != None: 
+            last_item = self.profile_status_pages[profile].listWidget.item(0) 
             last_item_widget = self.profile_status_pages[profile].listWidget.itemWidget(last_item)
-            print(last_item_widget)
             last_file_name = last_item_widget.get_file_name()
-            print(f"the last item file is : {last_file_name}")
+            print(f"The last list item's file name is : {last_file_name}")
 
             if file_name == last_file_name:
+                print("Deleting last list item")
                 self.profile_status_pages[profile].listWidget.takeItem(0)
-                
 
         myQCustomQWidget = TaskList()
         myQCustomQWidget.set_file_name(file_name)
-        myQCustomQWidget.set_progress(int(data['progress']))
+        myQCustomQWidget.set_progress(int(progress))
         myQCustomQWidget.set_icon(file_path)
-        myQCustomQWidget.hide_progress_bar(data['transfer_complete'])
+        myQCustomQWidget.hide_progress_bar(transfer_complete)
          
-        if data['transfer_complete']:
+        if file_operation == 'Deleting':
+            myQCustomQWidget.set_label_1(f"Deleted from {parent_dir}")
+            myQCustomQWidget.set_label_2(f'')
+        
+        elif transfer_complete:
             myQCustomQWidget.set_label_1(f"Available in <a href=file:///{absolute_path}>{parent_dir}</a>")
             myQCustomQWidget.set_label_2(f'{file_size_human}')
         else:
-            myQCustomQWidget.set_label_1(data['file_operation'])
+            myQCustomQWidget.set_label_1(file_operation)
             myQCustomQWidget.set_label_2(f'{progress_data_human} of {file_size_human}')
             
 
