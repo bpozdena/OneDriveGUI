@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
 import os
-import psutil
+# import psutil
 import re
 import subprocess
 import sys
-import time
+# import time
 from configparser import ConfigParser
 
 from PySide6.QtCore import QThread, QTimer, QUrl, Signal, QFileInfo, Qt 
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtWidgets import ( QWidget, QApplication, QMainWindow, QMenu, QSystemTrayIcon, 
                                 QListWidget, QListWidgetItem, QFileIconProvider, QStackedLayout, 
                                 QVBoxLayout, QLabel, QAbstractItemView)
@@ -240,32 +240,35 @@ class SettingsWindow(QWidget, Ui_settings_window):
 
 
 class ProfileStatusPage(QWidget, Ui_status_page):
-    def __init__(self, profile):
+    def __init__(self, profile_name):
         super(ProfileStatusPage, self).__init__()
+
+        self.profile_name = profile_name
 
         # Set up the user interface from Designer.
         self.setupUi(self)
 
-        # Show selected profile name
-        # self.label_4.setText(profile)
-
         # Temporary start/stop buttons
-        self.toolButton_start.clicked.connect(lambda: main_window.start_onedrive_monitor(profile))
-        self.toolButton_stop.clicked.connect(lambda: main_window.workers[profile].stop_worker())
-
-        # # Open Settings window
+        self.toolButton_start.clicked.connect(self.start_monitor)
+        self.toolButton_stop.clicked.connect(self.stop_monitor)
+        
+        # Open Settings window
         self.pushButton_settings.clicked.connect(self.show_settings_window)     
 
-        # Open login form TODO: testing
-        # self.pushButton_2.setText("login")
-        # self.pushButton_2.clicked.connect(lambda: self.show_login())    
+
+    def stop_monitor(self):
+        if self.profile_name in main_window.workers:
+            main_window.workers[self.profile_name].stop_worker()
+            self.label_onedrive_status.setText("OneDrive sync has been stopped")
+        else:
+            print(f"OneDrive for profile {self.profile_name} is not running")
+
+    def start_monitor(self):
+        main_window.start_onedrive_monitor(self.profile_name)
 
     def show_settings_window(self):
         self.settings_window = SettingsWindow()
         self.settings_window.show()
-
-    # def stop_worker(self, profile):
-    #     main_window.workers[profile].onedrive_process.kill()
 
 
 class ProfileSettingsPage(QWidget, Ui_profile_settings):
@@ -615,12 +618,13 @@ class WorkerThread(QThread):
         print(f"[{self.profile_name}] Waiting for worker to finish...")
         while self.onedrive_process.poll() is None:
             self.onedrive_process.kill()
-            time.sleep(1)
+            # time.sleep(1)
 
         print(f"[{self.profile_name}] Quiting thread")            
         self.quit()
         self.wait()
         print(f"[{self.profile_name}] Removing thread info")
+
         main_window.workers.pop(self.profile_name, None)
         print(f"Remaining running workers: {main_window.workers}")
 
@@ -659,6 +663,8 @@ class WorkerThread(QThread):
 
                 if 'Authorize this app visiting' in stdout:
                     self.onedrive_process.kill()
+                    self.profile_status["status_message"] = 'OneDrive login is required'
+                    self.update_profile_status.emit(self.profile_status, self.profile_name)                    
                     self.update_credentials.emit(self.profile_name)
 
                 elif 'Sync with OneDrive is complete' in stdout:
@@ -671,6 +677,7 @@ class WorkerThread(QThread):
 
                     print(f"[{self.profile_name}] Free Space: {self.free_space_human}")
                     self.profile_status["free_space"] = f"Free Space: {self.free_space_human}"
+                    # self.profile_status["account_type"] = f"{self.account_type.capitalize()} [{self.free_space_human}]"
                     self.update_profile_status.emit(self.profile_status, self.profile_name)
 
                 elif 'Account Type' in stdout:
@@ -680,11 +687,15 @@ class WorkerThread(QThread):
                     self.update_profile_status.emit(self.profile_status, self.profile_name)
 
                 elif 'Initializing the OneDrive API' in stdout:
-                    self.profile_status["status_message"] = stdout
+                    self.profile_status["status_message"] = 'Initializing the OneDrive API'
                     self.update_profile_status.emit(self.profile_status, self.profile_name)
 
                 elif 'Processing' in stdout:
-                    self.profile_status["status_message"] = "OneDrive is processing files..."
+                    items_left = re.match(r"^Processing\s([0-9]+)", stdout)
+                    if items_left != None:
+                        self.profile_status["status_message"] = f"OneDrive is processing {items_left.group(1)} items..."
+                    else:
+                        self.profile_status["status_message"] = "OneDrive is processing items..."
                     self.update_profile_status.emit(self.profile_status, self.profile_name)                    
 
                 elif any(_ in stdout for _ in tasks):  
@@ -708,8 +719,14 @@ class WorkerThread(QThread):
                         "progress": progress,
                         "transfer_complete": transfer_complete}                        
 
+                    # Update file transfer list
                     print(transfer_progress_new)
                     self.update_progress_new.emit(transfer_progress_new, self.profile_name)
+
+                    # Update profile status message.
+                    if transfer_complete:
+                        self.profile_status["status_message"] = 'OneDrive sync is complete'
+                  
 
                 elif '% |' in stdout and file_name is not None:  
                     # Capture upload/download progress status
@@ -725,7 +742,13 @@ class WorkerThread(QThread):
                         "transfer_complete": transfer_complete}                         
 
                     print(transfer_progress_new)
-                    self.update_progress_new.emit(transfer_progress_new, self.profile_name)
+                    self.update_progress_new.emit(transfer_progress_new, self.profile_name)    
+
+                    if transfer_complete:
+                        self.profile_status["status_message"] = 'OneDrive sync is complete'
+                    else:
+                        self.profile_status["status_message"] = 'OneDrive sync in progress...'
+                    self.update_profile_status.emit(self.profile_status, self.profile_name)                                               
 
                 else:
                     pass
@@ -767,8 +790,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         #
         # Menu
-        # 
-
         self.menubar.hide()
         # Update OneDrive Status
         self.actionRefresh_Service_Status.triggered.connect(lambda: self.onedrive_process_status())
@@ -830,6 +851,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.tray = None
 
+
+
+        self.refresh_process_status = QTimer()
+        self.refresh_process_status.setSingleShot(False)
+        self.refresh_process_status.timeout.connect(lambda: self.onedrive_process_status())
+        self.refresh_process_status.start(500)    
+
+
     def show_settings_window(self):
         self.settings_window = SettingsWindow()
         self.settings_window.show()            
@@ -839,16 +868,34 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def onedrive_process_status(self):
         # Check OneDrive status
-        for onedrive_process in psutil.process_iter():
-            if onedrive_process.name().lower() == 'onedrive' and onedrive_process.status() != 'zombie':
-                self.label_3.setText("running")
-                return True
+        # print(self.workers)
+        pixmap_running = QPixmap('resources/images/icons8-green-circle-48.png').scaled(20, 20, Qt.KeepAspectRatio)
+        pixmap_stopped = QPixmap('resources/images/icons8-red-circle-48.png').scaled(20, 20, Qt.KeepAspectRatio)
 
-        self.label_3.setText("not running")
-        self.tray.setIcon(QIcon("resources/images/icons8-cloud-cross-40_2.png"))
-        self.progressBar.hide()
-        self.label_5.hide()
-        return False
+        for profile_name in global_config:
+            # print(profile_name)
+            if profile_name not in self.workers:
+                self.profile_status_pages[profile_name].label_status.setText("stopped")
+                self.profile_status_pages[profile_name].label_status.setPixmap(pixmap_stopped)
+                # print(f"not running {profile_name}")
+                
+            else:
+                if self.workers[profile_name].isRunning():
+                    self.profile_status_pages[profile_name].label_status.setText("running")
+                    self.profile_status_pages[profile_name].label_status.setPixmap(pixmap_running)
+                    # print(f"running worker {profile_name}")
+            
+
+        # for onedrive_process in psutil.process_iter():
+        #     if onedrive_process.name().lower() == 'onedrive' and onedrive_process.status() != 'zombie':
+        #         self.label_3.setText("running")
+        #         return True
+
+        # self.label_3.setText("not running")
+        # self.tray.setIcon(QIcon("resources/images/icons8-cloud-cross-40_2.png"))
+        # self.progressBar.hide()
+        # self.label_5.hide()
+        # return False
 
     # def onedrive_sync_status(self):
     #     # Check OneDrive sync status
@@ -880,6 +927,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # self.worker.trigger_resync.connect(self.show_login)
         self.workers[profile_name].update_progress_new.connect(self.event_update_progress_new)
         self.workers[profile_name].update_profile_status.connect(self.event_update_profile_status)
+        self.workers[profile_name].started.connect(lambda: print(f"started worker {profile_name}"))
+        self.workers[profile_name].finished.connect(lambda: print(f"finished worker {profile_name}"))
 
     def event_update_profile_status(self, data, profile):
         self.profile_status_pages[profile].label_onedrive_status.setText(data['status_message'])
@@ -896,8 +945,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "progress": progress.group(1),
             "transfer_complete": transfer_complete
         }
-
-        TODO: De-monster once all possible situations are handled correctly. 
         """
         _sync_dir = os.path.expanduser(global_config[profile]['onedrive']['sync_dir'].strip('"'))
         # profile_status_page = self.profile_status_pages[profile]

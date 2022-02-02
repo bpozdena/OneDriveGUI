@@ -62,7 +62,17 @@
       <property name="spacing">
        <number>2</number>
       </property>
-      <item row="1" column="0" colspan="4">
+      <item row="5" column="0">
+       <widget class="QToolButton" name="toolButton_start">
+        <property name="styleSheet">
+         <string notr="true">color: rgb(255, 255, 255);</string>
+        </property>
+        <property name="text">
+         <string>Start</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="5">
        <widget class="QLabel" name="label_onedrive_status">
         <property name="font">
          <font>
@@ -82,40 +92,46 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
-       <widget class="QToolButton" name="toolButton_start">
+      <item row="5" column="2">
+       <widget class="QLabel" name="label_status">
+        <property name="styleSheet">
+         <string notr="true">color: rgb(255, 255, 255);</string>
+        </property>
         <property name="text">
-         <string>Start</string>
+         <string/>
         </property>
        </widget>
       </item>
       <item row="5" column="1">
        <widget class="QToolButton" name="toolButton_stop">
+        <property name="styleSheet">
+         <string notr="true">color: rgb(255, 255, 255);</string>
+        </property>
         <property name="text">
          <string>Stop</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="4">
+      <item row="3" column="0" colspan="5">
        <widget class="QLabel" name="label_account_type">
         <property name="styleSheet">
          <string notr="true">color: rgb(255, 255, 255);</string>
         </property>
         <property name="text">
-         <string>Account type: </string>
+         <string/>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
-      <item row="5" column="3">
+      <item row="5" column="4">
        <widget class="QLabel" name="label_free_space">
         <property name="styleSheet">
          <string notr="true">color: rgb(255, 255, 255);</string>
         </property>
         <property name="text">
-         <string>Free Space: </string>
+         <string/>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
