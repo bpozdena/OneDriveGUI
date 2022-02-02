@@ -1,0 +1,4 @@
+# Testing
+pyinstaller --onefile --icon=resources/images/OneDriveGUI.ico --add-data="resources:resources" OneDriveGUI.py
+
+pyinstaller --icon=resources/images/OneDriveGUI.ico --add-data="resources:resources" OneDriveGUI.py
