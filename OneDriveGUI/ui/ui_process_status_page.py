@@ -41,37 +41,46 @@ class Ui_status_page(object):
         self.gridLayout.setContentsMargins(2, 2, 2, 2)
         self.toolButton_start = QToolButton(self.frame)
         self.toolButton_start.setObjectName(u"toolButton_start")
+        self.toolButton_start.setStyleSheet(u"color: rgb(255, 255, 255);")
 
-        self.gridLayout.addWidget(self.toolButton_start, 2, 1, 1, 1)
+        self.gridLayout.addWidget(self.toolButton_start, 5, 0, 1, 1)
 
-        self.label_4 = QLabel(self.frame)
-        self.label_4.setObjectName(u"label_4")
-        self.label_4.setStyleSheet(u"color: rgb(255, 255, 255);")
-
-        self.gridLayout.addWidget(self.label_4, 2, 0, 1, 1)
-
-        self.label_6 = QLabel(self.frame)
-        self.label_6.setObjectName(u"label_6")
+        self.label_onedrive_status = QLabel(self.frame)
+        self.label_onedrive_status.setObjectName(u"label_onedrive_status")
         font = QFont()
         font.setPointSize(11)
         font.setBold(True)
-        self.label_6.setFont(font)
-        self.label_6.setStyleSheet(u"color: rgb(255, 255, 255);")
-        self.label_6.setAlignment(Qt.AlignCenter)
+        self.label_onedrive_status.setFont(font)
+        self.label_onedrive_status.setStyleSheet(u"color: rgb(255, 255, 255);")
+        self.label_onedrive_status.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout.addWidget(self.label_6, 1, 0, 1, 4)
+        self.gridLayout.addWidget(self.label_onedrive_status, 1, 0, 1, 5)
 
-        self.label_3 = QLabel(self.frame)
-        self.label_3.setObjectName(u"label_3")
-        self.label_3.setStyleSheet(u"color: rgb(255, 255, 255);")
-        self.label_3.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.label_status = QLabel(self.frame)
+        self.label_status.setObjectName(u"label_status")
+        self.label_status.setStyleSheet(u"color: rgb(255, 255, 255);")
 
-        self.gridLayout.addWidget(self.label_3, 2, 3, 1, 1)
+        self.gridLayout.addWidget(self.label_status, 5, 2, 1, 1)
 
         self.toolButton_stop = QToolButton(self.frame)
         self.toolButton_stop.setObjectName(u"toolButton_stop")
+        self.toolButton_stop.setStyleSheet(u"color: rgb(255, 255, 255);")
 
-        self.gridLayout.addWidget(self.toolButton_stop, 2, 2, 1, 1)
+        self.gridLayout.addWidget(self.toolButton_stop, 5, 1, 1, 1)
+
+        self.label_account_type = QLabel(self.frame)
+        self.label_account_type.setObjectName(u"label_account_type")
+        self.label_account_type.setStyleSheet(u"color: rgb(255, 255, 255);")
+        self.label_account_type.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout.addWidget(self.label_account_type, 3, 0, 1, 5)
+
+        self.label_free_space = QLabel(self.frame)
+        self.label_free_space.setObjectName(u"label_free_space")
+        self.label_free_space.setStyleSheet(u"color: rgb(255, 255, 255);")
+        self.label_free_space.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.gridLayout.addWidget(self.label_free_space, 5, 4, 1, 1)
 
 
         self.verticalLayout.addWidget(self.frame)
@@ -121,10 +130,11 @@ class Ui_status_page(object):
     def retranslateUi(self, status_page):
         status_page.setWindowTitle(QCoreApplication.translate("status_page", u"OneDriveGUI - Process Status", None))
         self.toolButton_start.setText(QCoreApplication.translate("status_page", u"Start", None))
-        self.label_4.setText(QCoreApplication.translate("status_page", u"...", None))
-        self.label_6.setText(QCoreApplication.translate("status_page", u"Onedrive is ...", None))
-        self.label_3.setText(QCoreApplication.translate("status_page", u"...", None))
+        self.label_onedrive_status.setText(QCoreApplication.translate("status_page", u"Onedrive is sync not running", None))
+        self.label_status.setText("")
         self.toolButton_stop.setText(QCoreApplication.translate("status_page", u"Stop", None))
+        self.label_account_type.setText("")
+        self.label_free_space.setText("")
         self.pushButton.setText(QCoreApplication.translate("status_page", u"Open Folder", None))
         self.pushButton_2.setText(QCoreApplication.translate("status_page", u"Sync", None))
         self.pushButton_settings.setText(QCoreApplication.translate("status_page", u"Settings", None))
