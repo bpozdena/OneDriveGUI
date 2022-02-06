@@ -6,7 +6,7 @@ import subprocess
 import sys
 from configparser import ConfigParser
 
-from PySide6.QtCore import QThread, QTimer, QUrl, Signal, QFileInfo, Qt
+from PySide6.QtCore import QThread, QTimer, QUrl, Signal, QFileInfo, Qt, QDir
 from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtWidgets import (
     QWidget,
@@ -22,6 +22,13 @@ from PySide6.QtWidgets import (
     QLabel,
     QAbstractItemView,
     QWizard,
+    QWizardPage,
+    QLineEdit,
+    QCheckBox,
+    QPushButton,
+    QFormLayout,
+    QGridLayout,
+    QFileDialog,
 )
 
 # TODO: Split into multiple files once all main features are implemented.
@@ -42,64 +49,36 @@ from ui.ui_import_existing_profile import Ui_import_profile
 from ui.ui_create_new_profile import Ui_create_new_profile
 
 # Imports for setup wizards
-from ui.ui_setup_wizard import Ui_SetupWizard
+# from ui.ui_setup_wizard import Ui_SetupWizard
+# from setup_wizard import SetupWizard
 
 
 PROFILES_FILE = os.path.expanduser("~/.config/onedrive-gui/profiles")
 
 
-class SetupWizard(QWizard, Ui_SetupWizard):
-    # TODO: Disable 'Next' button when neither profile import or creation is selected.
-    # TODO: Sub-class individual wizard pages and re-implement isComplete.
-    def __init__(self):
-        super(SetupWizard, self).__init__()
-        self.setupUi(self)
+class SetupWizard(QWizard):
+    def __init__(self, parent=None):
+        super(SetupWizard, self).__init__(parent)
         self.setWindowIcon(QIcon("resources/images/icons8-clouds-48.png"))
 
-        self.settings_window = SettingsWindow()
-        self.settings_window.hide()
+        self.setPage(1, WizardPage_welcome(self))
+        self.setPage(2, wizardPage_version_check(self))
+        self.setPage(3, wizardPage_create_import(self))
+        self.setPage(4, wizardPage_create(self))
+        self.setPage(5, wizardPage_import(self))
+        self.setPage(6, wizardPage_finish(self))
+        # self.setPage(7, wizardPage_extra(self))
+        # self.page(6).setFinalPage(True)
+
+        self.setWindowTitle("OneDriveGUI Setup Wizard")
+        self.resize(640, 480)
 
         self.currentIdChanged.connect(self.on_page_change)
-
-        self.checkBox_create.stateChanged.connect(self.on_checkbox_change)
-        # self.checkBox_create.stateChanged.connect(lambda: self.wizardPage_create_import.completeChanged.emit())
-
-        self.checkBox_import.stateChanged.connect(self.on_checkbox_change)
-        # self.checkBox_import.stateChanged.connect(lambda: self.wizardPage_create_import.completeChanged.emit())
-
-        self.pushButton_create.clicked.connect(self.create_profile)
-        self.pushButton_import.clicked.connect(self.import_profile)
-
-        self.wizardPage_finish.setFinalPage(True)
 
     def on_page_change(self):
         if self.currentId() == 2:
             print("Checking installed OneDrive version")
-            self.check_onedrive_version()
-
-    def on_checkbox_change(self, state):
-        self.checkbox_name = self.sender().objectName()
-        if self.checkbox_name == "checkBox_create":
-            if state == Qt.Checked:
-                print(f"{self.checkbox_name} is checked")
-                self.checkBox_import.setDisabled(True)
-                # self.wizardPage_create_import.completeChanged()
-
-            else:
-                print(f"{self.checkbox_name} is unchecked")
-                self.checkBox_import.setDisabled(False)
-
-        if self.checkbox_name == "checkBox_import":
-            if state == Qt.Checked:
-                print(f"{self.checkbox_name} is checked")
-                self.checkBox_create.setDisabled(True)
-                # self.wizardPage_create_import.completeChanged()
-
-            else:
-                print(f"{self.checkbox_name} is unchecked")
-                self.checkBox_create.setDisabled(False)
-
-        # if self.checkBox_create.isChecked() and self.checkBox_import.isChecked()
+            self.page(2).check_onedrive_version()
 
     def nextId(self):
         if self.currentPage() == self.page(1):
@@ -107,25 +86,60 @@ class SetupWizard(QWizard, Ui_SetupWizard):
         if self.currentPage() == self.page(2):
             return 3
         if self.currentPage() == self.page(3):
-            if self.checkBox_create.isChecked():
-                return 5
-            elif self.checkBox_import.isChecked():
+            if self.page(3).checkBox_create.isChecked():
                 return 4
-        if self.currentPage() == self.page(4) or self.page(5):
+            elif self.page(3).checkBox_import.isChecked():
+                return 5
+        if self.currentPage() == self.page(4):
+            return 6
+        if self.currentPage() == self.page(5):
             return 6
         if self.currentPage() == self.page(6):
-            # TODO: This is never called by QWizard's last page.
-            # TODO: Likely need to subclass the pages for this to work?...
             return -1
 
-    def isComplete(self):
-        # TODO: Does not seem work without sub-classing individual pages.
-        if self.checkBox_create.isChecked() == False and self.checkBox_import.isChecked() == False:
-            print("not complete")
-            return False
-        else:
-            print("complete")
-            return True
+
+class WizardPage_welcome(QWizardPage):
+    def __init__(self, parent=None):
+        super(WizardPage_welcome, self).__init__(parent)
+
+        self.setTitle("Welcome to OneDriveGUI")
+        # self.setSubTitle("SubTitle")
+
+        # self.label1 = QLabel()
+        # self.label1.setText("Welcome to OneDriveGUI")
+
+        self.label_2 = QLabel()
+        self.label_2.setText("This wizard will help you with initial OneDrive profile creation/import.")
+
+        layout = QVBoxLayout()
+        # layout.addWidget(self.label1)
+        layout.addWidget(self.label_2)
+        self.setLayout(layout)
+
+
+class wizardPage_version_check(QWizardPage):
+    def __init__(self, parent=None):
+        super(wizardPage_version_check, self).__init__(parent)
+        self.setTitle("OneDrive version check")
+
+        # self.label_3 = QLabel()
+        # self.label_3.setText("Installed OneDrive version:")
+
+        self.label_4 = QLabel()
+        self.label_4.setText("Installed/Not Installed/ version")
+
+        self.label_5 = QLabel()
+        self.label_5.setWordWrap(True)
+        self.label_5.setText(
+            "OneDrive Client for Linux does not seem to be installed. Please install it by following "
+            "<a href='https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md'>instructions</a> for your distro. "
+        )
+
+        layout = QVBoxLayout()
+        # layout.addWidget(self.label_3)
+        layout.addWidget(self.label_4)
+        layout.addWidget(self.label_5)
+        self.setLayout(layout)
 
     def check_onedrive_version(self):
         # Check if OneDrive is installed
@@ -139,6 +153,112 @@ class SetupWizard(QWizard, Ui_SetupWizard):
         else:
             self.label_4.setText("OneDrive not detected.")
             return False
+
+
+class wizardPage_create_import(QWizardPage):
+    def __init__(self, parent=None):
+        super(wizardPage_create_import, self).__init__(parent)
+        self.setTitle("Create/Import OneDrive profile")
+
+        self.checkBox_create = QCheckBox()
+        self.checkBox_create.setText("Create new OneDrive profile")
+        self.checkBox_create.stateChanged.connect(self.on_checkbox_change)
+
+        self.checkBox_import = QCheckBox()
+        self.checkBox_import.setText("Import existing OneDrive profile/config")
+        self.checkBox_import.stateChanged.connect(self.on_checkbox_change)
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.checkBox_create)
+        layout.addWidget(self.checkBox_import)
+        self.setLayout(layout)
+
+    def on_checkbox_change(self):
+        if self.checkBox_create.isChecked():
+            print(f"Create new profile is checked")
+            self.checkBox_import.setDisabled(True)
+            self.completeChanged.emit()
+
+        elif self.checkBox_import.isChecked():
+            print(f"Import profile is checked")
+            self.checkBox_create.setDisabled(True)
+            self.completeChanged.emit()
+
+        else:
+            print(f"No option is unchecked")
+            self.checkBox_import.setDisabled(False)
+            self.checkBox_create.setDisabled(False)
+            self.completeChanged.emit()
+
+    def isComplete(self):
+        if self.checkBox_create.isChecked() == False and self.checkBox_import.isChecked() == False:
+            print("not complete")
+            return False
+        else:
+            print("complete")
+            return True
+
+
+class wizardPage_create(QWizardPage):
+    def __init__(self, parent=None):
+        super(wizardPage_create, self).__init__(parent)
+        self.setTitle("Create OneDrive profile")
+
+        # self.label_10 = QLabel()
+        # self.label_10.setText("Create new profile")
+
+        self.label_new_profile_name = QLabel()
+        self.label_new_profile_name.setText("New profile name")
+
+        self.lineEdit_new_profile_name = QLineEdit()
+        self.lineEdit_new_profile_name.setPlaceholderText("E.g. john@live.com")
+        self.lineEdit_new_profile_name.textChanged.connect(self.update_sync_dir)
+
+        self.label_sync_dir = QLabel()
+        self.label_sync_dir.setText("Sync directory")
+
+        self.lineEdit_sync_dir = QLineEdit()
+        self.lineEdit_sync_dir.setPlaceholderText("E.g. ~/OneDrive_john@live.com/")
+
+        self.pushButton_browse = QPushButton()
+        self.pushButton_browse.setText("Browse")
+        self.pushButton_browse.clicked.connect(self.get_dir_name)
+
+        self.pushButton_create = QPushButton()
+        self.pushButton_create.setText("Create new profile")
+        self.pushButton_create.clicked.connect(self.create_profile)
+
+        layout = QGridLayout()
+        # layout.addRow("Profile Name", self.lineEdit_new_profile_name)
+        # layout.addRow("Sync Directory", self.lineEdit_sync_dir)
+        # layout.addRow(self.pushButton_create)
+
+        # layout.addWidget(self.label_10)
+        layout.addWidget(self.label_new_profile_name, 0, 0)
+        layout.addWidget(self.lineEdit_new_profile_name, 0, 1)
+        layout.addWidget(self.label_sync_dir, 1, 0)
+        layout.addWidget(self.lineEdit_sync_dir, 1, 1)
+        layout.addWidget(self.pushButton_browse, 1, 2)
+        layout.addWidget(self.pushButton_create, 2, 0, 1, 3)
+        self.setLayout(layout)
+
+    def isComplete(self):
+        if self.pushButton_create.text() == "Done":
+            return True
+        return False
+
+    def get_dir_name(self):
+        self.file_dialog = QFileDialog.getExistingDirectory(
+            dir=os.path.expanduser("~/")
+        )  # getOpenFileName(self, dir=os.path.expanduser("~/.config/"))
+
+        dir_name = self.file_dialog
+
+        print(dir_name)
+        self.lineEdit_sync_dir.setText(dir_name)
+
+    def update_sync_dir(self, text):
+        self.lineEdit_sync_dir.setText(f"~/OneDrive_{text}")
 
     def create_profile(self):
         """
@@ -183,9 +303,9 @@ class SetupWizard(QWizard, Ui_SetupWizard):
         save_global_config()
 
         # Add Setting page widget for new profile
-        self.settings_window.listWidget_profiles.addItem(profile_name)
+        settings_window.listWidget_profiles.addItem(profile_name)
         self.setting_page = ProfileSettingsPage(profile_name)
-        self.settings_window.stackedLayout.addWidget(self.setting_page)
+        settings_window.stackedLayout.addWidget(self.setting_page)
 
         # Add status page widget for new profile
         main_window.comboBox.addItem(profile_name)
@@ -198,6 +318,57 @@ class SetupWizard(QWizard, Ui_SetupWizard):
         print(f"Account {profile_name} has been created")
         self.pushButton_create.setText("Done")
         self.pushButton_create.setDisabled(True)
+        self.completeChanged.emit()
+
+
+class wizardPage_import(QWizardPage):
+    def __init__(self, parent=None):
+        super(wizardPage_import, self).__init__(parent)
+        self.setTitle("Import OneDrive profile")
+
+        self.label_profile_name = QLabel()
+        self.label_profile_name.setText("Profile name")
+
+        self.label_config_path = QLabel()
+        self.label_config_path.setText("Config file path")
+
+        self.lineEdit_profile_name = QLineEdit()
+        self.lineEdit_profile_name.setPlaceholderText("E.g. john@live.com")
+
+        self.lineEdit_config_path = QLineEdit()
+        self.lineEdit_config_path.setPlaceholderText("E.g. ~/.config/onedrive/config")
+
+        self.pushButton_browse = QPushButton()
+        self.pushButton_browse.setText("Browse")
+        self.pushButton_browse.clicked.connect(self.get_config_name)
+
+        self.pushButton_import = QPushButton()
+        self.pushButton_import.setText("Import")
+        self.pushButton_import.clicked.connect(self.import_profile)
+
+        # self.registerField("label_profile_name*",self.label_profile_name)
+
+        layout = QGridLayout()
+        layout.addWidget(self.label_profile_name, 0, 0)
+        layout.addWidget(self.label_config_path, 1, 0)
+        layout.addWidget(self.lineEdit_profile_name, 0, 1)
+        layout.addWidget(self.lineEdit_config_path, 1, 1)
+        layout.addWidget(self.pushButton_browse, 1, 2)
+        layout.addWidget(self.pushButton_import, 2, 0, 2, 3)
+        self.setLayout(layout)
+
+    def isComplete(self):
+        if self.pushButton_import.text() == "Done":
+            return True
+        return False
+
+    def get_config_name(self):
+        self.file_dialog = QFileDialog.getOpenFileName(self, dir=os.path.expanduser("~/.config/"))
+
+        file_name = self.file_dialog[0]
+
+        print(file_name)
+        self.lineEdit_config_path.setText(file_name)
 
     def import_profile(self):
         """
@@ -243,9 +414,9 @@ class SetupWizard(QWizard, Ui_SetupWizard):
         # print(new_profile)
         # print(global_config)
 
-        self.settings_window.listWidget_profiles.addItem(profile_name)
+        settings_window.listWidget_profiles.addItem(profile_name)
         self.setting_page = ProfileSettingsPage(profile_name)
-        self.settings_window.stackedLayout.addWidget(self.setting_page)
+        settings_window.stackedLayout.addWidget(self.setting_page)
 
         # Add status page widget for new profile
         main_window.comboBox.addItem(profile_name)
@@ -258,6 +429,25 @@ class SetupWizard(QWizard, Ui_SetupWizard):
         print(f"Account {profile_name} has been imported")
         self.pushButton_import.setText("Done")
         self.pushButton_import.setDisabled(True)
+        self.completeChanged.emit()
+
+
+class wizardPage_finish(QWizardPage):
+    def __init__(self, parent=None):
+        super(wizardPage_finish, self).__init__(parent)
+        self.setTitle("Finished")
+        self.label_13 = QLabel()
+        self.label_13.setWordWrap(True)
+        self.label_13.setText(
+            "<html><head/><body><p>Your OneDrive profile has been created. "
+            "</p><p><br/></p><p>You can adjust advanced profile options if needed. "
+            "Once you are happy with the profile settings, start sync with OneDrive. "
+            "You will be automatically presented with a OneDrive login page if you have not logged on previously.</p></body></html>"
+        )
+
+        layout = QFormLayout()
+        layout.addWidget(self.label_13)
+        self.setLayout(layout)
 
 
 class SettingsWindow(QWidget, Ui_settings_window):
@@ -457,7 +647,7 @@ class ProfileStatusPage(QWidget, Ui_status_page):
         self.toolButton_stop.clicked.connect(self.stop_monitor)
 
         # Open Settings window
-        self.pushButton_settings.clicked.connect(self.show_settings_window)
+        self.pushButton_settings.clicked.connect(lambda: settings_window.show())
 
         self.pushButton_2.setText("Wizard")
         self.pushButton_2.clicked.connect(self.show_setup_wizard)
@@ -477,9 +667,9 @@ class ProfileStatusPage(QWidget, Ui_status_page):
     def start_monitor(self):
         main_window.start_onedrive_monitor(self.profile_name)
 
-    def show_settings_window(self):
-        self.settings_window = SettingsWindow()
-        self.settings_window.show()
+    # def show_settings_window(self):
+    #     # self.settings_window = SettingsWindow()
+    #     settings_window.show()
 
 
 class ProfileSettingsPage(QWidget, Ui_profile_settings):
@@ -1091,8 +1281,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setup_wizard.show()
 
     def show_settings_window(self):
-        self.settings_window = SettingsWindow()
-        self.settings_window.show()
+        # self.settings_window = SettingsWindow()
+        settings_window.show()
 
     def switch_account_status_page(self):
         self.stackedLayout.setCurrentIndex(self.comboBox.currentIndex())
@@ -1388,6 +1578,11 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     main_window = MainWindow()
+
+    settings_window = SettingsWindow()
+    settings_window.hide()
+
+    # setup_wizard = SetupWizard()
 
     main_window.show()
     app.exec()
