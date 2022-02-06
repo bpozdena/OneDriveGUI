@@ -1,1 +1,1 @@
-PySide6
+PySide6==6.2.2.1
