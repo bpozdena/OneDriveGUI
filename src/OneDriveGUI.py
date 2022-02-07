@@ -128,9 +128,11 @@ class wizardPage_version_check(QWizardPage):
 
         self.label_4 = QLabel()
         self.label_4.setText("Installed/Not Installed/ version")
+        
 
         self.label_5 = QLabel()
         self.label_5.setWordWrap(True)
+        self.label_5.setStyleSheet("color: red;")
         self.label_5.setText(
             "OneDrive Client for Linux does not seem to be installed. Please install it by following "
             "<a href='https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md'>instructions</a> for your distro. "
@@ -149,10 +151,13 @@ class wizardPage_version_check(QWizardPage):
             self.od_version = re.search(r".\s(v[0-9.]+)", str(od_version_check)).group(1)
             print(f"OneDrive {self.od_version} detected.")
             self.label_4.setText(f"OneDrive {self.od_version} detected.")
+            self.label_4.setStyleSheet("color: green;")
             self.label_5.hide()
+            
             return True
         else:
             self.label_4.setText("OneDrive not detected.")
+            self.label_4.setStyleSheet("color: red;")
             return False
 
 
