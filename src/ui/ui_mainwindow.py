@@ -24,7 +24,9 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(420, 807)
+        MainWindow.resize(420, 800)
+        MainWindow.setMinimumSize(QSize(420, 0))
+        MainWindow.setMaximumSize(QSize(420, 16777215))
         icon = QIcon()
         icon.addFile(u"../../../OneDriveGUI_POC_recovered-multi/icons8-clouds-48.png", QSize(), QIcon.Normal, QIcon.Off)
         MainWindow.setWindowIcon(icon)

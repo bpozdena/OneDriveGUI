@@ -36,7 +36,7 @@ class Ui_LoginWindow(object):
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.loginFrame = QWebEngineView(LoginWindow)
         self.loginFrame.setObjectName(u"loginFrame")
-        self.loginFrame.setUrl(QUrl(u"http://www.seznam.cz"))
+        self.loginFrame.setUrl(QUrl(u"about:blank"))
 
         self.horizontalLayout.addWidget(self.loginFrame)
 
@@ -47,6 +47,6 @@ class Ui_LoginWindow(object):
     # setupUi
 
     def retranslateUi(self, LoginWindow):
-        LoginWindow.setWindowTitle(QCoreApplication.translate("LoginWindow", u"Form", None))
+        LoginWindow.setWindowTitle(QCoreApplication.translate("LoginWindow", u"OneDrive Login", None))
     # retranslateUi
 

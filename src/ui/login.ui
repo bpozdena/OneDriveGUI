@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>OneDrive Login</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
@@ -51,7 +51,7 @@
     <widget class="QWebEngineView" name="loginFrame">
      <property name="url">
       <url>
-       <string>https://www.seznam.cz/</string>
+       <string>about:blank</string>
       </url>
      </property>
     </widget>

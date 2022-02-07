@@ -154,7 +154,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="pushButton_open_dir">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -162,7 +162,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Open Folder</string>
+        <string>Open Sync Directory</string>
        </property>
       </widget>
      </item>

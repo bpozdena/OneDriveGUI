@@ -54,10 +54,10 @@ class Ui_profile_settings(object):
         self.gridLayout_9.setObjectName(u"gridLayout_9")
         self.gridLayout_5 = QGridLayout()
         self.gridLayout_5.setObjectName(u"gridLayout_5")
-        self.pushButton_3 = QPushButton(self.groupBox_8)
-        self.pushButton_3.setObjectName(u"pushButton_3")
+        self.pushButton_sync_dir_browse = QPushButton(self.groupBox_8)
+        self.pushButton_sync_dir_browse.setObjectName(u"pushButton_sync_dir_browse")
 
-        self.gridLayout_5.addWidget(self.pushButton_3, 0, 2, 1, 1)
+        self.gridLayout_5.addWidget(self.pushButton_sync_dir_browse, 0, 2, 1, 1)
 
         self.label_sync_dir = QLabel(self.groupBox_8)
         self.label_sync_dir.setObjectName(u"label_sync_dir")
@@ -453,10 +453,10 @@ class Ui_profile_settings(object):
 
         self.gridLayout_8.addWidget(self.lineEdit_log_dir, 1, 1, 1, 1)
 
-        self.pushButton_log_dir = QPushButton(self.groupBox_7)
-        self.pushButton_log_dir.setObjectName(u"pushButton_log_dir")
+        self.pushButton_log_dir_browse = QPushButton(self.groupBox_7)
+        self.pushButton_log_dir_browse.setObjectName(u"pushButton_log_dir_browse")
 
-        self.gridLayout_8.addWidget(self.pushButton_log_dir, 1, 2, 1, 1)
+        self.gridLayout_8.addWidget(self.pushButton_log_dir_browse, 1, 2, 1, 1)
 
         self.label_monitor_log_frequency = QLabel(self.groupBox_7)
         self.label_monitor_log_frequency.setObjectName(u"label_monitor_log_frequency")
@@ -610,7 +610,7 @@ class Ui_profile_settings(object):
 
         self.retranslateUi(profile_settings)
 
-        self.tabWidget.setCurrentIndex(5)
+        self.tabWidget.setCurrentIndex(3)
 
 
         QMetaObject.connectSlotsByName(profile_settings)
@@ -620,7 +620,7 @@ class Ui_profile_settings(object):
         profile_settings.setWindowTitle(QCoreApplication.translate("profile_settings", u"OneDriveGUI - Profile Settings", None))
         self.label_profile_name.setText(QCoreApplication.translate("profile_settings", u"Profile name", None))
         self.groupBox_8.setTitle(QCoreApplication.translate("profile_settings", u"Monitored directory", None))
-        self.pushButton_3.setText(QCoreApplication.translate("profile_settings", u"Browse", None))
+        self.pushButton_sync_dir_browse.setText(QCoreApplication.translate("profile_settings", u"Browse", None))
         self.label_sync_dir.setText(QCoreApplication.translate("profile_settings", u"Sync Folder:", None))
         self.checkBox_sync_root_files.setText(QCoreApplication.translate("profile_settings", u"Sync root files", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.exemptions_tab_2), QCoreApplication.translate("profile_settings", u"Monitored Files", None))
@@ -667,7 +667,7 @@ class Ui_profile_settings(object):
         self.checkBox_enable_logging.setText(QCoreApplication.translate("profile_settings", u"Enable Logging", None))
         self.label_log_dir.setText(QCoreApplication.translate("profile_settings", u"Log location:", None))
         self.checkBox_debug_https.setText(QCoreApplication.translate("profile_settings", u"Debug HTTPS", None))
-        self.pushButton_log_dir.setText(QCoreApplication.translate("profile_settings", u"Browse", None))
+        self.pushButton_log_dir_browse.setText(QCoreApplication.translate("profile_settings", u"Browse", None))
         self.label_monitor_log_frequency.setText(QCoreApplication.translate("profile_settings", u"Monitor log frequency", None))
         self.groupBox_6.setTitle(QCoreApplication.translate("profile_settings", u"Notifications", None))
         self.label_min_notify_changes.setText(QCoreApplication.translate("profile_settings", u"Minimum notify changes", None))

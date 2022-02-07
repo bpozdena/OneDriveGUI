@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from optparse import Option
 import os
 import re
 import subprocess
@@ -7,7 +8,7 @@ import sys
 from configparser import ConfigParser
 
 from PySide6.QtCore import QThread, QTimer, QUrl, Signal, QFileInfo, Qt, QDir
-from PySide6.QtGui import QIcon, QPixmap
+from PySide6.QtGui import QIcon, QPixmap, QDesktopServices
 from PySide6.QtWidgets import (
     QWidget,
     QApplication,
@@ -248,12 +249,9 @@ class wizardPage_create(QWizardPage):
         return False
 
     def get_dir_name(self):
-        self.file_dialog = QFileDialog.getExistingDirectory(
-            dir=os.path.expanduser("~/")
-        )  # getOpenFileName(self, dir=os.path.expanduser("~/.config/"))
+        self.file_dialog = QFileDialog.getExistingDirectory(dir=os.path.expanduser("~/"))
 
         dir_name = self.file_dialog
-
         print(dir_name)
         self.lineEdit_sync_dir.setText(dir_name)
 
@@ -468,13 +466,26 @@ class SettingsWindow(QWidget, Ui_settings_window):
 
         self.horizontalLayout.addLayout(self.stackedLayout)
         self.listWidget_profiles.itemSelectionChanged.connect(self.switch_account_settings_page)
+
         self.pushButton_open_create.clicked.connect(self.create_new_profile_window)
+        self.pushButton_open_create.hide()
         self.pushButton_open_import.clicked.connect(self.import_profile_window)
+        self.pushButton_open_import.hide()
+
         self.pushButton_remove.clicked.connect(self.remove_profile)
+        self.pushButton_create_import.clicked.connect(self.show_setup_wizard)
         self.show()
+
+    def closeEvent(self, event):
+        event.ignore()
+        self.hide()
 
     def switch_account_settings_page(self):
         self.stackedLayout.setCurrentIndex(self.listWidget_profiles.currentRow())
+
+    def show_setup_wizard(self):
+        self.setup_wizard = SetupWizard()
+        self.setup_wizard.show()
 
     def create_new_profile_window(self):
         # Show profile creation window
@@ -646,11 +657,20 @@ class ProfileStatusPage(QWidget, Ui_status_page):
         self.toolButton_start.clicked.connect(self.start_monitor)
         self.toolButton_stop.clicked.connect(self.stop_monitor)
 
+        # Open Sync Dir
+        self.pushButton_open_dir.clicked.connect(self.open_sync_dir)
+
         # Open Settings window
         self.pushButton_settings.clicked.connect(lambda: settings_window.show())
 
         self.pushButton_2.setText("Wizard")
         self.pushButton_2.clicked.connect(self.show_setup_wizard)
+        self.pushButton_2.hide()
+
+    def open_sync_dir(self):
+        sync_dir = global_config[self.profile_name]["onedrive"]["sync_dir"].strip('"')
+        url = QUrl(os.path.expanduser(sync_dir))
+        QDesktopServices.openUrl(url)
 
     def show_setup_wizard(self):
         self.setup_wizard = SetupWizard()
@@ -696,6 +716,8 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_sync_root_files.setChecked(self.get_check_box_state("sync_root_files"))
         self.checkBox_sync_root_files.stateChanged.connect(self.set_check_box_state)
 
+        self.pushButton_sync_dir_browse.clicked.connect(self.get_sync_dir_name)
+    
         #
         # Excluded files tab
         #
@@ -798,7 +820,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.lineEdit_azure_tenant_id.setText(self.temp_profile_config["azure_tenant_id"].strip('"'))
         self.lineEdit_azure_tenant_id.textChanged.connect(self.set_line_edit_value)
 
-        # Rate limit tab
+        # Rate limit
         self.spinBox_rate_limit.setValue(int(self.temp_profile_config["rate_limit"].strip('"')))
         self.horizontalSlider_rate_limit.setValue(int(self.temp_profile_config["rate_limit"].strip('"')))
         self.label_rate_limit_mbps.setText(
@@ -846,6 +868,8 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.lineEdit_log_dir.setText(self.temp_profile_config["log_dir"].strip('"'))
         self.lineEdit_log_dir.textChanged.connect(self.set_log_dir)
 
+        self.pushButton_log_dir_browse.clicked.connect(self.get_log_dir_name)
+
         self.checkBox_enable_logging.setChecked(self.get_check_box_state("enable_logging"))
         self.checkBox_enable_logging.stateChanged.connect(self.set_check_box_state)
 
@@ -879,8 +903,23 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         # self.pushButton_discart.clicked.connect(self.discart_changes)
         self.pushButton_save.clicked.connect(self.save_profile_settings)
 
+
     def str2bool(self, value):
         return value.lower() in "true"
+
+    def get_sync_dir_name(self):
+        self.file_dialog = QFileDialog.getExistingDirectory(dir=os.path.expanduser("~/"))
+
+        sync_dir = self.file_dialog
+        print(sync_dir)
+        self.lineEdit_sync_dir.setText(sync_dir)    
+
+    def get_log_dir_name(self):
+        self.file_dialog = QFileDialog.getExistingDirectory(dir=os.path.expanduser("~/"))
+
+        log_dir = self.file_dialog
+        print(log_dir)
+        self.lineEdit_log_dir.setText(log_dir)                    
 
     def set_line_edit_value(self, value):
         _property = self.sender().objectName()
@@ -1259,14 +1298,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             actionshow = menu.addAction("Show/Hide")
             actionshow.triggered.connect(lambda: self.hide() if self.isVisible() else self.show())
             setting_action = menu.addAction("Settings")
-            # setting_action.triggered.connect(self.show_settings)
+            setting_action.triggered.connect(self.show_settings_window)
             quit_action = menu.addAction("Quit")
             quit_action.triggered.connect(sys.exit)
 
+            self.tray.activated.connect(lambda: self.hide() if self.isVisible() else self.show())
             self.tray.setIcon(icon)
             self.tray.setContextMenu(menu)
             self.tray.show()
-            self.tray.setToolTip("This is OneDriveGUI")
+            self.tray.setToolTip("OneDriveGUI")
 
         else:
             self.tray = None
@@ -1275,6 +1315,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.refresh_process_status.setSingleShot(False)
         self.refresh_process_status.timeout.connect(lambda: self.onedrive_process_status())
         self.refresh_process_status.start(500)
+
+    def closeEvent(self, event):
+        event.ignore()
+        self.hide()
 
     def show_setup_wizard(self):
         self.setup_wizard = SetupWizard()
@@ -1440,6 +1484,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lw = Ui_LoginWindow()
         self.lw.setupUi(self.window1)
         self.window1.show()
+        self.window1.setWindowTitle(f"OneDrive login for profile {profile}")
 
         self.config_file = global_config[profile]["config_file"].strip('"')
         self.config_dir = re.search(r"(.+)/.+$", self.config_file).group(1)

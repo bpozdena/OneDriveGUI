@@ -48,7 +48,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>5</number>
+        <number>3</number>
        </property>
        <widget class="QWidget" name="exemptions_tab_2">
         <attribute name="title">
@@ -64,7 +64,7 @@
             <item row="1" column="0">
              <layout class="QGridLayout" name="gridLayout_5">
               <item row="0" column="2">
-               <widget class="QPushButton" name="pushButton_3">
+               <widget class="QPushButton" name="pushButton_sync_dir_browse">
                 <property name="text">
                  <string>Browse</string>
                 </property>
@@ -608,7 +608,7 @@
                <widget class="QLineEdit" name="lineEdit_log_dir"/>
               </item>
               <item row="1" column="2">
-               <widget class="QPushButton" name="pushButton_log_dir">
+               <widget class="QPushButton" name="pushButton_log_dir_browse">
                 <property name="text">
                  <string>Browse</string>
                 </property>

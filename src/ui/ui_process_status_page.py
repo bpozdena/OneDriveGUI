@@ -94,15 +94,15 @@ class Ui_status_page(object):
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.pushButton = QPushButton(status_page)
-        self.pushButton.setObjectName(u"pushButton")
+        self.pushButton_open_dir = QPushButton(status_page)
+        self.pushButton_open_dir.setObjectName(u"pushButton_open_dir")
         sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pushButton.sizePolicy().hasHeightForWidth())
-        self.pushButton.setSizePolicy(sizePolicy)
+        sizePolicy.setHeightForWidth(self.pushButton_open_dir.sizePolicy().hasHeightForWidth())
+        self.pushButton_open_dir.setSizePolicy(sizePolicy)
 
-        self.horizontalLayout.addWidget(self.pushButton)
+        self.horizontalLayout.addWidget(self.pushButton_open_dir)
 
         self.pushButton_2 = QPushButton(status_page)
         self.pushButton_2.setObjectName(u"pushButton_2")
@@ -135,7 +135,7 @@ class Ui_status_page(object):
         self.toolButton_stop.setText(QCoreApplication.translate("status_page", u"Stop", None))
         self.label_account_type.setText("")
         self.label_free_space.setText("")
-        self.pushButton.setText(QCoreApplication.translate("status_page", u"Open Folder", None))
+        self.pushButton_open_dir.setText(QCoreApplication.translate("status_page", u"Open Sync Directory", None))
         self.pushButton_2.setText(QCoreApplication.translate("status_page", u"Sync", None))
         self.pushButton_settings.setText(QCoreApplication.translate("status_page", u"Settings", None))
     # retranslateUi
