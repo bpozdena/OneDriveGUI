@@ -55,15 +55,18 @@ PROFILES_FILE = os.path.expanduser("~/.config/onedrive-gui/profiles")
 
 # Logging
 log_path = os.path.expanduser("~/.config/onedrive-gui/onedrivegui.log")
-timed_handler = handlers.TimedRotatingFileHandler(filename=log_path, when='D', interval=1, backupCount=2)
+if not os.path.exists(log_path):
+    os.makedirs(log_path)
+timed_handler = handlers.TimedRotatingFileHandler(filename=log_path, when="D", interval=1, backupCount=2)
 stdout_handler = logging.StreamHandler(sys.stdout)
-handlers = [timed_handler] #, stdout_handler]
+handlers = [timed_handler]  # , stdout_handler]
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
     handlers=handlers,
     level=logging.DEBUG,
 )
+
 
 class SetupWizard(QWizard):
     def __init__(self, parent=None):
@@ -126,7 +129,7 @@ class wizardPage_version_check(QWizardPage):
 
         self.label_4 = QLabel()
         self.label_4.setText("Installed/Not Installed/ version")
-        
+
         self.label_5 = QLabel()
         self.label_5.setWordWrap(True)
         self.label_5.setStyleSheet("color: red;")
@@ -153,7 +156,7 @@ class wizardPage_version_check(QWizardPage):
                 self.label_4.setStyleSheet("color: green;")
                 self.label_5.hide()
                 self.completeChanged.emit()
-                
+
                 return True
             else:
                 self.label_4.setText("OneDrive not detected.")
@@ -161,17 +164,16 @@ class wizardPage_version_check(QWizardPage):
                 self.completeChanged.emit()
                 return False
         except FileNotFoundError:
-                self.label_4.setText("OneDrive not detected.")
-                self.label_4.setStyleSheet("color: red;")
-                self.completeChanged.emit()
-                return False
-        
+            self.label_4.setText("OneDrive not detected.")
+            self.label_4.setStyleSheet("color: red;")
+            self.completeChanged.emit()
+            return False
 
     def isComplete(self):
-        if 'not' in self.label_4.text().lower():
+        if "not" in self.label_4.text().lower():
             return False
         else:
-            return True       
+            return True
 
 
 class wizardPage_create_import(QWizardPage):
@@ -723,7 +725,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_sync_root_files.stateChanged.connect(self.set_check_box_state)
 
         self.pushButton_sync_dir_browse.clicked.connect(self.get_sync_dir_name)
-    
+
         #
         # Excluded files tab
         #
@@ -909,7 +911,6 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         # self.pushButton_discart.clicked.connect(self.discart_changes)
         self.pushButton_save.clicked.connect(self.save_profile_settings)
 
-
     def str2bool(self, value):
         return value.lower() in "true"
 
@@ -917,32 +918,33 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         os.system(f"onedrive --confdir='{self.config_dir}' --logout")
         logging.info(f"Profile {self.profile} has been logged out.")
         # self.profile_status["status_message"] = "You have been logged out"
-        
+
         main_window.profile_status_pages[self.profile].stop_monitor()
         # main_window.profile_status_pages[self.profile]["status_message"] = "You have been logged out"
         if self.profile in main_window.workers:
             main_window.workers[self.profile].stop_worker()
-            main_window.profile_status_pages[self.profile].label_onedrive_status.setText("OneDrive sync has been stopped")
+            main_window.profile_status_pages[self.profile].label_onedrive_status.setText(
+                "OneDrive sync has been stopped"
+            )
             logging.info(f"OneDrive sync for profile {self.profile} has been stopped.")
         else:
             logging.info(f"OneDrive for profile {self.profile} is not running.")
-        
-        main_window.profile_status_pages[self.profile].label_onedrive_status.setText("You have been logged out")
 
+        main_window.profile_status_pages[self.profile].label_onedrive_status.setText("You have been logged out")
 
     def get_sync_dir_name(self):
         self.file_dialog = QFileDialog.getExistingDirectory(dir=os.path.expanduser("~/"))
 
         sync_dir = self.file_dialog
         logging.info(sync_dir)
-        self.lineEdit_sync_dir.setText(sync_dir)    
+        self.lineEdit_sync_dir.setText(sync_dir)
 
     def get_log_dir_name(self):
         self.file_dialog = QFileDialog.getExistingDirectory(dir=os.path.expanduser("~/"))
 
         log_dir = self.file_dialog
         logging.info(log_dir)
-        self.lineEdit_log_dir.setText(log_dir)                    
+        self.lineEdit_log_dir.setText(log_dir)
 
     def set_line_edit_value(self, value):
         _property = self.sender().objectName()
@@ -1364,7 +1366,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     self.profile_status_pages[profile_name].label_status.setPixmap(pixmap_running)
                     # logging.info(f"running worker {profile_name}")
 
-
     def start_onedrive_monitor(self, profile_name):
         # for profile in global_config:
 
@@ -1427,7 +1428,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         logging.info("file name: " + file_name)
         logging.info("file path2: " + file_path2)
 
-
         # Delete last item list if it has the same file name.
         if self.profile_status_pages[profile].listWidget.item(0) != None:
             last_item = self.profile_status_pages[profile].listWidget.item(0)
@@ -1488,9 +1488,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lw.loginFrame.setUrl(QUrl(url))
 
         # Wait for user to login and obtain response URL
-        self.lw.loginFrame.urlChanged.connect(lambda: 
-                            self.get_response_url(self.lw.loginFrame.url().toString(), self.config_dir, profile))
-
+        self.lw.loginFrame.urlChanged.connect(
+            lambda: self.get_response_url(self.lw.loginFrame.url().toString(), self.config_dir, profile)
+        )
 
     def get_response_url(self, response_url, config_dir, profile):
         # Get response URL from OneDrive OAuth2
@@ -1500,7 +1500,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             logging.info("Login performed")
             self.window1.hide()
             main_window.workers[profile].stop_worker()
-            main_window.profile_status_pages[profile].label_onedrive_status.setText("You have been logged in. Start sync manually.")
+            main_window.profile_status_pages[profile].label_onedrive_status.setText(
+                "You have been logged in. Start sync manually."
+            )
         else:
             pass
 
@@ -1601,7 +1603,6 @@ def save_global_config():
         logging.info(f"{profile} config saved")
 
     logging.info("All configs saved")
-
 
 
 if __name__ == "__main__":
