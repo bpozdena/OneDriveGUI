@@ -1,4 +1,7 @@
 venv/
 .qt_for_python/
 src/__thrash/
+src/nohup.out
+nohup.out
 __pycache__/
+
