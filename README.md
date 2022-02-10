@@ -32,7 +32,7 @@ A simple GUI for [abraunegg's OneDrive Linux client](https://github.com/abrauneg
 
 1) Start OneDrive GUI:
 	```sh
-	cd OneDriveGUI/
+	cd src/
 	python OneDriveGUI.py
 	```
 
