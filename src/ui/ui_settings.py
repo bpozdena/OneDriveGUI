@@ -48,6 +48,11 @@ class Ui_settings_window(object):
 
         self.verticalLayout.addWidget(self.pushButton_remove)
 
+        self.pushButton_create_import = QPushButton(settings_window)
+        self.pushButton_create_import.setObjectName(u"pushButton_create_import")
+
+        self.verticalLayout.addWidget(self.pushButton_create_import)
+
         self.pushButton_open_create = QPushButton(settings_window)
         self.pushButton_open_create.setObjectName(u"pushButton_open_create")
 
@@ -74,6 +79,7 @@ class Ui_settings_window(object):
         settings_window.setWindowTitle(QCoreApplication.translate("settings_window", u"OneDriveGUI - Settings", None))
         self.label_profiles.setText(QCoreApplication.translate("settings_window", u"Profiles:", None))
         self.pushButton_remove.setText(QCoreApplication.translate("settings_window", u"Remove profile", None))
+        self.pushButton_create_import.setText(QCoreApplication.translate("settings_window", u"Create/Import wizard", None))
         self.pushButton_open_create.setText(QCoreApplication.translate("settings_window", u"Create new profile", None))
         self.pushButton_open_import.setText(QCoreApplication.translate("settings_window", u"Import existing profile", None))
     # retranslateUi
