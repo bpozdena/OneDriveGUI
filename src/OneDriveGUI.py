@@ -50,20 +50,14 @@ from ui.ui_profile_settings_page import Ui_profile_settings
 from ui.ui_import_existing_profile import Ui_import_profile
 from ui.ui_create_new_profile import Ui_create_new_profile
 
-# Imports for setup wizards
-# from ui.ui_setup_wizard import Ui_SetupWizard
-# from setup_wizard import SetupWizard
-
 
 PROFILES_FILE = os.path.expanduser("~/.config/onedrive-gui/profiles")
 
 # Logging
-# dir_path = os.path.dirname(os.path.realpath(__file__))
 log_path = os.path.expanduser("~/.config/onedrive-gui/onedrivegui.log")
-# file_handler = logging.FileHandler(filename=log_path)
 timed_handler = handlers.TimedRotatingFileHandler(filename=log_path, when='D', interval=1, backupCount=2)
 stdout_handler = logging.StreamHandler(sys.stdout)
-handlers = [timed_handler, stdout_handler]
+handlers = [timed_handler] #, stdout_handler]
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -82,8 +76,6 @@ class SetupWizard(QWizard):
         self.setPage(4, wizardPage_create(self))
         self.setPage(5, wizardPage_import(self))
         self.setPage(6, wizardPage_finish(self))
-        # self.setPage(7, wizardPage_extra(self))
-        # self.page(6).setFinalPage(True)
 
         self.setWindowTitle("OneDriveGUI Setup Wizard")
         self.resize(640, 480)
@@ -118,16 +110,11 @@ class WizardPage_welcome(QWizardPage):
         super(WizardPage_welcome, self).__init__(parent)
 
         self.setTitle("Welcome to OneDriveGUI")
-        # self.setSubTitle("SubTitle")
-
-        # self.label1 = QLabel()
-        # self.label1.setText("Welcome to OneDriveGUI")
 
         self.label_2 = QLabel()
         self.label_2.setText("This wizard will help you with initial OneDrive profile creation/import.")
 
         layout = QVBoxLayout()
-        # layout.addWidget(self.label1)
         layout.addWidget(self.label_2)
         self.setLayout(layout)
 
@@ -136,9 +123,6 @@ class wizardPage_version_check(QWizardPage):
     def __init__(self, parent=None):
         super(wizardPage_version_check, self).__init__(parent)
         self.setTitle("OneDrive version check")
-
-        # self.label_3 = QLabel()
-        # self.label_3.setText("Installed OneDrive version:")
 
         self.label_4 = QLabel()
         self.label_4.setText("Installed/Not Installed/ version")
@@ -239,9 +223,6 @@ class wizardPage_create(QWizardPage):
         super(wizardPage_create, self).__init__(parent)
         self.setTitle("Create OneDrive profile")
 
-        # self.label_10 = QLabel()
-        # self.label_10.setText("Create new profile")
-
         self.label_new_profile_name = QLabel()
         self.label_new_profile_name.setText("New profile name")
 
@@ -264,11 +245,6 @@ class wizardPage_create(QWizardPage):
         self.pushButton_create.clicked.connect(self.create_profile)
 
         layout = QGridLayout()
-        # layout.addRow("Profile Name", self.lineEdit_new_profile_name)
-        # layout.addRow("Sync Directory", self.lineEdit_sync_dir)
-        # layout.addRow(self.pushButton_create)
-
-        # layout.addWidget(self.label_10)
         layout.addWidget(self.label_new_profile_name, 0, 0)
         layout.addWidget(self.lineEdit_new_profile_name, 0, 1)
         layout.addWidget(self.label_sync_dir, 1, 0)
@@ -405,7 +381,7 @@ class wizardPage_import(QWizardPage):
     def import_profile(self):
         """
         Imports pre-existing OneDrive profile.
-        Loads default values firt, then overwrite them with user settings.
+        Loads default values first, then overwrite them with user settings.
         This is to handle cases where imported config contains only some properties.
         """
 
@@ -486,7 +462,6 @@ class SettingsWindow(QWidget, Ui_settings_window):
     def __init__(self):
         super(SettingsWindow, self).__init__()
 
-        # Set up the user interface from Designer.
         self.setupUi(self)
         self.setWindowIcon(QIcon("resources/images/icons8-clouds-48.png"))
 
@@ -629,7 +604,7 @@ class SettingsWindow(QWidget, Ui_settings_window):
     def import_profile(self):
         """
         Imports pre-existing OneDrive profile.
-        Loads default values firt, then overwrite them with user settings.
+        Loads default values first, then overwrite them with user settings.
         This is to handle cases where imported config contains only some properties.
         """
 
@@ -721,10 +696,6 @@ class ProfileStatusPage(QWidget, Ui_status_page):
 
     def start_monitor(self):
         main_window.start_onedrive_monitor(self.profile_name)
-
-    # def show_settings_window(self):
-    #     # self.settings_window = SettingsWindow()
-    #     settings_window.show()
 
 
 class ProfileSettingsPage(QWidget, Ui_profile_settings):
@@ -929,9 +900,6 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.pushButton_login.clicked.connect(lambda: main_window.show_login(self.profile))
         self.pushButton_login.hide()
         self.pushButton_logout.clicked.connect(self.logout)
-        # self.pushButton_logout.clicked.connect(lambda: os.system(f"onedrive --confdir='{self.config_dir}' --logout"))
-        # self.pushButton_logout.clicked.connect(lambda: logging.info(f"Profile {self.profile} has been logged out."))
-
 
         #
         # Buttons
@@ -1030,7 +998,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
 
     def add_item_to_qlist(self, source_widget, destination_widget, list):
         if source_widget.text() == "":
-            logging.info("Inoring empty value.")
+            logging.info("Ignoring empty value.")
         elif source_widget.text() in list:
             logging.info("Item already in exemption list.")
         else:
@@ -1089,14 +1057,8 @@ class TaskList(QWidget, Ui_list_item_widget):
         # pass
         if transfer_status:
             self.ls_progressBar.hide()
-        #     self.ls_label_task.hide()
-        #     self.ls_label_status.hide()
-        #     self.ls_label_dir.show()
         else:
             self.ls_progressBar.show()
-        #     self.ls_label_task.show()
-        #     self.ls_label_status.show()
-        #     self.ls_label_dir.hide()
 
 
 class WorkerThread(QThread):
@@ -1105,7 +1067,6 @@ class WorkerThread(QThread):
     """
 
     update_credentials = Signal(str)
-    # update_progress = Signal(dict)
     update_progress_new = Signal(dict, str)
     update_profile_status = Signal(dict, str)
     trigger_resync = Signal()
@@ -1125,7 +1086,6 @@ class WorkerThread(QThread):
         logging.info(f"[{self.profile_name}] Waiting for worker to finish...")
         while self.onedrive_process.poll() is None:
             self.onedrive_process.kill()
-            # time.sleep(1)
 
         logging.info(f"[{self.profile_name}] Quiting thread")
         self.quit()
@@ -1162,7 +1122,6 @@ class WorkerThread(QThread):
             universal_newlines=True,
         )
 
-        # TODO: De-monster once all possible situations are handled correctly.
         while self.onedrive_process.poll() is None:
             if self.onedrive_process.stdout:
                 stdout = self.onedrive_process.stdout.readline()
@@ -1212,7 +1171,7 @@ class WorkerThread(QThread):
                     self.update_profile_status.emit(self.profile_status, self.profile_name)
 
                 elif any(_ in stdout for _ in tasks):
-                    # Capture information abouth file that is being uploaded/downloaded/deleted by OneDrive.
+                    # Capture information about file that is being uploaded/downloaded/deleted by OneDrive.
                     file_operation = re.search(r"\b([Uploading|Downloading|Deleting]+)*", stdout).group(1)
 
                     if file_operation == "Deleting":
@@ -1405,28 +1364,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     self.profile_status_pages[profile_name].label_status.setPixmap(pixmap_running)
                     # logging.info(f"running worker {profile_name}")
 
-        # for onedrive_process in psutil.process_iter():
-        #     if onedrive_process.name().lower() == 'onedrive' and onedrive_process.status() != 'zombie':
-        #         self.label_3.setText("running")
-        #         return True
-
-        # self.label_3.setText("not running")
-        # self.tray.setIcon(QIcon("resources/images/icons8-cloud-cross-40_2.png"))
-        # self.progressBar.hide()
-        # self.label_5.hide()
-        # return False
-
-    # def onedrive_sync_status(self):
-    #     # Check OneDrive sync status
-    #     status = subprocess.check_output(['onedrive', '--display-sync-status'])
-    #     if 'in sync' in str(status):
-    #         self.label_4.setText("In Sync")
-    #         self.tray.setIcon(QIcon("resources/images/icons8-cloud-done-40_2.png"))
-    #         return True
-    #     else:
-    #         self.label_4.setText("Out of Sync")
-    #         self.tray.setIcon(QIcon("resources/images/icons8-cloud-sync-40_2.png"))
-    # return False
 
     def start_onedrive_monitor(self, profile_name):
         # for profile in global_config:
@@ -1490,9 +1427,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         logging.info("file name: " + file_name)
         logging.info("file path2: " + file_path2)
 
-        # if data['transfer_complete'] == True:
-        #     if int(data['progress']) == 100:
-        #         self.profile_status_pages[profile].listWidget.takeItem(0)
 
         # Delete last item list if it has the same file name.
         if self.profile_status_pages[profile].listWidget.item(0) != None:
@@ -1556,7 +1490,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Wait for user to login and obtain response URL
         self.lw.loginFrame.urlChanged.connect(lambda: 
                             self.get_response_url(self.lw.loginFrame.url().toString(), self.config_dir, profile))
-        # self.profile_status_pages[profile].label_onedrive_status.setText("You have been logged in")
+
 
     def get_response_url(self, response_url, config_dir, profile):
         # Get response URL from OneDrive OAuth2
@@ -1567,8 +1501,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.window1.hide()
             main_window.workers[profile].stop_worker()
             main_window.profile_status_pages[profile].label_onedrive_status.setText("You have been logged in. Start sync manually.")
-
-            # main_window.workers[profile].onedrive_process.kill()
         else:
             pass
 
@@ -1616,7 +1548,7 @@ def create_global_config():
             "monitor_interval": '"15"', ...}
     """
 
-    # Load all default values. Needed for cases wher customer's config does not contain all properties.
+    # Load all default values. Needed for cases when imported config does not contain all properties.
     _default_od_config = read_config("resources/default_config")
     default_od_config = _default_od_config._sections
 
@@ -1642,11 +1574,6 @@ def save_global_config():
     for profile in global_config:
 
         profile_config_file = os.path.expanduser(global_config[profile]["config_file"].strip('"'))
-
-        # logging.info(profile_config_file)
-        # logging.info(global_config)
-        # logging.info(global_config[profile])
-        # logging.info(global_config[profile]['onedrive'])
 
         _od_config = {}
         _od_config["onedrive"] = global_config[profile]["onedrive"]
@@ -1685,8 +1612,6 @@ if __name__ == "__main__":
 
     settings_window = SettingsWindow()
     settings_window.hide()
-
-    # setup_wizard = SetupWizard()
 
     main_window.show()
     app.exec()
