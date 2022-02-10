@@ -1,7 +1,7 @@
 # OneDriveGUI
 A simple GUI for [abraunegg's OneDrive Linux client](https://github.com/abraunegg/onedrive) , with multi-account support. 
 
-<img src=https://user-images.githubusercontent.com/24818591/153468329-30f14b63-0500-40bd-8e34-5910fcea7e05.png width=90% height=90%>
+<img src=https://user-images.githubusercontent.com/24818591/153468329-30f14b63-0500-40bd-8e34-5910fcea7e05.png>
 
 # Usecases
 - Create new OneDrive profile or import pre-existing one.
