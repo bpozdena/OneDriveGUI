@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from optparse import Option
 import os
 import re
 import subprocess
@@ -54,9 +53,10 @@ from ui.ui_create_new_profile import Ui_create_new_profile
 PROFILES_FILE = os.path.expanduser("~/.config/onedrive-gui/profiles")
 
 # Logging
+# TODO: Implement logging configuration into the GUI.
+if not os.path.exists("~/.config/onedrive-gui/"):
+    os.makedirs("~/.config/onedrive-gui/")
 log_path = os.path.expanduser("~/.config/onedrive-gui/onedrivegui.log")
-if not os.path.exists(log_path):
-    os.makedirs(log_path)
 timed_handler = handlers.TimedRotatingFileHandler(filename=log_path, when="D", interval=1, backupCount=2)
 stdout_handler = logging.StreamHandler(sys.stdout)
 handlers = [timed_handler]  # , stdout_handler]
