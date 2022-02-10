@@ -5,6 +5,8 @@ import os
 import re
 import subprocess
 import sys
+import logging
+import logging.handlers as handlers
 from configparser import ConfigParser
 
 from PySide6.QtCore import QThread, QTimer, QUrl, Signal, QFileInfo, Qt, QDir
@@ -33,7 +35,6 @@ from PySide6.QtWidgets import (
 )
 
 # TODO: Split into multiple files once all main features are implemented.
-
 # Import for login window.
 from ui.ui_login import Ui_LoginWindow
 
@@ -56,6 +57,19 @@ from ui.ui_create_new_profile import Ui_create_new_profile
 
 PROFILES_FILE = os.path.expanduser("~/.config/onedrive-gui/profiles")
 
+# Logging
+# dir_path = os.path.dirname(os.path.realpath(__file__))
+log_path = os.path.expanduser("~/.config/onedrive-gui/onedrivegui.log")
+# file_handler = logging.FileHandler(filename=log_path)
+timed_handler = handlers.TimedRotatingFileHandler(filename=log_path, when='D', interval=1, backupCount=2)
+stdout_handler = logging.StreamHandler(sys.stdout)
+handlers = [timed_handler, stdout_handler]
+
+logging.basicConfig(
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=handlers,
+    level=logging.DEBUG,
+)
 
 class SetupWizard(QWizard):
     def __init__(self, parent=None):
@@ -78,7 +92,7 @@ class SetupWizard(QWizard):
 
     def on_page_change(self):
         if self.currentId() == 2:
-            print("Checking installed OneDrive version")
+            logging.info("Checking installed OneDrive version")
             self.page(2).check_onedrive_version()
 
     def nextId(self):
@@ -129,7 +143,6 @@ class wizardPage_version_check(QWizardPage):
         self.label_4 = QLabel()
         self.label_4.setText("Installed/Not Installed/ version")
         
-
         self.label_5 = QLabel()
         self.label_5.setWordWrap(True)
         self.label_5.setStyleSheet("color: red;")
@@ -146,19 +159,35 @@ class wizardPage_version_check(QWizardPage):
 
     def check_onedrive_version(self):
         # Check if OneDrive is installed
-        od_version_check = subprocess.check_output(["onedrive", "--version"])
-        if "onedrive v" in str(od_version_check):
-            self.od_version = re.search(r".\s(v[0-9.]+)", str(od_version_check)).group(1)
-            print(f"OneDrive {self.od_version} detected.")
-            self.label_4.setText(f"OneDrive {self.od_version} detected.")
-            self.label_4.setStyleSheet("color: green;")
-            self.label_5.hide()
-            
-            return True
-        else:
-            self.label_4.setText("OneDrive not detected.")
-            self.label_4.setStyleSheet("color: red;")
+        # TODO: Minimim version check not yet enforced
+        try:
+            od_version_check = subprocess.check_output(["onedrive", "--version"], stderr=subprocess.STDOUT)
+            if "onedrive v" in str(od_version_check):
+                self.od_version = re.search(r".\s(v[0-9.]+)", str(od_version_check)).group(1)
+                logging.info(f"OneDrive {self.od_version} detected.")
+                self.label_4.setText(f"OneDrive {self.od_version} detected.")
+                self.label_4.setStyleSheet("color: green;")
+                self.label_5.hide()
+                self.completeChanged.emit()
+                
+                return True
+            else:
+                self.label_4.setText("OneDrive not detected.")
+                self.label_4.setStyleSheet("color: red;")
+                self.completeChanged.emit()
+                return False
+        except FileNotFoundError:
+                self.label_4.setText("OneDrive not detected.")
+                self.label_4.setStyleSheet("color: red;")
+                self.completeChanged.emit()
+                return False
+        
+
+    def isComplete(self):
+        if 'not' in self.label_4.text().lower():
             return False
+        else:
+            return True       
 
 
 class wizardPage_create_import(QWizardPage):
@@ -181,27 +210,27 @@ class wizardPage_create_import(QWizardPage):
 
     def on_checkbox_change(self):
         if self.checkBox_create.isChecked():
-            print(f"Create new profile is checked")
+            logging.info(f"Create new profile is checked")
             self.checkBox_import.setDisabled(True)
             self.completeChanged.emit()
 
         elif self.checkBox_import.isChecked():
-            print(f"Import profile is checked")
+            logging.info(f"Import profile is checked")
             self.checkBox_create.setDisabled(True)
             self.completeChanged.emit()
 
         else:
-            print(f"No option is unchecked")
+            logging.info(f"No option is unchecked")
             self.checkBox_import.setDisabled(False)
             self.checkBox_create.setDisabled(False)
             self.completeChanged.emit()
 
     def isComplete(self):
         if self.checkBox_create.isChecked() == False and self.checkBox_import.isChecked() == False:
-            print("not complete")
+            logging.info("not complete")
             return False
         else:
-            print("complete")
+            logging.info("complete")
             return True
 
 
@@ -257,7 +286,7 @@ class wizardPage_create(QWizardPage):
         self.file_dialog = QFileDialog.getExistingDirectory(dir=os.path.expanduser("~/"))
 
         dir_name = self.file_dialog
-        print(dir_name)
+        logging.info(dir_name)
         self.lineEdit_sync_dir.setText(dir_name)
 
     def update_sync_dir(self, text):
@@ -318,7 +347,7 @@ class wizardPage_create(QWizardPage):
         # Hide "Create profile" push button from main windows.
         main_window.pushButton_new_profile.hide()
 
-        print(f"Account {profile_name} has been created")
+        logging.info(f"Account {profile_name} has been created")
         self.pushButton_create.setText("Done")
         self.pushButton_create.setDisabled(True)
         self.completeChanged.emit()
@@ -370,7 +399,7 @@ class wizardPage_import(QWizardPage):
 
         file_name = self.file_dialog[0]
 
-        print(file_name)
+        logging.info(file_name)
         self.lineEdit_config_path.setText(file_name)
 
     def import_profile(self):
@@ -414,8 +443,8 @@ class wizardPage_import(QWizardPage):
 
         # Append new profile into running global profile
         global_config.update(new_profile)
-        # print(new_profile)
-        # print(global_config)
+        # logging.info(new_profile)
+        # logging.info(global_config)
 
         settings_window.listWidget_profiles.addItem(profile_name)
         self.setting_page = ProfileSettingsPage(profile_name)
@@ -429,7 +458,7 @@ class wizardPage_import(QWizardPage):
         # Hide "Create profile" push button from main windows.
         main_window.pushButton_new_profile.hide()
 
-        print(f"Account {profile_name} has been imported")
+        logging.info(f"Account {profile_name} has been imported")
         self.pushButton_import.setText("Done")
         self.pushButton_import.setDisabled(True)
         self.completeChanged.emit()
@@ -464,7 +493,7 @@ class SettingsWindow(QWidget, Ui_settings_window):
         self.stackedLayout = QStackedLayout()
 
         for profile in global_config:
-            print(profile)
+            logging.info(profile)
             self.listWidget_profiles.addItem(profile)
             self.page = ProfileSettingsPage(profile)
             self.stackedLayout.addWidget(self.page)
@@ -531,7 +560,7 @@ class SettingsWindow(QWidget, Ui_settings_window):
         main_window.comboBox.removeItem(combo_box_index)
         main_window.profile_status_pages.pop(selected_profile_name, None)
         global_config.pop(selected_profile_name, None)
-        print(global_config)
+        logging.info(global_config)
 
         # Load existing user profiles and remove the new profile.
         _profiles = ConfigParser()
@@ -638,8 +667,8 @@ class SettingsWindow(QWidget, Ui_settings_window):
 
         # Append new profile into running global profile
         global_config.update(new_profile)
-        # print(new_profile)
-        # print(global_config)
+        # logging.info(new_profile)
+        # logging.info(global_config)
 
         self.listWidget_profiles.addItem(profile_name)
         self.page = ProfileSettingsPage(profile_name)
@@ -680,14 +709,15 @@ class ProfileStatusPage(QWidget, Ui_status_page):
     def show_setup_wizard(self):
         self.setup_wizard = SetupWizard()
         self.setup_wizard.show()
-        # self.currentIdChanged.connect(print("print test"))
+        # self.currentIdChanged.connect(logging.info("print test"))
 
     def stop_monitor(self):
         if self.profile_name in main_window.workers:
             main_window.workers[self.profile_name].stop_worker()
             self.label_onedrive_status.setText("OneDrive sync has been stopped")
+            logging.info(f"OneDrive sync for profile {self.profile_name} has been stopped.")
         else:
-            print(f"OneDrive for profile {self.profile_name} is not running")
+            logging.info(f"OneDrive for profile {self.profile_name} is not running.")
 
     def start_monitor(self):
         main_window.start_onedrive_monitor(self.profile_name)
@@ -897,8 +927,11 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.config_dir = re.search(r"(.+)/.+$", self.config_file).group(1)
 
         self.pushButton_login.clicked.connect(lambda: main_window.show_login(self.profile))
-        self.pushButton_logout.clicked.connect(lambda: os.system(f"onedrive --confdir='{self.config_dir}' --logout"))
-        self.pushButton_logout.clicked.connect(lambda: print(f"Profile {self.profile} has been logged out."))
+        self.pushButton_login.hide()
+        self.pushButton_logout.clicked.connect(self.logout)
+        # self.pushButton_logout.clicked.connect(lambda: os.system(f"onedrive --confdir='{self.config_dir}' --logout"))
+        # self.pushButton_logout.clicked.connect(lambda: logging.info(f"Profile {self.profile} has been logged out."))
+
 
         #
         # Buttons
@@ -912,18 +945,35 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
     def str2bool(self, value):
         return value.lower() in "true"
 
+    def logout(self):
+        os.system(f"onedrive --confdir='{self.config_dir}' --logout")
+        logging.info(f"Profile {self.profile} has been logged out.")
+        # self.profile_status["status_message"] = "You have been logged out"
+        
+        main_window.profile_status_pages[self.profile].stop_monitor()
+        # main_window.profile_status_pages[self.profile]["status_message"] = "You have been logged out"
+        if self.profile in main_window.workers:
+            main_window.workers[self.profile].stop_worker()
+            main_window.profile_status_pages[self.profile].label_onedrive_status.setText("OneDrive sync has been stopped")
+            logging.info(f"OneDrive sync for profile {self.profile} has been stopped.")
+        else:
+            logging.info(f"OneDrive for profile {self.profile} is not running.")
+        
+        main_window.profile_status_pages[self.profile].label_onedrive_status.setText("You have been logged out")
+
+
     def get_sync_dir_name(self):
         self.file_dialog = QFileDialog.getExistingDirectory(dir=os.path.expanduser("~/"))
 
         sync_dir = self.file_dialog
-        print(sync_dir)
+        logging.info(sync_dir)
         self.lineEdit_sync_dir.setText(sync_dir)    
 
     def get_log_dir_name(self):
         self.file_dialog = QFileDialog.getExistingDirectory(dir=os.path.expanduser("~/"))
 
         log_dir = self.file_dialog
-        print(log_dir)
+        logging.info(log_dir)
         self.lineEdit_log_dir.setText(log_dir)                    
 
     def set_line_edit_value(self, value):
@@ -939,12 +989,12 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
     def set_check_box_state(self, state):
         _property = self.sender().objectName()
         property = re.search(r"checkBox_(.+)", _property).group(1)
-        print(property)
+        logging.info(property)
         if state == Qt.Checked:
-            print("is checked")
+            logging.info("is checked")
             self.temp_profile_config[f"{property}"] = '"true"'
         else:
-            print("is unchecked")
+            logging.info("is unchecked")
             self.temp_profile_config[f"{property}"] = '"false"'
 
     def get_check_box_state(self, property):
@@ -980,19 +1030,19 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
 
     def add_item_to_qlist(self, source_widget, destination_widget, list):
         if source_widget.text() == "":
-            print("Inoring empty value.")
+            logging.info("Inoring empty value.")
         elif source_widget.text() in list:
-            print("Item already in exemption list.")
+            logging.info("Item already in exemption list.")
         else:
             list.append(source_widget.text())
             destination_widget.addItem(source_widget.text())
 
     def remove_item_from_qlist(self, qlistwidget_name, list):
         for item in qlistwidget_name.selectedItems():
-            print("Removing: " + item.text())
+            logging.info("Removing: " + item.text())
             # items.remove(item.text())
             qlistwidget_name.takeItem(qlistwidget_name.row(item))
-            print(list)
+            logging.info(list)
             list.remove(item.text())
 
     def save_profile_settings(self):
@@ -1062,28 +1112,28 @@ class WorkerThread(QThread):
 
     def __init__(self, profile):
         super(WorkerThread, self).__init__()
-        print(f"Starting worker for profile {profile}")
+        logging.info(f"Starting worker for profile {profile}")
 
         self.config_file = global_config[profile]["config_file"]
         self.config_folder = re.search(r"(.+)/.+$", self.config_file)
-        # print(self.config_file)
+        # logging.info(self.config_file)
         self._command = f"onedrive --confdir='{self.config_folder.group(1)}' --monitor -v"
-        # print(f"command is: {self._command}")
+        # logging.info(f"command is: {self._command}")
         self.profile_name = profile
 
     def stop_worker(self):
-        print(f"[{self.profile_name}] Waiting for worker to finish...")
+        logging.info(f"[{self.profile_name}] Waiting for worker to finish...")
         while self.onedrive_process.poll() is None:
             self.onedrive_process.kill()
             # time.sleep(1)
 
-        print(f"[{self.profile_name}] Quiting thread")
+        logging.info(f"[{self.profile_name}] Quiting thread")
         self.quit()
         self.wait()
-        print(f"[{self.profile_name}] Removing thread info")
+        logging.info(f"[{self.profile_name}] Removing thread info")
 
         main_window.workers.pop(self.profile_name, None)
-        print(f"Remaining running workers: {main_window.workers}")
+        logging.info(f"Remaining running workers: {main_window.workers}")
 
     def run(self, resync=False):
         """
@@ -1119,8 +1169,8 @@ class WorkerThread(QThread):
                 if stdout == "":
                     continue
 
-                # print(bytes(stdout, 'utf-8'))
-                print(f"[{self.profile_name}] " + stdout.strip())
+                # logging.info(bytes(stdout, 'utf-8'))
+                logging.info(f"[{self.profile_name}] " + stdout.strip())
 
                 if "Authorize this app visiting" in stdout:
                     self.onedrive_process.kill()
@@ -1136,7 +1186,7 @@ class WorkerThread(QThread):
                     self.free_space_bytes = re.search(r"([0-9]+)", stdout).group(1)
                     self.free_space_human = str(humanize_file_size(int(self.free_space_bytes)))
 
-                    print(f"[{self.profile_name}] Free Space: {self.free_space_human}")
+                    logging.info(f"[{self.profile_name}] Free Space: {self.free_space_human}")
                     self.profile_status["free_space"] = f"Free Space: {self.free_space_human}"
                     # self.profile_status["account_type"] = f"{self.account_type.capitalize()} [{self.free_space_human}]"
                     self.update_profile_status.emit(self.profile_status, self.profile_name)
@@ -1144,7 +1194,7 @@ class WorkerThread(QThread):
                 elif "Account Type" in stdout:
                     self.account_type = re.search(r"\s(\w+)$", stdout).group(1)
                     self.profile_status["account_type"] = self.account_type.capitalize()
-                    print(f"[{self.profile_name}] Account type: {self.account_type}")
+                    logging.info(f"[{self.profile_name}] Account type: {self.account_type}")
                     self.update_profile_status.emit(self.profile_status, self.profile_name)
 
                 elif "Initializing the OneDrive API" in stdout:
@@ -1184,7 +1234,7 @@ class WorkerThread(QThread):
                     }
 
                     # Update file transfer list
-                    print(transfer_progress_new)
+                    logging.info(transfer_progress_new)
                     self.update_progress_new.emit(transfer_progress_new, self.profile_name)
 
                     # Update profile status message.
@@ -1205,7 +1255,7 @@ class WorkerThread(QThread):
                         "transfer_complete": transfer_complete,
                     }
 
-                    print(transfer_progress_new)
+                    logging.info(transfer_progress_new)
                     self.update_progress_new.emit(transfer_progress_new, self.profile_name)
 
                     if transfer_complete:
@@ -1223,18 +1273,18 @@ class WorkerThread(QThread):
             stderr = self.onedrive_process.stderr.readline()
             if stderr != "":
                 if "command not found" in stderr:
-                    print(
+                    logging.info(
                         """Onedrive does not seem to be installed. Please install it as per instruction at 
                     https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md """
                     )
 
                 elif "--resync is required" in stderr:
-                    print(str(stderr) + " Starting resync.")
+                    logging.info(str(stderr) + " Starting resync.")
                     self.trigger_resync.emit()
 
                     self.run(resync=True)
                 else:
-                    print("@ERROR " + stderr)
+                    logging.info("@ERROR " + stderr)
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -1270,7 +1320,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionRestart_Service.triggered.connect(lambda: os.system("systemctl --user restart onedrive"))
 
         # Start OneDrive monitoring
-        self.actionStart_Monitor.triggered.connect(lambda: self.start_onedrive_monitor("boris@pozdena.eu"))
+        self.actionStart_Monitor.triggered.connect(lambda: self.start_onedrive_monitor(""))
 
         # Stop OneDrive monitoring
         self.actionStop_Monitor.triggered.connect(lambda: os.system("pkill onedrive"))
@@ -1280,7 +1330,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # self.actionObtain_Sync_Status.triggered.connect(lambda: self.onedrive_sync_status())
 
         # Start second account
-        self.actionstart.triggered.connect(lambda: self.start_onedrive_monitor("pozdenab"))
+        self.actionstart.triggered.connect(lambda: self.start_onedrive_monitor(""))
 
         self.comboBox.activated.connect(self.switch_account_status_page)
         self.stackedLayout = QStackedLayout()
@@ -1338,22 +1388,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def onedrive_process_status(self):
         # Check OneDrive status
-        # print(self.workers)
+        # logging.info(self.workers)
         pixmap_running = QPixmap("resources/images/icons8-green-circle-48.png").scaled(20, 20, Qt.KeepAspectRatio)
         pixmap_stopped = QPixmap("resources/images/icons8-red-circle-48.png").scaled(20, 20, Qt.KeepAspectRatio)
 
         for profile_name in global_config:
-            # print(profile_name)
+            # logging.info(profile_name)
             if profile_name not in self.workers:
                 self.profile_status_pages[profile_name].label_status.setText("stopped")
                 self.profile_status_pages[profile_name].label_status.setPixmap(pixmap_stopped)
-                # print(f"not running {profile_name}")
+                # logging.info(f"not running {profile_name}")
 
             else:
                 if self.workers[profile_name].isRunning():
                     self.profile_status_pages[profile_name].label_status.setText("running")
                     self.profile_status_pages[profile_name].label_status.setPixmap(pixmap_running)
-                    # print(f"running worker {profile_name}")
+                    # logging.info(f"running worker {profile_name}")
 
         # for onedrive_process in psutil.process_iter():
         #     if onedrive_process.name().lower() == 'onedrive' and onedrive_process.status() != 'zombie':
@@ -1385,8 +1435,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.workers[profile_name] = WorkerThread(profile_name)
             self.workers[profile_name].start()
         else:
-            print(f"Worker for profile {profile_name} is already running. Please stop it first.")
-            print(f"Running workers: {main_window.workers}")
+            logging.info(f"Worker for profile {profile_name} is already running. Please stop it first.")
+            logging.info(f"Running workers: {main_window.workers}")
 
         # self.worker = WorkerThread()
         # self.worker.start()
@@ -1395,8 +1445,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # self.worker.trigger_resync.connect(self.show_login)
         self.workers[profile_name].update_progress_new.connect(self.event_update_progress_new)
         self.workers[profile_name].update_profile_status.connect(self.event_update_profile_status)
-        self.workers[profile_name].started.connect(lambda: print(f"started worker {profile_name}"))
-        self.workers[profile_name].finished.connect(lambda: print(f"finished worker {profile_name}"))
+        self.workers[profile_name].started.connect(lambda: logging.info(f"started worker {profile_name}"))
+        self.workers[profile_name].finished.connect(lambda: logging.info(f"finished worker {profile_name}"))
 
     def event_update_profile_status(self, data, profile):
         self.profile_status_pages[profile].label_onedrive_status.setText(data["status_message"])
@@ -1416,7 +1466,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         _sync_dir = os.path.expanduser(global_config[profile]["onedrive"]["sync_dir"].strip('"'))
         # profile_status_page = self.profile_status_pages[profile]
 
-        print(data)
+        logging.info(data)
         file_path = f"{_sync_dir}" + "/" + data["file_path"]
         absolute_path = QFileInfo(file_path).absolutePath().replace(" ", "%20")
         parent_dir = re.search(r".+/([^/]+)/.+$", file_path).group(1)
@@ -1430,15 +1480,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         file_operation = data["file_operation"]
         transfer_complete = data["transfer_complete"]
 
-        print("absolute path " + absolute_path)
+        logging.info("absolute path " + absolute_path)
 
-        print("parent dir " + parent_dir)
-        print("progress: " + progress)
-        print("progress data: " + humanize_file_size(progress_data))
-        print("file path: " + file_path)
-        print("file size: " + humanize_file_size(file_size))
-        print("file name: " + file_name)
-        print("file path2: " + file_path2)
+        logging.info("parent dir " + parent_dir)
+        logging.info("progress: " + progress)
+        logging.info("progress data: " + humanize_file_size(progress_data))
+        logging.info("file path: " + file_path)
+        logging.info("file size: " + humanize_file_size(file_size))
+        logging.info("file name: " + file_name)
+        logging.info("file path2: " + file_path2)
 
         # if data['transfer_complete'] == True:
         #     if int(data['progress']) == 100:
@@ -1449,10 +1499,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             last_item = self.profile_status_pages[profile].listWidget.item(0)
             last_item_widget = self.profile_status_pages[profile].listWidget.itemWidget(last_item)
             last_file_name = last_item_widget.get_file_name()
-            print(f"The last list item's file name is : {last_file_name}")
+            logging.info(f"The last list item's file name is : {last_file_name}")
 
             if file_name == last_file_name:
-                print("Deleting last list item")
+                logging.info("Deleting last list item")
                 self.profile_status_pages[profile].listWidget.takeItem(0)
 
         myQCustomQWidget = TaskList()
@@ -1504,20 +1554,31 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lw.loginFrame.setUrl(QUrl(url))
 
         # Wait for user to login and obtain response URL
-        self.lw.loginFrame.urlChanged.connect(
-            lambda: self.get_response_url(self.lw.loginFrame.url().toString(), self.config_dir, profile)
-        )
+        self.lw.loginFrame.urlChanged.connect(lambda: 
+                            self.get_response_url(self.lw.loginFrame.url().toString(), self.config_dir, profile))
+        # self.profile_status_pages[profile].label_onedrive_status.setText("You have been logged in")
 
     def get_response_url(self, response_url, config_dir, profile):
         # Get response URL from OneDrive OAuth2
         if "nativeclient?code=" in response_url:
-            print(f'onedrive --confdir="{config_dir}" --auth-response "{response_url}"')
+            logging.info(f'onedrive --confdir="{config_dir}" --auth-response "{response_url}"')
             os.system(f'onedrive --confdir="{config_dir}" --auth-response "{response_url}"')
-            print("Login performed")
+            logging.info("Login performed")
             self.window1.hide()
-            main_window.workers[profile].onedrive_process.kill()
+            main_window.workers[profile].stop_worker()
+            main_window.profile_status_pages[profile].label_onedrive_status.setText("You have been logged in. Start sync manually.")
+
+            # main_window.workers[profile].onedrive_process.kill()
         else:
             pass
+
+
+def humanize_file_size(num, suffix="B"):
+    for unit in ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"]:
+        if abs(num) < 1024.0:
+            return f"{num:3.1f}{unit}{suffix}"
+        num /= 1024.0
+    return f"{num:.1f}Yi{suffix}"
 
 
 def read_config(config_file):
@@ -1572,7 +1633,7 @@ def create_global_config():
         profiles[profile].update(default_od_config)
         profiles[profile].update(od_config)
 
-    # print(profiles)
+    # logging.info(profiles)
     return profiles
 
 
@@ -1582,10 +1643,10 @@ def save_global_config():
 
         profile_config_file = os.path.expanduser(global_config[profile]["config_file"].strip('"'))
 
-        # print(profile_config_file)
-        # print(global_config)
-        # print(global_config[profile])
-        # print(global_config[profile]['onedrive'])
+        # logging.info(profile_config_file)
+        # logging.info(global_config)
+        # logging.info(global_config[profile])
+        # logging.info(global_config[profile]['onedrive'])
 
         _od_config = {}
         _od_config["onedrive"] = global_config[profile]["onedrive"]
@@ -1610,17 +1671,10 @@ def save_global_config():
         with open(profile_config_file, "w") as output:
             output.writelines(data[1:])
 
-        print(f"{profile} config saved")
+        logging.info(f"{profile} config saved")
 
-    print("All configs saved")
+    logging.info("All configs saved")
 
-
-def humanize_file_size(num, suffix="B"):
-    for unit in ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"]:
-        if abs(num) < 1024.0:
-            return f"{num:3.1f}{unit}{suffix}"
-        num /= 1024.0
-    return f"{num:.1f}Yi{suffix}"
 
 
 if __name__ == "__main__":
