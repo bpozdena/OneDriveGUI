@@ -51,6 +51,7 @@ from ui.ui_create_new_profile import Ui_create_new_profile
 
 
 PROFILES_FILE = os.path.expanduser("~/.config/onedrive-gui/profiles")
+dir_path = os.path.dirname(os.path.realpath(__file__))
 
 # Logging
 # TODO: Implement logging configuration into the GUI.
@@ -60,7 +61,7 @@ if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 timed_handler = handlers.TimedRotatingFileHandler(filename=log_file, when="D", interval=1, backupCount=2)
 stdout_handler = logging.StreamHandler(sys.stdout)
-handlers = [timed_handler]  # , stdout_handler]
+handlers = [timed_handler , stdout_handler]
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -72,7 +73,7 @@ logging.basicConfig(
 class SetupWizard(QWizard):
     def __init__(self, parent=None):
         super(SetupWizard, self).__init__(parent)
-        self.setWindowIcon(QIcon("resources/images/icons8-clouds-48.png"))
+        self.setWindowIcon(QIcon(dir_path + "/resources/images/icons8-clouds-48.png"))
 
         self.setPage(1, WizardPage_welcome(self))
         self.setPage(2, wizardPage_version_check(self))
@@ -232,12 +233,14 @@ class wizardPage_create(QWizardPage):
         self.lineEdit_new_profile_name = QLineEdit()
         self.lineEdit_new_profile_name.setPlaceholderText("E.g. john@live.com")
         self.lineEdit_new_profile_name.textChanged.connect(self.update_sync_dir)
+        self.lineEdit_new_profile_name.textChanged.connect(self.enable_create_button)        
 
         self.label_sync_dir = QLabel()
         self.label_sync_dir.setText("Sync directory")
 
         self.lineEdit_sync_dir = QLineEdit()
         self.lineEdit_sync_dir.setPlaceholderText("E.g. ~/OneDrive_john@live.com/")
+        self.lineEdit_sync_dir.textChanged.connect(self.enable_create_button) 
 
         self.pushButton_browse = QPushButton()
         self.pushButton_browse.setText("Browse")
@@ -245,6 +248,7 @@ class wizardPage_create(QWizardPage):
 
         self.pushButton_create = QPushButton()
         self.pushButton_create.setText("Create new profile")
+        self.pushButton_create.setEnabled(False)
         self.pushButton_create.clicked.connect(self.create_profile)
 
         layout = QGridLayout()
@@ -271,6 +275,13 @@ class wizardPage_create(QWizardPage):
     def update_sync_dir(self, text):
         self.lineEdit_sync_dir.setText(f"~/OneDrive_{text}")
 
+    def enable_create_button(self):
+        # Enable 'Import' button only when profile name and path to config file are not empty. 
+        if self.lineEdit_new_profile_name.text() == ''.strip() or self.lineEdit_sync_dir == ''.strip():
+            self.pushButton_create.setEnabled(False)
+        else:
+            self.pushButton_create.setEnabled(True)        
+
     def create_profile(self):
         """
         Creates new profile and loads default settings.
@@ -281,7 +292,7 @@ class wizardPage_create(QWizardPage):
         config_path = os.path.expanduser(f"~/.config/onedrive/accounts/{profile_name}/config")
 
         # Load all default values.
-        _default_od_config = read_config("resources/default_config")
+        _default_od_config = read_config(dir_path + "/resources/default_config")
         default_od_config = _default_od_config._sections
 
         # Construct dict with user profile settings.
@@ -345,9 +356,11 @@ class wizardPage_import(QWizardPage):
 
         self.lineEdit_profile_name = QLineEdit()
         self.lineEdit_profile_name.setPlaceholderText("E.g. john@live.com")
+        self.lineEdit_profile_name.textChanged.connect(self.enable_import_button)
 
         self.lineEdit_config_path = QLineEdit()
         self.lineEdit_config_path.setPlaceholderText("E.g. ~/.config/onedrive/config")
+        self.lineEdit_config_path.textChanged.connect(self.enable_import_button)
 
         self.pushButton_browse = QPushButton()
         self.pushButton_browse.setText("Browse")
@@ -355,6 +368,7 @@ class wizardPage_import(QWizardPage):
 
         self.pushButton_import = QPushButton()
         self.pushButton_import.setText("Import")
+        self.pushButton_import.setEnabled(False)
         self.pushButton_import.clicked.connect(self.import_profile)
 
         # self.registerField("label_profile_name*",self.label_profile_name)
@@ -369,9 +383,17 @@ class wizardPage_import(QWizardPage):
         self.setLayout(layout)
 
     def isComplete(self):
+        # Enable 'Next' button only when profile config was successfully imported
         if self.pushButton_import.text() == "Done":
             return True
         return False
+
+    def enable_import_button(self):
+        # Enable 'Import' button only when profile name and path to config file are not empty. 
+        if self.lineEdit_profile_name.text() == ''.strip() or self.lineEdit_config_path == ''.strip():
+            self.pushButton_import.setEnabled(False)
+        else:
+            self.pushButton_import.setEnabled(True)
 
     def get_config_name(self):
         self.file_dialog = QFileDialog.getOpenFileName(self, dir=os.path.expanduser("~/.config/"))
@@ -388,16 +410,18 @@ class wizardPage_import(QWizardPage):
         This is to handle cases where imported config contains only some properties.
         """
 
-        profile_name = self.lineEdit_profile_name.text()
+        profile_name = self.lineEdit_profile_name.text().strip()
         config_path = os.path.expanduser(self.lineEdit_config_path.text())
 
         # Load all default values.
-        _default_od_config = read_config("resources/default_config")
+        _default_od_config = read_config(dir_path + "/resources/default_config")
         default_od_config = _default_od_config._sections
+        logging.debug("[GUI] default_od_config: " + str(default_od_config))
 
         # Load user's settings.
         _new_od_config = read_config(config_path)
         new_od_config = _new_od_config._sections
+        logging.debug("[GUI] new_od_config: " + str(new_od_config))
 
         # Construct dict with user profile settings.
         new_profile = {profile_name: {"config_file": config_path, "enable_debug": False, "mode": "monitor"}}
@@ -413,17 +437,20 @@ class wizardPage_import(QWizardPage):
             os.makedirs(profiles_dir)
 
         # Save the new profile.
-        with open(PROFILES_FILE, "w") as configfile:
-            _profiles.write(configfile)
+        with open(PROFILES_FILE, "w") as profilefile:
+            _profiles.write(profilefile)
 
         # Append OD config
         new_profile[profile_name].update(default_od_config)
-        new_profile[profile_name].update(new_od_config)
+        for key, value in new_od_config['onedrive'].items():
+            new_profile[profile_name]['onedrive'][key] = value
+
+        # new_profile[profile_name].update(new_od_config)
 
         # Append new profile into running global profile
         global_config.update(new_profile)
-        # logging.info(new_profile)
-        # logging.info(global_config)
+        logging.debug("[GUI] new_profile: " + str(new_profile))
+        logging.debug("[GUI] global_config: " + str(global_config))
 
         settings_window.listWidget_profiles.addItem(profile_name)
         self.setting_page = ProfileSettingsPage(profile_name)
@@ -434,8 +461,11 @@ class wizardPage_import(QWizardPage):
         main_window.profile_status_pages[profile_name] = ProfileStatusPage(profile_name)
         main_window.stackedLayout.addWidget(main_window.profile_status_pages[profile_name])
 
-        # Hide "Create profile" push button from main windows.
+        # Hide "Create profile" push button from main window.
         main_window.pushButton_new_profile.hide()
+
+        # Automatically save global config to prevent loss if user does not press 'Save' button.
+        save_global_config()
 
         logging.info(f"Account {profile_name} has been imported")
         self.pushButton_import.setText("Done")
@@ -466,7 +496,7 @@ class SettingsWindow(QWidget, Ui_settings_window):
         super(SettingsWindow, self).__init__()
 
         self.setupUi(self)
-        self.setWindowIcon(QIcon("resources/images/icons8-clouds-48.png"))
+        self.setWindowIcon(QIcon(dir_path + "/resources/images/icons8-clouds-48.png"))
 
         self.stackedLayout = QStackedLayout()
 
@@ -502,7 +532,7 @@ class SettingsWindow(QWidget, Ui_settings_window):
     def create_new_profile_window(self):
         # Show profile creation window
         self.create_window = QWidget()
-        self.create_window.setWindowIcon(QIcon("resources/images/icons8-clouds-48.png"))
+        self.create_window.setWindowIcon(QIcon(dir_path + "/resources/images/icons8-clouds-48.png"))
         self.create_ui = Ui_create_new_profile()
         self.create_ui.setupUi(self.create_window)
         self.create_window.show()
@@ -515,7 +545,7 @@ class SettingsWindow(QWidget, Ui_settings_window):
     def import_profile_window(self):
         # Show profile import window
         self.import_window = QWidget()
-        self.import_window.setWindowIcon(QIcon("resources/images/icons8-clouds-48.png"))
+        self.import_window.setWindowIcon(QIcon(dir_path + "/resources/images/icons8-clouds-48.png"))
         self.import_ui = Ui_import_profile()
         self.import_ui.setupUi(self.import_window)
         self.import_window.show()
@@ -559,7 +589,7 @@ class SettingsWindow(QWidget, Ui_settings_window):
         config_path = os.path.expanduser(f"~/.config/onedrive/accounts/{profile_name}/config")
 
         # Load all default values.
-        _default_od_config = read_config("resources/default_config")
+        _default_od_config = read_config(dir_path + "/resources/default_config")
         default_od_config = _default_od_config._sections
 
         # Construct dict with user profile settings.
@@ -615,7 +645,7 @@ class SettingsWindow(QWidget, Ui_settings_window):
         config_path = os.path.expanduser(self.import_ui.lineEdit_config_path.text())
 
         # Load all default values.
-        _default_od_config = read_config("resources/default_config")
+        _default_od_config = read_config(dir_path + "/resources/default_config")
         default_od_config = _default_od_config._sections
 
         # Load user's settings.
@@ -1076,13 +1106,14 @@ class WorkerThread(QThread):
 
     def __init__(self, profile):
         super(WorkerThread, self).__init__()
-        logging.info(f"Starting worker for profile {profile}")
+        logging.info(f"[GUI] Starting worker for profile {profile}")
 
         self.config_file = global_config[profile]["config_file"]
-        self.config_folder = re.search(r"(.+)/.+$", self.config_file)
-        # logging.info(self.config_file)
-        self._command = f"onedrive --confdir='{self.config_folder.group(1)}' --monitor -v"
-        # logging.info(f"command is: {self._command}")
+        self.config_dir = re.search(r"(.+)/.+$", self.config_file)
+        logging.debug(f"[GUI] OneDrive config file: {self.config_file}")
+        logging.debug(f"[GUI] OneDrive config dir: {self.config_dir}")
+        self._command = f"onedrive --confdir='{self.config_dir.group(1)}' --monitor -v"
+        logging.debug(f"[GUI] Monitoring command: '{self._command}'")
         self.profile_name = profile
 
     def stop_worker(self):
@@ -1096,7 +1127,7 @@ class WorkerThread(QThread):
         logging.info(f"[{self.profile_name}] Removing thread info")
 
         main_window.workers.pop(self.profile_name, None)
-        logging.info(f"Remaining running workers: {main_window.workers}")
+        logging.info(f"[GUI] Remaining running workers: {main_window.workers}")
 
     def run(self, resync=False):
         """
@@ -1241,7 +1272,7 @@ class WorkerThread(QThread):
                     )
 
                 elif "--resync is required" in stderr:
-                    logging.info(str(stderr) + " Starting resync.")
+                    logging.info(f"[{self.profile_name}] {str(stderr)} Starting resync.")
                     self.trigger_resync.emit()
 
                     self.run(resync=True)
@@ -1255,7 +1286,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         super(MainWindow, self).__init__()
         self.setupUi(self)
-        self.setWindowIcon(QIcon("resources/images/icons8-clouds-48.png"))
+        self.setWindowIcon(QIcon(dir_path + "/resources/images/icons8-clouds-48.png"))
 
         if len(global_config) == 0:
             # self.pushButton_new_profile.clicked.connect(self.show_settings_window)
@@ -1309,7 +1340,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tray = QSystemTrayIcon()
         if self.tray.isSystemTrayAvailable():
 
-            icon = QIcon("resources/images/icons8-clouds-48.png")
+            icon = QIcon(dir_path + "/resources/images/icons8-clouds-48.png")
             menu = QMenu()
 
             actionshow = menu.addAction("Show/Hide")
@@ -1351,8 +1382,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def onedrive_process_status(self):
         # Check OneDrive status
         # logging.info(self.workers)
-        pixmap_running = QPixmap("resources/images/icons8-green-circle-48.png").scaled(20, 20, Qt.KeepAspectRatio)
-        pixmap_stopped = QPixmap("resources/images/icons8-red-circle-48.png").scaled(20, 20, Qt.KeepAspectRatio)
+        pixmap_running = QPixmap(dir_path + "/resources/images/icons8-green-circle-48.png").scaled(20, 20, Qt.KeepAspectRatio)
+        pixmap_stopped = QPixmap(dir_path + "/resources/images/icons8-red-circle-48.png").scaled(20, 20, Qt.KeepAspectRatio)
 
         for profile_name in global_config:
             # logging.info(profile_name)
@@ -1470,7 +1501,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def show_login(self, profile):
         # Show login window
         self.window1 = QWidget()
-        self.window1.setWindowIcon(QIcon("resources/images/icons8-clouds-48.png"))
+        self.window1.setWindowIcon(QIcon(dir_path + "/resources/images/icons8-clouds-48.png"))
         self.lw = Ui_LoginWindow()
         self.lw.setupUi(self.window1)
         self.window1.show()
@@ -1552,7 +1583,7 @@ def create_global_config():
     """
 
     # Load all default values. Needed for cases when imported config does not contain all properties.
-    _default_od_config = read_config("resources/default_config")
+    _default_od_config = read_config(dir_path + "/resources/default_config")
     default_od_config = _default_od_config._sections
 
     # Load existing user profiles.
@@ -1610,10 +1641,13 @@ if __name__ == "__main__":
     global_config = create_global_config()
 
     app = QApplication(sys.argv)
+    app.setApplicationName("OneDriveGUI")
+    app.setWindowIcon(QIcon(dir_path + "/resources/images/icons8-clouds-48.png"))
+    
     main_window = MainWindow()
-
     settings_window = SettingsWindow()
     settings_window.hide()
 
     main_window.show()
     app.exec()
+
