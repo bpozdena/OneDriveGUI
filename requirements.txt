@@ -1,1 +1,2 @@
 PySide6==6.2.2.1
+requests==2.27.1

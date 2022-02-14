@@ -5,6 +5,7 @@ import re
 import subprocess
 import sys
 import logging
+import requests
 import logging.handlers as handlers
 from configparser import ConfigParser
 
@@ -61,7 +62,7 @@ if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 timed_handler = handlers.TimedRotatingFileHandler(filename=log_file, when="D", interval=1, backupCount=2)
 stdout_handler = logging.StreamHandler(sys.stdout)
-handlers = [timed_handler , stdout_handler]
+handlers = [timed_handler, stdout_handler]
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -233,14 +234,14 @@ class wizardPage_create(QWizardPage):
         self.lineEdit_new_profile_name = QLineEdit()
         self.lineEdit_new_profile_name.setPlaceholderText("E.g. john@live.com")
         self.lineEdit_new_profile_name.textChanged.connect(self.update_sync_dir)
-        self.lineEdit_new_profile_name.textChanged.connect(self.enable_create_button)        
+        self.lineEdit_new_profile_name.textChanged.connect(self.enable_create_button)
 
         self.label_sync_dir = QLabel()
         self.label_sync_dir.setText("Sync directory")
 
         self.lineEdit_sync_dir = QLineEdit()
         self.lineEdit_sync_dir.setPlaceholderText("E.g. ~/OneDrive_john@live.com/")
-        self.lineEdit_sync_dir.textChanged.connect(self.enable_create_button) 
+        self.lineEdit_sync_dir.textChanged.connect(self.enable_create_button)
 
         self.pushButton_browse = QPushButton()
         self.pushButton_browse.setText("Browse")
@@ -276,11 +277,11 @@ class wizardPage_create(QWizardPage):
         self.lineEdit_sync_dir.setText(f"~/OneDrive_{text}")
 
     def enable_create_button(self):
-        # Enable 'Import' button only when profile name and path to config file are not empty. 
-        if self.lineEdit_new_profile_name.text() == ''.strip() or self.lineEdit_sync_dir == ''.strip():
+        # Enable 'Import' button only when profile name and path to config file are not empty.
+        if self.lineEdit_new_profile_name.text() == "".strip() or self.lineEdit_sync_dir == "".strip():
             self.pushButton_create.setEnabled(False)
         else:
-            self.pushButton_create.setEnabled(True)        
+            self.pushButton_create.setEnabled(True)
 
     def create_profile(self):
         """
@@ -389,8 +390,8 @@ class wizardPage_import(QWizardPage):
         return False
 
     def enable_import_button(self):
-        # Enable 'Import' button only when profile name and path to config file are not empty. 
-        if self.lineEdit_profile_name.text() == ''.strip() or self.lineEdit_config_path == ''.strip():
+        # Enable 'Import' button only when profile name and path to config file are not empty.
+        if self.lineEdit_profile_name.text() == "".strip() or self.lineEdit_config_path == "".strip():
             self.pushButton_import.setEnabled(False)
         else:
             self.pushButton_import.setEnabled(True)
@@ -442,8 +443,8 @@ class wizardPage_import(QWizardPage):
 
         # Append OD config
         new_profile[profile_name].update(default_od_config)
-        for key, value in new_od_config['onedrive'].items():
-            new_profile[profile_name]['onedrive'][key] = value
+        for key, value in new_od_config["onedrive"].items():
+            new_profile[profile_name]["onedrive"][key] = value
 
         # new_profile[profile_name].update(new_od_config)
 
@@ -1364,6 +1365,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.refresh_process_status.timeout.connect(lambda: self.onedrive_process_status())
         self.refresh_process_status.start(500)
 
+        self.check_client_version = QTimer()
+        self.check_client_version.setSingleShot(True)
+        self.check_client_version.timeout.connect(self.client_version_check)
+        self.check_client_version.start(500)
+
     def closeEvent(self, event):
         event.ignore()
         self.hide()
@@ -1379,11 +1385,47 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def switch_account_status_page(self):
         self.stackedLayout.setCurrentIndex(self.comboBox.currentIndex())
 
+    def client_version_check(self):
+        pixmap_warning = QPixmap(dir_path + "/resources/images/warning.png").scaled(20, 20, Qt.KeepAspectRatio)
+        s = requests.Session()
+
+        try:
+            latest_url = "https://api.github.com/repos/abraunegg/onedrive/releases/latest"
+            latest_client_version = s.get(latest_url).json()["tag_name"]
+            client_version_check = subprocess.check_output(["onedrive", "--version"], stderr=subprocess.STDOUT)
+            installed_client_version = re.search(r".\s(v[0-9.]+)", str(client_version_check)).group(1)
+
+            result = {
+                "latest_client_version": latest_client_version,
+                "installed_client_version": installed_client_version,
+            }
+            logging.debug(f"[GUI] Client version check: {result}")
+
+            if latest_client_version not in installed_client_version:
+                for profile_name in global_config:
+                    self.profile_status_pages[profile_name].label_onedrive_status.setText(
+                        "OneDrive client is out of date!"
+                    )
+                    self.profile_status_pages[profile_name].label_version_check.setToolTip(
+                        f"OneDrive client is out of date! \n Installed: {installed_client_version} \n Latest: {latest_client_version}"
+                    )
+                    self.profile_status_pages[profile_name].label_version_check.setPixmap(pixmap_warning)
+
+            return result
+
+        except Exception as e:
+            logging.error(f"Client version check failed: {e}")
+            return False
+
     def onedrive_process_status(self):
         # Check OneDrive status
         # logging.info(self.workers)
-        pixmap_running = QPixmap(dir_path + "/resources/images/icons8-green-circle-48.png").scaled(20, 20, Qt.KeepAspectRatio)
-        pixmap_stopped = QPixmap(dir_path + "/resources/images/icons8-red-circle-48.png").scaled(20, 20, Qt.KeepAspectRatio)
+        pixmap_running = QPixmap(dir_path + "/resources/images/icons8-green-circle-48.png").scaled(
+            20, 20, Qt.KeepAspectRatio
+        )
+        pixmap_stopped = QPixmap(dir_path + "/resources/images/icons8-red-circle-48.png").scaled(
+            20, 20, Qt.KeepAspectRatio
+        )
 
         for profile_name in global_config:
             # logging.info(profile_name)
@@ -1643,11 +1685,10 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setApplicationName("OneDriveGUI")
     app.setWindowIcon(QIcon(dir_path + "/resources/images/icons8-clouds-48.png"))
-    
+
     main_window = MainWindow()
     settings_window = SettingsWindow()
     settings_window.hide()
 
     main_window.show()
     app.exec()
-

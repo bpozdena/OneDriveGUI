@@ -58,6 +58,7 @@ class Ui_status_page(object):
 
         self.label_status = QLabel(self.frame)
         self.label_status.setObjectName(u"label_status")
+        self.label_status.setMaximumSize(QSize(20, 16777215))
         self.label_status.setStyleSheet(u"color: rgb(255, 255, 255);")
 
         self.gridLayout.addWidget(self.label_status, 5, 2, 1, 1)
@@ -81,6 +82,12 @@ class Ui_status_page(object):
         self.label_free_space.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
         self.gridLayout.addWidget(self.label_free_space, 5, 4, 1, 1)
+
+        self.label_version_check = QLabel(self.frame)
+        self.label_version_check.setObjectName(u"label_version_check")
+        self.label_version_check.setMaximumSize(QSize(20, 16777215))
+
+        self.gridLayout.addWidget(self.label_version_check, 5, 3, 1, 1)
 
 
         self.verticalLayout.addWidget(self.frame)
@@ -135,6 +142,7 @@ class Ui_status_page(object):
         self.toolButton_stop.setText(QCoreApplication.translate("status_page", u"Stop", None))
         self.label_account_type.setText("")
         self.label_free_space.setText("")
+        self.label_version_check.setText("")
         self.pushButton_open_dir.setText(QCoreApplication.translate("status_page", u"Open Sync Directory", None))
         self.pushButton_2.setText(QCoreApplication.translate("status_page", u"Sync", None))
         self.pushButton_settings.setText(QCoreApplication.translate("status_page", u"Settings", None))
