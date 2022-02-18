@@ -152,6 +152,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="styleSheet">
+         <string notr="true">QToolTip { color: white; }</string>
+        </property>
         <property name="text">
          <string/>
         </property>

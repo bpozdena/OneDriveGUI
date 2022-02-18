@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'process_status_page.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.2
+## Created by: Qt User Interface Compiler version 6.2.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -86,6 +86,7 @@ class Ui_status_page(object):
         self.label_version_check = QLabel(self.frame)
         self.label_version_check.setObjectName(u"label_version_check")
         self.label_version_check.setMaximumSize(QSize(20, 16777215))
+        self.label_version_check.setStyleSheet(u"QToolTip { color: white; }")
 
         self.gridLayout.addWidget(self.label_version_check, 5, 3, 1, 1)
 
