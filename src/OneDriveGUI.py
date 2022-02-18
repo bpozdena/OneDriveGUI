@@ -528,6 +528,7 @@ class SettingsWindow(QWidget, Ui_settings_window):
 
     def show_setup_wizard(self):
         self.setup_wizard = SetupWizard()
+        self.setup_wizard.setStartId(3)
         self.setup_wizard.show()
 
     def create_new_profile_window(self):
