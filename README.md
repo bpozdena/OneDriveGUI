@@ -29,6 +29,7 @@ A simple GUI for [OneDrive Linux client](https://github.com/abraunegg/onedrive),
 
     Optionally, you can detach the GUI from terminal by using the bellow command:
     ```sh
+	cd src/
     nohup python OneDriveGUI.py > /dev/null 2>&1&
     ```
 
