@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'settings.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.2
+## Created by: Qt User Interface Compiler version 6.2.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -79,7 +79,7 @@ class Ui_settings_window(object):
         settings_window.setWindowTitle(QCoreApplication.translate("settings_window", u"OneDriveGUI - Settings", None))
         self.label_profiles.setText(QCoreApplication.translate("settings_window", u"Profiles:", None))
         self.pushButton_remove.setText(QCoreApplication.translate("settings_window", u"Remove profile", None))
-        self.pushButton_create_import.setText(QCoreApplication.translate("settings_window", u"Create/Import wizard", None))
+        self.pushButton_create_import.setText(QCoreApplication.translate("settings_window", u"Create/Import profile", None))
         self.pushButton_open_create.setText(QCoreApplication.translate("settings_window", u"Create new profile", None))
         self.pushButton_open_import.setText(QCoreApplication.translate("settings_window", u"Import existing profile", None))
     # retranslateUi

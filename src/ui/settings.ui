@@ -54,7 +54,7 @@
        <item>
         <widget class="QPushButton" name="pushButton_create_import">
          <property name="text">
-          <string>Create/Import wizard</string>
+          <string>Create/Import profile</string>
          </property>
         </widget>
        </item>
