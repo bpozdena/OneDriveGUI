@@ -390,11 +390,17 @@ class wizardPage_import(QWizardPage):
         return False
 
     def enable_import_button(self):
-        # Enable 'Import' button only when profile name and path to config file are not empty.
-        if self.lineEdit_profile_name.text() == "".strip() or self.lineEdit_config_path == "".strip():
-            self.pushButton_import.setEnabled(False)
-        else:
+        # Enable 'Import' button only when profile name and path to config file are valid.
+        profile_name_filled = self.lineEdit_profile_name.text() != "".strip()
+
+        config_specified = re.search(r"/config$", self.lineEdit_config_path.text().strip()) != None
+        config_path = os.path.expanduser(self.lineEdit_config_path.text().strip())
+        config_exists = os.path.exists(config_path)
+
+        if all([profile_name_filled, config_specified, config_exists]):
             self.pushButton_import.setEnabled(True)
+        else:
+            self.pushButton_import.setEnabled(False)
 
     def get_config_name(self):
         self.file_dialog = QFileDialog.getOpenFileName(self, dir=os.path.expanduser("~/.config/"))

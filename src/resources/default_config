@@ -1,4 +1,4 @@
-sync_dir = ""
+sync_dir = "~/OneDrive"
 skip_file = "~*|.~*|*.tmp"
 monitor_interval = "300"
 skip_dir = ""
