@@ -6,10 +6,10 @@ script:
   - cp src AppDir/usr -r
   - cp src/resources/images/OneDriveGUI.png AppDir/usr/share/icons/hicolor/48x48
   - python3 -m pip install --ignore-installed --prefix=/usr --no-cache-dir --root=AppDir -r ./requirements.txt
-  - rm -rf AppDir/usr/lib/python3.9/site-packages/PySide6/Qt/qml/
-  - rm -rf AppDir/usr/lib/python3.9/site-packages/PySide6/examples/
-  - rm -rf AppDir/usr/lib/python3.9/site-packages/PySide6/Qt/resources/
-  - rm AppDir/usr/lib/python3.9/site-packages/PySide6/{assistant,designer,linguist,lrelease,lupdate}
+  - rm -rf AppDir/usr/lib/python3.8/site-packages/PySide6/Qt/qml/
+  - rm -rf AppDir/usr/lib/python3.8/site-packages/PySide6/examples/
+  - rm -rf AppDir/usr/lib/python3.8/site-packages/PySide6/Qt/resources/
+  - rm AppDir/usr/lib/python3.8/site-packages/PySide6/{assistant,designer,linguist,lrelease,lupdate}
 
 AppDir:
   path: ./AppDir
@@ -35,7 +35,7 @@ AppDir:
   runtime:
     env:
       PYTHONHOME: '${APPDIR}/usr'
-      PYTHONPATH: '${APPDIR}/usr/lib/python3.9/site-packages'
+      PYTHONPATH: '${APPDIR}/usr/lib/python3.8/site-packages'
 
 AppImage:
 #  update-information: gh-releases-zsync
