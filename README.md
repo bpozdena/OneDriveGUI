@@ -10,9 +10,11 @@ A simple GUI for [OneDrive Linux client](https://github.com/abraunegg/onedrive),
 - Backup your OneDrive config files before importing them to the GUI.
 - Backup your data before use to prevent accidental file deletion due to OneDrive misconfiguration. 
 
+# Running as AppImage 
+1) Download .AppImage from the [release assets](https://github.com/bpozdena/OneDriveGUI/releases)
+2) Make the .AppImage file executable and run it. 
 
-
-# Installation
+# Installation from source
 1) Ensure [OneDrive for Linux](https://abraunegg.github.io/) is installed based on [instructions](https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md) for your distro. 
 1) Ensure Python3 and [pip](https://pip.pypa.io/en/stable/installation/) are installed on your system. 
 1) Clone or download content this repository.
