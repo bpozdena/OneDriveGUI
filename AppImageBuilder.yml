@@ -1,0 +1,43 @@
+version: 1
+script:
+  - rm -rf AppDir  | true
+  - mkdir -p AppDir/usr
+  - mkdir -p AppDir/usr/share/icons/hicolor/48x48
+  - cp src AppDir/usr -r
+  - cp src/resources/images/OneDriveGUI.png AppDir/usr/share/icons/hicolor/48x48
+  - python3 -m pip install --ignore-installed --prefix=/usr --no-cache-dir --root=AppDir -r ./requirements.txt
+  - rm -rf AppDir/usr/lib/python3.8/site-packages/PySide6/Qt/qml/
+  - rm -rf AppDir/usr/lib/python3.8/site-packages/PySide6/examples/
+  - rm -rf AppDir/usr/lib/python3.8/site-packages/PySide6/Qt/resources/
+  - rm AppDir/usr/lib/python3.8/site-packages/PySide6/{assistant,designer,linguist,lrelease,lupdate}
+
+AppDir:
+  path: ./AppDir
+
+  app_info:
+    id: io.github.bpozdena.OneDriveGUI
+    name: OneDriveGUI
+    icon: OneDriveGUI
+    version: 0.0.1
+    exec: usr/bin/python3
+    exec_args: "$APPDIR/usr/src/OneDriveGUI.py $@"
+
+  apt:
+    arch: amd64
+    sources:
+      - sourceline: 'deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ focal main restricted universe multiverse'
+        key_url: 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3b4fe6acc0b21f32'
+
+    include:
+      - python3
+    exclude: []
+
+  runtime:
+    env:
+      PYTHONHOME: '${APPDIR}/usr'
+      PYTHONPATH: '${APPDIR}/usr/lib/python3.8/site-packages'
+
+AppImage:
+#  update-information: gh-releases-zsync
+  sign-key: None
+  arch: x86_64

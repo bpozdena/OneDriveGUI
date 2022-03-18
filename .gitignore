@@ -5,3 +5,6 @@ src/nohup.out
 nohup.out
 __pycache__/
 
+AppDir/
+appimage-builder-cache/
+*.AppImage
