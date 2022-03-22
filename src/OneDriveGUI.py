@@ -1436,7 +1436,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             if installed_client_version_num < min_supported_version_num:
                 version_label_text = 'Unsupported OneDrive client! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md" style="color:#FFFFFF;">upgrade</a> it.'
-                version_tooltip_text = f"OneDrive Client version not supported! Please upgrade it."
+                version_tooltip_text = f"OneDrive Client version not supported! Please upgrade it. \n Installed: {installed_client_version} \n Latest: {latest_client_version}"
                 min_requirements_met = False
 
         except FileNotFoundError as e:
