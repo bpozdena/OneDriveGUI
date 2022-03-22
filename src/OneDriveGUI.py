@@ -33,6 +33,7 @@ from PySide6.QtWidgets import (
     QGridLayout,
     QFileDialog,
 )
+from urllib3 import HTTPSConnectionPool
 
 # TODO: Split into multiple files once all main features are implemented.
 # Import for login window.
@@ -136,6 +137,7 @@ class wizardPage_version_check(QWizardPage):
         self.label_5 = QLabel()
         self.label_5.setWordWrap(True)
         self.label_5.setStyleSheet("color: red;")
+        self.label_5.setOpenExternalLinks(True)
         self.label_5.setText(
             "OneDrive Client for Linux does not seem to be installed. Please install it by following "
             "<a href='https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md'>instructions</a> for your distro. "
@@ -151,21 +153,38 @@ class wizardPage_version_check(QWizardPage):
         # Check if OneDrive is installed
         # TODO: Minimim version check not yet enforced
         try:
-            od_version_check = subprocess.check_output(["onedrive", "--version"], stderr=subprocess.STDOUT)
-            if "onedrive v" in str(od_version_check):
-                self.od_version = re.search(r".\s(v[0-9.]+)", str(od_version_check)).group(1)
-                logging.info(f"OneDrive {self.od_version} detected.")
-                self.label_4.setText(f"OneDrive {self.od_version} detected.")
+            client_version_check = subprocess.check_output(["onedrive", "--version"], stderr=subprocess.STDOUT)
+            installed_client_version = re.search(r".\s(v[0-9.]+)", str(client_version_check)).group(1)
+            installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
+            min_supported_version_num = 2415
+
+            if installed_client_version_num < min_supported_version_num:
+                logging.info(f"Unsupported OneDrive {installed_client_version} detected.")
+                self.label_4.setOpenExternalLinks(True)
+                self.label_4.setText(
+                    f'OneDrive {installed_client_version} is not supported. Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md">upgrade</a> it.'
+                )
+                self.label_4.setStyleSheet("color: red;")
+                self.label_5.hide()
+                self.completeChanged.emit()
+
+                return False
+
+            if "onedrive v" in str(client_version_check):
+                logging.info(f"OneDrive {installed_client_version} detected.")
+                self.label_4.setText(f"OneDrive {installed_client_version} detected.")
                 self.label_4.setStyleSheet("color: green;")
                 self.label_5.hide()
                 self.completeChanged.emit()
 
                 return True
+
             else:
                 self.label_4.setText("OneDrive not detected.")
                 self.label_4.setStyleSheet("color: red;")
                 self.completeChanged.emit()
                 return False
+
         except FileNotFoundError:
             self.label_4.setText("OneDrive not detected.")
             self.label_4.setStyleSheet("color: red;")
@@ -1401,6 +1420,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             latest_client_version = s.get(latest_url).json()["tag_name"]
             client_version_check = subprocess.check_output(["onedrive", "--version"], stderr=subprocess.STDOUT)
             installed_client_version = re.search(r".\s(v[0-9.]+)", str(client_version_check)).group(1)
+            installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
+            min_supported_version_num = 2415
+            min_requirements_met = True
 
             result = {
                 "latest_client_version": latest_client_version,
@@ -1409,20 +1431,34 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             logging.debug(f"[GUI] Client version check: {result}")
 
             if latest_client_version not in installed_client_version:
-                for profile_name in global_config:
-                    self.profile_status_pages[profile_name].label_onedrive_status.setText(
-                        "OneDrive client is out of date!"
-                    )
-                    self.profile_status_pages[profile_name].label_version_check.setToolTip(
-                        f"OneDrive client is out of date! \n Installed: {installed_client_version} \n Latest: {latest_client_version}"
-                    )
-                    self.profile_status_pages[profile_name].label_version_check.setPixmap(pixmap_warning)
+                version_label_text = "OneDrive client is out of date!"
+                version_tooltip_text = f"OneDrive client is out of date! \n Installed: {installed_client_version} \n Latest: {latest_client_version}"
 
-            return result
+            if installed_client_version_num < min_supported_version_num:
+                version_label_text = 'Unsupported OneDrive client! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md" style="color:#FFFFFF;">upgrade</a> it.'
+                version_tooltip_text = f"OneDrive Client version not supported! Please upgrade it."
+                min_requirements_met = False
+
+        except FileNotFoundError as e:
+            logging.error(f"OneDrive Client not found: {e}")
+            version_label_text = 'OneDrive Client not found! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md" style="color:#FFFFFF;">install</a> it.'
+            version_tooltip_text = f"OneDrive Client not found! Please install it."
+            min_requirements_met = False
 
         except Exception as e:
             logging.error(f"Client version check failed: {e}")
-            return False
+
+        finally:
+            for profile_name in global_config:
+                self.profile_status_pages[profile_name].label_onedrive_status.setOpenExternalLinks(True)
+                self.profile_status_pages[profile_name].label_onedrive_status.setText(version_label_text)
+
+                self.profile_status_pages[profile_name].label_version_check.setToolTip(version_tooltip_text)
+                self.profile_status_pages[profile_name].label_version_check.setPixmap(pixmap_warning)
+
+                if not min_requirements_met:
+                    self.profile_status_pages[profile_name].toolButton_start.setEnabled(False)
+                    self.profile_status_pages[profile_name].pushButton_settings.setEnabled(False)
 
     def onedrive_process_status(self):
         # Check OneDrive status
