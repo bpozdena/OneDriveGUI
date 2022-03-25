@@ -6,6 +6,7 @@ import subprocess
 import sys
 import logging
 import requests
+import copy
 import logging.handlers as handlers
 from configparser import ConfigParser
 
@@ -316,7 +317,9 @@ class wizardPage_create(QWizardPage):
         default_od_config = _default_od_config._sections
 
         # Construct dict with user profile settings.
-        new_profile = {profile_name: {"config_file": config_path, "enable_debug": False, "mode": "monitor"}}
+        new_profile = {
+            profile_name: {"config_file": config_path, "enable_debug": False, "mode": "monitor", "auto_sync": False}
+        }
 
         # Load existing user profiles and add the new profile.
         _profiles = ConfigParser()
@@ -450,7 +453,9 @@ class wizardPage_import(QWizardPage):
         logging.debug("[GUI] new_od_config: " + str(new_od_config))
 
         # Construct dict with user profile settings.
-        new_profile = {profile_name: {"config_file": config_path, "enable_debug": False, "mode": "monitor"}}
+        new_profile = {
+            profile_name: {"config_file": config_path, "enable_debug": False, "mode": "monitor", "auto_sync": False}
+        }
 
         # Load existing user profiles and add the new profile.
         _profiles = ConfigParser()
@@ -620,7 +625,9 @@ class SettingsWindow(QWidget, Ui_settings_window):
         default_od_config = _default_od_config._sections
 
         # Construct dict with user profile settings.
-        new_profile = {profile_name: {"config_file": config_path, "enable_debug": False, "mode": "monitor"}}
+        new_profile = {
+            profile_name: {"config_file": config_path, "enable_debug": False, "mode": "monitor", "auto_sync": False}
+        }
 
         # Load existing user profiles and add the new profile.
         _profiles = ConfigParser()
@@ -680,7 +687,9 @@ class SettingsWindow(QWidget, Ui_settings_window):
         new_od_config = _new_od_config._sections
 
         # Construct dict with user profile settings.
-        new_profile = {profile_name: {"config_file": config_path, "enable_debug": False, "mode": "monitor"}}
+        new_profile = {
+            profile_name: {"config_file": config_path, "enable_debug": False, "mode": "monitor", "auto_sync": False}
+        }
 
         # Load existing user profiles and add the new profile.
         _profiles = ConfigParser()
@@ -768,7 +777,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.setupUi(self)
 
         temp_global_config = global_config
-        self.temp_profile_config = temp_global_config[self.profile]["onedrive"]
+        self.temp_profile_config = temp_global_config[self.profile]
 
         self.label_profile_name.setText(self.profile)
         self.tabWidget.setCurrentIndex(0)
@@ -776,7 +785,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         #
         # Monitored files tab
         #
-        self.lineEdit_sync_dir.setText(self.temp_profile_config["sync_dir"].strip('"'))
+        self.lineEdit_sync_dir.setText(self.temp_profile_config["onedrive"]["sync_dir"].strip('"'))
         self.lineEdit_sync_dir.textChanged.connect(self.set_sync_dir)
 
         self.checkBox_sync_root_files.setChecked(self.get_check_box_state("sync_root_files"))
@@ -789,7 +798,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         #
 
         # Skip_file section
-        self.skip_files = self.temp_profile_config["skip_file"].strip('"').split("|")
+        self.skip_files = self.temp_profile_config["onedrive"]["skip_file"].strip('"').split("|")
         self.listWidget_skip_file.addItems(self.skip_files)
         self.listWidget_skip_file.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.pushButton_add_skip_file.clicked.connect(self.add_skip_file)
@@ -797,7 +806,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.pushButton_rm_skip_file.clicked.connect(self.remove_skip_file)
 
         # Skip_dir section
-        self.skip_dirs = self.temp_profile_config["skip_dir"].strip('"').split("|")
+        self.skip_dirs = self.temp_profile_config["onedrive"]["skip_dir"].strip('"').split("|")
         self.listWidget_skip_dir.addItems(self.skip_dirs)
         self.listWidget_skip_dir.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.pushButton_add_skip_dir.clicked.connect(self.add_skip_dir)
@@ -819,26 +828,34 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         #
         # Sync Options tab
         #
-        self.spinBox_monitor_interval.setValue(int(self.temp_profile_config["monitor_interval"].strip('"')))
+        self.spinBox_monitor_interval.setValue(
+            int(self.temp_profile_config["onedrive"]["monitor_interval"].strip('"'))
+        )
         self.spinBox_monitor_interval.valueChanged.connect(self.set_spin_box_value)
 
         self.spinBox_monitor_fullscan_frequency.setValue(
-            int(self.temp_profile_config["monitor_fullscan_frequency"].strip('"'))
+            int(self.temp_profile_config["onedrive"]["monitor_fullscan_frequency"].strip('"'))
         )
         self.spinBox_monitor_fullscan_frequency.valueChanged.connect(self.set_spin_box_value)
 
         self.spinBox_classify_as_big_delete.setValue(
-            int(self.temp_profile_config["classify_as_big_delete"].strip('"'))
+            int(self.temp_profile_config["onedrive"]["classify_as_big_delete"].strip('"'))
         )
         self.spinBox_classify_as_big_delete.valueChanged.connect(self.set_spin_box_value)
 
-        self.spinBox_sync_dir_permissions.setValue(int(self.temp_profile_config["sync_dir_permissions"].strip('"')))
+        self.spinBox_sync_dir_permissions.setValue(
+            int(self.temp_profile_config["onedrive"]["sync_dir_permissions"].strip('"'))
+        )
         self.spinBox_sync_dir_permissions.valueChanged.connect(self.set_spin_box_value)
 
-        self.spinBox_sync_file_permissions.setValue(int(self.temp_profile_config["sync_file_permissions"].strip('"')))
+        self.spinBox_sync_file_permissions.setValue(
+            int(self.temp_profile_config["onedrive"]["sync_file_permissions"].strip('"'))
+        )
         self.spinBox_sync_file_permissions.valueChanged.connect(self.set_spin_box_value)
 
-        self.spinBox_operation_timeout.setValue(int(self.temp_profile_config["operation_timeout"].strip('"')))
+        self.spinBox_operation_timeout.setValue(
+            int(self.temp_profile_config["onedrive"]["operation_timeout"].strip('"'))
+        )
         self.spinBox_operation_timeout.valueChanged.connect(self.set_spin_box_value)
 
         self.checkBox_download_only.setChecked(self.get_check_box_state("download_only"))
@@ -877,18 +894,18 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_bypass_data_preservation.setChecked(self.get_check_box_state("bypass_data_preservation"))
         self.checkBox_bypass_data_preservation.stateChanged.connect(self.set_check_box_state)
 
-        self.lineEdit_user_agent.setText(self.temp_profile_config["user_agent"].strip('"'))
+        self.lineEdit_user_agent.setText(self.temp_profile_config["onedrive"]["user_agent"].strip('"'))
         self.lineEdit_user_agent.textChanged.connect(self.set_line_edit_value)
 
-        self.lineEdit_azure_ad_endpoint.setText(self.temp_profile_config["azure_ad_endpoint"].strip('"'))
+        self.lineEdit_azure_ad_endpoint.setText(self.temp_profile_config["onedrive"]["azure_ad_endpoint"].strip('"'))
         self.lineEdit_azure_ad_endpoint.textChanged.connect(self.set_line_edit_value)
 
-        self.lineEdit_azure_tenant_id.setText(self.temp_profile_config["azure_tenant_id"].strip('"'))
+        self.lineEdit_azure_tenant_id.setText(self.temp_profile_config["onedrive"]["azure_tenant_id"].strip('"'))
         self.lineEdit_azure_tenant_id.textChanged.connect(self.set_line_edit_value)
 
         # Rate limit
-        self.spinBox_rate_limit.setValue(int(self.temp_profile_config["rate_limit"].strip('"')))
-        self.horizontalSlider_rate_limit.setValue(int(self.temp_profile_config["rate_limit"].strip('"')))
+        self.spinBox_rate_limit.setValue(int(self.temp_profile_config["onedrive"]["rate_limit"].strip('"')))
+        self.horizontalSlider_rate_limit.setValue(int(self.temp_profile_config["onedrive"]["rate_limit"].strip('"')))
         self.label_rate_limit_mbps.setText(
             str(round(self.spinBox_rate_limit.value() * 8 / 1000 / 1000, 2)) + " Mbit/s"
         )
@@ -908,30 +925,32 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_webhook_enabled.stateChanged.connect(self.set_check_box_state)
 
         self.spinBox_webhook_expiration_interval.setValue(
-            int(self.temp_profile_config["webhook_expiration_interval"].strip('"'))
+            int(self.temp_profile_config["onedrive"]["webhook_expiration_interval"].strip('"'))
         )
         self.spinBox_webhook_expiration_interval.valueChanged.connect(self.set_spin_box_value)
 
         self.spinBox_webhook_renewal_interval.setValue(
-            int(self.temp_profile_config["webhook_renewal_interval"].strip('"'))
+            int(self.temp_profile_config["onedrive"]["webhook_renewal_interval"].strip('"'))
         )
         self.spinBox_webhook_renewal_interval.valueChanged.connect(self.set_spin_box_value)
 
         self.spinBox_webhook_listening_port.setValue(
-            int(self.temp_profile_config["webhook_listening_port"].strip('"'))
+            int(self.temp_profile_config["onedrive"]["webhook_listening_port"].strip('"'))
         )
         self.spinBox_webhook_listening_port.valueChanged.connect(self.set_spin_box_value)
 
-        self.lineEdit_webhook_public_url.setText(self.temp_profile_config["webhook_public_url"].strip('"'))
+        self.lineEdit_webhook_public_url.setText(self.temp_profile_config["onedrive"]["webhook_public_url"].strip('"'))
         self.lineEdit_webhook_public_url.textChanged.connect(self.set_line_edit_value)
 
-        self.lineEdit_webhook_listening_host.setText(self.temp_profile_config["webhook_listening_host"].strip('"'))
+        self.lineEdit_webhook_listening_host.setText(
+            self.temp_profile_config["onedrive"]["webhook_listening_host"].strip('"')
+        )
         self.lineEdit_webhook_listening_host.textChanged.connect(self.set_line_edit_value)
 
         #
         # Logging tab
         #
-        self.lineEdit_log_dir.setText(self.temp_profile_config["log_dir"].strip('"'))
+        self.lineEdit_log_dir.setText(self.temp_profile_config["onedrive"]["log_dir"].strip('"'))
         self.lineEdit_log_dir.textChanged.connect(self.set_log_dir)
 
         self.pushButton_log_dir_browse.clicked.connect(self.get_log_dir_name)
@@ -945,10 +964,14 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_disable_notifications.setChecked(self.get_check_box_state("disable_notifications"))
         self.checkBox_disable_notifications.stateChanged.connect(self.set_check_box_state)
 
-        self.spinBox_monitor_log_frequency.setValue(int(self.temp_profile_config["monitor_log_frequency"].strip('"')))
+        self.spinBox_monitor_log_frequency.setValue(
+            int(self.temp_profile_config["onedrive"]["monitor_log_frequency"].strip('"'))
+        )
         self.spinBox_monitor_log_frequency.valueChanged.connect(self.set_spin_box_value)
 
-        self.spinBox_min_notify_changes.setValue(int(self.temp_profile_config["min_notify_changes"].strip('"')))
+        self.spinBox_min_notify_changes.setValue(
+            int(self.temp_profile_config["onedrive"]["min_notify_changes"].strip('"'))
+        )
         self.spinBox_min_notify_changes.valueChanged.connect(self.set_spin_box_value)
 
         #
@@ -960,6 +983,9 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.pushButton_login.clicked.connect(lambda: main_window.show_login(self.profile))
         self.pushButton_login.hide()
         self.pushButton_logout.clicked.connect(self.logout)
+
+        self.checkBox_auto_sync.setChecked(self.get_check_box_state_profile("auto_sync"))
+        self.checkBox_auto_sync.stateChanged.connect(self.set_check_box_state_profile)
 
         #
         # Buttons
@@ -1007,12 +1033,12 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
     def set_line_edit_value(self, value):
         _property = self.sender().objectName()
         property = re.search(r"lineEdit_(.+)", _property).group(1)
-        self.temp_profile_config[f"{property}"] = f'"{value}"'
+        self.temp_profile_config["onedrive"][f"{property}"] = f'"{value}"'
 
     def set_spin_box_value(self, value):
         _property = self.sender().objectName()
         property = re.search(r"spinBox_(.+)", _property).group(1)
-        self.temp_profile_config[f"{property}"] = f'"{value}"'
+        self.temp_profile_config["onedrive"][f"{property}"] = f'"{value}"'
 
     def set_check_box_state(self, state):
         _property = self.sender().objectName()
@@ -1020,41 +1046,55 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         logging.info(property)
         if state == Qt.Checked:
             logging.info("is checked")
-            self.temp_profile_config[f"{property}"] = '"true"'
+            self.temp_profile_config["onedrive"][f"{property}"] = '"true"'
         else:
             logging.info("is unchecked")
-            self.temp_profile_config[f"{property}"] = '"false"'
+            self.temp_profile_config["onedrive"][f"{property}"] = '"false"'
+
+    def set_check_box_state_profile(self, state):
+        _property = self.sender().objectName()
+        property = re.search(r"checkBox_(.+)", _property).group(1)
+        logging.info(property)
+        if state == Qt.Checked:
+            logging.info("is checked")
+            self.temp_profile_config[f"{property}"] = True
+        else:
+            logging.info("is unchecked")
+            self.temp_profile_config[f"{property}"] = False
 
     def get_check_box_state(self, property):
-        return self.temp_profile_config[f"{property}"].strip('"') in "true"
+        return self.temp_profile_config["onedrive"][f"{property}"].strip('"') in "true"
+
+    def get_check_box_state_profile(self, property):
+        return self.temp_profile_config[f"{property}"] == "True"
 
     def add_skip_file(self):
         self.add_item_to_qlist(self.lineEdit_skip_file, self.listWidget_skip_file, self.skip_files)
-        self.temp_profile_config["skip_file"] = '"' + "|".join(self.skip_files) + '"'
+        self.temp_profile_config["onedrive"]["skip_file"] = '"' + "|".join(self.skip_files) + '"'
 
     def remove_skip_file(self):
         self.remove_item_from_qlist(self.listWidget_skip_file, self.skip_files)
-        self.temp_profile_config["skip_file"] = '"' + "|".join(self.skip_files) + '"'
+        self.temp_profile_config["onedrive"]["skip_file"] = '"' + "|".join(self.skip_files) + '"'
 
     def add_skip_dir(self):
         self.add_item_to_qlist(self.lineEdit_skip_dir, self.listWidget_skip_dir, self.skip_dirs)
-        self.temp_profile_config["skip_dir"] = '"' + "|".join(self.skip_dirs) + '"'
+        self.temp_profile_config["onedrive"]["skip_dir"] = '"' + "|".join(self.skip_dirs) + '"'
 
     def remove_skip_dir(self):
         self.remove_item_from_qlist(self.listWidget_skip_dir, self.skip_dirs)
-        self.temp_profile_config["skip_dir"] = '"' + "|".join(self.skip_dirs) + '"'
+        self.temp_profile_config["onedrive"]["skip_dir"] = '"' + "|".join(self.skip_dirs) + '"'
 
     def set_rate_limit(self):
-        self.temp_profile_config["rate_limit"] = f'"{self.lineEdit_rate_limit.text()}"'
+        self.temp_profile_config["onedrive"]["rate_limit"] = f'"{self.lineEdit_rate_limit.text()}"'
         self.label_rate_limit_mbps.setText(
             str(round(int(self.lineEdit_rate_limit.text()) * 8 / 1000 / 1000, 2)) + " Mbit/s"
         )
 
     def set_sync_dir(self):
-        self.temp_profile_config["sync_dir"] = f'"{self.lineEdit_sync_dir.text()}"'
+        self.temp_profile_config["onedrive"]["sync_dir"] = f'"{self.lineEdit_sync_dir.text()}"'
 
     def set_log_dir(self):
-        self.temp_profile_config["log_dir"] = f'"{self.lineEdit_log_dir.text()}"'
+        self.temp_profile_config["onedrive"]["log_dir"] = f'"{self.lineEdit_log_dir.text()}"'
 
     def add_item_to_qlist(self, source_widget, destination_widget, list):
         if source_widget.text() == "":
@@ -1075,6 +1115,8 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
 
     def save_profile_settings(self):
         global_config[self.profile].update(self.temp_profile_config)
+        logging.debug("save_profile_settings" + "self.temp_profile_config" + str(self.temp_profile_config))
+        logging.debug("save_profile_settings" + "global_config" + str(global_config))
         save_global_config()
 
     def discart_changes(self):
@@ -1398,8 +1440,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.auto_sync = QTimer()
         self.auto_sync.setSingleShot(True)
-        for profile in global_config:
-            self.auto_sync.timeout.connect(lambda: self.start_onedrive_monitor(profile))
+        self.auto_sync.timeout.connect(self.autostart_monitor)
         self.auto_sync.start(1000)
 
     def closeEvent(self, event):
@@ -1420,6 +1461,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def client_version_check(self):
         pixmap_warning = QPixmap(dir_path + "/resources/images/warning.png").scaled(20, 20, Qt.KeepAspectRatio)
         s = requests.Session()
+        version_label_text = ""
+        version_tooltip_text = ""
 
         try:
             latest_url = "https://api.github.com/repos/abraunegg/onedrive/releases/latest"
@@ -1459,12 +1502,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.profile_status_pages[profile_name].label_onedrive_status.setOpenExternalLinks(True)
                 self.profile_status_pages[profile_name].label_onedrive_status.setText(version_label_text)
 
-                self.profile_status_pages[profile_name].label_version_check.setToolTip(version_tooltip_text)
-                self.profile_status_pages[profile_name].label_version_check.setPixmap(pixmap_warning)
-
                 if not min_requirements_met:
                     self.profile_status_pages[profile_name].toolButton_start.setEnabled(False)
                     self.profile_status_pages[profile_name].pushButton_settings.setEnabled(False)
+                    self.profile_status_pages[profile_name].label_version_check.setToolTip(version_tooltip_text)
+                    self.profile_status_pages[profile_name].label_version_check.setPixmap(pixmap_warning)
 
     def onedrive_process_status(self):
         # Check OneDrive status
@@ -1488,6 +1530,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     self.profile_status_pages[profile_name].label_status.setText("running")
                     self.profile_status_pages[profile_name].label_status.setPixmap(pixmap_running)
                     # logging.info(f"running worker {profile_name}")
+
+    def autostart_monitor(self):
+        # Auto-start sync if compatible version of OneDrive client is installed.
+
+        for profile_name in global_config:
+            logging.debug(
+                f"[{profile_name}] Compatible client version found: {self.profile_status_pages[profile_name].toolButton_start.isEnabled()}"
+            )
+            logging.debug(
+                f"[{profile_name}] Auto-sync enabled for profile: {global_config[profile_name]['auto_sync']}"
+            )
+
+            if (
+                self.profile_status_pages[profile_name].toolButton_start.isEnabled()
+                and global_config[profile_name]["auto_sync"] == "True"
+            ):
+                self.start_onedrive_monitor(profile_name)
 
     def start_onedrive_monitor(self, profile_name):
         # for profile in global_config:
@@ -1658,6 +1717,7 @@ def create_global_config():
         "config_file": "/home/bob/.config/onedrive/accounts/bob@live.com/config",
         "enable_debug": "True",
         "mode": "monitor",
+        "auto_sync": False,
         "onedrive": {
             "sync_dir": '"~/OneDrive"',
             "skip_file": '"~*|.~*|*.tmp|*.txt|*.exe|.testfile"',
@@ -1667,6 +1727,7 @@ def create_global_config():
         "config_file": "/home/bob/.config/onedrive/accounts/john@live.com/config",
         "enable_debug": "True",
         "mode": "monitor",
+        "auto_sync": False,
         "onedrive": {
             "sync_dir": '"~/OneDrive2"',
             "skip_file": '"~*|.~*|*.tmp|*.txt|*.exe"',
@@ -1675,6 +1736,7 @@ def create_global_config():
 
     # Load all default values. Needed for cases when imported config does not contain all properties.
     _default_od_config = read_config(dir_path + "/resources/default_config")
+    _default_profile_config = {"auto_sync": False}
     default_od_config = _default_od_config._sections
 
     # Load existing user profiles.
@@ -1687,18 +1749,47 @@ def create_global_config():
         _od_config = read_config(profile_config_file)
         od_config = _od_config._sections
 
+        if "auto_sync" not in profiles[profile]:  # add 'auto_sync' value if from older versions
+            profiles[profile].update(_default_profile_config)
         profiles[profile].update(default_od_config)
         profiles[profile].update(od_config)
 
-    # logging.info(profiles)
+    logging.debug(profiles)
     return profiles
 
 
 def save_global_config():
     # Save all OneDrive config files after configuration change.
+    #
+    # Save GUI profile file changes
+    #
+    _profile_config = copy.deepcopy(global_config)
+    logging.debug(f"[save_global_config]:[1]{_profile_config}")
+
+    for profile in _profile_config:
+        _profile_config[profile].pop("onedrive", None)
+
+    logging.debug(f"[save_global_config]:[2]{_profile_config}")
+    logging.debug(f"[save_global_config]:[3]{global_config}")
+
+    profile_config = ConfigParser()
+    profile_config.read_dict(_profile_config)
+
+    # Create profile config file if it does not exist.
+    profiles_dir = re.search(r"(.+)/profiles$", PROFILES_FILE).group(1)
+    if not os.path.exists(profiles_dir):
+        os.makedirs(profiles_dir)
+
+    # Save the new profile.
+    with open(PROFILES_FILE, "w") as profilefile:
+        profile_config.write(profilefile)
+
     for profile in global_config:
 
-        profile_config_file = os.path.expanduser(global_config[profile]["config_file"].strip('"'))
+        #
+        # Save OneDrive config changes
+        #
+        od_config_file = os.path.expanduser(global_config[profile]["config_file"].strip('"'))
 
         _od_config = {}
         _od_config["onedrive"] = global_config[profile]["onedrive"]
@@ -1707,25 +1798,26 @@ def save_global_config():
         od_config.read_dict(_od_config)
 
         # Backup last config
-        os.system(f"cp {profile_config_file} {profile_config_file}_backup")
+        os.system(f"cp {od_config_file} {od_config_file}_backup")
 
         # Save OD config changes.
-        directory = re.search(r"(.+)/.+$", profile_config_file).group(1)
+        directory = re.search(r"(.+)/.+$", od_config_file).group(1)
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-        with open(profile_config_file, "w") as f:
+        with open(od_config_file, "w") as f:
             od_config.write(f)
 
         # Remove first line (section) from config file so that OneDrive can read it.
-        with open(profile_config_file, "r") as input:
+        with open(od_config_file, "r") as input:
             data = input.read().splitlines(True)
-        with open(profile_config_file, "w") as output:
+        with open(od_config_file, "w") as output:
             output.writelines(data[1:])
 
         logging.info(f"{profile} config saved")
 
     logging.info("All configs saved")
+    logging.debug(global_config)
 
 
 if __name__ == "__main__":
