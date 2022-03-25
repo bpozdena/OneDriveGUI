@@ -48,7 +48,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>3</number>
+        <number>5</number>
        </property>
        <widget class="QWidget" name="exemptions_tab_2">
         <attribute name="title">
@@ -775,11 +775,11 @@
         <attribute name="title">
          <string>Account</string>
         </attribute>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <layout class="QVBoxLayout" name="verticalLayout">
          <item>
-          <widget class="QPushButton" name="pushButton_login">
+          <widget class="QCheckBox" name="checkBox_auto_sync">
            <property name="text">
-            <string>Login</string>
+            <string>Auto-sync on startup</string>
            </property>
           </widget>
          </item>
@@ -787,6 +787,13 @@
           <widget class="QPushButton" name="pushButton_logout">
            <property name="text">
             <string>Logout</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_login">
+           <property name="text">
+            <string>Login</string>
            </property>
           </widget>
          </item>
