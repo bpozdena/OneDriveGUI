@@ -1396,6 +1396,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.check_client_version.timeout.connect(self.client_version_check)
         self.check_client_version.start(500)
 
+        self.auto_sync = QTimer()
+        self.auto_sync.setSingleShot(True)
+        for profile in global_config:
+            self.auto_sync.timeout.connect(lambda: self.start_onedrive_monitor(profile))
+        self.auto_sync.start(1000)
+
     def closeEvent(self, event):
         event.ignore()
         self.hide()
