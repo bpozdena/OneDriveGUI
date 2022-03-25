@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'profile_settings_page.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.2
+## Created by: Qt User Interface Compiler version 6.2.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -578,17 +578,22 @@ class Ui_profile_settings(object):
         self.tabWidget.addTab(self.tab_5, "")
         self.tab_6 = QWidget()
         self.tab_6.setObjectName(u"tab_6")
-        self.horizontalLayout_2 = QHBoxLayout(self.tab_6)
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.pushButton_login = QPushButton(self.tab_6)
-        self.pushButton_login.setObjectName(u"pushButton_login")
+        self.verticalLayout = QVBoxLayout(self.tab_6)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.checkBox_auto_sync = QCheckBox(self.tab_6)
+        self.checkBox_auto_sync.setObjectName(u"checkBox_auto_sync")
 
-        self.horizontalLayout_2.addWidget(self.pushButton_login)
+        self.verticalLayout.addWidget(self.checkBox_auto_sync)
 
         self.pushButton_logout = QPushButton(self.tab_6)
         self.pushButton_logout.setObjectName(u"pushButton_logout")
 
-        self.horizontalLayout_2.addWidget(self.pushButton_logout)
+        self.verticalLayout.addWidget(self.pushButton_logout)
+
+        self.pushButton_login = QPushButton(self.tab_6)
+        self.pushButton_login.setObjectName(u"pushButton_login")
+
+        self.verticalLayout.addWidget(self.pushButton_login)
 
         self.tabWidget.addTab(self.tab_6, "")
 
@@ -610,7 +615,7 @@ class Ui_profile_settings(object):
 
         self.retranslateUi(profile_settings)
 
-        self.tabWidget.setCurrentIndex(3)
+        self.tabWidget.setCurrentIndex(5)
 
 
         QMetaObject.connectSlotsByName(profile_settings)
@@ -681,8 +686,9 @@ class Ui_profile_settings(object):
         self.label_webhook_renewal_interval.setText(QCoreApplication.translate("profile_settings", u"Renewal interval", None))
         self.checkBox_webhook_enabled.setText(QCoreApplication.translate("profile_settings", u"Enable webhook", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), QCoreApplication.translate("profile_settings", u"Webhooks", None))
-        self.pushButton_login.setText(QCoreApplication.translate("profile_settings", u"Login", None))
+        self.checkBox_auto_sync.setText(QCoreApplication.translate("profile_settings", u"Auto-sync on startup", None))
         self.pushButton_logout.setText(QCoreApplication.translate("profile_settings", u"Logout", None))
+        self.pushButton_login.setText(QCoreApplication.translate("profile_settings", u"Login", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), QCoreApplication.translate("profile_settings", u"Account", None))
         self.pushButton_discart.setText(QCoreApplication.translate("profile_settings", u"Discard changes", None))
         self.pushButton_save.setText(QCoreApplication.translate("profile_settings", u"Save", None))
