@@ -1827,7 +1827,7 @@ if __name__ == "__main__":
     app.setApplicationName("OneDriveGUI")
     app.setWindowIcon(QIcon(dir_path + "/resources/images/icons8-clouds-48.png"))
 
-    main_window = MainWindow()
+    MainWindow()
     settings_window = SettingsWindow()
     settings_window.hide()
 
