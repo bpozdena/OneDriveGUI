@@ -1831,5 +1831,4 @@ if __name__ == "__main__":
     settings_window = SettingsWindow()
     settings_window.hide()
 
-    main_window.show()
     app.exec()
