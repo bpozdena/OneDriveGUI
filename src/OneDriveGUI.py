@@ -54,6 +54,7 @@ from ui.ui_create_new_profile import Ui_create_new_profile
 
 
 PROFILES_FILE = os.path.expanduser("~/.config/onedrive-gui/profiles")
+GUI_SETTINGS_FILE = os.path.expanduser("~/.config/onedrive-gui/gui_settings")
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 # Logging
@@ -1368,7 +1369,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         #
         # Menu
-        self.menubar.hide()
+        # self.menubar.hide()
+        self.actionStart_Minimized.triggered.connect(self.set_check_box_state)
+        if gui_settings["SETTINGS"]["start_minimized"] == "True":
+            self.actionStart_Minimized.setChecked(True)
+
+        self.actionQuit.triggered.connect(sys.exit)
+
         # Update OneDrive Status
         self.actionRefresh_Service_Status.triggered.connect(lambda: self.onedrive_process_status())
 
@@ -1442,6 +1449,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.auto_sync.setSingleShot(True)
         self.auto_sync.timeout.connect(self.autostart_monitor)
         self.auto_sync.start(1000)
+
+    def set_check_box_state(self, state):
+        _property = self.sender().objectName()
+        logging.info(f"[GUI] {_property} changed to '{state}'")
+
+        if state == True:
+            logging.info(f"is checked")
+            gui_settings["SETTINGS"]["start_minimized"] = "True"
+        else:
+            logging.info(f"is unchecked")
+            gui_settings["SETTINGS"]["start_minimized"] = "False"
+
+        with open(GUI_SETTINGS_FILE, "w") as f:
+            gui_settings.write(f)
 
     def closeEvent(self, event):
         event.ignore()
@@ -1707,6 +1728,22 @@ def read_config(config_file):
     return config
 
 
+def read_gui_settings():
+    default_gui_settings = {
+        "SETTINGS": {
+            "start_minimized": "False",
+        }
+    }
+
+    gui_settings = ConfigParser()
+    gui_settings.read_dict(default_gui_settings)  # Read default settings and use them when config file does not exist.
+    gui_settings.read(GUI_SETTINGS_FILE)  # Read user settings from file and overwrite defaults.
+
+    logging.debug(f"GUI SETTINGS: {gui_settings._sections}")
+
+    return gui_settings
+
+
 def create_global_config():
     """
     Creates dict which is used as running global config.
@@ -1822,6 +1859,7 @@ def save_global_config():
 
 if __name__ == "__main__":
     global_config = create_global_config()
+    gui_settings = read_gui_settings()
 
     app = QApplication(sys.argv)
     app.setApplicationName("OneDriveGUI")
@@ -1831,5 +1869,9 @@ if __name__ == "__main__":
     settings_window = SettingsWindow()
     settings_window.hide()
 
-    main_window.show()
+    if gui_settings["SETTINGS"]["start_minimized"] == "True":
+        main_window.hide()
+    else:
+        main_window.show()
+
     app.exec()

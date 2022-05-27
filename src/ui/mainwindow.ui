@@ -56,7 +56,6 @@
         <property name="font">
          <font>
           <pointsize>10</pointsize>
-          <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
@@ -103,7 +102,7 @@ color: rgb(255, 255, 255);</string>
      <x>0</x>
      <y>0</y>
      <width>420</width>
-     <height>30</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuAdvanced">
@@ -111,10 +110,16 @@ color: rgb(255, 255, 255);</string>
      <string>Advanced</string>
     </property>
     <widget class="QMenu" name="menuDebug">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>Debug</string>
      </property>
      <widget class="QMenu" name="menuService">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="title">
        <string>Service</string>
       </property>
@@ -141,14 +146,10 @@ color: rgb(255, 255, 255);</string>
      <addaction name="menuMonitor"/>
      <addaction name="menuStatus"/>
     </widget>
-    <widget class="QMenu" name="menuaccount2">
-     <property name="title">
-      <string>account2</string>
-     </property>
-     <addaction name="actionstart"/>
-    </widget>
     <addaction name="menuDebug"/>
-    <addaction name="menuaccount2"/>
+    <addaction name="actionStart_Minimized"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuAdvanced"/>
   </widget>
@@ -205,6 +206,19 @@ color: rgb(255, 255, 255);</string>
   <action name="actionstart">
    <property name="text">
     <string>start</string>
+   </property>
+  </action>
+  <action name="actionStart_Minimized">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Start Minimized</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
    </property>
   </action>
  </widget>
