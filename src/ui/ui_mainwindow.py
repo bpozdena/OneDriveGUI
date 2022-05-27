@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'mainwindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.2
+## Created by: Qt User Interface Compiler version 6.2.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -52,6 +52,11 @@ class Ui_MainWindow(object):
         self.actionTest_Service.setObjectName(u"actionTest_Service")
         self.actionstart = QAction(MainWindow)
         self.actionstart.setObjectName(u"actionstart")
+        self.actionStart_Minimized = QAction(MainWindow)
+        self.actionStart_Minimized.setObjectName(u"actionStart_Minimized")
+        self.actionStart_Minimized.setCheckable(True)
+        self.actionQuit = QAction(MainWindow)
+        self.actionQuit.setObjectName(u"actionQuit")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayout = QVBoxLayout(self.centralwidget)
@@ -93,24 +98,26 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 420, 30))
+        self.menubar.setGeometry(QRect(0, 0, 420, 22))
         self.menuAdvanced = QMenu(self.menubar)
         self.menuAdvanced.setObjectName(u"menuAdvanced")
         self.menuDebug = QMenu(self.menuAdvanced)
         self.menuDebug.setObjectName(u"menuDebug")
+        self.menuDebug.setEnabled(False)
         self.menuService = QMenu(self.menuDebug)
         self.menuService.setObjectName(u"menuService")
+        self.menuService.setEnabled(False)
         self.menuMonitor = QMenu(self.menuDebug)
         self.menuMonitor.setObjectName(u"menuMonitor")
         self.menuStatus = QMenu(self.menuDebug)
         self.menuStatus.setObjectName(u"menuStatus")
-        self.menuaccount2 = QMenu(self.menuAdvanced)
-        self.menuaccount2.setObjectName(u"menuaccount2")
         MainWindow.setMenuBar(self.menubar)
 
         self.menubar.addAction(self.menuAdvanced.menuAction())
         self.menuAdvanced.addAction(self.menuDebug.menuAction())
-        self.menuAdvanced.addAction(self.menuaccount2.menuAction())
+        self.menuAdvanced.addAction(self.actionStart_Minimized)
+        self.menuAdvanced.addSeparator()
+        self.menuAdvanced.addAction(self.actionQuit)
         self.menuDebug.addAction(self.menuService.menuAction())
         self.menuDebug.addAction(self.menuMonitor.menuAction())
         self.menuDebug.addAction(self.menuStatus.menuAction())
@@ -122,7 +129,6 @@ class Ui_MainWindow(object):
         self.menuMonitor.addAction(self.actionForce_Resync)
         self.menuStatus.addAction(self.actionRefresh_Service_Status)
         self.menuStatus.addAction(self.actionObtain_Sync_Status)
-        self.menuaccount2.addAction(self.actionstart)
 
         self.retranslateUi(MainWindow)
 
@@ -142,12 +148,13 @@ class Ui_MainWindow(object):
         self.actionObtain_Sync_Status.setText(QCoreApplication.translate("MainWindow", u"Obtain Sync Status", None))
         self.actionTest_Service.setText(QCoreApplication.translate("MainWindow", u"Test Service", None))
         self.actionstart.setText(QCoreApplication.translate("MainWindow", u"start", None))
+        self.actionStart_Minimized.setText(QCoreApplication.translate("MainWindow", u"Start Minimized", None))
+        self.actionQuit.setText(QCoreApplication.translate("MainWindow", u"Quit", None))
         self.pushButton_new_profile.setText(QCoreApplication.translate("MainWindow", u"Create/ Import OneDrive profile", None))
         self.menuAdvanced.setTitle(QCoreApplication.translate("MainWindow", u"Advanced", None))
         self.menuDebug.setTitle(QCoreApplication.translate("MainWindow", u"Debug", None))
         self.menuService.setTitle(QCoreApplication.translate("MainWindow", u"Service", None))
         self.menuMonitor.setTitle(QCoreApplication.translate("MainWindow", u"Monitor", None))
         self.menuStatus.setTitle(QCoreApplication.translate("MainWindow", u"Status", None))
-        self.menuaccount2.setTitle(QCoreApplication.translate("MainWindow", u"account2", None))
     # retranslateUi
 
