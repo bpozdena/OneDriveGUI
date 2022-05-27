@@ -1374,6 +1374,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if gui_settings["SETTINGS"]["start_minimized"] == "True":
             self.actionStart_Minimized.setChecked(True)
 
+        # Quit OneDriveGUI
         self.actionQuit.triggered.connect(sys.exit)
 
         # Update OneDrive Status
