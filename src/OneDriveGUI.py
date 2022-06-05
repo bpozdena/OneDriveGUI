@@ -33,6 +33,9 @@ from PySide6.QtWidgets import (
     QFormLayout,
     QGridLayout,
     QFileDialog,
+    QDialog,
+    QDialogButtonBox,
+    QMessageBox,
 )
 from urllib3 import HTTPSConnectionPool
 
@@ -1172,9 +1175,9 @@ class WorkerThread(QThread):
     update_credentials = Signal(str)
     update_progress_new = Signal(dict, str)
     update_profile_status = Signal(dict, str)
-    trigger_resync = Signal()
+    trigger_resync = Signal(str)
 
-    def __init__(self, profile):
+    def __init__(self, profile, options=""):
         super(WorkerThread, self).__init__()
         logging.info(f"[GUI] Starting worker for profile {profile}")
 
@@ -1182,7 +1185,7 @@ class WorkerThread(QThread):
         self.config_dir = re.search(r"(.+)/.+$", self.config_file)
         logging.debug(f"[GUI] OneDrive config file: {self.config_file}")
         logging.debug(f"[GUI] OneDrive config dir: {self.config_dir}")
-        self._command = f"onedrive --confdir='{self.config_dir.group(1)}' --monitor -v"
+        self._command = f"onedrive --confdir='{self.config_dir.group(1)}' --monitor -v {options}"
         logging.debug(f"[GUI] Monitoring command: '{self._command}'")
         self.profile_name = profile
 
@@ -1342,10 +1345,11 @@ class WorkerThread(QThread):
                     )
 
                 elif "--resync is required" in stderr:
-                    logging.info(f"[{self.profile_name}] {str(stderr)} Starting resync.")
-                    self.trigger_resync.emit()
+                    # Ask user for resync authorization and stop the worker.
+                    logging.info(f"[{self.profile_name}] {str(stderr)}  - Asking for resync authorization.")
 
-                    self.run(resync=True)
+                    self.trigger_resync.emit(self.profile_name)
+
                 else:
                     logging.info("@ERROR " + stderr)
 
@@ -1570,11 +1574,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             ):
                 self.start_onedrive_monitor(profile_name)
 
-    def start_onedrive_monitor(self, profile_name):
+    def start_onedrive_monitor(self, profile_name, options=""):
         # for profile in global_config:
 
         if profile_name not in self.workers:
-            self.workers[profile_name] = WorkerThread(profile_name)
+            self.workers[profile_name] = WorkerThread(profile_name, options)
             self.workers[profile_name].start()
         else:
             logging.info(f"Worker for profile {profile_name} is already running. Please stop it first.")
@@ -1584,11 +1588,33 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # self.worker.start()
         self.workers[profile_name].update_credentials.connect(self.show_login)
         # self.worker.update_progress.connect(self.event_update_progress)
-        # self.worker.trigger_resync.connect(self.show_login)
+        self.workers[profile_name].trigger_resync.connect(self.resync_auth_dialog)
         self.workers[profile_name].update_progress_new.connect(self.event_update_progress_new)
         self.workers[profile_name].update_profile_status.connect(self.event_update_profile_status)
         self.workers[profile_name].started.connect(lambda: logging.info(f"started worker {profile_name}"))
         self.workers[profile_name].finished.connect(lambda: logging.info(f"finished worker {profile_name}"))
+
+    def resync_auth_dialog(self, profile_name):
+        resync_question = QMessageBox.question(
+            self,
+            f"Resync required for profile {profile_name}",
+            "An application configuration change has been detected where a resync is required. <br><br>"
+            "The use of resync will remove your local 'onedrive' client state, thus no record will exist regarding your current 'sync status'. <br><br>"
+            "This has the potential to overwrite local versions of files with potentially older versions downloaded from OneDrive which can lead to <b>data loss</b>. <br><br>"
+            "If in-doubt, backup your local data first before proceeding with resync.<br><br><br>"
+            f"Would you like to perform resync for profile <b>{profile_name}</b>?",
+            buttons=QMessageBox.Yes | QMessageBox.No,
+            defaultButton=QMessageBox.No,
+        )
+
+        if resync_question == QMessageBox.Yes:
+            print("Authorize sync: Yes")
+            main_window.profile_status_pages[profile_name].stop_monitor()
+            self.start_onedrive_monitor(profile_name, "--resync --resync-auth")
+
+        elif resync_question == QMessageBox.No:
+            print("Authorize sync: No")
+            main_window.profile_status_pages[profile_name].stop_monitor()
 
     def event_update_profile_status(self, data, profile):
         self.profile_status_pages[profile].label_onedrive_status.setText(data["status_message"])
