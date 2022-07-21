@@ -868,8 +868,8 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_upload_only.setChecked(self.get_check_box_state("upload_only"))
         self.checkBox_upload_only.stateChanged.connect(self.set_check_box_state)
 
-        self.checkBox_force_http_2.setChecked(self.get_check_box_state("force_http_2"))
-        self.checkBox_force_http_2.stateChanged.connect(self.set_check_box_state)
+        self.checkBox_force_http_11.setChecked(self.get_check_box_state("force_http_11"))
+        self.checkBox_force_http_11.stateChanged.connect(self.set_check_box_state)
 
         self.checkBox_disable_upload_validation.setChecked(self.get_check_box_state("disable_upload_validation"))
         self.checkBox_disable_upload_validation.stateChanged.connect(self.set_check_box_state)
@@ -1802,23 +1802,33 @@ def create_global_config():
     _default_od_config = read_config(dir_path + "/resources/default_config")
     _default_profile_config = {"auto_sync": False}
     default_od_config = _default_od_config._sections
+    logging.debug(f"[GUI] - loading default config {default_od_config}")
 
     # Load existing user profiles.
     _profiles = ConfigParser()
     _profiles.read(PROFILES_FILE)
     profiles = _profiles._sections
+    change_detected = False
 
     for profile in profiles:
         profile_config_file = profiles[profile]["config_file"]
         _od_config = read_config(profile_config_file)
         od_config = _od_config._sections
 
-        if "auto_sync" not in profiles[profile]:  # add 'auto_sync' value if from older versions
+        if "auto_sync" not in profiles[profile]:  # add 'auto_sync' value if missing from older versions
             profiles[profile].update(_default_profile_config)
+
         profiles[profile].update(default_od_config)
         profiles[profile].update(od_config)
 
-    logging.debug(profiles)
+        # this option is not supported since OneDrive v2.4.20 - #42
+        if "force_http_2" in profiles[profile]["onedrive"]:
+            logging.debug("[GUI] - removing obsolete option 'force_http_2' from config")
+            profiles[profile]["onedrive"].pop("force_http_2")
+            profiles[profile]["onedrive"]["force_http_11"] = '"false"'
+            change_detected = True
+
+    logging.debug(f"[GUI]{profiles}")
     return profiles
 
 
@@ -1886,6 +1896,7 @@ def save_global_config():
 
 if __name__ == "__main__":
     global_config = create_global_config()
+    save_global_config()
     gui_settings = read_gui_settings()
 
     app = QApplication(sys.argv)

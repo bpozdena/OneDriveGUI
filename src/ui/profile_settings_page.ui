@@ -469,9 +469,9 @@
            </property>
            <layout class="QGridLayout" name="gridLayout_4">
             <item row="2" column="1">
-             <widget class="QCheckBox" name="checkBox_force_http_2">
+             <widget class="QCheckBox" name="checkBox_force_http_11">
               <property name="text">
-               <string>Force HTTP2</string>
+               <string>Force HTTP 1.1</string>
               </property>
              </widget>
             </item>
