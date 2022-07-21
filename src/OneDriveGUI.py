@@ -868,8 +868,11 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_upload_only.setChecked(self.get_check_box_state("upload_only"))
         self.checkBox_upload_only.stateChanged.connect(self.set_check_box_state)
 
-        self.checkBox_force_http_11.setChecked(self.get_check_box_state("force_http_11"))
-        self.checkBox_force_http_11.stateChanged.connect(self.set_check_box_state)
+        if client_version < 2420:
+            self.checkBox_force_http_11.setEnabled(False)
+        else:
+            self.checkBox_force_http_11.setChecked(self.get_check_box_state("force_http_11"))
+            self.checkBox_force_http_11.stateChanged.connect(self.set_check_box_state)
 
         self.checkBox_disable_upload_validation.setChecked(self.get_check_box_state("disable_upload_validation"))
         self.checkBox_disable_upload_validation.stateChanged.connect(self.set_check_box_state)
@@ -1771,6 +1774,20 @@ def read_gui_settings():
     return gui_settings
 
 
+def get_installed_client_version() -> int:
+    try:
+        # Checks installed client version. Later used to remove unsupported options from account config if needed.
+        # TODO: Restructure and perform this in different function.
+        client_version_check = subprocess.check_output(["onedrive", "--version"], stderr=subprocess.STDOUT)
+        installed_client_version = re.search(r".\s(v[0-9.]+)", str(client_version_check)).group(1)
+        installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
+    except:
+        installed_client_version_num = 0
+
+    logging.debug(f"[GUI] Installed client version is {installed_client_version_num}")
+    return installed_client_version_num
+
+
 def create_global_config():
     """
     Creates dict which is used as running global config.
@@ -1808,7 +1825,6 @@ def create_global_config():
     _profiles = ConfigParser()
     _profiles.read(PROFILES_FILE)
     profiles = _profiles._sections
-    change_detected = False
 
     for profile in profiles:
         profile_config_file = profiles[profile]["config_file"]
@@ -1822,11 +1838,10 @@ def create_global_config():
         profiles[profile].update(od_config)
 
         # this option is not supported since OneDrive v2.4.20 - #42
-        if "force_http_2" in profiles[profile]["onedrive"]:
-            logging.debug("[GUI] - removing obsolete option 'force_http_2' from config")
+        if client_version >= 2420 and "force_http_2" in profiles[profile]["onedrive"]:
+            logging.debug("[GUI] - replacing obsolete option 'force_http_2' with 'force_http_11'")
             profiles[profile]["onedrive"].pop("force_http_2")
             profiles[profile]["onedrive"]["force_http_11"] = '"false"'
-            change_detected = True
 
     logging.debug(f"[GUI]{profiles}")
     return profiles
@@ -1895,6 +1910,7 @@ def save_global_config():
 
 
 if __name__ == "__main__":
+    client_version = get_installed_client_version()
     global_config = create_global_config()
     save_global_config()
     gui_settings = read_gui_settings()
