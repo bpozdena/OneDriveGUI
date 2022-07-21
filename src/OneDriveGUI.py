@@ -551,7 +551,6 @@ class SettingsWindow(QWidget, Ui_settings_window):
 
         self.pushButton_remove.clicked.connect(self.remove_profile)
         self.pushButton_create_import.clicked.connect(self.show_setup_wizard)
-        self.show()
 
     def closeEvent(self, event):
         event.ignore()
@@ -1921,11 +1920,11 @@ if __name__ == "__main__":
 
     main_window = MainWindow()
     settings_window = SettingsWindow()
-    settings_window.hide()
 
     if gui_settings["SETTINGS"]["start_minimized"] == "True":
         main_window.hide()
     else:
         main_window.show()
+        settings_window.show()
 
     app.exec()
