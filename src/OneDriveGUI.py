@@ -1472,8 +1472,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             gui_settings.write(f)
 
     def closeEvent(self, event):
+        # Minimize main window to system tray if it is available. Otherwise minimize to taskbar.
         event.ignore()
-        self.hide()
+        try:
+            if self.tray.isSystemTrayAvailable():
+                self.hide()
+                logging.info("[GUI] Minimizing main window to tray")
+            else:
+                self.setWindowState(Qt.WindowMinimized)
+                logging.info("[GUI] Minimizing main window to taskbar/dock")
+        except:
+            self.setWindowState(Qt.WindowMinimized)
+            logging.info("[GUI] Minimizing main window to taskbar/dock")
 
     def show_setup_wizard(self):
         self.setup_wizard = SetupWizard()
@@ -1908,6 +1918,24 @@ def save_global_config():
     logging.debug(global_config)
 
 
+def main_window_start_state():
+    # Determine if OneDriveGUI should start maximized, minimized to tray or minimized to taskbar/dock.
+    # This should help ensure the GUI does not just disappear on Gnome without system tray extension.
+
+    if gui_settings["SETTINGS"]["start_minimized"] == "True":
+        try:
+            if main_window.tray.isSystemTrayAvailable():
+                main_window.hide()
+                logging.info("[GUI] Starting OneDriveGUI minimized to system tray")
+        except:
+            main_window.show()
+            main_window.setWindowState(Qt.WindowMinimized)
+            logging.info("[GUI] Starting OneDriveGUI minimized to taskbar/dock")
+    else:
+        main_window.show()
+        logging.info("[GUI] Starting OneDriveGUI maximized")
+
+
 if __name__ == "__main__":
     client_version = get_installed_client_version()
     global_config = create_global_config()
@@ -1919,11 +1947,7 @@ if __name__ == "__main__":
     app.setWindowIcon(QIcon(dir_path + "/resources/images/icons8-clouds-48.png"))
 
     main_window = MainWindow()
+    main_window_start_state()
     settings_window = SettingsWindow()
-
-    if gui_settings["SETTINGS"]["start_minimized"] == "True":
-        main_window.hide()
-    else:
-        main_window.show()
 
     app.exec()
