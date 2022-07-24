@@ -78,7 +78,6 @@
      <property name="font">
       <font>
        <pointsize>10</pointsize>
-       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -89,8 +88,14 @@
    </item>
    <item row="2" column="2" rowspan="2">
     <widget class="QLabel" name="ls_label_2">
+     <property name="maximumSize">
+      <size>
+       <width>110</width>
+       <height>16777215</height>
+      </size>
+     </property>
      <property name="text">
-      <string>60KB of 100KB</string>
+      <string>9960KB of 9100KB</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -99,6 +104,12 @@
    </item>
    <item row="2" column="1" rowspan="2">
     <widget class="QLabel" name="ls_label_1">
+     <property name="maximumSize">
+      <size>
+       <width>250</width>
+       <height>16777215</height>
+      </size>
+     </property>
      <property name="text">
       <string>Downloading/Uploading </string>
      </property>

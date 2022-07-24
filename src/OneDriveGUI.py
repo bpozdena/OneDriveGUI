@@ -1196,7 +1196,7 @@ class WorkerThread(QThread):
         while self.onedrive_process.poll() is None:
             self.onedrive_process.kill()
 
-        logging.info(f"[{self.profile_name}] Quiting thread")
+        logging.info(f"[{self.profile_name}] Quitting thread")
         self.quit()
         self.wait()
         logging.info(f"[{self.profile_name}] Removing thread info")
