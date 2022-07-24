@@ -1520,7 +1520,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         try:
             latest_url = "https://api.github.com/repos/abraunegg/onedrive/releases/latest"
-            latest_client_version = s.get(latest_url).json()["tag_name"]
+            latest_client_version = s.get(latest_url, timeout=1).json()["tag_name"]
             client_version_check = subprocess.check_output(["onedrive", "--version"], stderr=subprocess.STDOUT)
             installed_client_version = re.search(r".\s(v[0-9.]+)", str(client_version_check)).group(1)
             installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
