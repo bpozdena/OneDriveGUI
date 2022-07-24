@@ -1426,14 +1426,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             icon = QIcon(dir_path + "/resources/images/icons8-clouds-48.png")
             menu = QMenu()
 
-            actionshow = menu.addAction("Show/Hide")
-            actionshow.triggered.connect(lambda: self.hide() if self.isVisible() else self.show())
+            show_action = menu.addAction("Show/Hide")
+            show_action.triggered.connect(lambda: self.hide() if self.isVisible() else self.show())
             setting_action = menu.addAction("Settings")
             setting_action.triggered.connect(self.show_settings_window)
             quit_action = menu.addAction("Quit")
             quit_action.triggered.connect(sys.exit)
 
-            self.tray.activated.connect(lambda: self.hide() if self.isVisible() else self.show())
+            self.tray.activated.connect(self.tray_icon_clicked)
+
             self.tray.setIcon(icon)
             self.tray.setContextMenu(menu)
             self.tray.show()
@@ -1456,6 +1457,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.auto_sync.setSingleShot(True)
         self.auto_sync.timeout.connect(self.autostart_monitor)
         self.auto_sync.start(1000)
+
+    def tray_icon_clicked(self, reason):
+        if reason == QSystemTrayIcon.Unknown:
+            pass
+        elif reason == QSystemTrayIcon.Context:
+            logging.debug("[GUI] Right clicked on tray icon")
+        elif reason == QSystemTrayIcon.DoubleClick:
+            pass
+        elif reason == QSystemTrayIcon.Trigger:
+            logging.debug("[GUI] Left clicked on tray icon")
+            self.hide() if self.isVisible() else self.show()
+        elif reason == QSystemTrayIcon.MiddleClick:
+            pass
+        else:
+            pass
 
     def set_check_box_state(self, state):
         _property = self.sender().objectName()
