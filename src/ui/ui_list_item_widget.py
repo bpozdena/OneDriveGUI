@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'list_item_widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.2
+## Created by: Qt User Interface Compiler version 6.2.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -53,12 +53,14 @@ class Ui_list_item_widget(object):
 
         self.ls_label_2 = QLabel(list_item_widget)
         self.ls_label_2.setObjectName(u"ls_label_2")
+        self.ls_label_2.setMaximumSize(QSize(110, 16777215))
         self.ls_label_2.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
         self.gridLayout.addWidget(self.ls_label_2, 2, 2, 2, 1)
 
         self.ls_label_1 = QLabel(list_item_widget)
         self.ls_label_1.setObjectName(u"ls_label_1")
+        self.ls_label_1.setMaximumSize(QSize(250, 16777215))
 
         self.gridLayout.addWidget(self.ls_label_1, 2, 1, 2, 1)
 
@@ -80,7 +82,7 @@ class Ui_list_item_widget(object):
         list_item_widget.setWindowTitle(QCoreApplication.translate("list_item_widget", u"Form", None))
         self.toolButton.setText(QCoreApplication.translate("list_item_widget", u"...", None))
         self.ls_label_file_name.setText(QCoreApplication.translate("list_item_widget", u"FileName", None))
-        self.ls_label_2.setText(QCoreApplication.translate("list_item_widget", u"60KB of 100KB", None))
+        self.ls_label_2.setText(QCoreApplication.translate("list_item_widget", u"9960KB of 9100KB", None))
         self.ls_label_1.setText(QCoreApplication.translate("list_item_widget", u"Downloading/Uploading ", None))
     # retranslateUi
 
