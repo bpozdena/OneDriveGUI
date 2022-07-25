@@ -1666,7 +1666,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         file_path = f"{_sync_dir}" + "/" + data["file_path"]
         absolute_path = QFileInfo(file_path).absolutePath().replace(" ", "%20")
         parent_dir = re.search(r".+/([^/]+)/.+$", file_path).group(1)
-        file_size = QFileInfo(file_path).size()
+        file_size = (
+            QFileInfo(file_path + ".partial").size()
+            if QFileInfo(file_path).size() == 0
+            else QFileInfo(file_path).size()
+        )
         file_size_human = humanize_file_size(file_size)
         file_name = QFileInfo(file_path).fileName()
         file_path2 = QFileInfo(file_path).filePath()
@@ -1710,6 +1714,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         elif transfer_complete:
             myQCustomQWidget.set_label_1(f"Available in <a href=file:///{absolute_path}>{parent_dir}</a>")
             myQCustomQWidget.set_label_2(f"{file_size_human}")
+
+        elif file_operation == "Downloading":
+            # Estimate final size of file before download completes
+            # Adding 5% to progress as the OD client report status 5% behind.
+            myQCustomQWidget.set_label_1(file_operation)
+            myQCustomQWidget.set_label_2(
+                f"{humanize_file_size(file_size)} of ~{humanize_file_size(int(file_size) / (int(progress) + 5) * 100)}"
+            )
         else:
             myQCustomQWidget.set_label_1(file_operation)
             myQCustomQWidget.set_label_2(f"{progress_data_human} of {file_size_human}")

@@ -53,7 +53,7 @@ class Ui_list_item_widget(object):
 
         self.ls_label_2 = QLabel(list_item_widget)
         self.ls_label_2.setObjectName(u"ls_label_2")
-        self.ls_label_2.setMaximumSize(QSize(110, 16777215))
+        self.ls_label_2.setMaximumSize(QSize(120, 16777215))
         self.ls_label_2.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
         self.gridLayout.addWidget(self.ls_label_2, 2, 2, 2, 1)
