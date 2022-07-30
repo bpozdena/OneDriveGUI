@@ -62,9 +62,6 @@ GUI_SETTINGS_FILE = os.path.expanduser("~/.config/onedrive-gui/gui_settings")
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 APPIMAGE = True if "tmp/.mount_One" in DIR_PATH else False
 
-logging.debug(f"[GUI] Running from directory: {DIR_PATH}")
-
-
 # Logging
 # TODO: Implement logging configuration into the GUI.
 log_dir = os.path.expanduser("~/.config/onedrive-gui/")
@@ -80,6 +77,8 @@ logging.basicConfig(
     handlers=handlers,
     level=logging.DEBUG,
 )
+
+logging.debug(f"[GUI] Running from directory: {DIR_PATH}")
 
 
 class SetupWizard(QWizard):
