@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ExternalLoginWindow</class>
+ <widget class="QWidget" name="ExternalLoginWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>730</width>
+    <height>321</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QVBoxLayout" name="layout_external_login">
+     <item>
+      <widget class="QLabel" name="label_1">
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:700; text-decoration: underline;&quot;&gt;OneDrive login has been requested&lt;/span&gt;&lt;/p&gt;&lt;p&gt;You will be asked to open a specific URL by using your web browser where you will have to login into your Microsoft Account and give &lt;br/&gt;OneDrive client the permission to access your files. &lt;/p&gt;&lt;p&gt;After giving permission to OneDrive client, you will be redirected to a blank page. Copy the URI of the blank page into the bellow field.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;1)Login to OneDrive in your browser by &lt;a href=&quot;https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=d50ca740-c83f-4d1b-b616-12c519384f0c&amp;amp;scope=Files.ReadWrite%20Files.ReadWrite.all%20Sites.Read.All%20Sites.ReadWrite.All%20offline_access&amp;amp;response_type=code&amp;amp;prompt=login&amp;amp;redirect_uri=https://login.microsoftonline.com/common/oauth2/nativeclient&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#5e81ac;&quot;&gt;clicking this link.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;2)Copy the response URI from your browser's address bar to the bellow field. &lt;/p&gt;&lt;p&gt;3)Press Save.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEdit_response_url"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_save">
+       <property name="text">
+        <string>Save</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
