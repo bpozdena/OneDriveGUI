@@ -1274,7 +1274,7 @@ class WorkerThread(QThread):
                     self.update_profile_status.emit(self.profile_status, self.profile_name)
 
                 elif "Processing" in stdout:
-                    items_left = re.match(r"^Processing\s([0-9]+)", stdout)
+                    items_left = re.match(r"^Processing\s([0-9]+)\sOneDrive\sitems", stdout)
                     if items_left != None:
                         self.profile_status[
                             "status_message"
@@ -1313,7 +1313,7 @@ class WorkerThread(QThread):
                     if transfer_complete:
                         self.profile_status["status_message"] = "OneDrive sync is complete"
 
-                elif "% |" in stdout and file_name is not None:
+                elif "% |" in stdout:
                     # Capture upload/download progress status
 
                     file_operation = re.search(r"\b([Uploading|Downloading]+)*", stdout).group(1)
@@ -1337,6 +1337,7 @@ class WorkerThread(QThread):
                     self.update_profile_status.emit(self.profile_status, self.profile_name)
 
                 else:
+                    # logging.debug(f"No rule matched: {stdout}")
                     pass
 
         if self.onedrive_process.stderr:
