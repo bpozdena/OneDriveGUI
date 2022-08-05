@@ -18,7 +18,7 @@ AppDir:
     id: io.github.bpozdena.OneDriveGUI
     name: OneDriveGUI
     icon: OneDriveGUI
-    version: 0.2.3
+    version: 0.2.4
     exec: usr/bin/python3
     exec_args: "$APPDIR/usr/src/OneDriveGUI.py $@"
 
@@ -30,7 +30,20 @@ AppDir:
 
     include:
       - python3
+      - libxcb-icccm4
+      - libxcb-image0
+      - libxcb-keysyms1
+      - libxcb-render-util0
     exclude: []
+
+  after_bundle: |
+    mkdir -p $APPDIR/lib/x86_64-linux-gnu
+    cp $APPDIR/usr/lib/x86_64-linux-gnu/{libxcb-icccm.so.4.0.0,libxcb-image.so.0.0.0,libxcb-keysyms.so.1.0.0,libxcb-render-util.so.0.0.0} $APPDIR/lib/x86_64-linux-gnu/
+    cd $APPDIR/lib/x86_64-linux-gnu
+    ln -s libxcb-icccm.so.4.0.0 libxcb-icccm.so.4
+    ln -s libxcb-image.so.0.0.0 libxcb-image.so.0
+    ln -s libxcb-keysyms.so.1.0.0 libxcb-keysyms.so.1
+    ln -s libxcb-render-util.so.0.0.0 libxcb-render-util.so.0
 
   runtime:
     env:
