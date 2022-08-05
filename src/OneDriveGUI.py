@@ -1191,7 +1191,7 @@ class WorkerThread(QThread):
         self.config_dir = re.search(r"(.+)/.+$", self.config_file)
         logging.debug(f"[GUI] OneDrive config file: {self.config_file}")
         logging.debug(f"[GUI] OneDrive config dir: {self.config_dir}")
-        self._command = f"onedrive --confdir='{self.config_dir.group(1)}' --monitor -v {options}"
+        self._command = f"exec onedrive --confdir='{self.config_dir.group(1)}' --monitor -v {options}"
         logging.debug(f"[GUI] Monitoring command: '{self._command}'")
         self.profile_name = profile
 
@@ -1809,8 +1809,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def get_response_url(self, response_url, config_dir, profile):
         # Get response URL from OneDrive OAuth2
         if "nativeclient?code=" in response_url:
-            logging.info(f'onedrive --confdir="{config_dir}" --auth-response "{response_url}"')
-            os.system(f'onedrive --confdir="{config_dir}" --auth-response "{response_url}"')
+            logging.info(f'exec onedrive --confdir="{config_dir}" --auth-response "{response_url}"')
+            os.system(f'exec onedrive --confdir="{config_dir}" --auth-response "{response_url}"')
             logging.info("Login performed")
             if APPIMAGE:
                 self.window2.hide()
