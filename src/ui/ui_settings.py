@@ -23,7 +23,7 @@ class Ui_settings_window(object):
     def setupUi(self, settings_window):
         if not settings_window.objectName():
             settings_window.setObjectName(u"settings_window")
-        settings_window.resize(272, 765)
+        settings_window.resize(272, 800)
         self.verticalLayout_2 = QVBoxLayout(settings_window)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.horizontalLayout = QHBoxLayout()
