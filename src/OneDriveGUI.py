@@ -1311,7 +1311,10 @@ class WorkerThread(QThread):
 
                     # Update profile status message.
                     if transfer_complete:
-                        self.profile_status["status_message"] = "OneDrive sync is complete"
+                        pass
+                        # self.profile_status["status_message"] = "OneDrive sync is complete"
+                    else:
+                        self.profile_status["status_message"] = "OneDrive sync in progress..."
 
                 elif "% |" in stdout:
                     # Capture upload/download progress status
@@ -1331,9 +1334,11 @@ class WorkerThread(QThread):
                     self.update_progress_new.emit(transfer_progress_new, self.profile_name)
 
                     if transfer_complete:
-                        self.profile_status["status_message"] = "OneDrive sync is complete"
+                        pass
+                        # self.profile_status["status_message"] = "OneDrive sync is complete"
                     else:
                         self.profile_status["status_message"] = "OneDrive sync in progress..."
+
                     self.update_profile_status.emit(self.profile_status, self.profile_name)
 
                 else:
