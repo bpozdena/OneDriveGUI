@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'process_status_page.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.3
+## Created by: Qt User Interface Compiler version 6.2.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -112,19 +112,19 @@ class Ui_status_page(object):
 
         self.horizontalLayout.addWidget(self.pushButton_open_dir)
 
-        self.pushButton_2 = QPushButton(status_page)
-        self.pushButton_2.setObjectName(u"pushButton_2")
-        sizePolicy.setHeightForWidth(self.pushButton_2.sizePolicy().hasHeightForWidth())
-        self.pushButton_2.setSizePolicy(sizePolicy)
+        self.pushButton_profiles = QPushButton(status_page)
+        self.pushButton_profiles.setObjectName(u"pushButton_profiles")
+        sizePolicy.setHeightForWidth(self.pushButton_profiles.sizePolicy().hasHeightForWidth())
+        self.pushButton_profiles.setSizePolicy(sizePolicy)
 
-        self.horizontalLayout.addWidget(self.pushButton_2)
+        self.horizontalLayout.addWidget(self.pushButton_profiles)
 
-        self.pushButton_settings = QPushButton(status_page)
-        self.pushButton_settings.setObjectName(u"pushButton_settings")
-        sizePolicy.setHeightForWidth(self.pushButton_settings.sizePolicy().hasHeightForWidth())
-        self.pushButton_settings.setSizePolicy(sizePolicy)
+        self.pushButton_gui_settings = QPushButton(status_page)
+        self.pushButton_gui_settings.setObjectName(u"pushButton_gui_settings")
+        sizePolicy.setHeightForWidth(self.pushButton_gui_settings.sizePolicy().hasHeightForWidth())
+        self.pushButton_gui_settings.setSizePolicy(sizePolicy)
 
-        self.horizontalLayout.addWidget(self.pushButton_settings)
+        self.horizontalLayout.addWidget(self.pushButton_gui_settings)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -145,7 +145,7 @@ class Ui_status_page(object):
         self.label_free_space.setText("")
         self.label_version_check.setText("")
         self.pushButton_open_dir.setText(QCoreApplication.translate("status_page", u"Open Sync Directory", None))
-        self.pushButton_2.setText(QCoreApplication.translate("status_page", u"Sync", None))
-        self.pushButton_settings.setText(QCoreApplication.translate("status_page", u"Settings", None))
+        self.pushButton_profiles.setText(QCoreApplication.translate("status_page", u"Profiles", None))
+        self.pushButton_gui_settings.setText(QCoreApplication.translate("status_page", u"GUI Settings", None))
     # retranslateUi
 

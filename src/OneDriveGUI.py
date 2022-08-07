@@ -50,11 +50,12 @@ from ui.ui_list_item_widget import Ui_list_item_widget
 from ui.ui_process_status_page import Ui_status_page
 
 
-# Imports for Setting windows.
-from ui.ui_settings import Ui_settings_window
+# Imports for Profiles windows.
+from ui.ui_profile_settings_window import Ui_profile_settings_window
 from ui.ui_profile_settings_page import Ui_profile_settings
-from ui.ui_import_existing_profile import Ui_import_profile
-from ui.ui_create_new_profile import Ui_create_new_profile
+
+# Imports for GUI settings window
+from ui.ui_gui_settings_window import Ui_gui_settings_window
 
 
 PROFILES_FILE = os.path.expanduser("~/.config/onedrive-gui/profiles")
@@ -63,13 +64,13 @@ DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 APPIMAGE = True if "tmp/.mount_One" in DIR_PATH else False
 
 # Logging
-# TODO: Implement logging configuration into the GUI.
 log_dir = os.path.expanduser("~/.config/onedrive-gui/")
 log_file = f"{log_dir}onedrivegui.log"
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 timed_handler = handlers.TimedRotatingFileHandler(filename=log_file, when="D", interval=1, backupCount=2)
 stdout_handler = logging.StreamHandler(sys.stdout)
+
 handlers = [timed_handler, stdout_handler]
 
 logging.basicConfig(
@@ -375,9 +376,9 @@ class wizardPage_create(QWizardPage):
         save_global_config()
 
         # Add Setting page widget for new profile
-        settings_window.listWidget_profiles.addItem(profile_name)
+        profile_settings_window.listWidget_profiles.addItem(profile_name)
         self.setting_page = ProfileSettingsPage(profile_name)
-        settings_window.stackedLayout.addWidget(self.setting_page)
+        profile_settings_window.stackedLayout.addWidget(self.setting_page)
 
         # Add status page widget for new profile
         main_window.comboBox.addItem(profile_name)
@@ -520,9 +521,9 @@ class wizardPage_import(QWizardPage):
         logging.debug("[GUI] new_profile: " + str(new_profile))
         logging.debug("[GUI] global_config: " + str(global_config))
 
-        settings_window.listWidget_profiles.addItem(profile_name)
+        profile_settings_window.listWidget_profiles.addItem(profile_name)
         self.setting_page = ProfileSettingsPage(profile_name)
-        settings_window.stackedLayout.addWidget(self.setting_page)
+        profile_settings_window.stackedLayout.addWidget(self.setting_page)
 
         # Add status page widget for new profile
         main_window.comboBox.addItem(profile_name)
@@ -562,9 +563,50 @@ class wizardPage_finish(QWizardPage):
         self.setLayout(layout)
 
 
-class SettingsWindow(QWidget, Ui_settings_window):
+class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
     def __init__(self):
-        super(SettingsWindow, self).__init__()
+        super(GuiSettingsWindow, self).__init__()
+
+        self.setupUi(self)
+        self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-48.png"))
+
+        self.checkBox_start_minimized.setChecked(self.get_check_box_state("start_minimized"))
+        self.checkBox_start_minimized.stateChanged.connect(self.set_check_box_state)
+
+        self.checkBox_show_debug.setChecked(self.get_check_box_state("show_debug"))
+        self.checkBox_show_debug.stateChanged.connect(self.set_check_box_state)
+
+        self.checkBox_save_debug.setChecked(self.get_check_box_state("save_debug"))
+        self.checkBox_save_debug.stateChanged.connect(self.set_check_box_state)
+
+        self.pushButton_save.clicked.connect(self.save_gui_settings)
+
+    def get_check_box_state(self, property):
+        return "True" in gui_settings["SETTINGS"][property]
+
+    def set_check_box_state(self, state):
+        _property = self.sender().objectName()
+        property = re.search(r"checkBox_(.+)", _property).group(1)
+
+        if state == Qt.Checked:
+            logging.info(f"[GUI][SETTINGS] {property} is checked")
+            gui_settings["SETTINGS"][property] = "True"
+        else:
+            logging.info(f"[GUI][SETTINGS] {property} is unchecked")
+            gui_settings["SETTINGS"][property] = "False"
+
+    def save_gui_settings(self):
+        logging.debug(f"[GUI][SETTINGS] Saving new GUI settings: {gui_settings._sections}")
+
+        with open(GUI_SETTINGS_FILE, "w") as f:
+            gui_settings.write(f)
+
+        self.hide()
+
+
+class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
+    def __init__(self):
+        super(ProfileSettingsWindow, self).__init__()
 
         self.setupUi(self)
         self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-48.png"))
@@ -637,21 +679,19 @@ class ProfileStatusPage(QWidget, Ui_status_page):
         self.pushButton_open_dir.clicked.connect(self.open_sync_dir)
 
         # Open Settings window
-        self.pushButton_settings.clicked.connect(lambda: settings_window.show())
+        self.pushButton_profiles.clicked.connect(lambda: profile_settings_window.show())
 
-        self.pushButton_2.setText("Wizard")
-        self.pushButton_2.clicked.connect(self.show_setup_wizard)
-        self.pushButton_2.hide()
+        self.pushButton_gui_settings.clicked.connect(self.show_gui_settings_window)
+        # self.pushButton_gui_settings.hide()
 
     def open_sync_dir(self):
         sync_dir = global_config[self.profile_name]["onedrive"]["sync_dir"].strip('"')
         url = QUrl(os.path.expanduser(sync_dir))
         QDesktopServices.openUrl(url)
 
-    def show_setup_wizard(self):
-        self.setup_wizard = SetupWizard()
-        self.setup_wizard.show()
-        # self.currentIdChanged.connect(logging.info("print test"))
+    def show_gui_settings_window(self):
+        self.gui_settings_window = GuiSettingsWindow()
+        self.gui_settings_window.show()
 
     def stop_monitor(self):
         if self.profile_name in main_window.workers:
@@ -1343,9 +1383,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # Menu
         # self.menubar.hide()
-        self.actionStart_Minimized.triggered.connect(self.set_check_box_state)
-        if gui_settings["SETTINGS"]["start_minimized"] == "True":
-            self.actionStart_Minimized.setChecked(True)
 
         # Quit OneDriveGUI
         self.actionQuit.triggered.connect(sys.exit)
@@ -1418,20 +1455,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             pass
 
-    def set_check_box_state(self, state):
-        _property = self.sender().objectName()
-        logging.info(f"[GUI] {_property} changed to '{state}'")
-
-        if state == True:
-            logging.info(f"is checked")
-            gui_settings["SETTINGS"]["start_minimized"] = "True"
-        else:
-            logging.info(f"is unchecked")
-            gui_settings["SETTINGS"]["start_minimized"] = "False"
-
-        with open(GUI_SETTINGS_FILE, "w") as f:
-            gui_settings.write(f)
-
     def closeEvent(self, event):
         # Minimize main window to system tray if it is available. Otherwise minimize to taskbar.
         event.ignore()
@@ -1451,8 +1474,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setup_wizard.show()
 
     def show_settings_window(self):
-        # self.settings_window = SettingsWindow()
-        settings_window.show()
+        # self.settings_window = ProfileSettingsWindow()
+        profile_settings_window.show()
 
     def switch_account_status_page(self):
         self.stackedLayout.setCurrentIndex(self.comboBox.currentIndex())
@@ -1785,6 +1808,8 @@ def read_gui_settings():
     default_gui_settings = {
         "SETTINGS": {
             "start_minimized": "False",
+            "show_debug": "True",
+            "save_debug": "True",
         }
     }
 
@@ -1962,6 +1987,6 @@ if __name__ == "__main__":
 
     main_window = MainWindow()
     main_window_start_state()
-    settings_window = SettingsWindow()
+    profile_settings_window = ProfileSettingsWindow()
 
     app.exec()

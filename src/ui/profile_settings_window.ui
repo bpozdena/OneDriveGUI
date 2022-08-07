@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>settings_window</class>
- <widget class="QWidget" name="settings_window">
+ <class>profile_settings_window</class>
+ <widget class="QWidget" name="profile_settings_window">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>OneDriveGUI - Settings</string>
+   <string>OneDriveGUI - Profiles</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
@@ -46,6 +46,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="pushButton_remove">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Removes selected profile from OneDriveGUI only.&lt;/p&gt;&lt;p&gt;The OneDrive client config files and synced files will remain untouched and can be re-imported again.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Remove profile</string>
          </property>
@@ -53,6 +56,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="pushButton_create_import">
+         <property name="toolTip">
+          <string>Opens wizard which allows creation of new profiles or import of existing ones.</string>
+         </property>
          <property name="text">
           <string>Create/Import profile</string>
          </property>

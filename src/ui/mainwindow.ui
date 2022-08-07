@@ -109,7 +109,6 @@ color: rgb(255, 255, 255);</string>
     <property name="title">
      <string>Advanced</string>
     </property>
-    <addaction name="actionStart_Minimized"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
