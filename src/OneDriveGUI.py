@@ -758,9 +758,11 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
 
         self.checkBox_download_only.setChecked(self.get_check_box_state("download_only"))
         self.checkBox_download_only.stateChanged.connect(self.set_check_box_state)
+        self.checkBox_download_only.stateChanged.connect(self.validate_checkbox_input)
 
         self.checkBox_upload_only.setChecked(self.get_check_box_state("upload_only"))
         self.checkBox_upload_only.stateChanged.connect(self.set_check_box_state)
+        self.checkBox_upload_only.stateChanged.connect(self.validate_checkbox_input)
 
         if client_version < 2420:
             self.checkBox_force_http_11.setEnabled(False)
@@ -778,6 +780,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_local_first.stateChanged.connect(self.set_check_box_state)
 
         self.checkBox_no_remote_delete.setChecked(self.get_check_box_state("no_remote_delete"))
+        self.checkBox_no_remote_delete.setEnabled(self.checkBox_upload_only.isChecked())
         self.checkBox_no_remote_delete.stateChanged.connect(self.set_check_box_state)
 
         self.checkBox_sync_business_shared_folders.setChecked(self.get_check_box_state("sync_business_shared_folders"))
@@ -824,55 +827,68 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         #
         self.checkBox_webhook_enabled.setChecked(self.get_check_box_state("webhook_enabled"))
         self.checkBox_webhook_enabled.stateChanged.connect(self.set_check_box_state)
+        self.checkBox_webhook_enabled.stateChanged.connect(self.validate_checkbox_input)
 
         self.spinBox_webhook_expiration_interval.setValue(
             int(self.temp_profile_config["onedrive"]["webhook_expiration_interval"].strip('"'))
         )
+        self.spinBox_webhook_expiration_interval.setEnabled(self.checkBox_webhook_enabled.isChecked())
         self.spinBox_webhook_expiration_interval.valueChanged.connect(self.set_spin_box_value)
 
         self.spinBox_webhook_renewal_interval.setValue(
             int(self.temp_profile_config["onedrive"]["webhook_renewal_interval"].strip('"'))
         )
+        self.spinBox_webhook_renewal_interval.setEnabled(self.checkBox_webhook_enabled.isChecked())
         self.spinBox_webhook_renewal_interval.valueChanged.connect(self.set_spin_box_value)
 
         self.spinBox_webhook_listening_port.setValue(
             int(self.temp_profile_config["onedrive"]["webhook_listening_port"].strip('"'))
         )
+        self.spinBox_webhook_listening_port.setEnabled(self.checkBox_webhook_enabled.isChecked())
         self.spinBox_webhook_listening_port.valueChanged.connect(self.set_spin_box_value)
 
         self.lineEdit_webhook_public_url.setText(self.temp_profile_config["onedrive"]["webhook_public_url"].strip('"'))
+        self.lineEdit_webhook_public_url.setEnabled(self.checkBox_webhook_enabled.isChecked())
         self.lineEdit_webhook_public_url.textChanged.connect(self.set_line_edit_value)
 
         self.lineEdit_webhook_listening_host.setText(
             self.temp_profile_config["onedrive"]["webhook_listening_host"].strip('"')
         )
+        self.lineEdit_webhook_listening_host.setEnabled(self.checkBox_webhook_enabled.isChecked())
         self.lineEdit_webhook_listening_host.textChanged.connect(self.set_line_edit_value)
 
         #
         # Logging tab
         #
-        self.lineEdit_log_dir.setText(self.temp_profile_config["onedrive"]["log_dir"].strip('"'))
-        self.lineEdit_log_dir.textChanged.connect(self.set_log_dir)
-
-        self.pushButton_log_dir_browse.clicked.connect(self.get_log_dir_name)
-
         self.checkBox_enable_logging.setChecked(self.get_check_box_state("enable_logging"))
         self.checkBox_enable_logging.stateChanged.connect(self.set_check_box_state)
+        self.checkBox_enable_logging.stateChanged.connect(self.validate_checkbox_input)
+
+        self.lineEdit_log_dir.setText(self.temp_profile_config["onedrive"]["log_dir"].strip('"'))
+        self.lineEdit_log_dir.textChanged.connect(self.set_log_dir)
+        self.lineEdit_log_dir.setEnabled(self.checkBox_enable_logging.isChecked())
+
+        self.pushButton_log_dir_browse.clicked.connect(self.get_log_dir_name)
+        self.pushButton_log_dir_browse.setEnabled(self.checkBox_enable_logging.isChecked())
 
         self.checkBox_debug_https.setChecked(self.get_check_box_state("debug_https"))
         self.checkBox_debug_https.stateChanged.connect(self.set_check_box_state)
-
-        self.checkBox_disable_notifications.setChecked(self.get_check_box_state("disable_notifications"))
-        self.checkBox_disable_notifications.stateChanged.connect(self.set_check_box_state)
+        self.checkBox_debug_https.setEnabled(self.checkBox_enable_logging.isChecked())
 
         self.spinBox_monitor_log_frequency.setValue(
             int(self.temp_profile_config["onedrive"]["monitor_log_frequency"].strip('"'))
         )
+        self.spinBox_monitor_log_frequency.setEnabled(self.checkBox_enable_logging.isChecked())
         self.spinBox_monitor_log_frequency.valueChanged.connect(self.set_spin_box_value)
+
+        self.checkBox_disable_notifications.setChecked(self.get_check_box_state("disable_notifications"))
+        self.checkBox_disable_notifications.stateChanged.connect(self.set_check_box_state)
+        self.checkBox_disable_notifications.stateChanged.connect(self.validate_checkbox_input)
 
         self.spinBox_min_notify_changes.setValue(
             int(self.temp_profile_config["onedrive"]["min_notify_changes"].strip('"'))
         )
+        self.spinBox_min_notify_changes.setEnabled(self.checkBox_disable_notifications.isChecked())
         self.spinBox_min_notify_changes.valueChanged.connect(self.set_spin_box_value)
 
         #
@@ -891,10 +907,61 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         #
         # Buttons
         #
-        self.pushButton_discart.hide()
-        # TODO: How to discart unsaved changes and refresh the widgets or close window?
-        # self.pushButton_discart.clicked.connect(self.discart_changes)
+        self.pushButton_discard.hide()
+        # TODO: How to discard unsaved changes and refresh the widgets or close window?
+        # self.pushButton_discard.clicked.connect(self.discard_changes)
         self.pushButton_save.clicked.connect(self.save_profile_settings)
+
+    def validate_checkbox_input(self, state):
+        """Disables incompatible settings"""
+
+        if self.sender().objectName() == "checkBox_download_only" or "checkBox_upload_only":
+            if self.checkBox_download_only.isChecked():
+                self.checkBox_upload_only.setChecked(False)
+                self.checkBox_upload_only.setDisabled(True)
+            else:
+                self.checkBox_upload_only.setDisabled(False)
+
+            if self.checkBox_upload_only.isChecked():
+                self.checkBox_download_only.setChecked(False)
+                self.checkBox_download_only.setDisabled(True)
+                self.checkBox_no_remote_delete.setDisabled(False)
+            else:
+                self.checkBox_download_only.setDisabled(False)
+                self.checkBox_no_remote_delete.setDisabled(True)
+                self.checkBox_no_remote_delete.setChecked(False)
+
+        if self.sender().objectName() == "checkBox_enable_logging":
+            if self.checkBox_enable_logging.isChecked():
+                self.lineEdit_log_dir.setEnabled(True)
+                self.spinBox_monitor_log_frequency.setEnabled(True)
+                self.checkBox_debug_https.setEnabled(True)
+                self.pushButton_log_dir_browse.setEnabled(True)
+            else:
+                self.lineEdit_log_dir.setEnabled(False)
+                self.spinBox_monitor_log_frequency.setEnabled(False)
+                self.checkBox_debug_https.setEnabled(False)
+                self.pushButton_log_dir_browse.setEnabled(False)
+
+        if self.sender().objectName() == "checkBox_disable_notifications":
+            if self.checkBox_disable_notifications.isChecked():
+                self.spinBox_min_notify_changes.setEnabled(True)
+            else:
+                self.spinBox_min_notify_changes.setEnabled(False)
+
+        if self.sender().objectName() == "checkBox_webhook_enabled":
+            if self.checkBox_webhook_enabled.isChecked():
+                self.spinBox_webhook_expiration_interval.setEnabled(True)
+                self.spinBox_webhook_renewal_interval.setEnabled(True)
+                self.spinBox_webhook_listening_port.setEnabled(True)
+                self.lineEdit_webhook_public_url.setEnabled(True)
+                self.lineEdit_webhook_listening_host.setEnabled(True)
+            else:
+                self.spinBox_webhook_expiration_interval.setEnabled(False)
+                self.spinBox_webhook_renewal_interval.setEnabled(False)
+                self.spinBox_webhook_listening_port.setEnabled(False)
+                self.lineEdit_webhook_public_url.setEnabled(False)
+                self.lineEdit_webhook_listening_host.setEnabled(False)
 
     def str2bool(self, value):
         return value.lower() in "true"
@@ -944,12 +1011,11 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
     def set_check_box_state(self, state):
         _property = self.sender().objectName()
         property = re.search(r"checkBox_(.+)", _property).group(1)
-        logging.info(property)
         if state == Qt.Checked:
-            logging.info("is checked")
+            logging.info(f"[GUI] [{self.profile}] {property} is checked.")
             self.temp_profile_config["onedrive"][f"{property}"] = '"true"'
         else:
-            logging.info("is unchecked")
+            logging.info(f"[GUI] [{self.profile}] {property} is unchecked.")
             self.temp_profile_config["onedrive"][f"{property}"] = '"false"'
 
     def set_check_box_state_profile(self, state):
