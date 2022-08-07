@@ -58,20 +58,6 @@
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_open_create">
-         <property name="text">
-          <string>Create new profile</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_open_import">
-         <property name="text">
-          <string>Import existing profile</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
     </layout>

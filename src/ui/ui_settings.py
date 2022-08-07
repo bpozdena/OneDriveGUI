@@ -53,16 +53,6 @@ class Ui_settings_window(object):
 
         self.verticalLayout.addWidget(self.pushButton_create_import)
 
-        self.pushButton_open_create = QPushButton(settings_window)
-        self.pushButton_open_create.setObjectName(u"pushButton_open_create")
-
-        self.verticalLayout.addWidget(self.pushButton_open_create)
-
-        self.pushButton_open_import = QPushButton(settings_window)
-        self.pushButton_open_import.setObjectName(u"pushButton_open_import")
-
-        self.verticalLayout.addWidget(self.pushButton_open_import)
-
 
         self.horizontalLayout.addLayout(self.verticalLayout)
 
@@ -80,7 +70,5 @@ class Ui_settings_window(object):
         self.label_profiles.setText(QCoreApplication.translate("settings_window", u"Profiles:", None))
         self.pushButton_remove.setText(QCoreApplication.translate("settings_window", u"Remove profile", None))
         self.pushButton_create_import.setText(QCoreApplication.translate("settings_window", u"Create/Import profile", None))
-        self.pushButton_open_create.setText(QCoreApplication.translate("settings_window", u"Create new profile", None))
-        self.pushButton_open_import.setText(QCoreApplication.translate("settings_window", u"Import existing profile", None))
     # retranslateUi
 

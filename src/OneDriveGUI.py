@@ -548,11 +548,6 @@ class SettingsWindow(QWidget, Ui_settings_window):
         self.horizontalLayout.addLayout(self.stackedLayout)
         self.listWidget_profiles.itemSelectionChanged.connect(self.switch_account_settings_page)
 
-        self.pushButton_open_create.clicked.connect(self.create_new_profile_window)
-        self.pushButton_open_create.hide()
-        self.pushButton_open_import.clicked.connect(self.import_profile_window)
-        self.pushButton_open_import.hide()
-
         self.pushButton_remove.clicked.connect(self.remove_profile)
         self.pushButton_create_import.clicked.connect(self.show_setup_wizard)
 
@@ -567,32 +562,6 @@ class SettingsWindow(QWidget, Ui_settings_window):
         self.setup_wizard = SetupWizard()
         self.setup_wizard.setStartId(3)
         self.setup_wizard.show()
-
-    def create_new_profile_window(self):
-        # Show profile creation window
-        self.create_window = QWidget()
-        self.create_window.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-48.png"))
-        self.create_ui = Ui_create_new_profile()
-        self.create_ui.setupUi(self.create_window)
-        self.create_window.show()
-
-        self.create_ui.pushButton_create.clicked.connect(self.create_profile)
-
-        # Hide window once account is created.
-        self.create_ui.pushButton_create.clicked.connect(self.create_window.hide)
-
-    def import_profile_window(self):
-        # Show profile import window
-        self.import_window = QWidget()
-        self.import_window.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-48.png"))
-        self.import_ui = Ui_import_profile()
-        self.import_ui.setupUi(self.import_window)
-        self.import_window.show()
-
-        self.import_ui.pushButton_import.clicked.connect(self.import_profile)
-
-        # Hide window once account is created
-        self.import_ui.pushButton_import.clicked.connect(self.import_window.hide)
 
     def remove_profile(self):
         # Remove profile from settings window.
@@ -617,116 +586,6 @@ class SettingsWindow(QWidget, Ui_settings_window):
         # Save the new profile.
         with open(PROFILES_FILE, "w") as profilefile:
             _profiles.write(profilefile)
-
-    def create_profile(self):
-        """
-        Creates new profile and loads default settings.
-        TODO: Consolidate with import_profile()
-        """
-        profile_name = self.create_ui.lineEdit_new_profile_name.text()
-        sync_dir = self.create_ui.lineEdit_sync_dir.text()
-        config_path = os.path.expanduser(f"~/.config/onedrive/accounts/{profile_name}/config")
-
-        # Load all default values.
-        _default_od_config = read_config(DIR_PATH + "/resources/default_config")
-        default_od_config = _default_od_config._sections
-
-        # Construct dict with user profile settings.
-        new_profile = {
-            profile_name: {"config_file": config_path, "enable_debug": False, "mode": "monitor", "auto_sync": False}
-        }
-
-        # Load existing user profiles and add the new profile.
-        _profiles = ConfigParser()
-        _profiles.read(PROFILES_FILE)
-        _profiles[profile_name] = new_profile[profile_name]
-
-        # Create profile config file if it does not exist.
-        profiles_dir = re.search(r"(.+)/profiles$", PROFILES_FILE).group(1)
-        if not os.path.exists(profiles_dir):
-            os.makedirs(profiles_dir)
-
-        # Save the new profile.
-        with open(PROFILES_FILE, "w") as profilefile:
-            _profiles.write(profilefile)
-
-        # Append default OD config
-        new_profile[profile_name].update(default_od_config)
-
-        # Configure sync directory
-        new_profile[profile_name]["onedrive"]["sync_dir"] = f'"{sync_dir}"'
-
-        # Append new profile into running global profile
-        global_config.update(new_profile)
-
-        # Automatically save global config to prevent loss if user does not press 'Save' button.
-        save_global_config()
-
-        # Add Setting page widget for new profile
-        self.listWidget_profiles.addItem(profile_name)
-        self.page = ProfileSettingsPage(profile_name)
-        self.stackedLayout.addWidget(self.page)
-
-        # Add status page widget for new profile
-        main_window.comboBox.addItem(profile_name)
-        main_window.profile_status_pages[profile_name] = ProfileStatusPage(profile_name)
-        main_window.stackedLayout.addWidget(main_window.profile_status_pages[profile_name])
-
-        # Hide "Create profile" push button from main windows.
-        main_window.pushButton_new_profile.hide()
-
-    def import_profile(self):
-        """
-        Imports pre-existing OneDrive profile.
-        Loads default values first, then overwrite them with user settings.
-        This is to handle cases where imported config contains only some properties.
-        """
-
-        profile_name = self.import_ui.lineEdit_profile_name.text()
-        config_path = os.path.expanduser(self.import_ui.lineEdit_config_path.text())
-
-        # Load all default values.
-        _default_od_config = read_config(DIR_PATH + "/resources/default_config")
-        default_od_config = _default_od_config._sections
-
-        # Load user's settings.
-        _new_od_config = read_config(config_path)
-        new_od_config = _new_od_config._sections
-
-        # Construct dict with user profile settings.
-        new_profile = {
-            profile_name: {"config_file": config_path, "enable_debug": False, "mode": "monitor", "auto_sync": False}
-        }
-
-        # Load existing user profiles and add the new profile.
-        _profiles = ConfigParser()
-        _profiles.read(PROFILES_FILE)
-        _profiles[profile_name] = new_profile[profile_name]
-
-        # Create profile config file if it does not exist.
-        profiles_dir = re.search(r"(.+)/profiles$", PROFILES_FILE).group(1)
-        if not os.path.exists(profiles_dir):
-            os.makedirs(profiles_dir)
-
-        # Save the new profile.
-        with open(PROFILES_FILE, "w") as configfile:
-            _profiles.write(configfile)
-
-        # Append OD config
-        new_profile[profile_name].update(default_od_config)
-        new_profile[profile_name].update(new_od_config)
-
-        # Append new profile into running global profile
-        global_config.update(new_profile)
-        # logging.info(new_profile)
-        # logging.info(global_config)
-
-        self.listWidget_profiles.addItem(profile_name)
-        self.page = ProfileSettingsPage(profile_name)
-        self.stackedLayout.addWidget(self.page)
-
-        # Hide "Create profile" push button from main windows.
-        main_window.pushButton_new_profile.hide()
 
 
 class ProfileStatusPage(QWidget, Ui_status_page):
@@ -1383,7 +1242,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # else:
         self.pushButton_new_profile.hide()
 
-        #
         # Menu
         # self.menubar.hide()
         self.actionStart_Minimized.triggered.connect(self.set_check_box_state)
@@ -1392,28 +1250,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # Quit OneDriveGUI
         self.actionQuit.triggered.connect(sys.exit)
-
-        # Update OneDrive Status
-        self.actionRefresh_Service_Status.triggered.connect(lambda: self.onedrive_process_status())
-
-        # Start OneDrive service
-        self.actionStart_Service.triggered.connect(lambda: os.system("systemctl --user start onedrive"))
-
-        # Stop OneDrive service
-        self.actionStop_Service.triggered.connect(lambda: os.system("systemctl --user stop onedrive"))
-
-        # Restart OneDrive service
-        self.actionRestart_Service.triggered.connect(lambda: os.system("systemctl --user restart onedrive"))
-
-        # Start OneDrive monitoring
-        self.actionStart_Monitor.triggered.connect(lambda: self.start_onedrive_monitor(""))
-
-        # Stop OneDrive monitoring
-        self.actionStop_Monitor.triggered.connect(lambda: os.system("pkill onedrive"))
-
-        # Refresh Sync Status
-        # self.actionObtain_Sync_Status.triggered.connect(lambda: self.label_4.setText("Retreiving status..."))
-        # self.actionObtain_Sync_Status.triggered.connect(lambda: self.onedrive_sync_status())
 
         # Start second account
         self.actionstart.triggered.connect(lambda: self.start_onedrive_monitor(""))
@@ -1597,7 +1433,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def autostart_monitor(self):
         # Auto-start sync if compatible version of OneDrive client is installed.
-
         for profile_name in global_config:
             logging.debug(
                 f"[{profile_name}] Compatible client version found: {self.profile_status_pages[profile_name].toolButton_start.isEnabled()}"

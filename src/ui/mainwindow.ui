@@ -109,44 +109,6 @@ color: rgb(255, 255, 255);</string>
     <property name="title">
      <string>Advanced</string>
     </property>
-    <widget class="QMenu" name="menuDebug">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="title">
-      <string>Debug</string>
-     </property>
-     <widget class="QMenu" name="menuService">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="title">
-       <string>Service</string>
-      </property>
-      <addaction name="actionStart_Service"/>
-      <addaction name="actionStop_Service"/>
-      <addaction name="actionRestart_Service"/>
-     </widget>
-     <widget class="QMenu" name="menuMonitor">
-      <property name="title">
-       <string>Monitor</string>
-      </property>
-      <addaction name="actionStart_Monitor"/>
-      <addaction name="actionStop_Monitor"/>
-      <addaction name="actionForce_Resync"/>
-     </widget>
-     <widget class="QMenu" name="menuStatus">
-      <property name="title">
-       <string>Status</string>
-      </property>
-      <addaction name="actionRefresh_Service_Status"/>
-      <addaction name="actionObtain_Sync_Status"/>
-     </widget>
-     <addaction name="menuService"/>
-     <addaction name="menuMonitor"/>
-     <addaction name="menuStatus"/>
-    </widget>
-    <addaction name="menuDebug"/>
     <addaction name="actionStart_Minimized"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
