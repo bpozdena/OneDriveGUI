@@ -237,17 +237,17 @@ class wizardPage_create_import(QWizardPage):
             self.completeChanged.emit()
 
         else:
-            logging.info(f"No option is unchecked")
+            logging.info(f"No option is checked")
             self.checkBox_import.setDisabled(False)
             self.checkBox_create.setDisabled(False)
             self.completeChanged.emit()
 
     def isComplete(self):
         if self.checkBox_create.isChecked() == False and self.checkBox_import.isChecked() == False:
-            logging.info("not complete")
+            logging.info("Wizard page is not complete.")
             return False
         else:
-            logging.info("complete")
+            logging.info("Wizard page is complete.")
             return True
 
 
@@ -305,9 +305,28 @@ class wizardPage_create(QWizardPage):
         self.lineEdit_sync_dir.setText(f"~/OneDrive_{text}")
 
     def enable_create_button(self):
-        # Enable 'Import' button only when profile name and path to config file are not empty.
-        if self.lineEdit_new_profile_name.text() == "".strip() or self.lineEdit_sync_dir == "".strip():
+        """Enables wizard 'Create' button only when below conditions are met."""
+        _used_sync_dirs = []  # List of used sync directories.
+        _used_profile_names = []  # List of used profile names.
+
+        for profile in global_config:
+            _used_sync_dirs.append(global_config[profile]["onedrive"]["sync_dir"].strip('"'))
+            _used_profile_names.append(profile)
+
+        if self.lineEdit_new_profile_name.text().strip() == "" or self.lineEdit_sync_dir.text().strip() == "":
+            # Do not allow profile creation when input fields are empty.
             self.pushButton_create.setEnabled(False)
+
+        elif self.lineEdit_new_profile_name.text().strip() in _used_profile_names:
+            # Do not allow profile creation when profile name is already used.
+            self.pushButton_create.setEnabled(False)
+            logging.warning(f"[GUI] Profile name '{self.lineEdit_new_profile_name.text()}' is already used!")
+
+        elif self.lineEdit_sync_dir.text().strip() in _used_sync_dirs:
+            # Do not allow profile creation when sync_dir is already used for different profile.
+            self.pushButton_create.setEnabled(False)
+            logging.warning(f"[GUI] Sync dir '{self.lineEdit_sync_dir.text()}' is already used by different profile!")
+
         else:
             self.pushButton_create.setEnabled(True)
 
@@ -371,6 +390,9 @@ class wizardPage_create(QWizardPage):
         logging.info(f"Account {profile_name} has been created")
         self.pushButton_create.setText("Done")
         self.pushButton_create.setDisabled(True)
+        self.lineEdit_new_profile_name.setDisabled(True)
+        self.lineEdit_sync_dir.setDisabled(True)
+        self.pushButton_browse.setDisabled(True)
         self.completeChanged.emit()
 
 
@@ -421,16 +443,23 @@ class wizardPage_import(QWizardPage):
 
     def enable_import_button(self):
         # Enable 'Import' button only when profile name and path to config file are valid.
-        profile_name_filled = self.lineEdit_profile_name.text() != "".strip()
+        profile_name_filled = self.lineEdit_profile_name.text().strip() != ""
 
         config_specified = re.search(r"/config$", self.lineEdit_config_path.text().strip()) != None
         config_path = os.path.expanduser(self.lineEdit_config_path.text().strip())
         config_exists = os.path.exists(config_path)
+        unique_profile_name = self.lineEdit_profile_name.text() not in global_config.keys()
 
-        if all([profile_name_filled, config_specified, config_exists]):
+        if all([profile_name_filled, config_specified, config_exists, unique_profile_name]):
             self.pushButton_import.setEnabled(True)
         else:
             self.pushButton_import.setEnabled(False)
+            if not unique_profile_name:
+                logging.warning(f"[GUI] Profile name {self.lineEdit_profile_name.text()} is already used!")
+            if not config_specified:
+                logging.warning(f"[GUI] Path to config file not specified.")
+            if not config_exists:
+                logging.warning(f"[GUI] Specified config file '{self.lineEdit_config_path.text().strip()}' not found!")
 
     def get_config_name(self):
         self.file_dialog = QFileDialog.getOpenFileName(self, dir=os.path.expanduser("~/.config/"))
@@ -509,6 +538,9 @@ class wizardPage_import(QWizardPage):
         logging.info(f"Account {profile_name} has been imported")
         self.pushButton_import.setText("Done")
         self.pushButton_import.setDisabled(True)
+        self.lineEdit_profile_name.setDisabled(True)
+        self.lineEdit_config_path.setDisabled(True)
+        self.pushButton_browse.setDisabled(True)
         self.completeChanged.emit()
 
 
