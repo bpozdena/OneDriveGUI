@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'mainwindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.3
+## Created by: Qt User Interface Compiler version 6.2.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -104,7 +104,6 @@ class Ui_MainWindow(object):
         MainWindow.setMenuBar(self.menubar)
 
         self.menubar.addAction(self.menuAdvanced.menuAction())
-        self.menuAdvanced.addAction(self.actionStart_Minimized)
         self.menuAdvanced.addSeparator()
         self.menuAdvanced.addAction(self.actionQuit)
 
