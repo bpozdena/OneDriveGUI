@@ -757,10 +757,12 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.spinBox_operation_timeout.valueChanged.connect(self.set_spin_box_value)
 
         self.checkBox_download_only.setChecked(self.get_check_box_state("download_only"))
+        self.checkBox_download_only.setDisabled(self.get_check_box_state("upload_only"))
         self.checkBox_download_only.stateChanged.connect(self.set_check_box_state)
         self.checkBox_download_only.stateChanged.connect(self.validate_checkbox_input)
 
         self.checkBox_upload_only.setChecked(self.get_check_box_state("upload_only"))
+        self.checkBox_upload_only.setDisabled(self.get_check_box_state("download_only"))
         self.checkBox_upload_only.stateChanged.connect(self.set_check_box_state)
         self.checkBox_upload_only.stateChanged.connect(self.validate_checkbox_input)
 
