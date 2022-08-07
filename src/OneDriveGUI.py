@@ -1023,12 +1023,11 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
     def set_check_box_state_profile(self, state):
         _property = self.sender().objectName()
         property = re.search(r"checkBox_(.+)", _property).group(1)
-        logging.info(property)
         if state == Qt.Checked:
-            logging.info("is checked")
+            logging.info(f"[GUI] [{self.profile}] {property} is checked.")
             self.temp_profile_config[f"{property}"] = True
         else:
-            logging.info("is unchecked")
+            logging.info(f"[GUI] [{self.profile}] {property} is unchecked.")
             self.temp_profile_config[f"{property}"] = False
 
     def get_check_box_state(self, property):
