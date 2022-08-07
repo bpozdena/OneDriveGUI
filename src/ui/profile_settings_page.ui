@@ -948,7 +948,7 @@ Do not download changes from OneDrive.</string>
     </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButton_discart">
+    <widget class="QPushButton" name="pushButton_discard">
      <property name="text">
       <string>Discard changes</string>
      </property>

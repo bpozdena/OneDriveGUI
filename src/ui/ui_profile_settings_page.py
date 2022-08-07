@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'profile_settings_page.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.3
+## Created by: Qt User Interface Compiler version 6.2.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -606,10 +606,10 @@ class Ui_profile_settings(object):
 
         self.verticalLayout_2.addLayout(self.horizontalLayout)
 
-        self.pushButton_discart = QPushButton(profile_settings)
-        self.pushButton_discart.setObjectName(u"pushButton_discart")
+        self.pushButton_discard = QPushButton(profile_settings)
+        self.pushButton_discard.setObjectName(u"pushButton_discard")
 
-        self.verticalLayout_2.addWidget(self.pushButton_discart)
+        self.verticalLayout_2.addWidget(self.pushButton_discard)
 
         self.pushButton_save = QPushButton(profile_settings)
         self.pushButton_save.setObjectName(u"pushButton_save")
@@ -827,7 +827,7 @@ class Ui_profile_settings(object):
         self.pushButton_logout.setText(QCoreApplication.translate("profile_settings", u"Logout", None))
         self.pushButton_login.setText(QCoreApplication.translate("profile_settings", u"Login", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), QCoreApplication.translate("profile_settings", u"Account", None))
-        self.pushButton_discart.setText(QCoreApplication.translate("profile_settings", u"Discard changes", None))
+        self.pushButton_discard.setText(QCoreApplication.translate("profile_settings", u"Discard changes", None))
         self.pushButton_save.setText(QCoreApplication.translate("profile_settings", u"Save", None))
     # retranslateUi
 
