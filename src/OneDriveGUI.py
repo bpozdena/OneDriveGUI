@@ -63,24 +63,6 @@ GUI_SETTINGS_FILE = os.path.expanduser("~/.config/onedrive-gui/gui_settings")
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 APPIMAGE = True if "tmp/.mount_One" in DIR_PATH else False
 
-# Logging
-log_dir = os.path.expanduser("~/.config/onedrive-gui/")
-log_file = f"{log_dir}onedrivegui.log"
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
-timed_handler = handlers.TimedRotatingFileHandler(filename=log_file, when="D", interval=1, backupCount=2)
-stdout_handler = logging.StreamHandler(sys.stdout)
-
-handlers = [timed_handler, stdout_handler]
-
-logging.basicConfig(
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    handlers=handlers,
-    level=logging.DEBUG,
-)
-
-logging.debug(f"[GUI] Running from directory: {DIR_PATH}")
-
 
 class SetupWizard(QWizard):
     def __init__(self, parent=None):
@@ -579,7 +561,39 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
         self.checkBox_save_debug.setChecked(self.get_check_box_state("save_debug"))
         self.checkBox_save_debug.stateChanged.connect(self.set_check_box_state)
 
+        self.spinBox_log_rotation_interval.setValue(int(gui_settings["SETTINGS"]["log_rotation_interval"]))
+        self.spinBox_log_rotation_interval.valueChanged.connect(self.set_spin_box_value)
+
+        self.spinBox_log_backup_count.setValue(int(gui_settings["SETTINGS"]["log_backup_count"]))
+        self.spinBox_log_backup_count.valueChanged.connect(self.set_spin_box_value)
+
+        self.comboBox_debug_level.setCurrentText(gui_settings["SETTINGS"]["debug_level"].upper())
+        self.comboBox_debug_level.activated.connect(self.set_debug_level)
+
+        self.lineEdit_log_file.setText(gui_settings["SETTINGS"]["log_file"])
+        self.lineEdit_log_file.textChanged.connect(self.set_log_file)
+
+        self.pushButton_log_file.clicked.connect(self.get_dir_name)
+
         self.pushButton_save.clicked.connect(self.save_gui_settings)
+
+    def get_dir_name(self):
+        self.file_dialog = QFileDialog.getExistingDirectory(dir=os.path.expanduser("~/"))
+
+        dir_name = self.file_dialog
+        logging.info(dir_name)
+        self.lineEdit_log_file.setText(dir_name)
+
+    def set_log_file(self):
+        gui_settings["SETTINGS"]["log_file"] = str(self.lineEdit_log_file.text())
+
+    def set_debug_level(self):
+        gui_settings["SETTINGS"]["debug_level"] = self.comboBox_debug_level.currentText()
+
+    def set_spin_box_value(self, value):
+        _property = self.sender().objectName()
+        property = re.search(r"spinBox_(.+)", _property).group(1)
+        gui_settings["SETTINGS"][property] = str(value)
 
     def get_check_box_state(self, property):
         return "True" in gui_settings["SETTINGS"][property]
@@ -1804,24 +1818,6 @@ def read_config(config_file):
     return config
 
 
-def read_gui_settings():
-    default_gui_settings = {
-        "SETTINGS": {
-            "start_minimized": "False",
-            "show_debug": "True",
-            "save_debug": "True",
-        }
-    }
-
-    gui_settings = ConfigParser()
-    gui_settings.read_dict(default_gui_settings)  # Read default settings and use them when config file does not exist.
-    gui_settings.read(GUI_SETTINGS_FILE)  # Read user settings from file and overwrite defaults.
-
-    logging.debug(f"GUI SETTINGS: {gui_settings._sections}")
-
-    return gui_settings
-
-
 def get_installed_client_version() -> int:
     try:
         # Checks installed client version. Later used to remove unsupported options from account config if needed.
@@ -1975,11 +1971,83 @@ def main_window_start_state():
         logging.info("[GUI] Starting OneDriveGUI maximized")
 
 
+def read_gui_settings():
+    default_gui_settings = {
+        "SETTINGS": {
+            "start_minimized": "False",
+            "show_debug": "True",
+            "save_debug": "True",
+            "log_rotation_interval": 24,
+            "log_backup_count": 3,
+            "log_file": "~/.config/onedrive-gui/onedrivegui.log",
+            "debug_level": "DEBUG",
+        }
+    }
+
+    gui_settings = ConfigParser()
+    gui_settings.read_dict(default_gui_settings)  # Read default settings and use them when config file does not exist.
+    gui_settings.read(GUI_SETTINGS_FILE)  # Read user settings from file and overwrite defaults.
+
+    return gui_settings
+
+
+def config_logging_handlers():
+    # Allow stdout logging and logging into rotating log file based on user settings.
+    show_debug = gui_settings["SETTINGS"]["show_debug"]
+    save_debug = gui_settings["SETTINGS"]["save_debug"]
+    log_rotation_interval = int(gui_settings["SETTINGS"]["log_rotation_interval"])
+    log_backup_count = int(gui_settings["SETTINGS"]["log_backup_count"])
+    log_file = os.path.expanduser(gui_settings["SETTINGS"]["log_file"])
+    _log_dir = re.search(r"(.+)/.+$", log_file).group(1)
+    log_dir = os.path.expanduser(_log_dir)
+
+    # log_dir = os.path.expanduser("~/.config/onedrive-gui/")
+    # log_file = f"{log_dir}onedrivegui.log"
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    timed_handler = handlers.TimedRotatingFileHandler(
+        filename=log_file, when="H", interval=log_rotation_interval, backupCount=log_backup_count
+    )
+
+    log_handlers = []
+
+    if show_debug == "True":
+        log_handlers.append(stdout_handler)
+    if save_debug == "True":
+        log_handlers.append(timed_handler)
+
+    return log_handlers
+
+
+def config_debug_level():
+    debug_level = gui_settings["SETTINGS"]["debug_level"].upper()
+
+    if debug_level == "DEBUG":
+        return logging.DEBUG
+    elif debug_level == "INFO":
+        return logging.INFO
+    elif debug_level == "WARNING":
+        return logging.WARNING
+    elif debug_level == "ERROR":
+        return logging.ERROR
+    else:
+        return logging.DEBUG
+
+
 if __name__ == "__main__":
+    gui_settings = read_gui_settings()
+
+    logging.basicConfig(
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        handlers=config_logging_handlers(),
+        level=config_debug_level(),
+    )
+
     client_version = get_installed_client_version()
     global_config = create_global_config()
     save_global_config()
-    gui_settings = read_gui_settings()
 
     app = QApplication(sys.argv)
     app.setApplicationName("OneDriveGUI")
