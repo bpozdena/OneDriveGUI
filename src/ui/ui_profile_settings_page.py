@@ -297,69 +297,79 @@ class Ui_profile_settings(object):
         self.label_user_agent = QLabel(self.groupBox_4)
         self.label_user_agent.setObjectName(u"label_user_agent")
 
-        self.formLayout.setWidget(3, QFormLayout.LabelRole, self.label_user_agent)
+        self.formLayout.setWidget(5, QFormLayout.LabelRole, self.label_user_agent)
 
         self.lineEdit_user_agent = QLineEdit(self.groupBox_4)
         self.lineEdit_user_agent.setObjectName(u"lineEdit_user_agent")
         self.lineEdit_user_agent.setMaximumSize(QSize(200, 16777215))
         self.lineEdit_user_agent.setMaxLength(32767)
 
-        self.formLayout.setWidget(3, QFormLayout.FieldRole, self.lineEdit_user_agent)
+        self.formLayout.setWidget(5, QFormLayout.FieldRole, self.lineEdit_user_agent)
 
         self.label_azure_ad_endpoint = QLabel(self.groupBox_4)
         self.label_azure_ad_endpoint.setObjectName(u"label_azure_ad_endpoint")
 
-        self.formLayout.setWidget(4, QFormLayout.LabelRole, self.label_azure_ad_endpoint)
+        self.formLayout.setWidget(6, QFormLayout.LabelRole, self.label_azure_ad_endpoint)
 
         self.lineEdit_azure_ad_endpoint = QLineEdit(self.groupBox_4)
         self.lineEdit_azure_ad_endpoint.setObjectName(u"lineEdit_azure_ad_endpoint")
         self.lineEdit_azure_ad_endpoint.setMaximumSize(QSize(200, 16777215))
 
-        self.formLayout.setWidget(4, QFormLayout.FieldRole, self.lineEdit_azure_ad_endpoint)
+        self.formLayout.setWidget(6, QFormLayout.FieldRole, self.lineEdit_azure_ad_endpoint)
 
         self.label_azure_tenant_id = QLabel(self.groupBox_4)
         self.label_azure_tenant_id.setObjectName(u"label_azure_tenant_id")
 
-        self.formLayout.setWidget(5, QFormLayout.LabelRole, self.label_azure_tenant_id)
+        self.formLayout.setWidget(7, QFormLayout.LabelRole, self.label_azure_tenant_id)
 
         self.lineEdit_azure_tenant_id = QLineEdit(self.groupBox_4)
         self.lineEdit_azure_tenant_id.setObjectName(u"lineEdit_azure_tenant_id")
         self.lineEdit_azure_tenant_id.setMaximumSize(QSize(200, 16777215))
 
-        self.formLayout.setWidget(5, QFormLayout.FieldRole, self.lineEdit_azure_tenant_id)
+        self.formLayout.setWidget(7, QFormLayout.FieldRole, self.lineEdit_azure_tenant_id)
 
         self.label_sync_dir_permissions = QLabel(self.groupBox_4)
         self.label_sync_dir_permissions.setObjectName(u"label_sync_dir_permissions")
 
-        self.formLayout.setWidget(6, QFormLayout.LabelRole, self.label_sync_dir_permissions)
+        self.formLayout.setWidget(8, QFormLayout.LabelRole, self.label_sync_dir_permissions)
 
         self.spinBox_sync_dir_permissions = QSpinBox(self.groupBox_4)
         self.spinBox_sync_dir_permissions.setObjectName(u"spinBox_sync_dir_permissions")
         self.spinBox_sync_dir_permissions.setMaximum(777)
 
-        self.formLayout.setWidget(6, QFormLayout.FieldRole, self.spinBox_sync_dir_permissions)
+        self.formLayout.setWidget(8, QFormLayout.FieldRole, self.spinBox_sync_dir_permissions)
 
         self.label_sync_file_permissions = QLabel(self.groupBox_4)
         self.label_sync_file_permissions.setObjectName(u"label_sync_file_permissions")
 
-        self.formLayout.setWidget(7, QFormLayout.LabelRole, self.label_sync_file_permissions)
+        self.formLayout.setWidget(9, QFormLayout.LabelRole, self.label_sync_file_permissions)
 
         self.spinBox_sync_file_permissions = QSpinBox(self.groupBox_4)
         self.spinBox_sync_file_permissions.setObjectName(u"spinBox_sync_file_permissions")
         self.spinBox_sync_file_permissions.setMaximum(777)
 
-        self.formLayout.setWidget(7, QFormLayout.FieldRole, self.spinBox_sync_file_permissions)
+        self.formLayout.setWidget(9, QFormLayout.FieldRole, self.spinBox_sync_file_permissions)
 
         self.label_operation_timeout = QLabel(self.groupBox_4)
         self.label_operation_timeout.setObjectName(u"label_operation_timeout")
 
-        self.formLayout.setWidget(8, QFormLayout.LabelRole, self.label_operation_timeout)
+        self.formLayout.setWidget(10, QFormLayout.LabelRole, self.label_operation_timeout)
 
         self.spinBox_operation_timeout = QSpinBox(self.groupBox_4)
         self.spinBox_operation_timeout.setObjectName(u"spinBox_operation_timeout")
         self.spinBox_operation_timeout.setMaximum(1000000)
 
-        self.formLayout.setWidget(8, QFormLayout.FieldRole, self.spinBox_operation_timeout)
+        self.formLayout.setWidget(10, QFormLayout.FieldRole, self.spinBox_operation_timeout)
+
+        self.label_drive_id = QLabel(self.groupBox_4)
+        self.label_drive_id.setObjectName(u"label_drive_id")
+
+        self.formLayout.setWidget(3, QFormLayout.LabelRole, self.label_drive_id)
+
+        self.lineEdit_drive_id = QLineEdit(self.groupBox_4)
+        self.lineEdit_drive_id.setObjectName(u"lineEdit_drive_id")
+
+        self.formLayout.setWidget(3, QFormLayout.FieldRole, self.lineEdit_drive_id)
 
 
         self.verticalLayout_8.addWidget(self.groupBox_4)
@@ -632,7 +642,7 @@ class Ui_profile_settings(object):
 
         self.retranslateUi(profile_settings)
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(2)
 
 
         QMetaObject.connectSlotsByName(profile_settings)
@@ -739,6 +749,7 @@ class Ui_profile_settings(object):
         self.label_operation_timeout.setToolTip(QCoreApplication.translate("profile_settings", u"Operation Timeout is the maximum amount of time (seconds) a file operation is allowed to take. This includes DNS resolution, connecting, data transfer, etc.", None))
 #endif // QT_CONFIG(tooltip)
         self.label_operation_timeout.setText(QCoreApplication.translate("profile_settings", u"Operation timeout", None))
+        self.label_drive_id.setText(QCoreApplication.translate("profile_settings", u"SharePoint Library Drive ID", None))
 #if QT_CONFIG(tooltip)
         self.groupBox_5.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Perform a 'one-way' upload sync.<br/></p><p><span style=\" font-weight:700;\">Note</span>: If a file or folder is present on OneDrive, that does not exist locally, it will be removed. </p><p>If the data on OneDrive should be kept, please enable '<span style=\" font-weight:700;\">No remote delete</span>' option.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)

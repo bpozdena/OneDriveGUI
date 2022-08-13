@@ -863,6 +863,9 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.lineEdit_azure_tenant_id.setText(self.temp_profile_config["onedrive"]["azure_tenant_id"].strip('"'))
         self.lineEdit_azure_tenant_id.textChanged.connect(self.set_line_edit_value)
 
+        self.lineEdit_drive_id.setText(self.temp_profile_config["onedrive"]["drive_id"].strip('"'))
+        self.lineEdit_drive_id.textChanged.connect(self.set_line_edit_value)
+
         # Rate limit
         self.spinBox_rate_limit.setValue(int(self.temp_profile_config["onedrive"]["rate_limit"].strip('"')))
         self.horizontalSlider_rate_limit.setValue(int(self.temp_profile_config["onedrive"]["rate_limit"].strip('"')))
@@ -1290,8 +1293,11 @@ class WorkerThread(QThread):
                     self.update_profile_status.emit(self.profile_status, self.profile_name)
 
                 elif "Remaining Free Space" in stdout:
-                    self.free_space_bytes = re.search(r"([0-9]+)", stdout).group(1)
-                    self.free_space_human = str(humanize_file_size(int(self.free_space_bytes)))
+                    try:
+                        self.free_space_bytes = re.search(r"([0-9]+)", stdout).group(1)
+                        self.free_space_human = str(humanize_file_size(int(self.free_space_bytes)))
+                    except:
+                        self.free_space_human = "Not Available"
 
                     logging.info(f"[{self.profile_name}] Free Space: {self.free_space_human}")
                     self.profile_status["free_space"] = f"Free Space: {self.free_space_human}"
