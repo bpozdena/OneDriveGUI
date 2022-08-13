@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'profile_settings_page.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.2
+## Created by: Qt User Interface Compiler version 6.2.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -19,13 +19,13 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QFormLayout, QGridLayout
     QGroupBox, QHBoxLayout, QLabel, QLineEdit,
     QListWidget, QListWidgetItem, QPushButton, QSizePolicy,
     QSlider, QSpacerItem, QSpinBox, QTabWidget,
-    QVBoxLayout, QWidget)
+    QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_profile_settings(object):
     def setupUi(self, profile_settings):
         if not profile_settings.objectName():
             profile_settings.setObjectName(u"profile_settings")
-        profile_settings.resize(670, 780)
+        profile_settings.resize(800, 780)
         self.verticalLayout_2 = QVBoxLayout(profile_settings)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout_2.setContentsMargins(-1, 0, -1, 0)
@@ -72,17 +72,30 @@ class Ui_profile_settings(object):
 
         self.gridLayout_9.addLayout(self.gridLayout_5, 1, 0, 1, 1)
 
-        self.checkBox_sync_root_files = QCheckBox(self.groupBox_8)
-        self.checkBox_sync_root_files.setObjectName(u"checkBox_sync_root_files")
-
-        self.gridLayout_9.addWidget(self.checkBox_sync_root_files, 2, 0, 1, 1)
-
 
         self.verticalLayout_5.addWidget(self.groupBox_8)
 
-        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.groupBox_11 = QGroupBox(self.exemptions_tab_2)
+        self.groupBox_11.setObjectName(u"groupBox_11")
+        self.verticalLayout_11 = QVBoxLayout(self.groupBox_11)
+        self.verticalLayout_11.setObjectName(u"verticalLayout_11")
+        self.label_sync_list = QLabel(self.groupBox_11)
+        self.label_sync_list.setObjectName(u"label_sync_list")
 
-        self.verticalLayout_5.addItem(self.verticalSpacer_3)
+        self.verticalLayout_11.addWidget(self.label_sync_list)
+
+        self.checkBox_sync_root_files = QCheckBox(self.groupBox_11)
+        self.checkBox_sync_root_files.setObjectName(u"checkBox_sync_root_files")
+
+        self.verticalLayout_11.addWidget(self.checkBox_sync_root_files)
+
+        self.textEdit_sync_list = QTextEdit(self.groupBox_11)
+        self.textEdit_sync_list.setObjectName(u"textEdit_sync_list")
+
+        self.verticalLayout_11.addWidget(self.textEdit_sync_list)
+
+
+        self.verticalLayout_5.addWidget(self.groupBox_11)
 
         self.tabWidget.addTab(self.exemptions_tab_2, "")
         self.tab = QWidget()
@@ -619,7 +632,7 @@ class Ui_profile_settings(object):
 
         self.retranslateUi(profile_settings)
 
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(profile_settings)
@@ -637,10 +650,15 @@ class Ui_profile_settings(object):
         self.label_sync_dir.setToolTip(QCoreApplication.translate("profile_settings", u"Specify local sync directory location for this profile.", None))
 #endif // QT_CONFIG(tooltip)
         self.label_sync_dir.setText(QCoreApplication.translate("profile_settings", u"Sync Directory:", None))
+        self.groupBox_11.setTitle(QCoreApplication.translate("profile_settings", u"Sync List", None))
+        self.label_sync_list.setText(QCoreApplication.translate("profile_settings", u"Selective sync allows you to sync only specific files and directories. <br> See <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/USAGE.md#performing-a-selective-sync-via-sync_list-file\">official documentation </a> for more details.", None))
 #if QT_CONFIG(tooltip)
-        self.checkBox_sync_root_files.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Sync all files in <span style=\" font-weight:700;\">Sync Directory</span> root when using <span style=\" font-weight:700;\">Sync List</span>.</p></body></html>", None))
+        self.checkBox_sync_root_files.setToolTip(QCoreApplication.translate("profile_settings", u"Sync all files in Sync Directory root when using Sync List.", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_sync_root_files.setText(QCoreApplication.translate("profile_settings", u"Sync root files", None))
+#if QT_CONFIG(tooltip)
+        self.textEdit_sync_list.setToolTip("")
+#endif // QT_CONFIG(tooltip)
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.exemptions_tab_2), QCoreApplication.translate("profile_settings", u"Monitored Files", None))
 #if QT_CONFIG(tooltip)
         self.groupBox.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>This option is used to 'skip' certain files and supports pattern matching.</p><p>Patterns are case insensitive. <span style=\" font-weight:700;\">*</span> and <span style=\" font-weight:700;\">? </span><a href=\"https://technet.microsoft.com/en-us/library/bb490639.aspx\"><span style=\" text-decoration: underline; color:#5e81ac;\">wildcards characters</span></a> are supported. </p><p>Use <span style=\" font-weight:700;\">|</span> to separate multiple patterns.<br/></p><p><span style=\" text-decoration: underline;\">Files can be skipped in the following fashion:</span></p><p>-Specify a wildcard, eg: '<span style=\" font-weight:700;\">*.txt</span>' (skip all txt files)</p><p>-Explicitly specify the filename and it's full path relative to your sync_dir, eg: '<span style=\" font-weight:700;\">path/to/file/filename.ext</span>'</p><p>-Explicitly specify the filename only and skip every instance of this filename, eg: '<span style=\" font-weight:700;\">filename.ext</span>'</p><p><br/></p><p><span "
