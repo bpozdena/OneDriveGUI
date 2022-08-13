@@ -50,7 +50,7 @@
         <string/>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="exemptions_tab_2">
         <attribute name="title">
@@ -416,7 +416,7 @@ locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seco
               </property>
              </widget>
             </item>
-            <item row="3" column="0">
+            <item row="5" column="0">
              <widget class="QLabel" name="label_user_agent">
               <property name="toolTip">
                <string>Specify a User Agent string to the http client</string>
@@ -426,7 +426,7 @@ locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seco
               </property>
              </widget>
             </item>
-            <item row="3" column="1">
+            <item row="5" column="1">
              <widget class="QLineEdit" name="lineEdit_user_agent">
               <property name="maximumSize">
                <size>
@@ -439,7 +439,7 @@ locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seco
               </property>
              </widget>
             </item>
-            <item row="4" column="0">
+            <item row="6" column="0">
              <widget class="QLabel" name="label_azure_ad_endpoint">
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Refer to the documentation for &lt;a href=&quot;https://github.com/abraunegg/onedrive/blob/master/docs/USAGE.md#configuring-the-client-for-single-tenant-application-use&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#5e81ac;&quot;&gt;single tenant application use&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -449,7 +449,7 @@ locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seco
               </property>
              </widget>
             </item>
-            <item row="4" column="1">
+            <item row="6" column="1">
              <widget class="QLineEdit" name="lineEdit_azure_ad_endpoint">
               <property name="maximumSize">
                <size>
@@ -459,7 +459,7 @@ locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seco
               </property>
              </widget>
             </item>
-            <item row="5" column="0">
+            <item row="7" column="0">
              <widget class="QLabel" name="label_azure_tenant_id">
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Refer to the documentation for &lt;a href=&quot;https://github.com/abraunegg/onedrive/blob/master/docs/USAGE.md#configuring-the-client-for-single-tenant-application-use&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#5e81ac;&quot;&gt;single tenant application use&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -469,7 +469,7 @@ locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seco
               </property>
              </widget>
             </item>
-            <item row="5" column="1">
+            <item row="7" column="1">
              <widget class="QLineEdit" name="lineEdit_azure_tenant_id">
               <property name="maximumSize">
                <size>
@@ -479,7 +479,7 @@ locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seco
               </property>
              </widget>
             </item>
-            <item row="6" column="0">
+            <item row="8" column="0">
              <widget class="QLabel" name="label_sync_dir_permissions">
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Utilise the &lt;a href=&quot;https://chmod-calculator.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#5e81ac;&quot;&gt;Unix Permissions Calculator&lt;/span&gt;&lt;/a&gt; to assist in determining the required permissions.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Important: Special permission bits (setuid, setgid, sticky bit) are not supported. &lt;/p&gt;&lt;p&gt;Valid permission values are from &lt;span style=&quot; font-weight:700;&quot;&gt;000&lt;/span&gt; to &lt;span style=&quot; font-weight:700;&quot;&gt;777&lt;/span&gt; only.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -489,14 +489,14 @@ locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seco
               </property>
              </widget>
             </item>
-            <item row="6" column="1">
+            <item row="8" column="1">
              <widget class="QSpinBox" name="spinBox_sync_dir_permissions">
               <property name="maximum">
                <number>777</number>
               </property>
              </widget>
             </item>
-            <item row="7" column="0">
+            <item row="9" column="0">
              <widget class="QLabel" name="label_sync_file_permissions">
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Utilise the &lt;a href=&quot;https://chmod-calculator.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#5e81ac;&quot;&gt;Unix Permissions Calculator&lt;/span&gt;&lt;/a&gt; to assist in determining the required permissions.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Important: Special permission bits (setuid, setgid, sticky bit) are not supported. &lt;/p&gt;&lt;p&gt;Valid permission values are from &lt;span style=&quot; font-weight:700;&quot;&gt;000&lt;/span&gt; to &lt;span style=&quot; font-weight:700;&quot;&gt;777&lt;/span&gt; only.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -506,14 +506,14 @@ locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seco
               </property>
              </widget>
             </item>
-            <item row="7" column="1">
+            <item row="9" column="1">
              <widget class="QSpinBox" name="spinBox_sync_file_permissions">
               <property name="maximum">
                <number>777</number>
               </property>
              </widget>
             </item>
-            <item row="8" column="0">
+            <item row="10" column="0">
              <widget class="QLabel" name="label_operation_timeout">
               <property name="toolTip">
                <string>Operation Timeout is the maximum amount of time (seconds) a file operation is allowed to take. This includes DNS resolution, connecting, data transfer, etc.</string>
@@ -523,12 +523,22 @@ locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seco
               </property>
              </widget>
             </item>
-            <item row="8" column="1">
+            <item row="10" column="1">
              <widget class="QSpinBox" name="spinBox_operation_timeout">
               <property name="maximum">
                <number>1000000</number>
               </property>
              </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_drive_id">
+              <property name="text">
+               <string>SharePoint Library Drive ID</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLineEdit" name="lineEdit_drive_id"/>
             </item>
            </layout>
           </widget>
