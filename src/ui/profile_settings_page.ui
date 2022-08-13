@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>670</width>
+    <width>800</width>
     <height>780</height>
    </rect>
   </property>
@@ -50,7 +50,7 @@
         <string/>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="exemptions_tab_2">
         <attribute name="title">
@@ -87,31 +87,41 @@
               </item>
              </layout>
             </item>
-            <item row="2" column="0">
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_11">
+           <property name="title">
+            <string>Sync List</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_11">
+            <item>
+             <widget class="QLabel" name="label_sync_list">
+              <property name="text">
+               <string>Selective sync allows you to sync only specific files and directories. &lt;br&gt; See &lt;a href=&quot;https://github.com/abraunegg/onedrive/blob/master/docs/USAGE.md#performing-a-selective-sync-via-sync_list-file&quot;&gt;official documentation &lt;/a&gt; for more details.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QCheckBox" name="checkBox_sync_root_files">
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sync all files in &lt;span style=&quot; font-weight:700;&quot;&gt;Sync Directory&lt;/span&gt; root when using &lt;span style=&quot; font-weight:700;&quot;&gt;Sync List&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>Sync all files in Sync Directory root when using Sync List.</string>
               </property>
               <property name="text">
                <string>Sync root files</string>
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QTextEdit" name="textEdit_sync_list">
+              <property name="toolTip">
+               <string/>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
-         </item>
-         <item>
-          <spacer name="verticalSpacer_3">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
          </item>
         </layout>
        </widget>

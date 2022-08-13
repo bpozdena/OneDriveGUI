@@ -961,12 +961,35 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_auto_sync.stateChanged.connect(self.set_check_box_state_profile)
 
         #
+        # Sync List tab
+        #
+        self.textEdit_sync_list.setText(self.read_sync_list())
+
+        #
         # Buttons
         #
         self.pushButton_discard.hide()
         # TODO: How to discard unsaved changes and refresh the widgets or close window?
         # self.pushButton_discard.clicked.connect(self.discard_changes)
         self.pushButton_save.clicked.connect(self.save_profile_settings)
+        self.pushButton_save.clicked.connect(self.save_sync_list)
+
+    def read_sync_list(self):
+        self.sync_list_file = re.search(r"(.+)/.+$", self.config_file).group(1) + "/sync_list"
+
+        try:
+            with open(self.sync_list_file, "r") as f:
+                self.sync_list = f.read()
+        except:
+            self.sync_list = ""
+
+        return self.sync_list
+
+    def save_sync_list(self):
+        self.sync_list_new = self.textEdit_sync_list.toPlainText()
+
+        with open(self.sync_list_file, "w") as f:
+            f.write(self.sync_list_new)
 
     def validate_checkbox_input(self, state):
         """Disables incompatible settings"""
