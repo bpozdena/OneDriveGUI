@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import time
 import os
 import re
 import subprocess
@@ -36,6 +37,7 @@ from PySide6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
     QMessageBox,
+    QComboBox,
 )
 from urllib3 import HTTPSConnectionPool
 
@@ -74,7 +76,8 @@ class SetupWizard(QWizard):
         self.setPage(3, wizardPage_create_import(self))
         self.setPage(4, wizardPage_create(self))
         self.setPage(5, wizardPage_import(self))
-        self.setPage(6, wizardPage_finish(self))
+        self.setPage(6, wizardPage_create_shared_library(self))
+        self.setPage(10, wizardPage_finish(self))
 
         self.setWindowTitle("OneDriveGUI Setup Wizard")
         self.resize(640, 480)
@@ -96,11 +99,15 @@ class SetupWizard(QWizard):
                 return 4
             elif self.page(3).checkBox_import.isChecked():
                 return 5
+            elif self.page(3).checkBox_sharepoint_library.isChecked():
+                return 6
         if self.currentPage() == self.page(4):
-            return 6
+            return 10
         if self.currentPage() == self.page(5):
-            return 6
+            return 10
         if self.currentPage() == self.page(6):
+            return 10
+        if self.currentPage() == self.page(10):
             return -1
 
 
@@ -203,35 +210,278 @@ class wizardPage_create_import(QWizardPage):
         self.checkBox_import.setText("Import existing OneDrive profile/config")
         self.checkBox_import.stateChanged.connect(self.on_checkbox_change)
 
+        self.checkBox_sharepoint_library = QCheckBox()
+        self.checkBox_sharepoint_library.setText("Add SharePoint Shared Library")
+        self.checkBox_sharepoint_library.stateChanged.connect(self.on_checkbox_change)
+
         layout = QVBoxLayout()
         layout.addWidget(self.checkBox_create)
         layout.addWidget(self.checkBox_import)
+        layout.addWidget(self.checkBox_sharepoint_library)
         self.setLayout(layout)
 
     def on_checkbox_change(self):
         if self.checkBox_create.isChecked():
             logging.info(f"Create new profile is checked")
             self.checkBox_import.setDisabled(True)
+            self.checkBox_sharepoint_library.setDisabled(True)
             self.completeChanged.emit()
 
         elif self.checkBox_import.isChecked():
             logging.info(f"Import profile is checked")
             self.checkBox_create.setDisabled(True)
+            self.checkBox_sharepoint_library.setDisabled(True)
+            self.completeChanged.emit()
+
+        elif self.checkBox_sharepoint_library.isChecked():
+            logging.info(f"SharePoint Shared Library is checked")
+            self.checkBox_create.setDisabled(True)
+            self.checkBox_import.setDisabled(True)
             self.completeChanged.emit()
 
         else:
             logging.info(f"No option is checked")
             self.checkBox_import.setDisabled(False)
             self.checkBox_create.setDisabled(False)
+            self.checkBox_sharepoint_library.setDisabled(False)
             self.completeChanged.emit()
 
     def isComplete(self):
-        if self.checkBox_create.isChecked() == False and self.checkBox_import.isChecked() == False:
-            logging.info("Wizard page is not complete.")
-            return False
-        else:
+        if any(
+            [
+                self.checkBox_create.isChecked(),
+                self.checkBox_import.isChecked(),
+                self.checkBox_sharepoint_library.isChecked(),
+            ]
+        ):
+
             logging.info("Wizard page is complete.")
             return True
+        else:
+            logging.info("Wizard page is not complete.")
+            return False
+
+
+class wizardPage_create_shared_library(QWizardPage):
+    def __init__(self, parent=None):
+        self.library_dict = {}
+
+        super(wizardPage_create_shared_library, self).__init__(parent)
+        self.setTitle("Add SharePoint Shared Library")
+
+        self.label_1 = QLabel()
+        self.label_1.setText("1. Select profile with access to SharePoint Library.")
+
+        self.label_2 = QLabel()
+        self.label_2.setText("2. Obtain list of SharePoint Sites")
+
+        self.label_3 = QLabel()
+        self.label_3.setText("3. Select a SharePoint Site")
+
+        self.label_4 = QLabel()
+        self.label_4.setText("4. Obtain list of Shared Libraries")
+
+        self.label_5 = QLabel()
+        self.label_5.setText("4. Select a SharePoint Shared Library")
+
+        self.label_6 = QLabel()
+        self.label_6.setText("6. Create profile")
+
+        self.comboBox_profile_list = QComboBox()
+
+        self.pushButton_get_sites = QPushButton()
+        self.pushButton_get_sites.setText("Get SharePoint Sites")
+        self.pushButton_get_sites.clicked.connect(self.get_sharepoint_site_list)
+
+        self.comboBox_sharepoint_site_list = QComboBox()
+        self.comboBox_sharepoint_site_list.setDisabled(True)
+
+        self.pushButton_get_libraries = QPushButton()
+        self.pushButton_get_libraries.setText("Get Shared Libraries")
+        self.pushButton_get_libraries.setDisabled(True)
+        self.pushButton_get_libraries.clicked.connect(self.get_library_drive_ids)
+
+        self.comboBox_sharepoint_library_list = QComboBox()
+        self.comboBox_sharepoint_library_list.setDisabled(True)
+
+        self.pushButton_create_profile = QPushButton()
+        self.pushButton_create_profile.clicked.connect(self.create_library_profile)
+        self.pushButton_create_profile.setText("Create Profile")
+        self.pushButton_create_profile.setDisabled(True)
+
+        for profile in global_config:
+            self.comboBox_profile_list.addItem(profile)
+
+        layout = QGridLayout()
+        layout.addWidget(self.label_1, 0, 0)
+        layout.addWidget(self.comboBox_profile_list, 0, 1)
+        layout.addWidget(self.label_2, 1, 0)
+        layout.addWidget(self.pushButton_get_sites, 1, 1)
+        layout.addWidget(self.label_3, 2, 0)
+        layout.addWidget(self.comboBox_sharepoint_site_list, 2, 1)
+        layout.addWidget(self.label_4, 3, 0)
+        layout.addWidget(self.pushButton_get_libraries, 3, 1)
+        layout.addWidget(self.label_5, 4, 0)
+        layout.addWidget(self.comboBox_sharepoint_library_list, 4, 1)
+        layout.addWidget(self.label_6, 5, 0)
+        layout.addWidget(self.pushButton_create_profile, 5, 1)
+
+        self.setLayout(layout)
+
+    def isComplete(self):
+        if self.pushButton_create_profile.text() == "Done":
+            return True
+        return False
+
+    def get_sharepoint_site_list(self):
+        profile_name = self.comboBox_profile_list.currentText()
+        options = "--get-O365-drive-id 'non-existent-library'"
+
+        self.pushButton_get_sites.setDisabled(True)
+        self.pushButton_get_sites.setText("Please wait...")
+
+        logging.info(
+            f"[GUI] Starting maintenance worker to obtain SharePoint Library List for profile {profile_name}."
+        )
+
+        self.obtain_sharepoint_site_list = MaintenanceWorker(profile_name, options)
+        self.obtain_sharepoint_site_list.start()
+        self.obtain_sharepoint_site_list.update_sharepoint_site_list.connect(
+            self.populate_comboBox_sharepoint_site_list
+        )
+
+    def get_library_drive_ids(self):
+        profile_name = self.comboBox_profile_list.currentText()
+        library_name = self.comboBox_sharepoint_site_list.currentText()
+        options = f"--get-O365-drive-id '{library_name}'"
+
+        self.pushButton_get_libraries.setText("Please wait...")
+        self.pushButton_get_libraries.setDisabled(True)
+        self.comboBox_sharepoint_site_list.setDisabled(True)
+
+        logging.info(
+            f"[GUI] Starting maintenance worker to obtain SharePoint Library Drive ID for library {library_name} from profile {profile_name}."
+        )
+
+        self.obtain_library_drive_ids = MaintenanceWorker(profile_name, options)
+        self.obtain_library_drive_ids.start()
+        self.obtain_library_drive_ids.update_library_list.connect(self.populate_comboBox_sharepoint_library_list)
+
+    def populate_comboBox_sharepoint_site_list(self, sharepoint_site_list):
+
+        if len(sharepoint_site_list) == 0:
+            self.comboBox_sharepoint_site_list.setPlaceholderText("Failed to fetch SharePoint Site list.")
+            self.comboBox_sharepoint_site_list.setDisabled(True)
+
+            self.pushButton_get_sites.setDisabled(False)
+            self.pushButton_get_sites.setText("Get SharePoint Sites")
+
+        else:
+            self.comboBox_sharepoint_site_list.setPlaceholderText("")
+            self.comboBox_sharepoint_site_list.addItems(sorted(sharepoint_site_list, key=str.casefold))
+            self.comboBox_sharepoint_site_list.setDisabled(False)
+
+            self.comboBox_profile_list.setDisabled(True)
+
+            self.pushButton_get_sites.setDisabled(True)
+            self.pushButton_get_sites.setText("Done")
+
+            self.comboBox_sharepoint_site_list.setDisabled(False)
+            self.pushButton_get_libraries.setDisabled(False)
+
+    def populate_comboBox_sharepoint_library_list(self, library_dict):
+        self.library_dict = library_dict
+
+        if len(library_dict) == 0:
+            self.comboBox_sharepoint_library_list.setPlaceholderText("Failed to fetch Shared Libraries.")
+            self.comboBox_sharepoint_library_list.setDisabled(True)
+
+            self.pushButton_get_libraries.setDisabled(False)
+            self.pushButton_get_libraries.setText("Get Shared Libraries")
+
+        else:
+            self.list_of_libraries = sorted(library_dict.keys(), key=str.casefold)
+
+            self.comboBox_sharepoint_library_list.setPlaceholderText("")
+            self.comboBox_sharepoint_library_list.addItems(self.list_of_libraries)
+            self.comboBox_sharepoint_library_list.setDisabled(False)
+
+            self.pushButton_get_libraries.setDisabled(True)
+            self.pushButton_get_libraries.setText("Done")
+
+            self.comboBox_sharepoint_site_list.setDisabled(True)
+            self.pushButton_create_profile.setDisabled(False)
+
+    def create_library_profile(self):
+        """
+        1 - Create new profile for SharePoint Library
+        2 - Load default settings
+        3 - Set 'sync_dir' based on Site and Library name
+        4 - Set 'drive_id'
+        """
+        logging.info(f"[GUI] Available Libraries:  {self.library_dict}")
+        _site_name = self.comboBox_sharepoint_site_list.currentText().replace(" ", "_")
+        _library_name = self.comboBox_sharepoint_library_list.currentText().replace(" ", "_")
+        _library_id = self.library_dict[_library_name]
+        profile_name = f"SharePoint_{_site_name}_{_library_name}"
+
+        sync_dir = os.path.expanduser(f"~/{profile_name}")
+        config_path = os.path.expanduser(f"~/.config/onedrive/accounts/{profile_name}/config")
+
+        # Load all default values.
+        _default_od_config = read_config(DIR_PATH + "/resources/default_config")
+        default_od_config = _default_od_config._sections
+
+        # Construct dict with user profile settings.
+        new_profile = {
+            profile_name: {"config_file": config_path, "enable_debug": False, "mode": "monitor", "auto_sync": False}
+        }
+
+        # Load existing user profiles and add the new profile.
+        _profiles = ConfigParser()
+        _profiles.read(PROFILES_FILE)
+        _profiles[profile_name] = new_profile[profile_name]
+
+        # Create profile config file if it does not exist.
+        profiles_dir = re.search(r"(.+)/profiles$", PROFILES_FILE).group(1)
+        if not os.path.exists(profiles_dir):
+            os.makedirs(profiles_dir)
+
+        # Save the new profile.
+        with open(PROFILES_FILE, "w") as profilefile:
+            _profiles.write(profilefile)
+
+        # Append default OD config
+        new_profile[profile_name].update(default_od_config)
+
+        # Configure sync directory
+        new_profile[profile_name]["onedrive"]["sync_dir"] = f'"{sync_dir}"'
+
+        # Set SharePoint Library Drive ID
+        new_profile[profile_name]["onedrive"]["drive_id"] = f'"{_library_id}"'
+
+        # Append new profile into running global profile
+        global_config.update(new_profile)
+
+        # Automatically save global config to prevent loss if user does not press 'Save' button.
+        save_global_config()
+
+        # Add Setting page widget for new profile
+        profile_settings_window.listWidget_profiles.addItem(profile_name)
+        self.setting_page = ProfileSettingsPage(profile_name)
+        profile_settings_window.stackedLayout.addWidget(self.setting_page)
+
+        # Add status page widget for new profile
+        main_window.comboBox.addItem(profile_name)
+        main_window.profile_status_pages[profile_name] = ProfileStatusPage(profile_name)
+        main_window.stackedLayout.addWidget(main_window.profile_status_pages[profile_name])
+
+        logging.info(f"Account {profile_name} has been created")
+        self.pushButton_create_profile.setText("Done")
+        self.pushButton_create_profile.setDisabled(True)
+        self.comboBox_sharepoint_library_list.setDisabled(True)
+
+        self.completeChanged.emit()
 
 
 class wizardPage_create(QWizardPage):
@@ -1211,6 +1461,135 @@ class TaskList(QWidget, Ui_list_item_widget):
             self.ls_progressBar.show()
 
 
+class MaintenanceWorker(QThread):
+    """
+    Performs various onedrive tasks asynchronously.
+    """
+
+    update_sharepoint_site_list = Signal(list)
+    update_library_list = Signal(dict)
+
+    def __init__(self, profile, options=""):
+        super(MaintenanceWorker, self).__init__()
+
+        self.options = options
+        self.profile = profile
+
+        logging.info(f"[GUI] Starting maintenance worker for profile {self.profile} {self.options}")
+
+        self.config_file = global_config[self.profile]["config_file"]
+        self.config_dir = re.search(r"(.+)/.+$", self.config_file).group(1)
+        logging.debug(f"[GUI] OneDrive config file: {self.config_file}")
+        logging.debug(f"[GUI] OneDrive config dir: {self.config_dir}")
+
+        self._command = f"exec onedrive --confdir='{self.config_dir}' -v {options}"
+        logging.debug(f"[GUI] Maintenance command: '{self._command}'")
+
+    def run(self):
+        logging.debug(f"[GUI] Starting Maintenance Worker")
+        self.onedrive_maintainer = subprocess.Popen(
+            self._command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=True,
+            universal_newlines=True,
+        )
+
+        if "--get-O365-drive-id 'non-existent-library'" in self.options:
+            # Trying to obtain Sharepoint Library list by searching a non-existent library name.
+            logging.info(f"[GUI] Trying to get list of SharePoint Sites...")
+            self.sharepoint_site_list = []
+
+            while self.onedrive_maintainer.poll() is None:
+                self.read_sharepoint_sites()
+
+            timeout = time.time() + 1
+            while True:
+                # When there are 1000+ of sites, the list may be printed several milliseconds after OneDrive process stops.
+                # This helps monitor stdout for extra second. I could not find a smarter way.
+                self.read_sharepoint_sites()
+                if time.time() > timeout:
+                    break
+
+            logging.info(f"[GUI] - Number of retrieved Shared libraries: {len(self.sharepoint_site_list)}")
+            self.update_sharepoint_site_list.emit(self.sharepoint_site_list)
+
+        elif "--get-O365-drive-id '" in self.options:
+            self.library_ids_dict = {}
+
+            # Obtain Drive ID of a specific Shared Library.
+            logging.info(f"[GUI] Trying to get Drive ID of shared library...")
+
+            while self.onedrive_maintainer.poll() is None:
+                self.read_library_drive_ids()
+
+            timeout = time.time() + 5
+            while True:
+                # When there are 1000+ of libraries, the list may be printed several milliseconds after OneDrive process stops.
+                # This helps monitor stdout for extra second. I could not find a smarter way.
+                self.read_library_drive_ids()
+                if time.time() > timeout:
+                    break
+
+            self.update_library_list.emit(self.library_ids_dict)
+
+    def read_library_drive_ids(self):
+        """
+        Reads returned Drive IDs of SharePoint Shared Libraries and emits them to GUI wizard.
+        """
+
+        if self.onedrive_maintainer.stdout:
+            stdout = self.onedrive_maintainer.stdout.readline()
+
+            if stdout.strip() == "":
+                pass
+            elif "Library Name:" in stdout:
+                library_name = re.match(r"^.+\:\s+(.+)$", stdout).group(1)
+                logging.info(f"[MaintenanceWorker][{self.profile}] Library Name: {library_name}")
+
+                self.library_ids_dict[library_name] = ""
+
+            elif "drive_id:" in stdout:
+                last_key = list(self.library_ids_dict.keys())[-1]
+
+                library_id = re.match(r"^.+\:\s+(.+)$", stdout).group(1)
+                logging.info(f"[MaintenanceWorker][{self.profile}] Library ID: {library_id}")
+
+                self.library_ids_dict[last_key] = library_id
+
+                # library_dict = {library_name: library_id}
+
+            if self.onedrive_maintainer.stderr:
+                stderr = self.onedrive_maintainer.stderr.readline()
+                if stderr != "":
+                    logging.error("@ERROR " + stderr)
+
+        # self.lib_drive_id = lib_drive_id
+
+        # return lib_drive_id
+
+    def read_sharepoint_sites(self):
+        """
+        Reads list of returned SharePoint Sites and emits them to GUI wizard.
+        """
+        if self.onedrive_maintainer.stdout:
+            stdout = self.onedrive_maintainer.stdout.readline()
+
+            if stdout.strip() == "":
+                pass
+            elif " * " in stdout:
+                site_name = re.match(r"^\s\*\s(.+)", stdout).group(1)
+                self.sharepoint_site_list.append(site_name)
+                logging.info(f"[MaintenanceWorker][{self.profile}] Retrieved SharePoint Site: {site_name}")
+            else:
+                logging.info(f"[MaintenanceWorker][{self.profile}] " + stdout.strip())
+
+        if self.onedrive_maintainer.stderr:
+            stderr = self.onedrive_maintainer.stderr.readline()
+            if stderr != "":
+                logging.error("@ERROR " + stderr)
+
+
 class WorkerThread(QThread):
     """
     Constructs a thread, which can start, monitor and stop OneDrive process.
@@ -1655,12 +2034,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
 
         if resync_question == QMessageBox.Yes:
-            print("Authorize sync: Yes")
+            logging.info("Authorize sync: Yes")
             main_window.profile_status_pages[profile_name].stop_monitor()
             self.start_onedrive_monitor(profile_name, "--resync --resync-auth")
 
         elif resync_question == QMessageBox.No:
-            print("Authorize sync: No")
+            logging.info("Authorize sync: No")
             main_window.profile_status_pages[profile_name].stop_monitor()
 
     def event_update_profile_status(self, data, profile):
