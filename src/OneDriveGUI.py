@@ -1003,6 +1003,18 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.label_profile_name.setText(self.profile)
         self.tabWidget.setCurrentIndex(0)
 
+        self.set_widget_values()
+
+        #
+        # Buttons
+        #
+        # self.pushButton_discard.hide()
+        # TODO: How to discard unsaved changes and refresh the widgets or close window?
+        self.pushButton_discard.clicked.connect(self.discard_changes)
+        self.pushButton_save.clicked.connect(self.save_profile_settings)
+        self.pushButton_save.clicked.connect(self.save_sync_list)
+
+    def set_widget_values(self):
         #
         # Monitored files tab
         #
@@ -1237,15 +1249,6 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         #
         self.textEdit_sync_list.setText(self.read_sync_list())
 
-        #
-        # Buttons
-        #
-        self.pushButton_discard.hide()
-        # TODO: How to discard unsaved changes and refresh the widgets or close window?
-        # self.pushButton_discard.clicked.connect(self.discard_changes)
-        self.pushButton_save.clicked.connect(self.save_profile_settings)
-        self.pushButton_save.clicked.connect(self.save_sync_list)
-
     def read_sync_list(self):
         self.sync_list_file = re.search(r"(.+)/.+$", self.config_file).group(1) + "/sync_list"
 
@@ -1436,9 +1439,9 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         logging.debug("save_profile_settings" + "global_config" + str(global_config))
         save_global_config()
 
-    # def discard_changes(self):
-    #     self.temp_profile_config = None
-    #     self.close()
+    def discard_changes(self):
+        self.temp_profile_config = copy.deepcopy(global_config[self.profile])
+        self.set_widget_values()
 
 
 class TaskList(QWidget, Ui_list_item_widget):
