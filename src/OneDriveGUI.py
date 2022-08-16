@@ -997,7 +997,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         # Set up the user interface from Designer.
         self.setupUi(self)
 
-        temp_global_config = global_config
+        temp_global_config = copy.deepcopy(global_config)
         self.temp_profile_config = temp_global_config[self.profile]
 
         self.label_profile_name.setText(self.profile)
@@ -1436,9 +1436,9 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         logging.debug("save_profile_settings" + "global_config" + str(global_config))
         save_global_config()
 
-    def discart_changes(self):
-        self.temp_profile_config = None
-        self.close()
+    # def discard_changes(self):
+    #     self.temp_profile_config = None
+    #     self.close()
 
 
 class TaskList(QWidget, Ui_list_item_widget):
