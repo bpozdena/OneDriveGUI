@@ -1922,6 +1922,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedLayout.setCurrentIndex(self.comboBox.currentIndex())
 
     def client_version_check(self):
+        """
+        Compare installed version of OneDrive client with the latest version on Github releases.
+        Show workings or prevent sync when installed version is too old.
+        """
         pixmap_warning = QPixmap(DIR_PATH + "/resources/images/warning.png").scaled(20, 20, Qt.KeepAspectRatio)
         s = requests.Session()
         version_label_text = ""
@@ -1966,8 +1970,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.profile_status_pages[profile_name].label_onedrive_status.setText(version_label_text)
 
                 if not min_requirements_met:
+                    # Disable Start Sync button if OneDrive client is too old (smaller then min_supported_version_num).
                     self.profile_status_pages[profile_name].toolButton_start.setEnabled(False)
                     self.profile_status_pages[profile_name].pushButton_settings.setEnabled(False)
+                    self.profile_status_pages[profile_name].label_version_check.setToolTip(version_tooltip_text)
+                    self.profile_status_pages[profile_name].label_version_check.setPixmap(pixmap_warning)
+
+                elif latest_client_version not in installed_client_version:
+                    # Display warning in GUI when installed OneDrive client is not up to date.
                     self.profile_status_pages[profile_name].label_version_check.setToolTip(version_tooltip_text)
                     self.profile_status_pages[profile_name].label_version_check.setPixmap(pixmap_warning)
 
