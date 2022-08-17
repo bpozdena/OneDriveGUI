@@ -35,6 +35,8 @@ from PySide6.QtWidgets import (
     QFileDialog,
     QMessageBox,
     QComboBox,
+    QStyledItemDelegate,
+    QStyleOptionViewItem,
 )
 from urllib3 import HTTPSConnectionPool
 
@@ -879,12 +881,58 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
         self.hide()
 
 
+class ProfileStatusPage(QWidget, Ui_status_page):
+    def __init__(self, profile_name):
+        super(ProfileStatusPage, self).__init__()
+
+        self.profile_name = profile_name
+
+        # Set up the user interface from Designer.
+        self.setupUi(self)
+
+        # Temporary start/stop buttons
+        self.toolButton_start.clicked.connect(self.start_monitor)
+        self.toolButton_stop.clicked.connect(self.stop_monitor)
+
+        # Open Sync Dir
+        self.pushButton_open_dir.clicked.connect(self.open_sync_dir)
+
+        # Open Settings window
+        self.pushButton_profiles.clicked.connect(lambda: profile_settings_window.show())
+        self.pushButton_profiles.clicked.connect(lambda: profile_settings_window.start_unsaved_changes_timer())
+
+        # Open GUI Settings window
+        self.pushButton_gui_settings.clicked.connect(self.show_gui_settings_window)
+
+    def open_sync_dir(self):
+        sync_dir = global_config[self.profile_name]["onedrive"]["sync_dir"].strip('"')
+        url = QUrl(os.path.expanduser(sync_dir))
+        QDesktopServices.openUrl(url)
+
+    def show_gui_settings_window(self):
+        self.gui_settings_window = GuiSettingsWindow()
+        self.gui_settings_window.show()
+
+    def stop_monitor(self):
+        if self.profile_name in main_window.workers:
+            main_window.workers[self.profile_name].stop_worker()
+            self.label_onedrive_status.setText("OneDrive sync has been stopped")
+            logging.info(f"OneDrive sync for profile {self.profile_name} has been stopped.")
+        else:
+            logging.info(f"OneDrive for profile {self.profile_name} is not running.")
+
+    def start_monitor(self):
+        main_window.start_onedrive_monitor(self.profile_name)
+
+
 class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
     def __init__(self):
         super(ProfileSettingsWindow, self).__init__()
 
         self.setupUi(self)
         self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-48.png"))
+        self.delegate = ListItemDelegate()
+        self.listWidget_profiles.setItemDelegate(self.delegate)
 
         self.stackedLayout = QStackedLayout()
 
@@ -903,8 +951,23 @@ class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
         self.pushButton_create_import.clicked.connect(self.show_setup_wizard)
 
     def closeEvent(self, event):
+        self.stop_unsaved_changes_timer()
         event.ignore()
         self.hide()
+
+    def stop_unsaved_changes_timer(self):
+        """Stops checking for unsaved changes when Profile Settings Window is closed to save CPU resources."""
+
+        logging.debug("[GUI] Stopping timer for unsaved changes checker")
+        for widget_num in range(self.stackedLayout.count()):
+            self.stackedLayout.widget(widget_num).timer_unsaved_changes.stop()
+
+    def start_unsaved_changes_timer(self):
+        """Start checking for unsaved changes when Profile Settings Window is opened."""
+
+        logging.debug("[GUI] Starting timer for unsaved changes checker")
+        for widget_num in range(self.stackedLayout.count()):
+            self.stackedLayout.widget(widget_num).timer_unsaved_changes.start(500)
 
     def switch_account_settings_page(self):
         self.stackedLayout.setCurrentIndex(self.listWidget_profiles.currentRow())
@@ -939,47 +1002,14 @@ class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
             _profiles.write(profilefile)
 
 
-class ProfileStatusPage(QWidget, Ui_status_page):
-    def __init__(self, profile_name):
-        super(ProfileStatusPage, self).__init__()
+class ListItemDelegate(QStyledItemDelegate):
+    """
+    Ensures a warning icon for unsaved profile changes is shown right of the profile name.
+    """
 
-        self.profile_name = profile_name
-
-        # Set up the user interface from Designer.
-        self.setupUi(self)
-
-        # Temporary start/stop buttons
-        self.toolButton_start.clicked.connect(self.start_monitor)
-        self.toolButton_stop.clicked.connect(self.stop_monitor)
-
-        # Open Sync Dir
-        self.pushButton_open_dir.clicked.connect(self.open_sync_dir)
-
-        # Open Settings window
-        self.pushButton_profiles.clicked.connect(lambda: profile_settings_window.show())
-
-        # Open GUI Settings window
-        self.pushButton_gui_settings.clicked.connect(self.show_gui_settings_window)
-
-    def open_sync_dir(self):
-        sync_dir = global_config[self.profile_name]["onedrive"]["sync_dir"].strip('"')
-        url = QUrl(os.path.expanduser(sync_dir))
-        QDesktopServices.openUrl(url)
-
-    def show_gui_settings_window(self):
-        self.gui_settings_window = GuiSettingsWindow()
-        self.gui_settings_window.show()
-
-    def stop_monitor(self):
-        if self.profile_name in main_window.workers:
-            main_window.workers[self.profile_name].stop_worker()
-            self.label_onedrive_status.setText("OneDrive sync has been stopped")
-            logging.info(f"OneDrive sync for profile {self.profile_name} has been stopped.")
-        else:
-            logging.info(f"OneDrive for profile {self.profile_name} is not running.")
-
-    def start_monitor(self):
-        main_window.start_onedrive_monitor(self.profile_name)
+    def paint(self, painter, option, index):
+        option.decorationPosition = QStyleOptionViewItem.Right
+        super(ListItemDelegate, self).paint(painter, option, index)
 
 
 class ProfileSettingsPage(QWidget, Ui_profile_settings):
@@ -1003,6 +1033,34 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.pushButton_discard.clicked.connect(self.discard_changes)
         self.pushButton_save.clicked.connect(self.save_profile_settings)
         self.pushButton_save.clicked.connect(self.save_sync_list)
+
+        # Time which periodically checks for unsaved changes.
+        self.timer_unsaved_changes = QTimer()
+        self.timer_unsaved_changes.setSingleShot(False)
+        self.timer_unsaved_changes.timeout.connect(self.check_for_unsaved_changes)
+        self.timer_unsaved_changes.stop()
+
+    def check_for_unsaved_changes(self):
+        """
+        Compare saved profile configuration with 'running' temporary configuration.
+        Show a warning icon next to unsaved profile name.
+        Remove the warning icon when profile changes are reverted or saved.
+        """
+
+        pixmap_warning = QPixmap(DIR_PATH + "/resources/images/warning.png").scaled(20, 20, Qt.KeepAspectRatio)
+        matching_profile_item = profile_settings_window.listWidget_profiles.findItems(self.profile, Qt.MatchExactly)[0]
+
+        if global_config[self.profile] != self.temp_profile_config:
+            # logging.debug(f"[{self.profile}] Unsaved changes detected")
+
+            matching_profile_item.setIcon(pixmap_warning)
+            matching_profile_item.setToolTip("This profile has unsaved configuration changes.")
+
+        else:
+            pixmap_warning = QPixmap().isNull()
+            matching_profile_item.setIcon(QIcon())
+            matching_profile_item.setToolTip("")
+            # logging.debug(f"[{self.profile}] No unsaved changes")
 
     def set_widget_values(self):
         # Monitored files tab
@@ -1407,7 +1465,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
             list.remove(item.text())
 
     def save_profile_settings(self):
-        global_config[self.profile].update(self.temp_profile_config)
+        global_config[self.profile] = copy.deepcopy(self.temp_profile_config)
         logging.debug("save_profile_settings" + "self.temp_profile_config" + str(self.temp_profile_config))
         logging.debug("save_profile_settings" + "global_config" + str(global_config))
         save_global_config()
