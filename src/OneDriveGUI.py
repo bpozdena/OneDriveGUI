@@ -895,6 +895,8 @@ class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
             self.stackedLayout.addWidget(self.page)
 
         self.horizontalLayout.addLayout(self.stackedLayout)
+
+        self.listWidget_profiles.setCurrentRow(0)
         self.listWidget_profiles.itemSelectionChanged.connect(self.switch_account_settings_page)
 
         self.pushButton_remove.clicked.connect(self.remove_profile)
