@@ -18,7 +18,7 @@ AppDir:
     id: io.github.bpozdena.OneDriveGUI
     name: OneDriveGUI
     icon: OneDriveGUI
-    version: 0.2.4
+    version: 1.0.0
     exec: usr/bin/python3
     exec_args: "$APPDIR/usr/src/OneDriveGUI.py $@"
 
