@@ -928,6 +928,7 @@ class ProfileStatusPage(QWidget, Ui_status_page):
 class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
     def __init__(self):
         super(ProfileSettingsWindow, self).__init__()
+        self.unsaved_profiles = []
 
         self.setupUi(self)
         self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-48.png"))
@@ -951,9 +952,33 @@ class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
         self.pushButton_create_import.clicked.connect(self.show_setup_wizard)
 
     def closeEvent(self, event):
-        self.stop_unsaved_changes_timer()
         event.ignore()
-        self.hide()
+        if len(self.unsaved_profiles) != 0:
+            self.close_window_dialog()
+        else:
+            self.hide()
+            self.stop_unsaved_changes_timer()
+            logging.debug("[GUI] Closing Profiles window.")
+
+    def close_window_dialog(self):
+        close_question = QMessageBox.question(
+            self,
+            "Discard changes?",
+            f"You have unsaved changes in profile(s) <b>{', '.join(self.unsaved_profiles)}</b>."
+            "<br><br> Discard changes and close Profiles window?",
+            buttons=QMessageBox.Yes | QMessageBox.No,
+            defaultButton=QMessageBox.No,
+        )
+
+        if close_question == QMessageBox.Yes:
+            logging.debug("[GUI] Discarding changes and closing Profiles window.")
+            self.hide()
+            self.stop_unsaved_changes_timer()
+            for widget_num in range(self.stackedLayout.count()):
+                self.stackedLayout.widget(widget_num).discard_changes()
+
+        elif close_question == QMessageBox.No:
+            logging.debug("[GUI] Keeping Profiles window open.")
 
     def stop_unsaved_changes_timer(self):
         """Stops checking for unsaved changes when Profile Settings Window is closed to save CPU resources."""
@@ -1056,11 +1081,17 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
             matching_profile_item.setIcon(pixmap_warning)
             matching_profile_item.setToolTip("This profile has unsaved configuration changes.")
 
+            if self.profile not in profile_settings_window.unsaved_profiles:
+                profile_settings_window.unsaved_profiles.append(self.profile)
+
         else:
+            # logging.debug(f"[{self.profile}] No unsaved changes")
             pixmap_warning = QPixmap().isNull()
             matching_profile_item.setIcon(QIcon())
             matching_profile_item.setToolTip("")
-            # logging.debug(f"[{self.profile}] No unsaved changes")
+
+            if self.profile in profile_settings_window.unsaved_profiles:
+                profile_settings_window.unsaved_profiles.remove(self.profile)
 
     def set_widget_values(self):
         # Monitored files tab
