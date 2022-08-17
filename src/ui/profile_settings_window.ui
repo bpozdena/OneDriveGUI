@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>272</width>
+    <width>372</width>
     <height>800</height>
    </rect>
   </property>
@@ -32,7 +32,7 @@
         <widget class="QListWidget" name="listWidget_profiles">
          <property name="minimumSize">
           <size>
-           <width>200</width>
+           <width>350</width>
            <height>0</height>
           </size>
          </property>

@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'profile_settings_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.2
+## Created by: Qt User Interface Compiler version 6.2.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -23,7 +23,7 @@ class Ui_profile_settings_window(object):
     def setupUi(self, profile_settings_window):
         if not profile_settings_window.objectName():
             profile_settings_window.setObjectName(u"profile_settings_window")
-        profile_settings_window.resize(272, 800)
+        profile_settings_window.resize(372, 800)
         self.verticalLayout_2 = QVBoxLayout(profile_settings_window)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.horizontalLayout = QHBoxLayout()
@@ -38,7 +38,7 @@ class Ui_profile_settings_window(object):
 
         self.listWidget_profiles = QListWidget(profile_settings_window)
         self.listWidget_profiles.setObjectName(u"listWidget_profiles")
-        self.listWidget_profiles.setMinimumSize(QSize(200, 0))
+        self.listWidget_profiles.setMinimumSize(QSize(350, 0))
         self.listWidget_profiles.setMaximumSize(QSize(250, 16777215))
 
         self.verticalLayout.addWidget(self.listWidget_profiles)
