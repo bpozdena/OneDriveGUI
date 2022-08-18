@@ -336,7 +336,7 @@ class wizardPage_create_shared_library(QWizardPage):
 
     def get_sharepoint_site_list(self):
         """
-        Starts OneDrive with --get-O365-drive-id argument and populates comboBox with emitted list of SharePoint Sites.
+        Starts OneDrive with --get-O365-drive-id argument and populates comboBox list of SharePoint Sites emitted by MaintenanceWorker.
         """
         profile_name = self.comboBox_profile_list.currentText()
         options = "--get-O365-drive-id 'non-existent-library'"
@@ -1052,7 +1052,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.label_profile_name.setText(self.profile)
         self.tabWidget.setCurrentIndex(0)
 
-        self.set_widget_values()
+        self.configure_profile_settings_page()
 
         # Buttons
         self.pushButton_discard.clicked.connect(self.discard_changes)
@@ -1064,6 +1064,39 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.timer_unsaved_changes.setSingleShot(False)
         self.timer_unsaved_changes.timeout.connect(self.check_for_unsaved_changes)
         self.timer_unsaved_changes.stop()
+
+    def get_business_shared_folders(self):
+        """
+        Starts OneDrive with --list-shared-folders argument and populates QListWidget list of SharePoint Sites emitted by MaintenanceWorker.
+        """
+        options = "--list-shared-folders"
+
+        self.listWidget_available_business_folders.clear()
+
+        self.pushButton_get_business_folders.setDisabled(True)
+        self.pushButton_get_business_folders.setText("Please wait...")
+
+        self.worker_business_shared_folders = MaintenanceWorker(self.profile, options)
+        self.worker_business_shared_folders.start()
+        self.worker_business_shared_folders.update_business_folder_list.connect(
+            self.populate_listWidget_available_business_folders
+        )
+
+    def populate_listWidget_available_business_folders(self, business_folder_list):
+        """
+        Populates listWidget_available_business_folders with a list of emitted Business Shared Folders.
+        """
+        if len(business_folder_list) == 0:
+            self.listWidget_available_business_folders.setDisabled(True)
+            self.pushButton_get_business_folders.setDisabled(False)
+            self.pushButton_get_business_folders.setText("Retry getting Business Shared Folders")
+
+        else:
+            self.listWidget_available_business_folders.addItems(sorted(business_folder_list, key=str.casefold))
+            self.listWidget_available_business_folders.setDisabled(False)
+
+            self.pushButton_get_business_folders.setText("Update Business Shared Folders")
+            self.pushButton_get_business_folders.setDisabled(False)
 
     def check_for_unsaved_changes(self):
         """
@@ -1093,7 +1126,13 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
             if self.profile in profile_settings_window.unsaved_profiles:
                 profile_settings_window.unsaved_profiles.remove(self.profile)
 
-    def set_widget_values(self):
+    def configure_profile_settings_page(self):
+        """Sets all widgets values with values from profile config files"""
+
+        # Business Shared Folders
+        self.pushButton_get_business_folders.clicked.connect(self.get_business_shared_folders)
+        self.listWidget_available_business_folders.setDisabled(True)
+
         # Monitored files tab
         self.lineEdit_sync_dir.setText(self.temp_profile_config["onedrive"]["sync_dir"].strip('"'))
         self.lineEdit_sync_dir.textChanged.connect(self.set_sync_dir)
@@ -1503,7 +1542,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
 
     def discard_changes(self):
         self.temp_profile_config = copy.deepcopy(global_config[self.profile])
-        self.set_widget_values()
+        self.configure_profile_settings_page()
 
 
 class TaskList(QWidget, Ui_list_item_widget):
@@ -1550,6 +1589,7 @@ class MaintenanceWorker(QThread):
 
     update_sharepoint_site_list = Signal(list)
     update_library_list = Signal(dict)
+    update_business_folder_list = Signal(list)
 
     def __init__(self, profile, options=""):
         super(MaintenanceWorker, self).__init__()
@@ -1587,8 +1627,7 @@ class MaintenanceWorker(QThread):
 
             timeout = time.time() + 1
             while True:
-                # When there are 1000+ of sites, the list may be printed several milliseconds after OneDrive process stops.
-                # This helps monitor stdout for extra second. I could not find a smarter way.
+                # This helps monitor stdout for extra second after onedrive process stops. I could not find a smarter way.
                 self.read_sharepoint_sites()
                 if time.time() > timeout:
                     break
@@ -1607,13 +1646,27 @@ class MaintenanceWorker(QThread):
 
             timeout = time.time() + 5
             while True:
-                # When there are 1000+ of libraries, the list may be printed several milliseconds after OneDrive process stops.
-                # This helps monitor stdout for extra second. I could not find a smarter way.
+                # This helps monitor stdout for extra second after onedrive process stops. I could not find a smarter way.
                 self.read_library_drive_ids()
                 if time.time() > timeout:
                     break
 
             self.update_library_list.emit(self.library_ids_dict)
+
+        elif "--list-shared-folders" in self.options:
+            self.business_folder_list = []
+
+            while self.onedrive_maintainer.poll() is None:
+                self.read_shared_business_folders()
+
+            timeout = time.time() + 1
+            while True:
+                # This helps monitor stdout for extra second after onedrive process stops. I could not find a smarter way.
+                self.read_shared_business_folders()
+                if time.time() > timeout:
+                    break
+
+            self.update_business_folder_list.emit(self.business_folder_list)
 
     def read_library_drive_ids(self):
         """
@@ -1643,6 +1696,27 @@ class MaintenanceWorker(QThread):
                 stderr = self.onedrive_maintainer.stderr.readline()
                 if stderr != "":
                     logging.error("@ERROR " + stderr)
+
+    def read_shared_business_folders(self):
+        """
+        Reads list of returned Shared Business Folders and emits them to GUI.
+        """
+        if self.onedrive_maintainer.stdout:
+            stdout = self.onedrive_maintainer.stdout.readline()
+
+            if stdout.strip() == "":
+                pass
+            elif "Shared Folder:" in stdout:
+                folder_name = re.match(r"^.+:\s+(.+)$", stdout).group(1)
+                self.business_folder_list.append(folder_name)
+                logging.info(f"[MaintenanceWorker][{self.profile}] Retrieved Business Shared Folder: {folder_name}")
+            else:
+                logging.info(f"[MaintenanceWorker][{self.profile}] " + stdout.strip())
+
+        if self.onedrive_maintainer.stderr:
+            stderr = self.onedrive_maintainer.stderr.readline()
+            if stderr != "":
+                logging.error("@ERROR " + stderr)
 
     def read_sharepoint_sites(self):
         """

@@ -25,7 +25,7 @@ class Ui_profile_settings(object):
     def setupUi(self, profile_settings):
         if not profile_settings.objectName():
             profile_settings.setObjectName(u"profile_settings")
-        profile_settings.resize(800, 780)
+        profile_settings.resize(820, 692)
         self.verticalLayout_2 = QVBoxLayout(profile_settings)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout_2.setContentsMargins(-1, 0, -1, 0)
@@ -39,16 +39,16 @@ class Ui_profile_settings(object):
 
         self.verticalLayout_2.addWidget(self.label_profile_name)
 
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.verticalLayout_13 = QVBoxLayout()
+        self.verticalLayout_13.setObjectName(u"verticalLayout_13")
         self.tabWidget = QTabWidget(profile_settings)
         self.tabWidget.setObjectName(u"tabWidget")
         self.tabWidget.setMinimumSize(QSize(650, 600))
-        self.exemptions_tab_2 = QWidget()
-        self.exemptions_tab_2.setObjectName(u"exemptions_tab_2")
-        self.verticalLayout_5 = QVBoxLayout(self.exemptions_tab_2)
+        self.monitored_tab_2 = QWidget()
+        self.monitored_tab_2.setObjectName(u"monitored_tab_2")
+        self.verticalLayout_5 = QVBoxLayout(self.monitored_tab_2)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.groupBox_8 = QGroupBox(self.exemptions_tab_2)
+        self.groupBox_8 = QGroupBox(self.monitored_tab_2)
         self.groupBox_8.setObjectName(u"groupBox_8")
         self.gridLayout_9 = QGridLayout(self.groupBox_8)
         self.gridLayout_9.setObjectName(u"gridLayout_9")
@@ -75,29 +75,33 @@ class Ui_profile_settings(object):
 
         self.verticalLayout_5.addWidget(self.groupBox_8)
 
-        self.groupBox_11 = QGroupBox(self.exemptions_tab_2)
-        self.groupBox_11.setObjectName(u"groupBox_11")
-        self.verticalLayout_11 = QVBoxLayout(self.groupBox_11)
-        self.verticalLayout_11.setObjectName(u"verticalLayout_11")
-        self.label_sync_list = QLabel(self.groupBox_11)
-        self.label_sync_list.setObjectName(u"label_sync_list")
+        self.groupBox_12 = QGroupBox(self.monitored_tab_2)
+        self.groupBox_12.setObjectName(u"groupBox_12")
+        self.gridLayout_3 = QGridLayout(self.groupBox_12)
+        self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.checkBox_auto_sync = QCheckBox(self.groupBox_12)
+        self.checkBox_auto_sync.setObjectName(u"checkBox_auto_sync")
 
-        self.verticalLayout_11.addWidget(self.label_sync_list)
+        self.gridLayout_3.addWidget(self.checkBox_auto_sync, 0, 0, 1, 1)
 
-        self.checkBox_sync_root_files = QCheckBox(self.groupBox_11)
-        self.checkBox_sync_root_files.setObjectName(u"checkBox_sync_root_files")
+        self.pushButton_logout = QPushButton(self.groupBox_12)
+        self.pushButton_logout.setObjectName(u"pushButton_logout")
 
-        self.verticalLayout_11.addWidget(self.checkBox_sync_root_files)
+        self.gridLayout_3.addWidget(self.pushButton_logout, 2, 0, 1, 1)
 
-        self.textEdit_sync_list = QTextEdit(self.groupBox_11)
-        self.textEdit_sync_list.setObjectName(u"textEdit_sync_list")
+        self.pushButton_login = QPushButton(self.groupBox_12)
+        self.pushButton_login.setObjectName(u"pushButton_login")
 
-        self.verticalLayout_11.addWidget(self.textEdit_sync_list)
+        self.gridLayout_3.addWidget(self.pushButton_login, 1, 0, 1, 1)
 
 
-        self.verticalLayout_5.addWidget(self.groupBox_11)
+        self.verticalLayout_5.addWidget(self.groupBox_12)
 
-        self.tabWidget.addTab(self.exemptions_tab_2, "")
+        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_5.addItem(self.verticalSpacer_3)
+
+        self.tabWidget.addTab(self.monitored_tab_2, "")
         self.tab = QWidget()
         self.tab.setObjectName(u"tab")
         self.verticalLayout_7 = QVBoxLayout(self.tab)
@@ -214,6 +218,33 @@ class Ui_profile_settings(object):
         self.verticalLayout_7.addWidget(self.groupBox_3)
 
         self.tabWidget.addTab(self.tab, "")
+        self.tab_3 = QWidget()
+        self.tab_3.setObjectName(u"tab_3")
+        self.verticalLayout_10 = QVBoxLayout(self.tab_3)
+        self.verticalLayout_10.setObjectName(u"verticalLayout_10")
+        self.groupBox_11 = QGroupBox(self.tab_3)
+        self.groupBox_11.setObjectName(u"groupBox_11")
+        self.verticalLayout_11 = QVBoxLayout(self.groupBox_11)
+        self.verticalLayout_11.setObjectName(u"verticalLayout_11")
+        self.label_sync_list = QLabel(self.groupBox_11)
+        self.label_sync_list.setObjectName(u"label_sync_list")
+
+        self.verticalLayout_11.addWidget(self.label_sync_list)
+
+        self.checkBox_sync_root_files = QCheckBox(self.groupBox_11)
+        self.checkBox_sync_root_files.setObjectName(u"checkBox_sync_root_files")
+
+        self.verticalLayout_11.addWidget(self.checkBox_sync_root_files)
+
+        self.textEdit_sync_list = QTextEdit(self.groupBox_11)
+        self.textEdit_sync_list.setObjectName(u"textEdit_sync_list")
+
+        self.verticalLayout_11.addWidget(self.textEdit_sync_list)
+
+
+        self.verticalLayout_10.addWidget(self.groupBox_11)
+
+        self.tabWidget.addTab(self.tab_3, "")
         self.tab_2 = QWidget()
         self.tab_2.setObjectName(u"tab_2")
         self.verticalLayout_8 = QVBoxLayout(self.tab_2)
@@ -259,117 +290,136 @@ class Ui_profile_settings(object):
 
         self.groupBox_4 = QGroupBox(self.tab_2)
         self.groupBox_4.setObjectName(u"groupBox_4")
-        self.formLayout = QFormLayout(self.groupBox_4)
-        self.formLayout.setObjectName(u"formLayout")
+        self.horizontalLayout = QHBoxLayout(self.groupBox_4)
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.formLayout_4 = QFormLayout()
+        self.formLayout_4.setObjectName(u"formLayout_4")
         self.label_monitor_interval = QLabel(self.groupBox_4)
         self.label_monitor_interval.setObjectName(u"label_monitor_interval")
 
-        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.label_monitor_interval)
+        self.formLayout_4.setWidget(0, QFormLayout.LabelRole, self.label_monitor_interval)
 
         self.spinBox_monitor_interval = QSpinBox(self.groupBox_4)
         self.spinBox_monitor_interval.setObjectName(u"spinBox_monitor_interval")
         self.spinBox_monitor_interval.setMaximum(1000000)
 
-        self.formLayout.setWidget(0, QFormLayout.FieldRole, self.spinBox_monitor_interval)
+        self.formLayout_4.setWidget(0, QFormLayout.FieldRole, self.spinBox_monitor_interval)
 
         self.label_monitor_fullscan_frequency = QLabel(self.groupBox_4)
         self.label_monitor_fullscan_frequency.setObjectName(u"label_monitor_fullscan_frequency")
 
-        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.label_monitor_fullscan_frequency)
+        self.formLayout_4.setWidget(1, QFormLayout.LabelRole, self.label_monitor_fullscan_frequency)
 
         self.spinBox_monitor_fullscan_frequency = QSpinBox(self.groupBox_4)
         self.spinBox_monitor_fullscan_frequency.setObjectName(u"spinBox_monitor_fullscan_frequency")
         self.spinBox_monitor_fullscan_frequency.setMaximum(1000000)
 
-        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.spinBox_monitor_fullscan_frequency)
+        self.formLayout_4.setWidget(1, QFormLayout.FieldRole, self.spinBox_monitor_fullscan_frequency)
 
         self.label_classify_as_big_delete = QLabel(self.groupBox_4)
         self.label_classify_as_big_delete.setObjectName(u"label_classify_as_big_delete")
 
-        self.formLayout.setWidget(2, QFormLayout.LabelRole, self.label_classify_as_big_delete)
+        self.formLayout_4.setWidget(2, QFormLayout.LabelRole, self.label_classify_as_big_delete)
 
         self.spinBox_classify_as_big_delete = QSpinBox(self.groupBox_4)
         self.spinBox_classify_as_big_delete.setObjectName(u"spinBox_classify_as_big_delete")
         self.spinBox_classify_as_big_delete.setMaximum(1000000)
 
-        self.formLayout.setWidget(2, QFormLayout.FieldRole, self.spinBox_classify_as_big_delete)
-
-        self.label_user_agent = QLabel(self.groupBox_4)
-        self.label_user_agent.setObjectName(u"label_user_agent")
-
-        self.formLayout.setWidget(5, QFormLayout.LabelRole, self.label_user_agent)
-
-        self.lineEdit_user_agent = QLineEdit(self.groupBox_4)
-        self.lineEdit_user_agent.setObjectName(u"lineEdit_user_agent")
-        self.lineEdit_user_agent.setMaximumSize(QSize(200, 16777215))
-        self.lineEdit_user_agent.setMaxLength(32767)
-
-        self.formLayout.setWidget(5, QFormLayout.FieldRole, self.lineEdit_user_agent)
-
-        self.label_azure_ad_endpoint = QLabel(self.groupBox_4)
-        self.label_azure_ad_endpoint.setObjectName(u"label_azure_ad_endpoint")
-
-        self.formLayout.setWidget(6, QFormLayout.LabelRole, self.label_azure_ad_endpoint)
-
-        self.lineEdit_azure_ad_endpoint = QLineEdit(self.groupBox_4)
-        self.lineEdit_azure_ad_endpoint.setObjectName(u"lineEdit_azure_ad_endpoint")
-        self.lineEdit_azure_ad_endpoint.setMaximumSize(QSize(200, 16777215))
-
-        self.formLayout.setWidget(6, QFormLayout.FieldRole, self.lineEdit_azure_ad_endpoint)
-
-        self.label_azure_tenant_id = QLabel(self.groupBox_4)
-        self.label_azure_tenant_id.setObjectName(u"label_azure_tenant_id")
-
-        self.formLayout.setWidget(7, QFormLayout.LabelRole, self.label_azure_tenant_id)
-
-        self.lineEdit_azure_tenant_id = QLineEdit(self.groupBox_4)
-        self.lineEdit_azure_tenant_id.setObjectName(u"lineEdit_azure_tenant_id")
-        self.lineEdit_azure_tenant_id.setMaximumSize(QSize(200, 16777215))
-
-        self.formLayout.setWidget(7, QFormLayout.FieldRole, self.lineEdit_azure_tenant_id)
-
-        self.label_sync_dir_permissions = QLabel(self.groupBox_4)
-        self.label_sync_dir_permissions.setObjectName(u"label_sync_dir_permissions")
-
-        self.formLayout.setWidget(8, QFormLayout.LabelRole, self.label_sync_dir_permissions)
-
-        self.spinBox_sync_dir_permissions = QSpinBox(self.groupBox_4)
-        self.spinBox_sync_dir_permissions.setObjectName(u"spinBox_sync_dir_permissions")
-        self.spinBox_sync_dir_permissions.setMaximum(777)
-
-        self.formLayout.setWidget(8, QFormLayout.FieldRole, self.spinBox_sync_dir_permissions)
-
-        self.label_sync_file_permissions = QLabel(self.groupBox_4)
-        self.label_sync_file_permissions.setObjectName(u"label_sync_file_permissions")
-
-        self.formLayout.setWidget(9, QFormLayout.LabelRole, self.label_sync_file_permissions)
-
-        self.spinBox_sync_file_permissions = QSpinBox(self.groupBox_4)
-        self.spinBox_sync_file_permissions.setObjectName(u"spinBox_sync_file_permissions")
-        self.spinBox_sync_file_permissions.setMaximum(777)
-
-        self.formLayout.setWidget(9, QFormLayout.FieldRole, self.spinBox_sync_file_permissions)
+        self.formLayout_4.setWidget(2, QFormLayout.FieldRole, self.spinBox_classify_as_big_delete)
 
         self.label_operation_timeout = QLabel(self.groupBox_4)
         self.label_operation_timeout.setObjectName(u"label_operation_timeout")
 
-        self.formLayout.setWidget(10, QFormLayout.LabelRole, self.label_operation_timeout)
+        self.formLayout_4.setWidget(3, QFormLayout.LabelRole, self.label_operation_timeout)
 
         self.spinBox_operation_timeout = QSpinBox(self.groupBox_4)
         self.spinBox_operation_timeout.setObjectName(u"spinBox_operation_timeout")
         self.spinBox_operation_timeout.setMaximum(1000000)
 
-        self.formLayout.setWidget(10, QFormLayout.FieldRole, self.spinBox_operation_timeout)
+        self.formLayout_4.setWidget(3, QFormLayout.FieldRole, self.spinBox_operation_timeout)
 
         self.label_drive_id = QLabel(self.groupBox_4)
         self.label_drive_id.setObjectName(u"label_drive_id")
 
-        self.formLayout.setWidget(3, QFormLayout.LabelRole, self.label_drive_id)
+        self.formLayout_4.setWidget(4, QFormLayout.LabelRole, self.label_drive_id)
 
         self.lineEdit_drive_id = QLineEdit(self.groupBox_4)
         self.lineEdit_drive_id.setObjectName(u"lineEdit_drive_id")
 
-        self.formLayout.setWidget(3, QFormLayout.FieldRole, self.lineEdit_drive_id)
+        self.formLayout_4.setWidget(4, QFormLayout.FieldRole, self.lineEdit_drive_id)
+
+
+        self.horizontalLayout.addLayout(self.formLayout_4)
+
+        self.gridLayout_10 = QGridLayout()
+        self.gridLayout_10.setObjectName(u"gridLayout_10")
+        self.horizontalSpacer_2 = QSpacerItem(20, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+
+        self.gridLayout_10.addItem(self.horizontalSpacer_2, 0, 0, 1, 1)
+
+
+        self.horizontalLayout.addLayout(self.gridLayout_10)
+
+        self.formLayout_5 = QFormLayout()
+        self.formLayout_5.setObjectName(u"formLayout_5")
+        self.label_sync_file_permissions = QLabel(self.groupBox_4)
+        self.label_sync_file_permissions.setObjectName(u"label_sync_file_permissions")
+
+        self.formLayout_5.setWidget(0, QFormLayout.LabelRole, self.label_sync_file_permissions)
+
+        self.spinBox_sync_file_permissions = QSpinBox(self.groupBox_4)
+        self.spinBox_sync_file_permissions.setObjectName(u"spinBox_sync_file_permissions")
+        self.spinBox_sync_file_permissions.setMaximum(777)
+
+        self.formLayout_5.setWidget(0, QFormLayout.FieldRole, self.spinBox_sync_file_permissions)
+
+        self.label_sync_dir_permissions = QLabel(self.groupBox_4)
+        self.label_sync_dir_permissions.setObjectName(u"label_sync_dir_permissions")
+
+        self.formLayout_5.setWidget(1, QFormLayout.LabelRole, self.label_sync_dir_permissions)
+
+        self.spinBox_sync_dir_permissions = QSpinBox(self.groupBox_4)
+        self.spinBox_sync_dir_permissions.setObjectName(u"spinBox_sync_dir_permissions")
+        self.spinBox_sync_dir_permissions.setMaximum(777)
+
+        self.formLayout_5.setWidget(1, QFormLayout.FieldRole, self.spinBox_sync_dir_permissions)
+
+        self.label_user_agent = QLabel(self.groupBox_4)
+        self.label_user_agent.setObjectName(u"label_user_agent")
+
+        self.formLayout_5.setWidget(2, QFormLayout.LabelRole, self.label_user_agent)
+
+        self.lineEdit_user_agent = QLineEdit(self.groupBox_4)
+        self.lineEdit_user_agent.setObjectName(u"lineEdit_user_agent")
+        self.lineEdit_user_agent.setMaximumSize(QSize(16777215, 16777215))
+        self.lineEdit_user_agent.setMaxLength(32767)
+
+        self.formLayout_5.setWidget(2, QFormLayout.FieldRole, self.lineEdit_user_agent)
+
+        self.label_azure_ad_endpoint = QLabel(self.groupBox_4)
+        self.label_azure_ad_endpoint.setObjectName(u"label_azure_ad_endpoint")
+
+        self.formLayout_5.setWidget(3, QFormLayout.LabelRole, self.label_azure_ad_endpoint)
+
+        self.lineEdit_azure_ad_endpoint = QLineEdit(self.groupBox_4)
+        self.lineEdit_azure_ad_endpoint.setObjectName(u"lineEdit_azure_ad_endpoint")
+        self.lineEdit_azure_ad_endpoint.setMaximumSize(QSize(16777215, 16777215))
+
+        self.formLayout_5.setWidget(3, QFormLayout.FieldRole, self.lineEdit_azure_ad_endpoint)
+
+        self.label_azure_tenant_id = QLabel(self.groupBox_4)
+        self.label_azure_tenant_id.setObjectName(u"label_azure_tenant_id")
+
+        self.formLayout_5.setWidget(4, QFormLayout.LabelRole, self.label_azure_tenant_id)
+
+        self.lineEdit_azure_tenant_id = QLineEdit(self.groupBox_4)
+        self.lineEdit_azure_tenant_id.setObjectName(u"lineEdit_azure_tenant_id")
+        self.lineEdit_azure_tenant_id.setMaximumSize(QSize(16777215, 16777215))
+
+        self.formLayout_5.setWidget(4, QFormLayout.FieldRole, self.lineEdit_azure_tenant_id)
+
+
+        self.horizontalLayout.addLayout(self.formLayout_5)
 
 
         self.verticalLayout_8.addWidget(self.groupBox_4)
@@ -432,11 +482,6 @@ class Ui_profile_settings(object):
         self.checkBox_upload_only.setObjectName(u"checkBox_upload_only")
 
         self.gridLayout_4.addWidget(self.checkBox_upload_only, 1, 1, 1, 1)
-
-        self.checkBox_sync_business_shared_folders = QCheckBox(self.groupBox_5)
-        self.checkBox_sync_business_shared_folders.setObjectName(u"checkBox_sync_business_shared_folders")
-
-        self.gridLayout_4.addWidget(self.checkBox_sync_business_shared_folders, 1, 2, 1, 1)
 
 
         self.verticalLayout_8.addWidget(self.groupBox_5)
@@ -599,35 +644,78 @@ class Ui_profile_settings(object):
         self.gridLayout.addItem(self.verticalSpacer, 1, 0, 1, 1)
 
         self.tabWidget.addTab(self.tab_5, "")
-        self.tab_6 = QWidget()
-        self.tab_6.setObjectName(u"tab_6")
-        self.verticalLayout = QVBoxLayout(self.tab_6)
+        self.tab_4 = QWidget()
+        self.tab_4.setObjectName(u"tab_4")
+        self.verticalLayout = QVBoxLayout(self.tab_4)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.checkBox_auto_sync = QCheckBox(self.tab_6)
-        self.checkBox_auto_sync.setObjectName(u"checkBox_auto_sync")
+        self.groupBox_13 = QGroupBox(self.tab_4)
+        self.groupBox_13.setObjectName(u"groupBox_13")
+        self.groupBox_13.setCheckable(False)
+        self.gridLayout_12 = QGridLayout(self.groupBox_13)
+        self.gridLayout_12.setObjectName(u"gridLayout_12")
+        self.label_business_available = QLabel(self.groupBox_13)
+        self.label_business_available.setObjectName(u"label_business_available")
 
-        self.verticalLayout.addWidget(self.checkBox_auto_sync)
+        self.gridLayout_12.addWidget(self.label_business_available, 3, 0, 1, 1)
 
+        self.checkBox_sync_business_shared_folders = QCheckBox(self.groupBox_13)
+        self.checkBox_sync_business_shared_folders.setObjectName(u"checkBox_sync_business_shared_folders")
+
+        self.gridLayout_12.addWidget(self.checkBox_sync_business_shared_folders, 0, 0, 1, 1)
+
+        self.listWidget_available_business_folders = QListWidget(self.groupBox_13)
+        self.listWidget_available_business_folders.setObjectName(u"listWidget_available_business_folders")
+
+        self.gridLayout_12.addWidget(self.listWidget_available_business_folders, 6, 0, 1, 1)
+
+        self.label_business_selected = QLabel(self.groupBox_13)
+        self.label_business_selected.setObjectName(u"label_business_selected")
+
+        self.gridLayout_12.addWidget(self.label_business_selected, 3, 2, 1, 1)
+
+        self.verticalLayout_14 = QVBoxLayout()
+        self.verticalLayout_14.setObjectName(u"verticalLayout_14")
         self.verticalSpacer_5 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.verticalLayout.addItem(self.verticalSpacer_5)
+        self.verticalLayout_14.addItem(self.verticalSpacer_5)
 
-        self.pushButton_logout = QPushButton(self.tab_6)
-        self.pushButton_logout.setObjectName(u"pushButton_logout")
+        self.pushButton_select_business_folder = QPushButton(self.groupBox_13)
+        self.pushButton_select_business_folder.setObjectName(u"pushButton_select_business_folder")
+        self.pushButton_select_business_folder.setMaximumSize(QSize(50, 16777215))
 
-        self.verticalLayout.addWidget(self.pushButton_logout)
+        self.verticalLayout_14.addWidget(self.pushButton_select_business_folder)
 
-        self.pushButton_login = QPushButton(self.tab_6)
-        self.pushButton_login.setObjectName(u"pushButton_login")
+        self.verticalSpacer_6 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.verticalLayout.addWidget(self.pushButton_login)
-
-        self.tabWidget.addTab(self.tab_6, "")
-
-        self.horizontalLayout.addWidget(self.tabWidget)
+        self.verticalLayout_14.addItem(self.verticalSpacer_6)
 
 
-        self.verticalLayout_2.addLayout(self.horizontalLayout)
+        self.gridLayout_12.addLayout(self.verticalLayout_14, 6, 1, 1, 1)
+
+        self.listWidget_selected_business_folders = QListWidget(self.groupBox_13)
+        self.listWidget_selected_business_folders.setObjectName(u"listWidget_selected_business_folders")
+
+        self.gridLayout_12.addWidget(self.listWidget_selected_business_folders, 6, 2, 1, 1)
+
+        self.pushButton_get_business_folders = QPushButton(self.groupBox_13)
+        self.pushButton_get_business_folders.setObjectName(u"pushButton_get_business_folders")
+
+        self.gridLayout_12.addWidget(self.pushButton_get_business_folders, 4, 0, 1, 1)
+
+        self.pushButton_remove_business_folders = QPushButton(self.groupBox_13)
+        self.pushButton_remove_business_folders.setObjectName(u"pushButton_remove_business_folders")
+
+        self.gridLayout_12.addWidget(self.pushButton_remove_business_folders, 4, 2, 1, 1)
+
+
+        self.verticalLayout.addWidget(self.groupBox_13)
+
+        self.tabWidget.addTab(self.tab_4, "")
+
+        self.verticalLayout_13.addWidget(self.tabWidget)
+
+
+        self.verticalLayout_2.addLayout(self.verticalLayout_13)
 
         self.pushButton_discard = QPushButton(profile_settings)
         self.pushButton_discard.setObjectName(u"pushButton_discard")
@@ -642,7 +730,7 @@ class Ui_profile_settings(object):
 
         self.retranslateUi(profile_settings)
 
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(6)
 
 
         QMetaObject.connectSlotsByName(profile_settings)
@@ -660,16 +748,17 @@ class Ui_profile_settings(object):
         self.label_sync_dir.setToolTip(QCoreApplication.translate("profile_settings", u"Specify local sync directory location for this profile.", None))
 #endif // QT_CONFIG(tooltip)
         self.label_sync_dir.setText(QCoreApplication.translate("profile_settings", u"Sync Directory:", None))
-        self.groupBox_11.setTitle(QCoreApplication.translate("profile_settings", u"Sync List", None))
-        self.label_sync_list.setText(QCoreApplication.translate("profile_settings", u"Selective sync allows you to sync only specific files and directories. <br> See <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/USAGE.md#performing-a-selective-sync-via-sync_list-file\">official documentation </a> for more details.", None))
+        self.groupBox_12.setTitle(QCoreApplication.translate("profile_settings", u"Account actions", None))
 #if QT_CONFIG(tooltip)
-        self.checkBox_sync_root_files.setToolTip(QCoreApplication.translate("profile_settings", u"Sync all files in Sync Directory root when using Sync List.", None))
+        self.checkBox_auto_sync.setToolTip(QCoreApplication.translate("profile_settings", u"Automatically start sync for this profile when OneDriveGUI starts.", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBox_sync_root_files.setText(QCoreApplication.translate("profile_settings", u"Sync root files", None))
+        self.checkBox_auto_sync.setText(QCoreApplication.translate("profile_settings", u"Auto-sync on GUI startup", None))
 #if QT_CONFIG(tooltip)
-        self.textEdit_sync_list.setToolTip("")
+        self.pushButton_logout.setToolTip(QCoreApplication.translate("profile_settings", u"Logout user from this profile and force login during next sync attempt. ", None))
 #endif // QT_CONFIG(tooltip)
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.exemptions_tab_2), QCoreApplication.translate("profile_settings", u"Monitored Files", None))
+        self.pushButton_logout.setText(QCoreApplication.translate("profile_settings", u"Logout", None))
+        self.pushButton_login.setText(QCoreApplication.translate("profile_settings", u"Login", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.monitored_tab_2), QCoreApplication.translate("profile_settings", u"Monitored Files", None))
 #if QT_CONFIG(tooltip)
         self.groupBox.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>This option is used to 'skip' certain files and supports pattern matching.</p><p>Patterns are case insensitive. <span style=\" font-weight:700;\">*</span> and <span style=\" font-weight:700;\">? </span><a href=\"https://technet.microsoft.com/en-us/library/bb490639.aspx\"><span style=\" text-decoration: underline; color:#5e81ac;\">wildcards characters</span></a> are supported. </p><p>Use <span style=\" font-weight:700;\">|</span> to separate multiple patterns.<br/></p><p><span style=\" text-decoration: underline;\">Files can be skipped in the following fashion:</span></p><p>-Specify a wildcard, eg: '<span style=\" font-weight:700;\">*.txt</span>' (skip all txt files)</p><p>-Explicitly specify the filename and it's full path relative to your sync_dir, eg: '<span style=\" font-weight:700;\">path/to/file/filename.ext</span>'</p><p>-Explicitly specify the filename only and skip every instance of this filename, eg: '<span style=\" font-weight:700;\">filename.ext</span>'</p><p><br/></p><p><span "
                         "style=\" text-decoration: underline;\">By default, the following files will be skipped:</span></p><p>-Files that start with <span style=\" font-weight:700;\">~</span></p><p>-Files that start with <span style=\" font-weight:700;\">.~</span> (like .~lock.* files generated by LibreOffice)</p><p>-Files that end in <span style=\" font-weight:700;\">.tmp</span></p><p><br/></p><p><span style=\" font-weight:700;\">Important:</span> Do not use a skip file entry of <span style=\" font-weight:700;\">.*</span> as this will prevent correct searching of local changes to process.</p></body></html>", None))
@@ -696,8 +785,18 @@ class Ui_profile_settings(object):
 #if QT_CONFIG(tooltip)
         self.checkBox_skip_dotfiles.setToolTip(QCoreApplication.translate("profile_settings", u"Skip dot files and folders from syncing", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBox_skip_dotfiles.setText(QCoreApplication.translate("profile_settings", u"Exclude dotfiles (hidden files)", None))
+        self.checkBox_skip_dotfiles.setText(QCoreApplication.translate("profile_settings", u"Skip dotfiles (hidden files)", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("profile_settings", u"Excluded files", None))
+        self.groupBox_11.setTitle(QCoreApplication.translate("profile_settings", u"Sync List", None))
+        self.label_sync_list.setText(QCoreApplication.translate("profile_settings", u"Selective sync allows you to sync only specific files and directories. <br> See <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/USAGE.md#performing-a-selective-sync-via-sync_list-file\">official documentation </a> for more details.", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_sync_root_files.setToolTip(QCoreApplication.translate("profile_settings", u"Sync all files in Sync Directory root when using Sync List.", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_sync_root_files.setText(QCoreApplication.translate("profile_settings", u"Sync root files", None))
+#if QT_CONFIG(tooltip)
+        self.textEdit_sync_list.setToolTip("")
+#endif // QT_CONFIG(tooltip)
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), QCoreApplication.translate("profile_settings", u"Selective Sync", None))
 #if QT_CONFIG(tooltip)
         self.groupBox_10.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>To minimise the Internet bandwidth for upload and download operations, you can configure the bandwidth limit option. </p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
@@ -726,6 +825,19 @@ class Ui_profile_settings(object):
 #endif // QT_CONFIG(tooltip)
         self.label_classify_as_big_delete.setText(QCoreApplication.translate("profile_settings", u"Clasify as big delete", None))
 #if QT_CONFIG(tooltip)
+        self.label_operation_timeout.setToolTip(QCoreApplication.translate("profile_settings", u"Operation Timeout is the maximum amount of time (seconds) a file operation is allowed to take. This includes DNS resolution, connecting, data transfer, etc.", None))
+#endif // QT_CONFIG(tooltip)
+        self.label_operation_timeout.setText(QCoreApplication.translate("profile_settings", u"Operation timeout", None))
+        self.label_drive_id.setText(QCoreApplication.translate("profile_settings", u"SharePoint Library Drive ID", None))
+#if QT_CONFIG(tooltip)
+        self.label_sync_file_permissions.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Utilise the <a href=\"https://chmod-calculator.com/\"><span style=\" text-decoration: underline; color:#5e81ac;\">Unix Permissions Calculator</span></a> to assist in determining the required permissions.</p><p><br/></p><p>Important: Special permission bits (setuid, setgid, sticky bit) are not supported. </p><p>Valid permission values are from <span style=\" font-weight:700;\">000</span> to <span style=\" font-weight:700;\">777</span> only.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.label_sync_file_permissions.setText(QCoreApplication.translate("profile_settings", u"Sync file permissions", None))
+#if QT_CONFIG(tooltip)
+        self.label_sync_dir_permissions.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Utilise the <a href=\"https://chmod-calculator.com/\"><span style=\" text-decoration: underline; color:#5e81ac;\">Unix Permissions Calculator</span></a> to assist in determining the required permissions.</p><p><br/></p><p>Important: Special permission bits (setuid, setgid, sticky bit) are not supported. </p><p>Valid permission values are from <span style=\" font-weight:700;\">000</span> to <span style=\" font-weight:700;\">777</span> only.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.label_sync_dir_permissions.setText(QCoreApplication.translate("profile_settings", u"Sync dir permissions", None))
+#if QT_CONFIG(tooltip)
         self.label_user_agent.setToolTip(QCoreApplication.translate("profile_settings", u"Specify a User Agent string to the http client", None))
 #endif // QT_CONFIG(tooltip)
         self.label_user_agent.setText(QCoreApplication.translate("profile_settings", u"User-agent", None))
@@ -737,19 +849,6 @@ class Ui_profile_settings(object):
         self.label_azure_tenant_id.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Refer to the documentation for <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/USAGE.md#configuring-the-client-for-single-tenant-application-use\"><span style=\" text-decoration: underline; color:#5e81ac;\">single tenant application use</span></a>.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.label_azure_tenant_id.setText(QCoreApplication.translate("profile_settings", u"Azure tenant ID", None))
-#if QT_CONFIG(tooltip)
-        self.label_sync_dir_permissions.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Utilise the <a href=\"https://chmod-calculator.com/\"><span style=\" text-decoration: underline; color:#5e81ac;\">Unix Permissions Calculator</span></a> to assist in determining the required permissions.</p><p><br/></p><p>Important: Special permission bits (setuid, setgid, sticky bit) are not supported. </p><p>Valid permission values are from <span style=\" font-weight:700;\">000</span> to <span style=\" font-weight:700;\">777</span> only.</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.label_sync_dir_permissions.setText(QCoreApplication.translate("profile_settings", u"Sync dir permissions", None))
-#if QT_CONFIG(tooltip)
-        self.label_sync_file_permissions.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Utilise the <a href=\"https://chmod-calculator.com/\"><span style=\" text-decoration: underline; color:#5e81ac;\">Unix Permissions Calculator</span></a> to assist in determining the required permissions.</p><p><br/></p><p>Important: Special permission bits (setuid, setgid, sticky bit) are not supported. </p><p>Valid permission values are from <span style=\" font-weight:700;\">000</span> to <span style=\" font-weight:700;\">777</span> only.</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.label_sync_file_permissions.setText(QCoreApplication.translate("profile_settings", u"Sync file permissions", None))
-#if QT_CONFIG(tooltip)
-        self.label_operation_timeout.setToolTip(QCoreApplication.translate("profile_settings", u"Operation Timeout is the maximum amount of time (seconds) a file operation is allowed to take. This includes DNS resolution, connecting, data transfer, etc.", None))
-#endif // QT_CONFIG(tooltip)
-        self.label_operation_timeout.setText(QCoreApplication.translate("profile_settings", u"Operation timeout", None))
-        self.label_drive_id.setText(QCoreApplication.translate("profile_settings", u"SharePoint Library Drive ID", None))
 #if QT_CONFIG(tooltip)
         self.groupBox_5.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Perform a 'one-way' upload sync.<br/></p><p><span style=\" font-weight:700;\">Note</span>: If a file or folder is present on OneDrive, that does not exist locally, it will be removed. </p><p>If the data on OneDrive should be kept, please enable '<span style=\" font-weight:700;\">No remote delete</span>' option.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
@@ -799,10 +898,6 @@ class Ui_profile_settings(object):
 "Do not download changes from OneDrive.", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_upload_only.setText(QCoreApplication.translate("profile_settings", u"Upload only", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_sync_business_shared_folders.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Refer to <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/BusinessSharedFolders.md\"><span style=\" text-decoration: underline; color:#5e81ac;\">Business Shared Folders</span></a> for configuration assistance.</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_sync_business_shared_folders.setText(QCoreApplication.translate("profile_settings", u"Sync business shared folders", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("profile_settings", u"Sync Options", None))
 #if QT_CONFIG(tooltip)
         self.groupBox_7.setToolTip("")
@@ -846,16 +941,17 @@ class Ui_profile_settings(object):
         self.label_webhook_renewal_interval.setText(QCoreApplication.translate("profile_settings", u"Renewal interval", None))
         self.checkBox_webhook_enabled.setText(QCoreApplication.translate("profile_settings", u"Enable webhook", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), QCoreApplication.translate("profile_settings", u"Webhooks", None))
+        self.groupBox_13.setTitle(QCoreApplication.translate("profile_settings", u"Shared Folders", None))
+        self.label_business_available.setText(QCoreApplication.translate("profile_settings", u"Available Business Shared Folders:", None))
 #if QT_CONFIG(tooltip)
-        self.checkBox_auto_sync.setToolTip(QCoreApplication.translate("profile_settings", u"Automatically start sync for this profile when OneDriveGUI starts.", None))
+        self.checkBox_sync_business_shared_folders.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Refer to <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/BusinessSharedFolders.md\"><span style=\" text-decoration: underline; color:#5e81ac;\">Business Shared Folders</span></a> for configuration assistance.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBox_auto_sync.setText(QCoreApplication.translate("profile_settings", u"Auto-sync on startup", None))
-#if QT_CONFIG(tooltip)
-        self.pushButton_logout.setToolTip(QCoreApplication.translate("profile_settings", u"Logout user from this profile and force login during next sync attempt. ", None))
-#endif // QT_CONFIG(tooltip)
-        self.pushButton_logout.setText(QCoreApplication.translate("profile_settings", u"Logout", None))
-        self.pushButton_login.setText(QCoreApplication.translate("profile_settings", u"Login", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), QCoreApplication.translate("profile_settings", u"Account", None))
+        self.checkBox_sync_business_shared_folders.setText(QCoreApplication.translate("profile_settings", u"Sync business shared folders", None))
+        self.label_business_selected.setText(QCoreApplication.translate("profile_settings", u"Selected Business Shared Folders:", None))
+        self.pushButton_select_business_folder.setText(QCoreApplication.translate("profile_settings", u">>", None))
+        self.pushButton_get_business_folders.setText(QCoreApplication.translate("profile_settings", u"Update", None))
+        self.pushButton_remove_business_folders.setText(QCoreApplication.translate("profile_settings", u"Remove", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), QCoreApplication.translate("profile_settings", u"Shared Folders", None))
         self.pushButton_discard.setText(QCoreApplication.translate("profile_settings", u"Discard changes", None))
         self.pushButton_save.setText(QCoreApplication.translate("profile_settings", u"Save", None))
     # retranslateUi
