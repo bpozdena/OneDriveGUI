@@ -43,7 +43,7 @@ class Ui_profile_settings(object):
         self.verticalLayout_13.setObjectName(u"verticalLayout_13")
         self.tabWidget = QTabWidget(profile_settings)
         self.tabWidget.setObjectName(u"tabWidget")
-        self.tabWidget.setMinimumSize(QSize(650, 600))
+        self.tabWidget.setMinimumSize(QSize(800, 600))
         self.monitored_tab_2 = QWidget()
         self.monitored_tab_2.setObjectName(u"monitored_tab_2")
         self.verticalLayout_5 = QVBoxLayout(self.monitored_tab_2)
@@ -431,57 +431,57 @@ class Ui_profile_settings(object):
         self.checkBox_force_http_11 = QCheckBox(self.groupBox_5)
         self.checkBox_force_http_11.setObjectName(u"checkBox_force_http_11")
 
-        self.gridLayout_4.addWidget(self.checkBox_force_http_11, 2, 1, 1, 1)
+        self.gridLayout_4.addWidget(self.checkBox_force_http_11, 4, 1, 1, 1)
 
-        self.checkBox_check_nomount = QCheckBox(self.groupBox_5)
-        self.checkBox_check_nomount.setObjectName(u"checkBox_check_nomount")
+        self.checkBox_upload_only = QCheckBox(self.groupBox_5)
+        self.checkBox_upload_only.setObjectName(u"checkBox_upload_only")
 
-        self.gridLayout_4.addWidget(self.checkBox_check_nomount, 4, 1, 1, 1)
-
-        self.checkBox_resync = QCheckBox(self.groupBox_5)
-        self.checkBox_resync.setObjectName(u"checkBox_resync")
-
-        self.gridLayout_4.addWidget(self.checkBox_resync, 4, 2, 1, 1)
-
-        self.checkBox_download_only = QCheckBox(self.groupBox_5)
-        self.checkBox_download_only.setObjectName(u"checkBox_download_only")
-
-        self.gridLayout_4.addWidget(self.checkBox_download_only, 0, 1, 1, 1)
-
-        self.checkBox_local_first = QCheckBox(self.groupBox_5)
-        self.checkBox_local_first.setObjectName(u"checkBox_local_first")
-
-        self.gridLayout_4.addWidget(self.checkBox_local_first, 5, 1, 1, 1)
-
-        self.checkBox_dry_run = QCheckBox(self.groupBox_5)
-        self.checkBox_dry_run.setObjectName(u"checkBox_dry_run")
-
-        self.gridLayout_4.addWidget(self.checkBox_dry_run, 2, 2, 1, 1)
-
-        self.checkBox_disable_upload_validation = QCheckBox(self.groupBox_5)
-        self.checkBox_disable_upload_validation.setObjectName(u"checkBox_disable_upload_validation")
-
-        self.gridLayout_4.addWidget(self.checkBox_disable_upload_validation, 3, 1, 1, 1)
-
-        self.checkBox_bypass_data_preservation = QCheckBox(self.groupBox_5)
-        self.checkBox_bypass_data_preservation.setObjectName(u"checkBox_bypass_data_preservation")
-
-        self.gridLayout_4.addWidget(self.checkBox_bypass_data_preservation, 5, 2, 1, 1)
+        self.gridLayout_4.addWidget(self.checkBox_upload_only, 2, 1, 1, 1)
 
         self.checkBox_no_remote_delete = QCheckBox(self.groupBox_5)
         self.checkBox_no_remote_delete.setObjectName(u"checkBox_no_remote_delete")
 
-        self.gridLayout_4.addWidget(self.checkBox_no_remote_delete, 0, 2, 1, 1)
+        self.gridLayout_4.addWidget(self.checkBox_no_remote_delete, 3, 1, 1, 1)
+
+        self.checkBox_check_nomount = QCheckBox(self.groupBox_5)
+        self.checkBox_check_nomount.setObjectName(u"checkBox_check_nomount")
+
+        self.gridLayout_4.addWidget(self.checkBox_check_nomount, 5, 1, 1, 1)
+
+        self.checkBox_download_only = QCheckBox(self.groupBox_5)
+        self.checkBox_download_only.setObjectName(u"checkBox_download_only")
+
+        self.gridLayout_4.addWidget(self.checkBox_download_only, 1, 1, 1, 1)
+
+        self.checkBox_local_first = QCheckBox(self.groupBox_5)
+        self.checkBox_local_first.setObjectName(u"checkBox_local_first")
+
+        self.gridLayout_4.addWidget(self.checkBox_local_first, 0, 1, 1, 1)
+
+        self.checkBox_dry_run = QCheckBox(self.groupBox_5)
+        self.checkBox_dry_run.setObjectName(u"checkBox_dry_run")
+
+        self.gridLayout_4.addWidget(self.checkBox_dry_run, 0, 2, 1, 1)
+
+        self.checkBox_resync = QCheckBox(self.groupBox_5)
+        self.checkBox_resync.setObjectName(u"checkBox_resync")
+
+        self.gridLayout_4.addWidget(self.checkBox_resync, 1, 2, 1, 1)
+
+        self.checkBox_bypass_data_preservation = QCheckBox(self.groupBox_5)
+        self.checkBox_bypass_data_preservation.setObjectName(u"checkBox_bypass_data_preservation")
+
+        self.gridLayout_4.addWidget(self.checkBox_bypass_data_preservation, 2, 2, 1, 1)
 
         self.checkBox_remove_source_files = QCheckBox(self.groupBox_5)
         self.checkBox_remove_source_files.setObjectName(u"checkBox_remove_source_files")
 
         self.gridLayout_4.addWidget(self.checkBox_remove_source_files, 3, 2, 1, 1)
 
-        self.checkBox_upload_only = QCheckBox(self.groupBox_5)
-        self.checkBox_upload_only.setObjectName(u"checkBox_upload_only")
+        self.checkBox_disable_upload_validation = QCheckBox(self.groupBox_5)
+        self.checkBox_disable_upload_validation.setObjectName(u"checkBox_disable_upload_validation")
 
-        self.gridLayout_4.addWidget(self.checkBox_upload_only, 1, 1, 1, 1)
+        self.gridLayout_4.addWidget(self.checkBox_disable_upload_validation, 4, 2, 1, 1)
 
 
         self.verticalLayout_8.addWidget(self.groupBox_5)
@@ -648,27 +648,28 @@ class Ui_profile_settings(object):
         self.tab_4.setObjectName(u"tab_4")
         self.verticalLayout = QVBoxLayout(self.tab_4)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.groupBox_13 = QGroupBox(self.tab_4)
-        self.groupBox_13.setObjectName(u"groupBox_13")
-        self.groupBox_13.setCheckable(False)
-        self.gridLayout_12 = QGridLayout(self.groupBox_13)
+        self.groupBox_sync_business_shared_folders = QGroupBox(self.tab_4)
+        self.groupBox_sync_business_shared_folders.setObjectName(u"groupBox_sync_business_shared_folders")
+        self.groupBox_sync_business_shared_folders.setCheckable(True)
+        self.groupBox_sync_business_shared_folders.setChecked(True)
+        self.gridLayout_12 = QGridLayout(self.groupBox_sync_business_shared_folders)
         self.gridLayout_12.setObjectName(u"gridLayout_12")
-        self.label_business_available = QLabel(self.groupBox_13)
+        self.label_business_available = QLabel(self.groupBox_sync_business_shared_folders)
         self.label_business_available.setObjectName(u"label_business_available")
 
         self.gridLayout_12.addWidget(self.label_business_available, 3, 0, 1, 1)
 
-        self.checkBox_sync_business_shared_folders = QCheckBox(self.groupBox_13)
+        self.checkBox_sync_business_shared_folders = QCheckBox(self.groupBox_sync_business_shared_folders)
         self.checkBox_sync_business_shared_folders.setObjectName(u"checkBox_sync_business_shared_folders")
 
         self.gridLayout_12.addWidget(self.checkBox_sync_business_shared_folders, 0, 0, 1, 1)
 
-        self.listWidget_available_business_folders = QListWidget(self.groupBox_13)
+        self.listWidget_available_business_folders = QListWidget(self.groupBox_sync_business_shared_folders)
         self.listWidget_available_business_folders.setObjectName(u"listWidget_available_business_folders")
 
         self.gridLayout_12.addWidget(self.listWidget_available_business_folders, 6, 0, 1, 1)
 
-        self.label_business_selected = QLabel(self.groupBox_13)
+        self.label_business_selected = QLabel(self.groupBox_sync_business_shared_folders)
         self.label_business_selected.setObjectName(u"label_business_selected")
 
         self.gridLayout_12.addWidget(self.label_business_selected, 3, 2, 1, 1)
@@ -679,11 +680,11 @@ class Ui_profile_settings(object):
 
         self.verticalLayout_14.addItem(self.verticalSpacer_5)
 
-        self.pushButton_select_business_folder = QPushButton(self.groupBox_13)
-        self.pushButton_select_business_folder.setObjectName(u"pushButton_select_business_folder")
-        self.pushButton_select_business_folder.setMaximumSize(QSize(50, 16777215))
+        self.pushButton_add_business_folder = QPushButton(self.groupBox_sync_business_shared_folders)
+        self.pushButton_add_business_folder.setObjectName(u"pushButton_add_business_folder")
+        self.pushButton_add_business_folder.setMaximumSize(QSize(50, 16777215))
 
-        self.verticalLayout_14.addWidget(self.pushButton_select_business_folder)
+        self.verticalLayout_14.addWidget(self.pushButton_add_business_folder)
 
         self.verticalSpacer_6 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -692,23 +693,23 @@ class Ui_profile_settings(object):
 
         self.gridLayout_12.addLayout(self.verticalLayout_14, 6, 1, 1, 1)
 
-        self.listWidget_selected_business_folders = QListWidget(self.groupBox_13)
+        self.listWidget_selected_business_folders = QListWidget(self.groupBox_sync_business_shared_folders)
         self.listWidget_selected_business_folders.setObjectName(u"listWidget_selected_business_folders")
 
         self.gridLayout_12.addWidget(self.listWidget_selected_business_folders, 6, 2, 1, 1)
 
-        self.pushButton_get_business_folders = QPushButton(self.groupBox_13)
+        self.pushButton_get_business_folders = QPushButton(self.groupBox_sync_business_shared_folders)
         self.pushButton_get_business_folders.setObjectName(u"pushButton_get_business_folders")
 
         self.gridLayout_12.addWidget(self.pushButton_get_business_folders, 4, 0, 1, 1)
 
-        self.pushButton_remove_business_folders = QPushButton(self.groupBox_13)
+        self.pushButton_remove_business_folders = QPushButton(self.groupBox_sync_business_shared_folders)
         self.pushButton_remove_business_folders.setObjectName(u"pushButton_remove_business_folders")
 
         self.gridLayout_12.addWidget(self.pushButton_remove_business_folders, 4, 2, 1, 1)
 
 
-        self.verticalLayout.addWidget(self.groupBox_13)
+        self.verticalLayout.addWidget(self.groupBox_sync_business_shared_folders)
 
         self.tabWidget.addTab(self.tab_4, "")
 
@@ -858,13 +859,19 @@ class Ui_profile_settings(object):
 #endif // QT_CONFIG(tooltip)
         self.checkBox_force_http_11.setText(QCoreApplication.translate("profile_settings", u"Force HTTP 1.1", None))
 #if QT_CONFIG(tooltip)
+        self.checkBox_upload_only.setToolTip(QCoreApplication.translate("profile_settings", u"Replicate the locally configured sync_dir state to OneDrive, by only uploading local changes to OneDrive. \n"
+"\n"
+"Do not download changes from OneDrive.", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_upload_only.setText(QCoreApplication.translate("profile_settings", u"Upload only", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_no_remote_delete.setToolTip(QCoreApplication.translate("profile_settings", u"Do not delete local file 'deletes' from OneDrive when using --upload-only", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_no_remote_delete.setText(QCoreApplication.translate("profile_settings", u"No remote delete", None))
+#if QT_CONFIG(tooltip)
         self.checkBox_check_nomount.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><pre style=\" margin-top:0px; margin-bottom:16px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:145%;\"><span style=\" font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; color:#c9d1d9; background-color:transparent;\">Check for the presence of </span><span style=\" font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; font-weight:700; color:#c9d1d9; background-color:transparent;\">.nosync</span><span style=\" font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; color:#c9d1d9; background-color:transparent;\"> in the syncdir root. If found, do not perform sync.</span></pre></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_check_nomount.setText(QCoreApplication.translate("profile_settings", u"Check for .nomount", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_resync.setToolTip(QCoreApplication.translate("profile_settings", u"Forget the last saved state, perform a full sync.", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_resync.setText(QCoreApplication.translate("profile_settings", u"Full re-sync", None))
 #if QT_CONFIG(tooltip)
         self.checkBox_download_only.setToolTip(QCoreApplication.translate("profile_settings", u"Replicate the OneDrive online state locally, by only downloading changes from OneDrive. \n"
 "\n"
@@ -880,24 +887,18 @@ class Ui_profile_settings(object):
 #endif // QT_CONFIG(tooltip)
         self.checkBox_dry_run.setText(QCoreApplication.translate("profile_settings", u"Dry run", None))
 #if QT_CONFIG(tooltip)
-        self.checkBox_disable_upload_validation.setToolTip(QCoreApplication.translate("profile_settings", u"Disable download validation when downloading from OneDrive.", None))
+        self.checkBox_resync.setToolTip(QCoreApplication.translate("profile_settings", u"Forget the last saved state, perform a full sync.", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBox_disable_upload_validation.setText(QCoreApplication.translate("profile_settings", u"Disable upload validation", None))
+        self.checkBox_resync.setText(QCoreApplication.translate("profile_settings", u"Full re-sync", None))
         self.checkBox_bypass_data_preservation.setText(QCoreApplication.translate("profile_settings", u"Bypass data preservation", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_no_remote_delete.setToolTip(QCoreApplication.translate("profile_settings", u"Do not delete local file 'deletes' from OneDrive when using --upload-only", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_no_remote_delete.setText(QCoreApplication.translate("profile_settings", u"No remote delete", None))
 #if QT_CONFIG(tooltip)
         self.checkBox_remove_source_files.setToolTip(QCoreApplication.translate("profile_settings", u"Remove source file after successful transfer to OneDrive when using --upload-only .", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_remove_source_files.setText(QCoreApplication.translate("profile_settings", u"Remove source files", None))
 #if QT_CONFIG(tooltip)
-        self.checkBox_upload_only.setToolTip(QCoreApplication.translate("profile_settings", u"Replicate the locally configured sync_dir state to OneDrive, by only uploading local changes to OneDrive. \n"
-"\n"
-"Do not download changes from OneDrive.", None))
+        self.checkBox_disable_upload_validation.setToolTip(QCoreApplication.translate("profile_settings", u"Disable download validation when downloading from OneDrive.", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBox_upload_only.setText(QCoreApplication.translate("profile_settings", u"Upload only", None))
+        self.checkBox_disable_upload_validation.setText(QCoreApplication.translate("profile_settings", u"Disable upload validation", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("profile_settings", u"Sync Options", None))
 #if QT_CONFIG(tooltip)
         self.groupBox_7.setToolTip("")
@@ -941,15 +942,15 @@ class Ui_profile_settings(object):
         self.label_webhook_renewal_interval.setText(QCoreApplication.translate("profile_settings", u"Renewal interval", None))
         self.checkBox_webhook_enabled.setText(QCoreApplication.translate("profile_settings", u"Enable webhook", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), QCoreApplication.translate("profile_settings", u"Webhooks", None))
-        self.groupBox_13.setTitle(QCoreApplication.translate("profile_settings", u"Shared Folders", None))
+        self.groupBox_sync_business_shared_folders.setTitle(QCoreApplication.translate("profile_settings", u"Sync business shared folders", None))
         self.label_business_available.setText(QCoreApplication.translate("profile_settings", u"Available Business Shared Folders:", None))
 #if QT_CONFIG(tooltip)
         self.checkBox_sync_business_shared_folders.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Refer to <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/BusinessSharedFolders.md\"><span style=\" text-decoration: underline; color:#5e81ac;\">Business Shared Folders</span></a> for configuration assistance.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_sync_business_shared_folders.setText(QCoreApplication.translate("profile_settings", u"Sync business shared folders", None))
         self.label_business_selected.setText(QCoreApplication.translate("profile_settings", u"Selected Business Shared Folders:", None))
-        self.pushButton_select_business_folder.setText(QCoreApplication.translate("profile_settings", u">>", None))
-        self.pushButton_get_business_folders.setText(QCoreApplication.translate("profile_settings", u"Update", None))
+        self.pushButton_add_business_folder.setText(QCoreApplication.translate("profile_settings", u">>", None))
+        self.pushButton_get_business_folders.setText(QCoreApplication.translate("profile_settings", u"Get Shared Folders", None))
         self.pushButton_remove_business_folders.setText(QCoreApplication.translate("profile_settings", u"Remove", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), QCoreApplication.translate("profile_settings", u"Shared Folders", None))
         self.pushButton_discard.setText(QCoreApplication.translate("profile_settings", u"Discard changes", None))
