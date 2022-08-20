@@ -487,6 +487,10 @@ class wizardPage_create_shared_library(QWizardPage):
         main_window.profile_status_pages[profile_name] = ProfileStatusPage(profile_name)
         main_window.stackedLayout.addWidget(main_window.profile_status_pages[profile_name])
 
+        # Show comboBox with profile list if more than one profiles exist
+        if len(self.profile_status_pages) > 1:
+            main_window.comboBox.show()
+
         logging.info(f"Account {profile_name} has been created")
         self.pushButton_create_profile.setText("Done")
         self.pushButton_create_profile.setDisabled(True)
@@ -626,6 +630,10 @@ class wizardPage_create(QWizardPage):
         main_window.profile_status_pages[profile_name] = ProfileStatusPage(profile_name)
         main_window.stackedLayout.addWidget(main_window.profile_status_pages[profile_name])
 
+        # Show comboBox with profile list if more than one profiles exist
+        if len(self.profile_status_pages) > 1:
+            main_window.comboBox.show()
+
         # Hide "Create profile" push button from main windows.
         main_window.pushButton_new_profile.hide()
 
@@ -764,6 +772,10 @@ class wizardPage_import(QWizardPage):
         main_window.comboBox.addItem(profile_name)
         main_window.profile_status_pages[profile_name] = ProfileStatusPage(profile_name)
         main_window.stackedLayout.addWidget(main_window.profile_status_pages[profile_name])
+
+        # Show comboBox with profile list if more than one profiles exist
+        if len(global_config) > 1:
+            main_window.comboBox.show()
 
         # Hide "Create profile" push button from main window.
         main_window.pushButton_new_profile.hide()
