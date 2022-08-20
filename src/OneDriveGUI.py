@@ -968,6 +968,18 @@ class ProfileStatusPage(QWidget, Ui_status_page):
         self.pushButton_gui_settings.setIcon(settings_icon)
         self.pushButton_gui_settings.clicked.connect(self.show_gui_settings_window)
 
+        # Show Account Type on GUI startup (when sync is not running)
+        self.label_account_type.setText(global_config[self.profile_name]["account_type"])
+
+        # Show last known Free Space on GUI startup (when sync is not running)
+        _free_space = global_config[self.profile_name]["free_space"]
+
+        if _free_space == 0:
+            pass
+            # self.label_free_space_icon.hide()
+        else:
+            self.label_free_space.setText(global_config[self.profile_name]["free_space"])
+
     def open_sync_dir(self):
         sync_dir = global_config[self.profile_name]["onedrive"]["sync_dir"].strip('"')
         url = QUrl(os.path.expanduser(sync_dir))
