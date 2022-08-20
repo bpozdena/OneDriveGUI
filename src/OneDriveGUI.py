@@ -808,6 +808,9 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
         self.checkBox_start_minimized.setChecked(self.get_check_box_state("start_minimized"))
         self.checkBox_start_minimized.stateChanged.connect(self.set_check_box_state)
 
+        self.checkBox_frameless_window.setChecked(self.get_check_box_state("frameless_window"))
+        self.checkBox_frameless_window.stateChanged.connect(self.set_check_box_state)
+
         self.checkBox_show_debug.setChecked(self.get_check_box_state("show_debug"))
         self.checkBox_show_debug.stateChanged.connect(self.set_check_box_state)
 
@@ -880,18 +883,59 @@ class ProfileStatusPage(QWidget, Ui_status_page):
         # Set up the user interface from Designer.
         self.setupUi(self)
 
-        # Temporary start/stop buttons
-        self.toolButton_start.clicked.connect(self.start_monitor)
-        self.toolButton_stop.clicked.connect(self.stop_monitor)
+        # Configure Icons
+        start_icon = QIcon(DIR_PATH + "/resources/images/play.png")
+        stop_icon = QIcon(DIR_PATH + "/resources/images/stop.png")
+        storage_icon = QPixmap(DIR_PATH + "/resources/images/storage.png").scaled(26, 26, Qt.KeepAspectRatio)
+        quit_icon = QIcon(DIR_PATH + "/resources/images/quit.png")
+        close_icon = QIcon(DIR_PATH + "/resources/images/close-filled.png")
+
+        folder_icon = QIcon(DIR_PATH + "/resources/images/folder.png")
+        profile_icon = QIcon(DIR_PATH + "/resources/images/account.png")
+        settings_icon = QIcon(DIR_PATH + "/resources/images/gear.png")
+
+        # Start/Stop button
+        self.pushButton_start_stop.hide()
+
+        # Temporary separate start/stop buttons
+        self.pushButton_start.setIcon(start_icon)
+        self.pushButton_start.setText("")
+        self.pushButton_start.clicked.connect(self.start_monitor)
+
+        self.pushButton_stop.setIcon(stop_icon)
+        self.pushButton_stop.setText("")
+        self.pushButton_stop.clicked.connect(self.stop_monitor)
+
+        # Temp Quit button
+        self.pushButton_quit.setIcon(quit_icon)
+        self.pushButton_quit.setText("")
+        self.pushButton_quit.clicked.connect(sys.exit)
+
+        # Close Button
+        if gui_settings["SETTINGS"]["frameless_window"] == "True":
+            self.pushButton_close.setIcon(close_icon)
+            self.pushButton_close.setText("")
+            self.pushButton_close.clicked.connect(lambda: main_window.close())
+        else:
+            self.pushButton_close.hide()
+
+        # Free Space Icon
+        self.label_free_space_icon.setPixmap(storage_icon)
 
         # Open Sync Dir
+        self.pushButton_open_dir.setText("")
+        self.pushButton_open_dir.setIcon(folder_icon)
         self.pushButton_open_dir.clicked.connect(self.open_sync_dir)
 
-        # Open Settings window
+        # Open Profiles window
+        self.pushButton_profiles.setText("")
+        self.pushButton_profiles.setIcon(profile_icon)
         self.pushButton_profiles.clicked.connect(lambda: profile_settings_window.show())
         self.pushButton_profiles.clicked.connect(lambda: profile_settings_window.start_unsaved_changes_timer())
 
         # Open GUI Settings window
+        self.pushButton_gui_settings.setText("")
+        self.pushButton_gui_settings.setIcon(settings_icon)
         self.pushButton_gui_settings.clicked.connect(self.show_gui_settings_window)
 
     def open_sync_dir(self):
@@ -1887,7 +1931,7 @@ class WorkerThread(QThread):
                         self.free_space_human = "Not Available"
 
                     logging.info(f"[{self.profile_name}] Free Space: {self.free_space_human}")
-                    self.profile_status["free_space"] = f"Free Space: {self.free_space_human}"
+                    self.profile_status["free_space"] = f"{self.free_space_human}"
                     self.update_profile_status.emit(self.profile_status, self.profile_name)
 
                 elif "Account Type" in stdout:
@@ -1999,10 +2043,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-48.png"))
 
+        if gui_settings["SETTINGS"]["frameless_window"] == "True":
+            self.setWindowFlags(Qt.FramelessWindowHint)
+
         if len(global_config) == 0:
             self.show_setup_wizard()
 
         self.pushButton_new_profile.hide()
+        self.menubar.hide()
 
         # Quit OneDriveGUI
         self.actionQuit.triggered.connect(sys.exit)
@@ -2020,6 +2068,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.stackedLayout.addWidget(self.profile_status_pages[profile])
 
         self.verticalLayout_2.addLayout(self.stackedLayout)
+
+        if len(self.profile_status_pages) < 2:
+            self.comboBox.hide()
 
         # System Tray
         self.tray = QSystemTrayIcon()
@@ -2059,6 +2110,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.auto_sync.setSingleShot(True)
         self.auto_sync.timeout.connect(self.autostart_monitor)
         self.auto_sync.start(1000)
+
+    def mousePressEvent(self, event):
+        self.dragPos = event.globalPosition().toPoint()
+
+    def mouseMoveEvent(self, event):
+        self.move(self.pos() + event.globalPosition().toPoint() - self.dragPos)
+        self.dragPos = event.globalPosition().toPoint()
+        event.accept()
 
     def tray_icon_clicked(self, reason):
         if reason == QSystemTrayIcon.Unknown:
@@ -2149,7 +2208,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
                 if not min_requirements_met:
                     # Disable Start Sync button if OneDrive client is too old (smaller then min_supported_version_num).
-                    self.profile_status_pages[profile_name].toolButton_start.setEnabled(False)
+                    self.profile_status_pages[profile_name].pushButton_start.setEnabled(False)
                     self.profile_status_pages[profile_name].pushButton_settings.setEnabled(False)
                     self.profile_status_pages[profile_name].label_version_check.setToolTip(version_tooltip_text)
                     self.profile_status_pages[profile_name].label_version_check.setPixmap(pixmap_warning)
@@ -2177,10 +2236,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def autostart_monitor(self):
         # Auto-start sync if compatible version of OneDrive client is installed.
         for profile_name in global_config:
-            logging.debug(f"[{profile_name}] Compatible client version found: {self.profile_status_pages[profile_name].toolButton_start.isEnabled()}")
+            logging.debug(f"[{profile_name}] Compatible client version found: {self.profile_status_pages[profile_name].pushButton_start.isEnabled()}")
             logging.debug(f"[{profile_name}] Auto-sync enabled for profile: {global_config[profile_name]['auto_sync']}")
 
-            if self.profile_status_pages[profile_name].toolButton_start.isEnabled() and global_config[profile_name]["auto_sync"] == "True":
+            if self.profile_status_pages[profile_name].pushButton_start.isEnabled() and global_config[profile_name]["auto_sync"] == "True":
                 self.start_onedrive_monitor(profile_name)
 
     def start_onedrive_monitor(self, profile_name, options=""):
@@ -2553,6 +2612,7 @@ def read_gui_settings():
     default_gui_settings = {
         "SETTINGS": {
             "start_minimized": "False",
+            "frameless_window": "False",
             "show_debug": "True",
             "save_debug": "True",
             "log_rotation_interval": 24,
