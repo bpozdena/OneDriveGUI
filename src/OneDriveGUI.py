@@ -2175,16 +2175,29 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             pass
 
     def graceful_shutdown(self):
-        logging.info("Quitting OneDriveGUI")
-        workers_to_stop = []
 
-        for worker in self.workers:
-            workers_to_stop.append(worker)
+        close_question = QMessageBox.question(
+            self,
+            "Quit OneDriveGUI ?",
+            f"Would you like to stop all sync operations and quit OneDriveGUI ?",
+            buttons=QMessageBox.Yes | QMessageBox.No,
+            defaultButton=QMessageBox.No,
+        )
 
-        for worker in workers_to_stop:
-            self.workers[worker].stop_worker()
+        if close_question == QMessageBox.Yes:
+            logging.info("Quitting OneDriveGUI")
+            workers_to_stop = []
 
-        sys.exit()
+            for worker in self.workers:
+                workers_to_stop.append(worker)
+
+            for worker in workers_to_stop:
+                self.workers[worker].stop_worker()
+
+            sys.exit()
+
+        elif close_question == QMessageBox.No:
+            logging.debug("[GUI] Keeping OneDriveGUI running.")
 
     def closeEvent(self, event):
         # Minimize main window to system tray if it is available. Otherwise minimize to taskbar.
