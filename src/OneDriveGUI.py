@@ -201,7 +201,7 @@ class wizardPage_version_check(QWizardPage):
 class wizardPage_create_import(QWizardPage):
     def __init__(self, parent=None):
         super(wizardPage_create_import, self).__init__(parent)
-        self.setTitle("Create/Import OneDrive profile")
+        self.setTitle("Add OneDrive profile")
 
         self.checkBox_create = QCheckBox()
         self.checkBox_create.setText("Create new OneDrive profile")
@@ -449,7 +449,7 @@ class wizardPage_create_shared_library(QWizardPage):
         default_od_config = _default_od_config._sections
 
         # Construct dict with user profile settings.
-        new_profile = {profile_name: {"config_file": config_path, "enable_debug": False, "mode": "monitor", "auto_sync": False}}
+        new_profile = {profile_name: {"config_file": config_path, "auto_sync": False, "account_type": "", "free_space": ""}}
 
         # Load existing user profiles and add the new profile.
         _profiles = ConfigParser()
@@ -601,7 +601,7 @@ class wizardPage_create(QWizardPage):
         default_od_config = _default_od_config._sections
 
         # Construct dict with user profile settings.
-        new_profile = {profile_name: {"config_file": config_path, "enable_debug": False, "mode": "monitor", "auto_sync": False}}
+        new_profile = {profile_name: {"config_file": config_path, "auto_sync": False, "account_type": "", "free_space": ""}}
 
         # Load existing user profiles and add the new profile.
         _profiles = ConfigParser()
@@ -753,7 +753,7 @@ class wizardPage_import(QWizardPage):
         logging.debug("[GUI] new_od_config: " + str(new_od_config))
 
         # Construct dict with user profile settings.
-        new_profile = {profile_name: {"config_file": config_path, "enable_debug": False, "mode": "monitor", "auto_sync": False}}
+        new_profile = {profile_name: {"config_file": config_path, "auto_sync": False, "account_type": "", "free_space": ""}}
 
         # Load existing user profiles and add the new profile.
         _profiles = ConfigParser()
@@ -974,8 +974,8 @@ class ProfileStatusPage(QWidget, Ui_status_page):
         # Show last known Free Space on GUI startup (when sync is not running)
         _free_space = global_config[self.profile_name]["free_space"]
 
-        if _free_space == 0:
-            pass
+        if _free_space == "0":
+            self.label_free_space.setText("")
             # self.label_free_space_icon.hide()
         else:
             self.label_free_space.setText(global_config[self.profile_name]["free_space"])
@@ -1496,6 +1496,17 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.listWidget_selected_business_folders.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.listWidget_selected_business_folders.clear()
         self.listWidget_selected_business_folders.addItems(existing_business_shared_folders)
+
+        # Disable Business Shared Folder tab when account type is not Business
+        # TODO: This should be a separate method. We only need to run this check on startup and when new account is created.
+        # TODO: Since we do not know the account type when the profile is created, the tab will be disabled by default.
+        # TODO: We also keep the tab enabled when imported profile has sync_business_shared_folders set to True.
+        if global_config[self.profile]["account_type"] == "Business":
+            self.tabWidget.setTabEnabled(4, True)
+        elif global_config[self.profile]["onedrive"]["sync_business_shared_folders"].strip('"') == "true":
+            self.tabWidget.setTabEnabled(4, True)
+        else:
+            self.tabWidget.setTabEnabled(4, False)
 
     def read_sync_list(self):
         self.sync_list_file = re.search(r"(.+)/.+$", self.config_file).group(1) + "/sync_list"
@@ -2590,7 +2601,7 @@ def create_global_config():
 
     # Load all default values. Needed for cases when imported config does not contain all properties.
     _default_od_config = read_config(DIR_PATH + "/resources/default_config")
-    _default_profile_config = {"auto_sync": False, "account_type": "", "free_space": 0}
+    _default_profile_config = {"auto_sync": False, "account_type": "", "free_space": ""}
     default_od_config = _default_od_config._sections
     logging.debug(f"[GUI] - loading default config {default_od_config}")
 
@@ -2637,8 +2648,17 @@ def save_global_config():
     for profile in _profile_config:
         _profile_config[profile].pop("onedrive", None)
 
-    logging.debug(f"[save_global_config]:[2]{_profile_config}")
-    logging.debug(f"[save_global_config]:[3]{global_config}")
+    # TODO: Re-write to better support future options.
+    _default_profile_config = {"auto_sync": False, "account_type": "", "free_space": ""}
+
+    if "auto_sync" not in _profile_config[profile]:  # add 'auto_sync' value if missing from older versions
+        _profile_config[profile]["auto_sync"] = _default_profile_config["auto_sync"]
+
+    if "account_type" not in _profile_config[profile]:  # add 'account_type' value if missing from older versions
+        _profile_config[profile]["account_type"] = _default_profile_config["account_type"]
+
+    if "free_space" not in _profile_config[profile]:  # add 'free_space' value if missing from older versions
+        _profile_config[profile]["free_space"] = _default_profile_config["free_space"]
 
     profile_config = ConfigParser()
     profile_config.read_dict(_profile_config)
