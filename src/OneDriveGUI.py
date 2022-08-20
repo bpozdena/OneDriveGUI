@@ -702,7 +702,7 @@ class wizardPage_import(QWizardPage):
                 logging.warning(f"[GUI] Specified config file '{self.lineEdit_config_path.text().strip()}' not found!")
 
     def get_config_name(self):
-        self.file_dialog = QFileDialog.getOpenFileName(self, dir=os.path.expanduser("~/.config/"))
+        self.file_dialog = QFileDialog.getOpenFileName(self, dir=os.path.expanduser("~/.config/onedrive"))
 
         file_name = self.file_dialog[0]
 
