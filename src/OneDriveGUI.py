@@ -1974,11 +1974,19 @@ class WorkerThread(QThread):
                     self.profile_status["free_space"] = f"{self.free_space_human}"
                     self.update_profile_status.emit(self.profile_status, self.profile_name)
 
+                    # Update profile file with Free Space
+                    global_config[self.profile_name]["free_space"] = self.free_space_human
+                    save_global_config()
+
                 elif "Account Type" in stdout:
                     self.account_type = re.search(r"\s(\w+)$", stdout).group(1)
                     self.profile_status["account_type"] = self.account_type.capitalize()
                     logging.info(f"[{self.profile_name}] Account type: {self.account_type}")
                     self.update_profile_status.emit(self.profile_status, self.profile_name)
+
+                    # Update profile file with account type
+                    global_config[self.profile_name]["account_type"] = self.account_type.capitalize()
+                    save_global_config()
 
                 elif "Initializing the OneDrive API" in stdout:
                     self.profile_status["status_message"] = "Initializing the OneDrive API"
@@ -2219,6 +2227,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def show_settings_window(self):
         profile_settings_window.show()
+
+        # Start checking for unsaved changes.
+        profile_settings_window.start_unsaved_changes_timer()
 
     def switch_account_status_page(self):
         self.stackedLayout.setCurrentIndex(self.comboBox.currentIndex())
@@ -2567,7 +2578,7 @@ def create_global_config():
 
     # Load all default values. Needed for cases when imported config does not contain all properties.
     _default_od_config = read_config(DIR_PATH + "/resources/default_config")
-    _default_profile_config = {"auto_sync": False}
+    _default_profile_config = {"auto_sync": False, "account_type": "", "free_space": 0}
     default_od_config = _default_od_config._sections
     logging.debug(f"[GUI] - loading default config {default_od_config}")
 
@@ -2581,8 +2592,15 @@ def create_global_config():
         _od_config = read_config(profile_config_file)
         od_config = _od_config._sections
 
+        # TODO: Re-write to better support future options.
         if "auto_sync" not in profiles[profile]:  # add 'auto_sync' value if missing from older versions
-            profiles[profile].update(_default_profile_config)
+            profiles[profile]["auto_sync"] = _default_profile_config["auto_sync"]
+
+        if "account_type" not in profiles[profile]:  # add 'account_type' value if missing from older versions
+            profiles[profile]["account_type"] = _default_profile_config["account_type"]
+
+        if "free_space" not in profiles[profile]:  # add 'free_space' value if missing from older versions
+            profiles[profile]["free_space"] = _default_profile_config["free_space"]
 
         profiles[profile].update(default_od_config)
         profiles[profile].update(od_config)
