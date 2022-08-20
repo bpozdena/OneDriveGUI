@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'process_status_page.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.2
+## Created by: Qt User Interface Compiler version 6.2.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -15,10 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QGridLayout,
-    QHBoxLayout, QLabel, QListWidget, QListWidgetItem,
-    QPushButton, QSizePolicy, QToolButton, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QHBoxLayout,
+    QLabel, QListWidget, QListWidgetItem, QPushButton,
+    QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
 
 class Ui_status_page(object):
     def setupUi(self, status_page):
@@ -31,19 +30,40 @@ class Ui_status_page(object):
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.frame = QFrame(status_page)
         self.frame.setObjectName(u"frame")
-        self.frame.setMinimumSize(QSize(0, 80))
+        self.frame.setMinimumSize(QSize(0, 100))
         self.frame.setStyleSheet(u"background-color: rgb(0, 120, 212);")
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
-        self.gridLayout = QGridLayout(self.frame)
-        self.gridLayout.setSpacing(2)
-        self.gridLayout.setObjectName(u"gridLayout")
-        self.gridLayout.setContentsMargins(2, 2, 2, 2)
-        self.toolButton_start = QToolButton(self.frame)
-        self.toolButton_start.setObjectName(u"toolButton_start")
-        self.toolButton_start.setStyleSheet(u"color: rgb(255, 255, 255);")
+        self.verticalLayout_2 = QVBoxLayout(self.frame)
+        self.verticalLayout_2.setSpacing(0)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setSpacing(0)
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.horizontalLayout_3.setContentsMargins(5, 5, 5, -1)
+        self.pushButton_quit = QPushButton(self.frame)
+        self.pushButton_quit.setObjectName(u"pushButton_quit")
+        self.pushButton_quit.setMaximumSize(QSize(40, 16777215))
+        self.pushButton_quit.setIconSize(QSize(20, 20))
+        self.pushButton_quit.setFlat(True)
 
-        self.gridLayout.addWidget(self.toolButton_start, 5, 0, 1, 1)
+        self.horizontalLayout_3.addWidget(self.pushButton_quit)
+
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_3.addItem(self.horizontalSpacer)
+
+        self.pushButton_close = QPushButton(self.frame)
+        self.pushButton_close.setObjectName(u"pushButton_close")
+        self.pushButton_close.setMaximumSize(QSize(40, 16777215))
+        self.pushButton_close.setIconSize(QSize(26, 26))
+        self.pushButton_close.setFlat(True)
+
+        self.horizontalLayout_3.addWidget(self.pushButton_close)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_3)
 
         self.label_onedrive_status = QLabel(self.frame)
         self.label_onedrive_status.setObjectName(u"label_onedrive_status")
@@ -54,41 +74,77 @@ class Ui_status_page(object):
         self.label_onedrive_status.setStyleSheet(u"color: rgb(255, 255, 255);")
         self.label_onedrive_status.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout.addWidget(self.label_onedrive_status, 1, 0, 1, 5)
-
-        self.label_status = QLabel(self.frame)
-        self.label_status.setObjectName(u"label_status")
-        self.label_status.setMaximumSize(QSize(20, 16777215))
-        self.label_status.setStyleSheet(u"color: rgb(255, 255, 255);")
-
-        self.gridLayout.addWidget(self.label_status, 5, 2, 1, 1)
-
-        self.toolButton_stop = QToolButton(self.frame)
-        self.toolButton_stop.setObjectName(u"toolButton_stop")
-        self.toolButton_stop.setStyleSheet(u"color: rgb(255, 255, 255);")
-
-        self.gridLayout.addWidget(self.toolButton_stop, 5, 1, 1, 1)
+        self.verticalLayout_2.addWidget(self.label_onedrive_status)
 
         self.label_account_type = QLabel(self.frame)
         self.label_account_type.setObjectName(u"label_account_type")
         self.label_account_type.setStyleSheet(u"color: rgb(255, 255, 255);")
         self.label_account_type.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout.addWidget(self.label_account_type, 3, 0, 1, 5)
+        self.verticalLayout_2.addWidget(self.label_account_type)
 
-        self.label_free_space = QLabel(self.frame)
-        self.label_free_space.setObjectName(u"label_free_space")
-        self.label_free_space.setStyleSheet(u"color: rgb(255, 255, 255);")
-        self.label_free_space.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setSpacing(0)
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalLayout_2.setContentsMargins(0, -1, 5, -1)
+        self.pushButton_start_stop = QPushButton(self.frame)
+        self.pushButton_start_stop.setObjectName(u"pushButton_start_stop")
+        self.pushButton_start_stop.setMaximumSize(QSize(40, 16777215))
+        self.pushButton_start_stop.setFlat(True)
 
-        self.gridLayout.addWidget(self.label_free_space, 5, 4, 1, 1)
+        self.horizontalLayout_2.addWidget(self.pushButton_start_stop)
+
+        self.pushButton_start = QPushButton(self.frame)
+        self.pushButton_start.setObjectName(u"pushButton_start")
+        self.pushButton_start.setMaximumSize(QSize(30, 16777215))
+        self.pushButton_start.setStyleSheet(u"color: rgb(255, 255, 255);")
+        self.pushButton_start.setIconSize(QSize(20, 20))
+        self.pushButton_start.setFlat(True)
+
+        self.horizontalLayout_2.addWidget(self.pushButton_start)
+
+        self.pushButton_stop = QPushButton(self.frame)
+        self.pushButton_stop.setObjectName(u"pushButton_stop")
+        self.pushButton_stop.setMaximumSize(QSize(30, 16777215))
+        self.pushButton_stop.setStyleSheet(u"color: rgb(255, 255, 255);")
+        self.pushButton_stop.setIconSize(QSize(20, 20))
+        self.pushButton_stop.setFlat(True)
+
+        self.horizontalLayout_2.addWidget(self.pushButton_stop)
+
+        self.label_status = QLabel(self.frame)
+        self.label_status.setObjectName(u"label_status")
+        self.label_status.setMaximumSize(QSize(20, 16777215))
+        self.label_status.setStyleSheet(u"color: rgb(255, 255, 255);")
+
+        self.horizontalLayout_2.addWidget(self.label_status)
 
         self.label_version_check = QLabel(self.frame)
         self.label_version_check.setObjectName(u"label_version_check")
         self.label_version_check.setMaximumSize(QSize(20, 16777215))
         self.label_version_check.setStyleSheet(u"QToolTip { color: white; }")
 
-        self.gridLayout.addWidget(self.label_version_check, 5, 3, 1, 1)
+        self.horizontalLayout_2.addWidget(self.label_version_check)
+
+        self.label_free_space = QLabel(self.frame)
+        self.label_free_space.setObjectName(u"label_free_space")
+        font1 = QFont()
+        font1.setBold(True)
+        self.label_free_space.setFont(font1)
+        self.label_free_space.setStyleSheet(u"color: rgb(255, 255, 255);")
+        self.label_free_space.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.horizontalLayout_2.addWidget(self.label_free_space)
+
+        self.label_free_space_icon = QLabel(self.frame)
+        self.label_free_space_icon.setObjectName(u"label_free_space_icon")
+        self.label_free_space_icon.setMaximumSize(QSize(26, 16777215))
+        self.label_free_space_icon.setStyleSheet(u"QToolTip { color: white; }")
+
+        self.horizontalLayout_2.addWidget(self.label_free_space_icon)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_2)
 
 
         self.verticalLayout.addWidget(self.frame)
@@ -109,6 +165,8 @@ class Ui_status_page(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton_open_dir.sizePolicy().hasHeightForWidth())
         self.pushButton_open_dir.setSizePolicy(sizePolicy)
+        self.pushButton_open_dir.setIconSize(QSize(26, 26))
+        self.pushButton_open_dir.setFlat(True)
 
         self.horizontalLayout.addWidget(self.pushButton_open_dir)
 
@@ -116,6 +174,8 @@ class Ui_status_page(object):
         self.pushButton_profiles.setObjectName(u"pushButton_profiles")
         sizePolicy.setHeightForWidth(self.pushButton_profiles.sizePolicy().hasHeightForWidth())
         self.pushButton_profiles.setSizePolicy(sizePolicy)
+        self.pushButton_profiles.setIconSize(QSize(26, 26))
+        self.pushButton_profiles.setFlat(True)
 
         self.horizontalLayout.addWidget(self.pushButton_profiles)
 
@@ -123,6 +183,8 @@ class Ui_status_page(object):
         self.pushButton_gui_settings.setObjectName(u"pushButton_gui_settings")
         sizePolicy.setHeightForWidth(self.pushButton_gui_settings.sizePolicy().hasHeightForWidth())
         self.pushButton_gui_settings.setSizePolicy(sizePolicy)
+        self.pushButton_gui_settings.setIconSize(QSize(26, 26))
+        self.pushButton_gui_settings.setFlat(True)
 
         self.horizontalLayout.addWidget(self.pushButton_gui_settings)
 
@@ -137,13 +199,23 @@ class Ui_status_page(object):
 
     def retranslateUi(self, status_page):
         status_page.setWindowTitle(QCoreApplication.translate("status_page", u"OneDriveGUI - Process Status", None))
-        self.toolButton_start.setText(QCoreApplication.translate("status_page", u"Start", None))
+        self.pushButton_quit.setText(QCoreApplication.translate("status_page", u"Quit", None))
+        self.pushButton_close.setText(QCoreApplication.translate("status_page", u"Close", None))
         self.label_onedrive_status.setText(QCoreApplication.translate("status_page", u"Onedrive is sync not running", None))
-        self.label_status.setText("")
-        self.toolButton_stop.setText(QCoreApplication.translate("status_page", u"Stop", None))
         self.label_account_type.setText("")
-        self.label_free_space.setText("")
+        self.pushButton_start_stop.setText(QCoreApplication.translate("status_page", u"start/stop", None))
+        self.pushButton_start.setText(QCoreApplication.translate("status_page", u"Start", None))
+        self.pushButton_stop.setText(QCoreApplication.translate("status_page", u"Stop", None))
+        self.label_status.setText("")
         self.label_version_check.setText("")
+#if QT_CONFIG(tooltip)
+        self.label_free_space.setToolTip(QCoreApplication.translate("status_page", u"Free Space", None))
+#endif // QT_CONFIG(tooltip)
+        self.label_free_space.setText("")
+#if QT_CONFIG(tooltip)
+        self.label_free_space_icon.setToolTip(QCoreApplication.translate("status_page", u"Free Space", None))
+#endif // QT_CONFIG(tooltip)
+        self.label_free_space_icon.setText(QCoreApplication.translate("status_page", u"TextLabel", None))
         self.pushButton_open_dir.setText(QCoreApplication.translate("status_page", u"Open Sync Directory", None))
         self.pushButton_profiles.setText(QCoreApplication.translate("status_page", u"Profiles", None))
         self.pushButton_gui_settings.setText(QCoreApplication.translate("status_page", u"GUI Settings", None))
