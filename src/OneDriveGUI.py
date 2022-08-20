@@ -2216,7 +2216,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         finally:
             for profile_name in global_config:
                 self.profile_status_pages[profile_name].label_onedrive_status.setOpenExternalLinks(True)
-                self.profile_status_pages[profile_name].label_onedrive_status.setText(version_label_text)
+                if version_label_text != "":
+                    self.profile_status_pages[profile_name].label_onedrive_status.setText(version_label_text)
 
                 if not min_requirements_met:
                     # Disable Start Sync button if OneDrive client is too old (smaller then min_supported_version_num).
