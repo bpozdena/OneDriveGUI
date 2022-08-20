@@ -209,7 +209,7 @@ class Ui_status_page(object):
         self.label_status.setText("")
         self.label_version_check.setText("")
 #if QT_CONFIG(tooltip)
-        self.label_free_space.setToolTip(QCoreApplication.translate("status_page", u"Free Space", None))
+        self.label_free_space.setToolTip("")
 #endif // QT_CONFIG(tooltip)
         self.label_free_space.setText("")
 #if QT_CONFIG(tooltip)

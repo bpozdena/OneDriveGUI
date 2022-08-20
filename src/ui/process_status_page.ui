@@ -284,7 +284,7 @@
            </font>
           </property>
           <property name="toolTip">
-           <string>Free Space</string>
+           <string/>
           </property>
           <property name="styleSheet">
            <string notr="true">color: rgb(255, 255, 255);</string>
