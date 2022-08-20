@@ -81,6 +81,9 @@ class Ui_profile_settings(object):
         self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.checkBox_auto_sync = QCheckBox(self.groupBox_12)
         self.checkBox_auto_sync.setObjectName(u"checkBox_auto_sync")
+        font1 = QFont()
+        font1.setBold(True)
+        self.checkBox_auto_sync.setFont(font1)
 
         self.gridLayout_3.addWidget(self.checkBox_auto_sync, 0, 0, 1, 1)
 
@@ -102,149 +105,6 @@ class Ui_profile_settings(object):
         self.verticalLayout_5.addItem(self.verticalSpacer_3)
 
         self.tabWidget.addTab(self.monitored_tab_2, "")
-        self.tab = QWidget()
-        self.tab.setObjectName(u"tab")
-        self.verticalLayout_7 = QVBoxLayout(self.tab)
-        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
-        self.groupBox = QGroupBox(self.tab)
-        self.groupBox.setObjectName(u"groupBox")
-        self.verticalLayout_3 = QVBoxLayout(self.groupBox)
-        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.gridLayout_6 = QGridLayout()
-        self.gridLayout_6.setObjectName(u"gridLayout_6")
-        self.lineEdit_skip_file = QLineEdit(self.groupBox)
-        self.lineEdit_skip_file.setObjectName(u"lineEdit_skip_file")
-
-        self.gridLayout_6.addWidget(self.lineEdit_skip_file, 1, 0, 1, 1)
-
-        self.pushButton_add_skip_file = QPushButton(self.groupBox)
-        self.pushButton_add_skip_file.setObjectName(u"pushButton_add_skip_file")
-
-        self.gridLayout_6.addWidget(self.pushButton_add_skip_file, 1, 1, 1, 1)
-
-        self.pushButton_rm_skip_file = QPushButton(self.groupBox)
-        self.pushButton_rm_skip_file.setObjectName(u"pushButton_rm_skip_file")
-        sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pushButton_rm_skip_file.sizePolicy().hasHeightForWidth())
-        self.pushButton_rm_skip_file.setSizePolicy(sizePolicy)
-
-        self.gridLayout_6.addWidget(self.pushButton_rm_skip_file, 0, 1, 1, 1)
-
-        self.listWidget_skip_file = QListWidget(self.groupBox)
-        self.listWidget_skip_file.setObjectName(u"listWidget_skip_file")
-
-        self.gridLayout_6.addWidget(self.listWidget_skip_file, 0, 0, 1, 1)
-
-
-        self.verticalLayout_3.addLayout(self.gridLayout_6)
-
-
-        self.verticalLayout_7.addWidget(self.groupBox)
-
-        self.groupBox_2 = QGroupBox(self.tab)
-        self.groupBox_2.setObjectName(u"groupBox_2")
-        self.verticalLayout_4 = QVBoxLayout(self.groupBox_2)
-        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-        self.checkBox_skip_dir_strict_match = QCheckBox(self.groupBox_2)
-        self.checkBox_skip_dir_strict_match.setObjectName(u"checkBox_skip_dir_strict_match")
-
-        self.verticalLayout_4.addWidget(self.checkBox_skip_dir_strict_match)
-
-        self.gridLayout_7 = QGridLayout()
-        self.gridLayout_7.setObjectName(u"gridLayout_7")
-        self.pushButton_rm_skip_dir = QPushButton(self.groupBox_2)
-        self.pushButton_rm_skip_dir.setObjectName(u"pushButton_rm_skip_dir")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Minimum)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.pushButton_rm_skip_dir.sizePolicy().hasHeightForWidth())
-        self.pushButton_rm_skip_dir.setSizePolicy(sizePolicy1)
-
-        self.gridLayout_7.addWidget(self.pushButton_rm_skip_dir, 0, 1, 1, 1)
-
-        self.listWidget_skip_dir = QListWidget(self.groupBox_2)
-        self.listWidget_skip_dir.setObjectName(u"listWidget_skip_dir")
-        sizePolicy2 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.listWidget_skip_dir.sizePolicy().hasHeightForWidth())
-        self.listWidget_skip_dir.setSizePolicy(sizePolicy2)
-
-        self.gridLayout_7.addWidget(self.listWidget_skip_dir, 0, 0, 1, 1)
-
-        self.lineEdit_skip_dir = QLineEdit(self.groupBox_2)
-        self.lineEdit_skip_dir.setObjectName(u"lineEdit_skip_dir")
-
-        self.gridLayout_7.addWidget(self.lineEdit_skip_dir, 1, 0, 1, 1)
-
-        self.pushButton_add_skip_dir = QPushButton(self.groupBox_2)
-        self.pushButton_add_skip_dir.setObjectName(u"pushButton_add_skip_dir")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.pushButton_add_skip_dir.sizePolicy().hasHeightForWidth())
-        self.pushButton_add_skip_dir.setSizePolicy(sizePolicy3)
-
-        self.gridLayout_7.addWidget(self.pushButton_add_skip_dir, 1, 1, 1, 1)
-
-
-        self.verticalLayout_4.addLayout(self.gridLayout_7)
-
-
-        self.verticalLayout_7.addWidget(self.groupBox_2)
-
-        self.groupBox_3 = QGroupBox(self.tab)
-        self.groupBox_3.setObjectName(u"groupBox_3")
-        self.gridLayout_2 = QGridLayout(self.groupBox_3)
-        self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.checkBox_skip_symlinks = QCheckBox(self.groupBox_3)
-        self.checkBox_skip_symlinks.setObjectName(u"checkBox_skip_symlinks")
-
-        self.gridLayout_2.addWidget(self.checkBox_skip_symlinks, 0, 1, 1, 1)
-
-        self.checkBox_check_nosync = QCheckBox(self.groupBox_3)
-        self.checkBox_check_nosync.setObjectName(u"checkBox_check_nosync")
-
-        self.gridLayout_2.addWidget(self.checkBox_check_nosync, 0, 0, 1, 1)
-
-        self.checkBox_skip_dotfiles = QCheckBox(self.groupBox_3)
-        self.checkBox_skip_dotfiles.setObjectName(u"checkBox_skip_dotfiles")
-
-        self.gridLayout_2.addWidget(self.checkBox_skip_dotfiles, 1, 0, 1, 1)
-
-
-        self.verticalLayout_7.addWidget(self.groupBox_3)
-
-        self.tabWidget.addTab(self.tab, "")
-        self.tab_3 = QWidget()
-        self.tab_3.setObjectName(u"tab_3")
-        self.verticalLayout_10 = QVBoxLayout(self.tab_3)
-        self.verticalLayout_10.setObjectName(u"verticalLayout_10")
-        self.groupBox_11 = QGroupBox(self.tab_3)
-        self.groupBox_11.setObjectName(u"groupBox_11")
-        self.verticalLayout_11 = QVBoxLayout(self.groupBox_11)
-        self.verticalLayout_11.setObjectName(u"verticalLayout_11")
-        self.label_sync_list = QLabel(self.groupBox_11)
-        self.label_sync_list.setObjectName(u"label_sync_list")
-
-        self.verticalLayout_11.addWidget(self.label_sync_list)
-
-        self.checkBox_sync_root_files = QCheckBox(self.groupBox_11)
-        self.checkBox_sync_root_files.setObjectName(u"checkBox_sync_root_files")
-
-        self.verticalLayout_11.addWidget(self.checkBox_sync_root_files)
-
-        self.textEdit_sync_list = QTextEdit(self.groupBox_11)
-        self.textEdit_sync_list.setObjectName(u"textEdit_sync_list")
-
-        self.verticalLayout_11.addWidget(self.textEdit_sync_list)
-
-
-        self.verticalLayout_10.addWidget(self.groupBox_11)
-
-        self.tabWidget.addTab(self.tab_3, "")
         self.tab_2 = QWidget()
         self.tab_2.setObjectName(u"tab_2")
         self.verticalLayout_8 = QVBoxLayout(self.tab_2)
@@ -491,6 +351,292 @@ class Ui_profile_settings(object):
         self.verticalLayout_8.addItem(self.verticalSpacer_4)
 
         self.tabWidget.addTab(self.tab_2, "")
+        self.tab = QWidget()
+        self.tab.setObjectName(u"tab")
+        self.verticalLayout_7 = QVBoxLayout(self.tab)
+        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
+        self.groupBox = QGroupBox(self.tab)
+        self.groupBox.setObjectName(u"groupBox")
+        self.verticalLayout_3 = QVBoxLayout(self.groupBox)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.gridLayout_6 = QGridLayout()
+        self.gridLayout_6.setObjectName(u"gridLayout_6")
+        self.lineEdit_skip_file = QLineEdit(self.groupBox)
+        self.lineEdit_skip_file.setObjectName(u"lineEdit_skip_file")
+
+        self.gridLayout_6.addWidget(self.lineEdit_skip_file, 1, 0, 1, 1)
+
+        self.pushButton_add_skip_file = QPushButton(self.groupBox)
+        self.pushButton_add_skip_file.setObjectName(u"pushButton_add_skip_file")
+
+        self.gridLayout_6.addWidget(self.pushButton_add_skip_file, 1, 1, 1, 1)
+
+        self.pushButton_rm_skip_file = QPushButton(self.groupBox)
+        self.pushButton_rm_skip_file.setObjectName(u"pushButton_rm_skip_file")
+        sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.pushButton_rm_skip_file.sizePolicy().hasHeightForWidth())
+        self.pushButton_rm_skip_file.setSizePolicy(sizePolicy)
+
+        self.gridLayout_6.addWidget(self.pushButton_rm_skip_file, 0, 1, 1, 1)
+
+        self.listWidget_skip_file = QListWidget(self.groupBox)
+        self.listWidget_skip_file.setObjectName(u"listWidget_skip_file")
+
+        self.gridLayout_6.addWidget(self.listWidget_skip_file, 0, 0, 1, 1)
+
+
+        self.verticalLayout_3.addLayout(self.gridLayout_6)
+
+
+        self.verticalLayout_7.addWidget(self.groupBox)
+
+        self.groupBox_2 = QGroupBox(self.tab)
+        self.groupBox_2.setObjectName(u"groupBox_2")
+        self.verticalLayout_4 = QVBoxLayout(self.groupBox_2)
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.checkBox_skip_dir_strict_match = QCheckBox(self.groupBox_2)
+        self.checkBox_skip_dir_strict_match.setObjectName(u"checkBox_skip_dir_strict_match")
+
+        self.verticalLayout_4.addWidget(self.checkBox_skip_dir_strict_match)
+
+        self.gridLayout_7 = QGridLayout()
+        self.gridLayout_7.setObjectName(u"gridLayout_7")
+        self.pushButton_rm_skip_dir = QPushButton(self.groupBox_2)
+        self.pushButton_rm_skip_dir.setObjectName(u"pushButton_rm_skip_dir")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Minimum)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.pushButton_rm_skip_dir.sizePolicy().hasHeightForWidth())
+        self.pushButton_rm_skip_dir.setSizePolicy(sizePolicy1)
+
+        self.gridLayout_7.addWidget(self.pushButton_rm_skip_dir, 0, 1, 1, 1)
+
+        self.listWidget_skip_dir = QListWidget(self.groupBox_2)
+        self.listWidget_skip_dir.setObjectName(u"listWidget_skip_dir")
+        sizePolicy2 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.listWidget_skip_dir.sizePolicy().hasHeightForWidth())
+        self.listWidget_skip_dir.setSizePolicy(sizePolicy2)
+
+        self.gridLayout_7.addWidget(self.listWidget_skip_dir, 0, 0, 1, 1)
+
+        self.lineEdit_skip_dir = QLineEdit(self.groupBox_2)
+        self.lineEdit_skip_dir.setObjectName(u"lineEdit_skip_dir")
+
+        self.gridLayout_7.addWidget(self.lineEdit_skip_dir, 1, 0, 1, 1)
+
+        self.pushButton_add_skip_dir = QPushButton(self.groupBox_2)
+        self.pushButton_add_skip_dir.setObjectName(u"pushButton_add_skip_dir")
+        sizePolicy3 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.pushButton_add_skip_dir.sizePolicy().hasHeightForWidth())
+        self.pushButton_add_skip_dir.setSizePolicy(sizePolicy3)
+
+        self.gridLayout_7.addWidget(self.pushButton_add_skip_dir, 1, 1, 1, 1)
+
+
+        self.verticalLayout_4.addLayout(self.gridLayout_7)
+
+
+        self.verticalLayout_7.addWidget(self.groupBox_2)
+
+        self.groupBox_3 = QGroupBox(self.tab)
+        self.groupBox_3.setObjectName(u"groupBox_3")
+        self.gridLayout_2 = QGridLayout(self.groupBox_3)
+        self.gridLayout_2.setObjectName(u"gridLayout_2")
+        self.checkBox_skip_symlinks = QCheckBox(self.groupBox_3)
+        self.checkBox_skip_symlinks.setObjectName(u"checkBox_skip_symlinks")
+
+        self.gridLayout_2.addWidget(self.checkBox_skip_symlinks, 0, 1, 1, 1)
+
+        self.checkBox_check_nosync = QCheckBox(self.groupBox_3)
+        self.checkBox_check_nosync.setObjectName(u"checkBox_check_nosync")
+
+        self.gridLayout_2.addWidget(self.checkBox_check_nosync, 0, 0, 1, 1)
+
+        self.checkBox_skip_dotfiles = QCheckBox(self.groupBox_3)
+        self.checkBox_skip_dotfiles.setObjectName(u"checkBox_skip_dotfiles")
+
+        self.gridLayout_2.addWidget(self.checkBox_skip_dotfiles, 1, 0, 1, 1)
+
+
+        self.verticalLayout_7.addWidget(self.groupBox_3)
+
+        self.tabWidget.addTab(self.tab, "")
+        self.tab_3 = QWidget()
+        self.tab_3.setObjectName(u"tab_3")
+        self.verticalLayout_10 = QVBoxLayout(self.tab_3)
+        self.verticalLayout_10.setObjectName(u"verticalLayout_10")
+        self.groupBox_11 = QGroupBox(self.tab_3)
+        self.groupBox_11.setObjectName(u"groupBox_11")
+        self.verticalLayout_11 = QVBoxLayout(self.groupBox_11)
+        self.verticalLayout_11.setObjectName(u"verticalLayout_11")
+        self.label_sync_list = QLabel(self.groupBox_11)
+        self.label_sync_list.setObjectName(u"label_sync_list")
+
+        self.verticalLayout_11.addWidget(self.label_sync_list)
+
+        self.checkBox_sync_root_files = QCheckBox(self.groupBox_11)
+        self.checkBox_sync_root_files.setObjectName(u"checkBox_sync_root_files")
+
+        self.verticalLayout_11.addWidget(self.checkBox_sync_root_files)
+
+        self.textEdit_sync_list = QTextEdit(self.groupBox_11)
+        self.textEdit_sync_list.setObjectName(u"textEdit_sync_list")
+
+        self.verticalLayout_11.addWidget(self.textEdit_sync_list)
+
+
+        self.verticalLayout_10.addWidget(self.groupBox_11)
+
+        self.tabWidget.addTab(self.tab_3, "")
+        self.tab_4 = QWidget()
+        self.tab_4.setObjectName(u"tab_4")
+        self.verticalLayout = QVBoxLayout(self.tab_4)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.groupBox_sync_business_shared_folders = QGroupBox(self.tab_4)
+        self.groupBox_sync_business_shared_folders.setObjectName(u"groupBox_sync_business_shared_folders")
+        self.groupBox_sync_business_shared_folders.setCheckable(True)
+        self.groupBox_sync_business_shared_folders.setChecked(True)
+        self.gridLayout_12 = QGridLayout(self.groupBox_sync_business_shared_folders)
+        self.gridLayout_12.setObjectName(u"gridLayout_12")
+        self.label_business_available = QLabel(self.groupBox_sync_business_shared_folders)
+        self.label_business_available.setObjectName(u"label_business_available")
+
+        self.gridLayout_12.addWidget(self.label_business_available, 3, 0, 1, 1)
+
+        self.checkBox_sync_business_shared_folders = QCheckBox(self.groupBox_sync_business_shared_folders)
+        self.checkBox_sync_business_shared_folders.setObjectName(u"checkBox_sync_business_shared_folders")
+
+        self.gridLayout_12.addWidget(self.checkBox_sync_business_shared_folders, 0, 0, 1, 1)
+
+        self.listWidget_available_business_folders = QListWidget(self.groupBox_sync_business_shared_folders)
+        self.listWidget_available_business_folders.setObjectName(u"listWidget_available_business_folders")
+
+        self.gridLayout_12.addWidget(self.listWidget_available_business_folders, 6, 0, 1, 1)
+
+        self.label_business_selected = QLabel(self.groupBox_sync_business_shared_folders)
+        self.label_business_selected.setObjectName(u"label_business_selected")
+
+        self.gridLayout_12.addWidget(self.label_business_selected, 3, 2, 1, 1)
+
+        self.verticalLayout_14 = QVBoxLayout()
+        self.verticalLayout_14.setObjectName(u"verticalLayout_14")
+        self.verticalSpacer_5 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_14.addItem(self.verticalSpacer_5)
+
+        self.pushButton_add_business_folder = QPushButton(self.groupBox_sync_business_shared_folders)
+        self.pushButton_add_business_folder.setObjectName(u"pushButton_add_business_folder")
+        self.pushButton_add_business_folder.setMaximumSize(QSize(50, 16777215))
+
+        self.verticalLayout_14.addWidget(self.pushButton_add_business_folder)
+
+        self.verticalSpacer_6 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_14.addItem(self.verticalSpacer_6)
+
+
+        self.gridLayout_12.addLayout(self.verticalLayout_14, 6, 1, 1, 1)
+
+        self.listWidget_selected_business_folders = QListWidget(self.groupBox_sync_business_shared_folders)
+        self.listWidget_selected_business_folders.setObjectName(u"listWidget_selected_business_folders")
+
+        self.gridLayout_12.addWidget(self.listWidget_selected_business_folders, 6, 2, 1, 1)
+
+        self.pushButton_get_business_folders = QPushButton(self.groupBox_sync_business_shared_folders)
+        self.pushButton_get_business_folders.setObjectName(u"pushButton_get_business_folders")
+
+        self.gridLayout_12.addWidget(self.pushButton_get_business_folders, 4, 0, 1, 1)
+
+        self.pushButton_remove_business_folders = QPushButton(self.groupBox_sync_business_shared_folders)
+        self.pushButton_remove_business_folders.setObjectName(u"pushButton_remove_business_folders")
+
+        self.gridLayout_12.addWidget(self.pushButton_remove_business_folders, 4, 2, 1, 1)
+
+
+        self.verticalLayout.addWidget(self.groupBox_sync_business_shared_folders)
+
+        self.tabWidget.addTab(self.tab_4, "")
+        self.tab_5 = QWidget()
+        self.tab_5.setObjectName(u"tab_5")
+        self.gridLayout = QGridLayout(self.tab_5)
+        self.gridLayout.setObjectName(u"gridLayout")
+        self.groupBox_9 = QGroupBox(self.tab_5)
+        self.groupBox_9.setObjectName(u"groupBox_9")
+        self.formLayout_2 = QFormLayout(self.groupBox_9)
+        self.formLayout_2.setObjectName(u"formLayout_2")
+        self.label_webhook_public_url = QLabel(self.groupBox_9)
+        self.label_webhook_public_url.setObjectName(u"label_webhook_public_url")
+
+        self.formLayout_2.setWidget(1, QFormLayout.LabelRole, self.label_webhook_public_url)
+
+        self.lineEdit_webhook_public_url = QLineEdit(self.groupBox_9)
+        self.lineEdit_webhook_public_url.setObjectName(u"lineEdit_webhook_public_url")
+
+        self.formLayout_2.setWidget(1, QFormLayout.FieldRole, self.lineEdit_webhook_public_url)
+
+        self.label_webhook_listening_host = QLabel(self.groupBox_9)
+        self.label_webhook_listening_host.setObjectName(u"label_webhook_listening_host")
+
+        self.formLayout_2.setWidget(2, QFormLayout.LabelRole, self.label_webhook_listening_host)
+
+        self.lineEdit_webhook_listening_host = QLineEdit(self.groupBox_9)
+        self.lineEdit_webhook_listening_host.setObjectName(u"lineEdit_webhook_listening_host")
+
+        self.formLayout_2.setWidget(2, QFormLayout.FieldRole, self.lineEdit_webhook_listening_host)
+
+        self.label_webhook_listening_port = QLabel(self.groupBox_9)
+        self.label_webhook_listening_port.setObjectName(u"label_webhook_listening_port")
+
+        self.formLayout_2.setWidget(3, QFormLayout.LabelRole, self.label_webhook_listening_port)
+
+        self.spinBox_webhook_listening_port = QSpinBox(self.groupBox_9)
+        self.spinBox_webhook_listening_port.setObjectName(u"spinBox_webhook_listening_port")
+        self.spinBox_webhook_listening_port.setMinimum(1)
+        self.spinBox_webhook_listening_port.setMaximum(65353)
+
+        self.formLayout_2.setWidget(3, QFormLayout.FieldRole, self.spinBox_webhook_listening_port)
+
+        self.label_webhook_expiration_interval = QLabel(self.groupBox_9)
+        self.label_webhook_expiration_interval.setObjectName(u"label_webhook_expiration_interval")
+
+        self.formLayout_2.setWidget(4, QFormLayout.LabelRole, self.label_webhook_expiration_interval)
+
+        self.spinBox_webhook_expiration_interval = QSpinBox(self.groupBox_9)
+        self.spinBox_webhook_expiration_interval.setObjectName(u"spinBox_webhook_expiration_interval")
+        self.spinBox_webhook_expiration_interval.setMaximum(1000000)
+
+        self.formLayout_2.setWidget(4, QFormLayout.FieldRole, self.spinBox_webhook_expiration_interval)
+
+        self.label_webhook_renewal_interval = QLabel(self.groupBox_9)
+        self.label_webhook_renewal_interval.setObjectName(u"label_webhook_renewal_interval")
+
+        self.formLayout_2.setWidget(5, QFormLayout.LabelRole, self.label_webhook_renewal_interval)
+
+        self.spinBox_webhook_renewal_interval = QSpinBox(self.groupBox_9)
+        self.spinBox_webhook_renewal_interval.setObjectName(u"spinBox_webhook_renewal_interval")
+        self.spinBox_webhook_renewal_interval.setMaximum(1000000)
+
+        self.formLayout_2.setWidget(5, QFormLayout.FieldRole, self.spinBox_webhook_renewal_interval)
+
+        self.checkBox_webhook_enabled = QCheckBox(self.groupBox_9)
+        self.checkBox_webhook_enabled.setObjectName(u"checkBox_webhook_enabled")
+
+        self.formLayout_2.setWidget(0, QFormLayout.LabelRole, self.checkBox_webhook_enabled)
+
+
+        self.gridLayout.addWidget(self.groupBox_9, 0, 0, 1, 1)
+
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.gridLayout.addItem(self.verticalSpacer, 1, 0, 1, 1)
+
+        self.tabWidget.addTab(self.tab_5, "")
         self.tab_logging = QWidget()
         self.tab_logging.setObjectName(u"tab_logging")
         self.verticalLayout_6 = QVBoxLayout(self.tab_logging)
@@ -569,149 +715,6 @@ class Ui_profile_settings(object):
         self.verticalLayout_6.addItem(self.verticalSpacer_2)
 
         self.tabWidget.addTab(self.tab_logging, "")
-        self.tab_5 = QWidget()
-        self.tab_5.setObjectName(u"tab_5")
-        self.gridLayout = QGridLayout(self.tab_5)
-        self.gridLayout.setObjectName(u"gridLayout")
-        self.groupBox_9 = QGroupBox(self.tab_5)
-        self.groupBox_9.setObjectName(u"groupBox_9")
-        self.formLayout_2 = QFormLayout(self.groupBox_9)
-        self.formLayout_2.setObjectName(u"formLayout_2")
-        self.label_webhook_public_url = QLabel(self.groupBox_9)
-        self.label_webhook_public_url.setObjectName(u"label_webhook_public_url")
-
-        self.formLayout_2.setWidget(1, QFormLayout.LabelRole, self.label_webhook_public_url)
-
-        self.lineEdit_webhook_public_url = QLineEdit(self.groupBox_9)
-        self.lineEdit_webhook_public_url.setObjectName(u"lineEdit_webhook_public_url")
-
-        self.formLayout_2.setWidget(1, QFormLayout.FieldRole, self.lineEdit_webhook_public_url)
-
-        self.label_webhook_listening_host = QLabel(self.groupBox_9)
-        self.label_webhook_listening_host.setObjectName(u"label_webhook_listening_host")
-
-        self.formLayout_2.setWidget(2, QFormLayout.LabelRole, self.label_webhook_listening_host)
-
-        self.lineEdit_webhook_listening_host = QLineEdit(self.groupBox_9)
-        self.lineEdit_webhook_listening_host.setObjectName(u"lineEdit_webhook_listening_host")
-
-        self.formLayout_2.setWidget(2, QFormLayout.FieldRole, self.lineEdit_webhook_listening_host)
-
-        self.label_webhook_listening_port = QLabel(self.groupBox_9)
-        self.label_webhook_listening_port.setObjectName(u"label_webhook_listening_port")
-
-        self.formLayout_2.setWidget(3, QFormLayout.LabelRole, self.label_webhook_listening_port)
-
-        self.spinBox_webhook_listening_port = QSpinBox(self.groupBox_9)
-        self.spinBox_webhook_listening_port.setObjectName(u"spinBox_webhook_listening_port")
-        self.spinBox_webhook_listening_port.setMinimum(1)
-        self.spinBox_webhook_listening_port.setMaximum(65353)
-
-        self.formLayout_2.setWidget(3, QFormLayout.FieldRole, self.spinBox_webhook_listening_port)
-
-        self.label_webhook_expiration_interval = QLabel(self.groupBox_9)
-        self.label_webhook_expiration_interval.setObjectName(u"label_webhook_expiration_interval")
-
-        self.formLayout_2.setWidget(4, QFormLayout.LabelRole, self.label_webhook_expiration_interval)
-
-        self.spinBox_webhook_expiration_interval = QSpinBox(self.groupBox_9)
-        self.spinBox_webhook_expiration_interval.setObjectName(u"spinBox_webhook_expiration_interval")
-        self.spinBox_webhook_expiration_interval.setMaximum(1000000)
-
-        self.formLayout_2.setWidget(4, QFormLayout.FieldRole, self.spinBox_webhook_expiration_interval)
-
-        self.label_webhook_renewal_interval = QLabel(self.groupBox_9)
-        self.label_webhook_renewal_interval.setObjectName(u"label_webhook_renewal_interval")
-
-        self.formLayout_2.setWidget(5, QFormLayout.LabelRole, self.label_webhook_renewal_interval)
-
-        self.spinBox_webhook_renewal_interval = QSpinBox(self.groupBox_9)
-        self.spinBox_webhook_renewal_interval.setObjectName(u"spinBox_webhook_renewal_interval")
-        self.spinBox_webhook_renewal_interval.setMaximum(1000000)
-
-        self.formLayout_2.setWidget(5, QFormLayout.FieldRole, self.spinBox_webhook_renewal_interval)
-
-        self.checkBox_webhook_enabled = QCheckBox(self.groupBox_9)
-        self.checkBox_webhook_enabled.setObjectName(u"checkBox_webhook_enabled")
-
-        self.formLayout_2.setWidget(0, QFormLayout.LabelRole, self.checkBox_webhook_enabled)
-
-
-        self.gridLayout.addWidget(self.groupBox_9, 0, 0, 1, 1)
-
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        self.gridLayout.addItem(self.verticalSpacer, 1, 0, 1, 1)
-
-        self.tabWidget.addTab(self.tab_5, "")
-        self.tab_4 = QWidget()
-        self.tab_4.setObjectName(u"tab_4")
-        self.verticalLayout = QVBoxLayout(self.tab_4)
-        self.verticalLayout.setObjectName(u"verticalLayout")
-        self.groupBox_sync_business_shared_folders = QGroupBox(self.tab_4)
-        self.groupBox_sync_business_shared_folders.setObjectName(u"groupBox_sync_business_shared_folders")
-        self.groupBox_sync_business_shared_folders.setCheckable(True)
-        self.groupBox_sync_business_shared_folders.setChecked(True)
-        self.gridLayout_12 = QGridLayout(self.groupBox_sync_business_shared_folders)
-        self.gridLayout_12.setObjectName(u"gridLayout_12")
-        self.label_business_available = QLabel(self.groupBox_sync_business_shared_folders)
-        self.label_business_available.setObjectName(u"label_business_available")
-
-        self.gridLayout_12.addWidget(self.label_business_available, 3, 0, 1, 1)
-
-        self.checkBox_sync_business_shared_folders = QCheckBox(self.groupBox_sync_business_shared_folders)
-        self.checkBox_sync_business_shared_folders.setObjectName(u"checkBox_sync_business_shared_folders")
-
-        self.gridLayout_12.addWidget(self.checkBox_sync_business_shared_folders, 0, 0, 1, 1)
-
-        self.listWidget_available_business_folders = QListWidget(self.groupBox_sync_business_shared_folders)
-        self.listWidget_available_business_folders.setObjectName(u"listWidget_available_business_folders")
-
-        self.gridLayout_12.addWidget(self.listWidget_available_business_folders, 6, 0, 1, 1)
-
-        self.label_business_selected = QLabel(self.groupBox_sync_business_shared_folders)
-        self.label_business_selected.setObjectName(u"label_business_selected")
-
-        self.gridLayout_12.addWidget(self.label_business_selected, 3, 2, 1, 1)
-
-        self.verticalLayout_14 = QVBoxLayout()
-        self.verticalLayout_14.setObjectName(u"verticalLayout_14")
-        self.verticalSpacer_5 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        self.verticalLayout_14.addItem(self.verticalSpacer_5)
-
-        self.pushButton_add_business_folder = QPushButton(self.groupBox_sync_business_shared_folders)
-        self.pushButton_add_business_folder.setObjectName(u"pushButton_add_business_folder")
-        self.pushButton_add_business_folder.setMaximumSize(QSize(50, 16777215))
-
-        self.verticalLayout_14.addWidget(self.pushButton_add_business_folder)
-
-        self.verticalSpacer_6 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        self.verticalLayout_14.addItem(self.verticalSpacer_6)
-
-
-        self.gridLayout_12.addLayout(self.verticalLayout_14, 6, 1, 1, 1)
-
-        self.listWidget_selected_business_folders = QListWidget(self.groupBox_sync_business_shared_folders)
-        self.listWidget_selected_business_folders.setObjectName(u"listWidget_selected_business_folders")
-
-        self.gridLayout_12.addWidget(self.listWidget_selected_business_folders, 6, 2, 1, 1)
-
-        self.pushButton_get_business_folders = QPushButton(self.groupBox_sync_business_shared_folders)
-        self.pushButton_get_business_folders.setObjectName(u"pushButton_get_business_folders")
-
-        self.gridLayout_12.addWidget(self.pushButton_get_business_folders, 4, 0, 1, 1)
-
-        self.pushButton_remove_business_folders = QPushButton(self.groupBox_sync_business_shared_folders)
-        self.pushButton_remove_business_folders.setObjectName(u"pushButton_remove_business_folders")
-
-        self.gridLayout_12.addWidget(self.pushButton_remove_business_folders, 4, 2, 1, 1)
-
-
-        self.verticalLayout.addWidget(self.groupBox_sync_business_shared_folders)
-
-        self.tabWidget.addTab(self.tab_4, "")
 
         self.verticalLayout_13.addWidget(self.tabWidget)
 
@@ -731,7 +734,7 @@ class Ui_profile_settings(object):
 
         self.retranslateUi(profile_settings)
 
-        self.tabWidget.setCurrentIndex(6)
+        self.tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(profile_settings)
@@ -760,44 +763,6 @@ class Ui_profile_settings(object):
         self.pushButton_logout.setText(QCoreApplication.translate("profile_settings", u"Logout", None))
         self.pushButton_login.setText(QCoreApplication.translate("profile_settings", u"Login", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.monitored_tab_2), QCoreApplication.translate("profile_settings", u"Monitored Files", None))
-#if QT_CONFIG(tooltip)
-        self.groupBox.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>This option is used to 'skip' certain files and supports pattern matching.</p><p>Patterns are case insensitive. <span style=\" font-weight:700;\">*</span> and <span style=\" font-weight:700;\">? </span><a href=\"https://technet.microsoft.com/en-us/library/bb490639.aspx\"><span style=\" text-decoration: underline; color:#5e81ac;\">wildcards characters</span></a> are supported. </p><p>Use <span style=\" font-weight:700;\">|</span> to separate multiple patterns.<br/></p><p><span style=\" text-decoration: underline;\">Files can be skipped in the following fashion:</span></p><p>-Specify a wildcard, eg: '<span style=\" font-weight:700;\">*.txt</span>' (skip all txt files)</p><p>-Explicitly specify the filename and it's full path relative to your sync_dir, eg: '<span style=\" font-weight:700;\">path/to/file/filename.ext</span>'</p><p>-Explicitly specify the filename only and skip every instance of this filename, eg: '<span style=\" font-weight:700;\">filename.ext</span>'</p><p><br/></p><p><span "
-                        "style=\" text-decoration: underline;\">By default, the following files will be skipped:</span></p><p>-Files that start with <span style=\" font-weight:700;\">~</span></p><p>-Files that start with <span style=\" font-weight:700;\">.~</span> (like .~lock.* files generated by LibreOffice)</p><p>-Files that end in <span style=\" font-weight:700;\">.tmp</span></p><p><br/></p><p><span style=\" font-weight:700;\">Important:</span> Do not use a skip file entry of <span style=\" font-weight:700;\">.*</span> as this will prevent correct searching of local changes to process.</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.groupBox.setTitle(QCoreApplication.translate("profile_settings", u"Skip files", None))
-        self.pushButton_add_skip_file.setText(QCoreApplication.translate("profile_settings", u"Add", None))
-        self.pushButton_rm_skip_file.setText(QCoreApplication.translate("profile_settings", u"Remove", None))
-#if QT_CONFIG(tooltip)
-        self.groupBox_2.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>This option is used to 'skip' certain directories and supports pattern matching.</p><p><br/></p><p>Patterns are case insensitive. <span style=\" font-weight:700;\">*</span> and <span style=\" font-weight:700;\">? </span><a href=\"https://technet.microsoft.com/en-us/library/bb490639.aspx\"><span style=\" text-decoration: underline; color:#5e81ac;\">wildcards characters</span></a> are supported. </p><p>Use <span style=\" font-weight:700;\">|</span> to separate multiple patterns.</p><p><br/></p><p><span style=\" font-weight:700;\">Important</span>: Entries under Skip directories are relative to your <span style=\" font-weight:700;\">Sync directory</span> path.</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.groupBox_2.setTitle(QCoreApplication.translate("profile_settings", u"Skip directories", None))
-        self.checkBox_skip_dir_strict_match.setText(QCoreApplication.translate("profile_settings", u"Strict match", None))
-        self.pushButton_rm_skip_dir.setText(QCoreApplication.translate("profile_settings", u"Remove", None))
-        self.pushButton_add_skip_dir.setText(QCoreApplication.translate("profile_settings", u"Add", None))
-        self.groupBox_3.setTitle(QCoreApplication.translate("profile_settings", u"Others", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_skip_symlinks.setToolTip(QCoreApplication.translate("profile_settings", u"Skip syncing of symlinks.", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_skip_symlinks.setText(QCoreApplication.translate("profile_settings", u"Skip symlinks", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_check_nosync.setToolTip(QCoreApplication.translate("profile_settings", u"Check for the presence of .nosync in each directory. If found, skip directory from sync.", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_check_nosync.setText(QCoreApplication.translate("profile_settings", u"Check for .nosync", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_skip_dotfiles.setToolTip(QCoreApplication.translate("profile_settings", u"Skip dot files and folders from syncing", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_skip_dotfiles.setText(QCoreApplication.translate("profile_settings", u"Skip dotfiles (hidden files)", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("profile_settings", u"Excluded files", None))
-        self.groupBox_11.setTitle(QCoreApplication.translate("profile_settings", u"Sync List", None))
-        self.label_sync_list.setText(QCoreApplication.translate("profile_settings", u"Selective sync allows you to sync only specific files and directories. <br> See <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/USAGE.md#performing-a-selective-sync-via-sync_list-file\">official documentation </a> for more details.", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_sync_root_files.setToolTip(QCoreApplication.translate("profile_settings", u"Sync all files in Sync Directory root when using Sync List.", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_sync_root_files.setText(QCoreApplication.translate("profile_settings", u"Sync root files", None))
-#if QT_CONFIG(tooltip)
-        self.textEdit_sync_list.setToolTip("")
-#endif // QT_CONFIG(tooltip)
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), QCoreApplication.translate("profile_settings", u"Selective Sync", None))
 #if QT_CONFIG(tooltip)
         self.groupBox_10.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>To minimise the Internet bandwidth for upload and download operations, you can configure the bandwidth limit option. </p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
@@ -901,6 +866,66 @@ class Ui_profile_settings(object):
         self.checkBox_disable_upload_validation.setText(QCoreApplication.translate("profile_settings", u"Disable upload validation", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("profile_settings", u"Sync Options", None))
 #if QT_CONFIG(tooltip)
+        self.groupBox.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>This option is used to 'skip' certain files and supports pattern matching.</p><p>Patterns are case insensitive. <span style=\" font-weight:700;\">*</span> and <span style=\" font-weight:700;\">? </span><a href=\"https://technet.microsoft.com/en-us/library/bb490639.aspx\"><span style=\" text-decoration: underline; color:#5e81ac;\">wildcards characters</span></a> are supported. </p><p>Use <span style=\" font-weight:700;\">|</span> to separate multiple patterns.<br/></p><p><span style=\" text-decoration: underline;\">Files can be skipped in the following fashion:</span></p><p>-Specify a wildcard, eg: '<span style=\" font-weight:700;\">*.txt</span>' (skip all txt files)</p><p>-Explicitly specify the filename and it's full path relative to your sync_dir, eg: '<span style=\" font-weight:700;\">path/to/file/filename.ext</span>'</p><p>-Explicitly specify the filename only and skip every instance of this filename, eg: '<span style=\" font-weight:700;\">filename.ext</span>'</p><p><br/></p><p><span "
+                        "style=\" text-decoration: underline;\">By default, the following files will be skipped:</span></p><p>-Files that start with <span style=\" font-weight:700;\">~</span></p><p>-Files that start with <span style=\" font-weight:700;\">.~</span> (like .~lock.* files generated by LibreOffice)</p><p>-Files that end in <span style=\" font-weight:700;\">.tmp</span></p><p><br/></p><p><span style=\" font-weight:700;\">Important:</span> Do not use a skip file entry of <span style=\" font-weight:700;\">.*</span> as this will prevent correct searching of local changes to process.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.groupBox.setTitle(QCoreApplication.translate("profile_settings", u"Skip files", None))
+        self.pushButton_add_skip_file.setText(QCoreApplication.translate("profile_settings", u"Add", None))
+        self.pushButton_rm_skip_file.setText(QCoreApplication.translate("profile_settings", u"Remove", None))
+#if QT_CONFIG(tooltip)
+        self.groupBox_2.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>This option is used to 'skip' certain directories and supports pattern matching.</p><p><br/></p><p>Patterns are case insensitive. <span style=\" font-weight:700;\">*</span> and <span style=\" font-weight:700;\">? </span><a href=\"https://technet.microsoft.com/en-us/library/bb490639.aspx\"><span style=\" text-decoration: underline; color:#5e81ac;\">wildcards characters</span></a> are supported. </p><p>Use <span style=\" font-weight:700;\">|</span> to separate multiple patterns.</p><p><br/></p><p><span style=\" font-weight:700;\">Important</span>: Entries under Skip directories are relative to your <span style=\" font-weight:700;\">Sync directory</span> path.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.groupBox_2.setTitle(QCoreApplication.translate("profile_settings", u"Skip directories", None))
+        self.checkBox_skip_dir_strict_match.setText(QCoreApplication.translate("profile_settings", u"Strict match", None))
+        self.pushButton_rm_skip_dir.setText(QCoreApplication.translate("profile_settings", u"Remove", None))
+        self.pushButton_add_skip_dir.setText(QCoreApplication.translate("profile_settings", u"Add", None))
+        self.groupBox_3.setTitle(QCoreApplication.translate("profile_settings", u"Others", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_skip_symlinks.setToolTip(QCoreApplication.translate("profile_settings", u"Skip syncing of symlinks.", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_skip_symlinks.setText(QCoreApplication.translate("profile_settings", u"Skip symlinks", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_check_nosync.setToolTip(QCoreApplication.translate("profile_settings", u"Check for the presence of .nosync in each directory. If found, skip directory from sync.", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_check_nosync.setText(QCoreApplication.translate("profile_settings", u"Check for .nosync", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_skip_dotfiles.setToolTip(QCoreApplication.translate("profile_settings", u"Skip dot files and folders from syncing", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_skip_dotfiles.setText(QCoreApplication.translate("profile_settings", u"Skip dotfiles (hidden files)", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("profile_settings", u"Excluded files", None))
+        self.groupBox_11.setTitle(QCoreApplication.translate("profile_settings", u"Sync List", None))
+        self.label_sync_list.setText(QCoreApplication.translate("profile_settings", u"Selective sync allows you to sync only specific files and directories. <br> See <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/USAGE.md#performing-a-selective-sync-via-sync_list-file\">official documentation </a> for more details.", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_sync_root_files.setToolTip(QCoreApplication.translate("profile_settings", u"Sync all files in Sync Directory root when using Sync List.", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_sync_root_files.setText(QCoreApplication.translate("profile_settings", u"Sync root files", None))
+#if QT_CONFIG(tooltip)
+        self.textEdit_sync_list.setToolTip("")
+#endif // QT_CONFIG(tooltip)
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), QCoreApplication.translate("profile_settings", u"Selective Sync", None))
+        self.groupBox_sync_business_shared_folders.setTitle(QCoreApplication.translate("profile_settings", u"Sync business shared folders", None))
+        self.label_business_available.setText(QCoreApplication.translate("profile_settings", u"Available Business Shared Folders:", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_sync_business_shared_folders.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Refer to <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/BusinessSharedFolders.md\"><span style=\" text-decoration: underline; color:#5e81ac;\">Business Shared Folders</span></a> for configuration assistance.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_sync_business_shared_folders.setText(QCoreApplication.translate("profile_settings", u"Sync business shared folders", None))
+        self.label_business_selected.setText(QCoreApplication.translate("profile_settings", u"Selected Business Shared Folders:", None))
+        self.pushButton_add_business_folder.setText(QCoreApplication.translate("profile_settings", u">>", None))
+        self.pushButton_get_business_folders.setText(QCoreApplication.translate("profile_settings", u"Get Shared Folders", None))
+        self.pushButton_remove_business_folders.setText(QCoreApplication.translate("profile_settings", u"Remove", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), QCoreApplication.translate("profile_settings", u"Shared Folders", None))
+#if QT_CONFIG(tooltip)
+        self.groupBox_9.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Refer to <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/USAGE.md#use-webhook-to-subscribe-to-remote-updates-in-monitor-mode\"><span style=\" text-decoration: underline; color:#5e81ac;\">webhook documentation</span></a> for more details. </p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.groupBox_9.setTitle(QCoreApplication.translate("profile_settings", u"Webhook settings", None))
+        self.label_webhook_public_url.setText(QCoreApplication.translate("profile_settings", u"Public URL", None))
+        self.label_webhook_listening_host.setText(QCoreApplication.translate("profile_settings", u"Listening host", None))
+        self.label_webhook_listening_port.setText(QCoreApplication.translate("profile_settings", u"Listening port", None))
+        self.label_webhook_expiration_interval.setText(QCoreApplication.translate("profile_settings", u"Expiration interval", None))
+        self.label_webhook_renewal_interval.setText(QCoreApplication.translate("profile_settings", u"Renewal interval", None))
+        self.checkBox_webhook_enabled.setText(QCoreApplication.translate("profile_settings", u"Enable webhook", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), QCoreApplication.translate("profile_settings", u"Webhooks", None))
+#if QT_CONFIG(tooltip)
         self.groupBox_7.setToolTip("")
 #endif // QT_CONFIG(tooltip)
         self.groupBox_7.setTitle(QCoreApplication.translate("profile_settings", u"Logging", None))
@@ -931,28 +956,6 @@ class Ui_profile_settings(object):
 #endif // QT_CONFIG(tooltip)
         self.checkBox_disable_notifications.setText(QCoreApplication.translate("profile_settings", u"Disable notifications", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_logging), QCoreApplication.translate("profile_settings", u"Logging", None))
-#if QT_CONFIG(tooltip)
-        self.groupBox_9.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Refer to <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/USAGE.md#use-webhook-to-subscribe-to-remote-updates-in-monitor-mode\"><span style=\" text-decoration: underline; color:#5e81ac;\">webhook documentation</span></a> for more details. </p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.groupBox_9.setTitle(QCoreApplication.translate("profile_settings", u"Webhook settings", None))
-        self.label_webhook_public_url.setText(QCoreApplication.translate("profile_settings", u"Public URL", None))
-        self.label_webhook_listening_host.setText(QCoreApplication.translate("profile_settings", u"Listening host", None))
-        self.label_webhook_listening_port.setText(QCoreApplication.translate("profile_settings", u"Listening port", None))
-        self.label_webhook_expiration_interval.setText(QCoreApplication.translate("profile_settings", u"Expiration interval", None))
-        self.label_webhook_renewal_interval.setText(QCoreApplication.translate("profile_settings", u"Renewal interval", None))
-        self.checkBox_webhook_enabled.setText(QCoreApplication.translate("profile_settings", u"Enable webhook", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), QCoreApplication.translate("profile_settings", u"Webhooks", None))
-        self.groupBox_sync_business_shared_folders.setTitle(QCoreApplication.translate("profile_settings", u"Sync business shared folders", None))
-        self.label_business_available.setText(QCoreApplication.translate("profile_settings", u"Available Business Shared Folders:", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_sync_business_shared_folders.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Refer to <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/BusinessSharedFolders.md\"><span style=\" text-decoration: underline; color:#5e81ac;\">Business Shared Folders</span></a> for configuration assistance.</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_sync_business_shared_folders.setText(QCoreApplication.translate("profile_settings", u"Sync business shared folders", None))
-        self.label_business_selected.setText(QCoreApplication.translate("profile_settings", u"Selected Business Shared Folders:", None))
-        self.pushButton_add_business_folder.setText(QCoreApplication.translate("profile_settings", u">>", None))
-        self.pushButton_get_business_folders.setText(QCoreApplication.translate("profile_settings", u"Get Shared Folders", None))
-        self.pushButton_remove_business_folders.setText(QCoreApplication.translate("profile_settings", u"Remove", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), QCoreApplication.translate("profile_settings", u"Shared Folders", None))
         self.pushButton_discard.setText(QCoreApplication.translate("profile_settings", u"Discard changes", None))
         self.pushButton_save.setText(QCoreApplication.translate("profile_settings", u"Save", None))
     # retranslateUi
