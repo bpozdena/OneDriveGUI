@@ -432,6 +432,9 @@ class wizardPage_create_shared_library(QWizardPage):
         3 - Set 'sync_dir' based on Site and Library name
         4 - Set 'drive_id'
         """
+        # Stop checking for unsaved changes while new profile is being created.
+        profile_settings_window.stop_unsaved_changes_timer()
+
         logging.info(f"[GUI] Available Libraries:  {self.library_dict}")
         _site_name = self.comboBox_sharepoint_site_list.currentText().replace(" ", "_")
         _library_name = self.comboBox_sharepoint_library_list.currentText().replace(" ", "_")
@@ -488,8 +491,11 @@ class wizardPage_create_shared_library(QWizardPage):
         main_window.stackedLayout.addWidget(main_window.profile_status_pages[profile_name])
 
         # Show comboBox with profile list if more than one profiles exist
-        if len(self.profile_status_pages) > 1:
+        if len(global_config) > 1:
             main_window.comboBox.show()
+
+        # Start checking for unsaved changes again after a new profile has been created.
+        profile_settings_window.start_unsaved_changes_timer()
 
         logging.info(f"Account {profile_name} has been created")
         self.pushButton_create_profile.setText("Done")
@@ -583,6 +589,9 @@ class wizardPage_create(QWizardPage):
         Creates new profile and loads default settings.
         TODO: Consolidate with import_profile()
         """
+        # Stop checking for unsaved changes while new profile is being created.
+        profile_settings_window.stop_unsaved_changes_timer()
+
         profile_name = self.lineEdit_new_profile_name.text()
         sync_dir = self.lineEdit_sync_dir.text()
         config_path = os.path.expanduser(f"~/.config/onedrive/accounts/{profile_name}/config")
@@ -631,11 +640,14 @@ class wizardPage_create(QWizardPage):
         main_window.stackedLayout.addWidget(main_window.profile_status_pages[profile_name])
 
         # Show comboBox with profile list if more than one profiles exist
-        if len(self.profile_status_pages) > 1:
+        if len(global_config) > 1:
             main_window.comboBox.show()
 
         # Hide "Create profile" push button from main windows.
         main_window.pushButton_new_profile.hide()
+
+        # Start checking for unsaved changes again after new profile has been created.
+        profile_settings_window.start_unsaved_changes_timer()
 
         logging.info(f"Account {profile_name} has been created")
         self.pushButton_create.setText("Done")
@@ -724,6 +736,9 @@ class wizardPage_import(QWizardPage):
         This is to handle cases where imported config contains only some properties.
         """
 
+        # Stop checking for unsaved changes while new profile is being imported.
+        profile_settings_window.stop_unsaved_changes_timer()
+
         profile_name = self.lineEdit_profile_name.text().strip()
         config_path = os.path.expanduser(self.lineEdit_config_path.text())
 
@@ -782,6 +797,9 @@ class wizardPage_import(QWizardPage):
 
         # Automatically save global config to prevent loss if user does not press 'Save' button.
         save_global_config()
+
+        # Start checking for unsaved changes again after new profile has being created.
+        profile_settings_window.start_unsaved_changes_timer()
 
         logging.info(f"Account {profile_name} has been imported")
         self.pushButton_import.setText("Done")
@@ -1049,6 +1067,10 @@ class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
         self.setup_wizard.show()
 
     def remove_profile(self):
+
+        # Stop checking for unsaved changes while new profile is being removed.
+        self.stop_unsaved_changes_timer()
+
         # Remove profile from settings window.
         selected_profile_name = self.listWidget_profiles.currentItem().text()
         selected_profile_index = self.listWidget_profiles.currentRow()
@@ -1068,9 +1090,15 @@ class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
         _profiles.read(PROFILES_FILE)
         _profiles.remove_section(selected_profile_name)
 
-        # Save the new profile.
+        # Save the new profiles file.
         with open(PROFILES_FILE, "w") as profilefile:
             _profiles.write(profilefile)
+
+        if len(global_config) < 2:
+            main_window.comboBox.hide()
+
+        # Start checking for unsaved changes again after profile has been removed.
+        self.start_unsaved_changes_timer()
 
 
 class ListItemDelegate(QStyledItemDelegate):
