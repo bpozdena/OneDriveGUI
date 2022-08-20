@@ -2156,7 +2156,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for worker in workers_to_stop:
             self.workers[worker].stop_worker()
 
-        app.quit()
+        sys.exit()
 
     def closeEvent(self, event):
         # Minimize main window to system tray if it is available. Otherwise minimize to taskbar.
