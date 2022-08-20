@@ -909,7 +909,7 @@ class ProfileStatusPage(QWidget, Ui_status_page):
         # Temp Quit button
         self.pushButton_quit.setIcon(quit_icon)
         self.pushButton_quit.setText("")
-        self.pushButton_quit.clicked.connect(sys.exit)
+        self.pushButton_quit.clicked.connect(lambda: main_window.graceful_shutdown())
 
         # Close Button
         if gui_settings["SETTINGS"]["frameless_window"] == "True":
@@ -2053,10 +2053,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.menubar.hide()
 
         # Quit OneDriveGUI
-        self.actionQuit.triggered.connect(sys.exit)
+        # self.actionQuit.triggered.connect(lambda: main_window.graceful_shutdown())
 
         # Start second account
-        self.actionstart.triggered.connect(lambda: self.start_onedrive_monitor(""))
+        # self.actionstart.triggered.connect(lambda: self.start_onedrive_monitor(""))
 
         self.comboBox.activated.connect(self.switch_account_status_page)
         self.stackedLayout = QStackedLayout()
@@ -2084,7 +2084,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             setting_action = menu.addAction("Settings")
             setting_action.triggered.connect(self.show_settings_window)
             quit_action = menu.addAction("Quit")
-            quit_action.triggered.connect(sys.exit)
+            quit_action.triggered.connect(lambda: main_window.graceful_shutdown())
 
             self.tray.activated.connect(self.tray_icon_clicked)
 
@@ -2133,6 +2133,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             pass
         else:
             pass
+
+    def graceful_shutdown(self):
+        logging.info("Quitting OneDriveGUI")
+        workers_to_stop = []
+
+        for worker in self.workers:
+            workers_to_stop.append(worker)
+
+        for worker in workers_to_stop:
+            self.workers[worker].stop_worker()
+
+        app.quit()
 
     def closeEvent(self, event):
         # Minimize main window to system tray if it is available. Otherwise minimize to taskbar.
