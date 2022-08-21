@@ -2822,7 +2822,7 @@ if __name__ == "__main__":
     gui_settings = read_gui_settings()
 
     logging.basicConfig(
-        format="%(asctime)s - %(levelname)s - %(message)s",
+        format="%(asctime)s [%(filename)s:%(lineno)s][fn=%(funcName)s][%(levelname)s] - %(message)s",
         handlers=config_logging_handlers(),
         level=config_debug_level(),
     )
