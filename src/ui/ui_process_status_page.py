@@ -86,7 +86,7 @@ class Ui_status_page(object):
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setSpacing(0)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_2.setContentsMargins(0, -1, 5, -1)
+        self.horizontalLayout_2.setContentsMargins(5, -1, 5, 5)
         self.pushButton_start_stop = QPushButton(self.frame)
         self.pushButton_start_stop.setObjectName(u"pushButton_start_stop")
         self.pushButton_start_stop.setMaximumSize(QSize(40, 16777215))
