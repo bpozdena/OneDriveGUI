@@ -2653,12 +2653,14 @@ def create_global_config():
         profiles[profile].update(od_config)
 
         # this option is not supported since OneDrive v2.4.20 - #42
+        # TODO: Remove after some time...
         if client_version >= 2420 and "force_http_2" in profiles[profile]["onedrive"]:
             logging.debug("[GUI] - replacing obsolete option 'force_http_2' with 'force_http_11'")
             profiles[profile]["onedrive"].pop("force_http_2")
             profiles[profile]["onedrive"]["force_http_11"] = '"false"'
 
         # Support bad boys with outdated version of OneDrive Client
+        # TODO: Remove after some time...
         if client_version < 2420 and "force_http_11" in profiles[profile]["onedrive"]:
             logging.debug("[GUI] - replacing option 'force_http_11' with 'force_http_2'")
             profiles[profile]["onedrive"].pop("force_http_11")
