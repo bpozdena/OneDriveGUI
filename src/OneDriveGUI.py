@@ -41,9 +41,6 @@ from PySide6.QtWidgets import (
 from urllib3 import HTTPSConnectionPool
 
 # TODO: Split into multiple files once all main features are implemented.
-# Import for login windows.
-from ui.ui_login import Ui_LoginWindow
-from ui.ui_external_login import Ui_ExternalLoginWindow
 
 # Imports for main window.
 from ui.ui_mainwindow import Ui_MainWindow
@@ -58,11 +55,18 @@ from ui.ui_profile_settings_page import Ui_profile_settings
 # Imports for GUI settings window
 from ui.ui_gui_settings_window import Ui_gui_settings_window
 
+# Import for login windows.
+# Don't use WebEngine login window when running from AppImage.
+DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+APPIMAGE = True if "tmp/.mount_One" in DIR_PATH else False
+if APPIMAGE:
+    from ui.ui_external_login import Ui_ExternalLoginWindow
+else:
+    from ui.ui_login import Ui_LoginWindow
+
 
 PROFILES_FILE = os.path.expanduser("~/.config/onedrive-gui/profiles")
 GUI_SETTINGS_FILE = os.path.expanduser("~/.config/onedrive-gui/gui_settings")
-DIR_PATH = os.path.dirname(os.path.realpath(__file__))
-APPIMAGE = True if "tmp/.mount_One" in DIR_PATH else False
 
 
 class SetupWizard(QWizard):
