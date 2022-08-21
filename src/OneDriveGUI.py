@@ -290,9 +290,11 @@ class wizardPage_create_shared_library(QWizardPage):
         self.label_6.setText("6. Create profile")
 
         self.comboBox_profile_list = QComboBox()
+        self.comboBox_profile_list.setPlaceholderText("No Business accounts detected.")
 
         self.pushButton_get_sites = QPushButton()
         self.pushButton_get_sites.setText("Get SharePoint Sites")
+        self.pushButton_get_sites.setDisabled(True)
         self.pushButton_get_sites.clicked.connect(self.get_sharepoint_site_list)
 
         self.comboBox_sharepoint_site_list = QComboBox()
@@ -312,7 +314,10 @@ class wizardPage_create_shared_library(QWizardPage):
         self.pushButton_create_profile.setDisabled(True)
 
         for profile in global_config:
-            self.comboBox_profile_list.addItem(profile)
+            if global_config[profile]["account_type"] == "Business":
+                self.comboBox_profile_list.addItem(profile)
+                self.comboBox_profile_list.setPlaceholderText("")
+                self.pushButton_get_sites.setDisabled(False)
 
         layout = QGridLayout()
         layout.addWidget(self.label_1, 0, 0)
