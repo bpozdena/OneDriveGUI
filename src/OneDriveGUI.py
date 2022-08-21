@@ -110,6 +110,7 @@ class SetupWizard(QWizard):
         if self.currentPage() == self.page(6):
             return 10
         if self.currentPage() == self.page(10):
+            main_window.show()
             return -1
 
 
@@ -2710,7 +2711,7 @@ def main_window_start_state():
     # Determine if OneDriveGUI should start maximized, minimized to tray or minimized to taskbar/dock.
     # This should help ensure the GUI does not just disappear on Gnome without system tray extension.
 
-    if gui_settings["SETTINGS"]["start_minimized"] == "True":
+    if gui_settings["SETTINGS"]["start_minimized"] == "True" or len(global_config) == 0:
         try:
             if main_window.tray.isSystemTrayAvailable():
                 main_window.hide()
@@ -2797,7 +2798,9 @@ if __name__ == "__main__":
 
     client_version = get_installed_client_version()
     global_config = create_global_config()
-    save_global_config()
+
+    if len(global_config) > 0:
+        save_global_config()
 
     app = QApplication(sys.argv)
     app.setApplicationName("OneDriveGUI")
