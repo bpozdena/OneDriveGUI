@@ -476,7 +476,11 @@ class wizardPage_create_shared_library(QWizardPage):
         new_profile[profile_name]["onedrive"]["drive_id"] = f'"{_library_id}"'
 
         # Append new profile into running global profile
-        global_config.update(new_profile)
+        _global_config = copy.deepcopy(new_profile)
+        _temp_global_config = copy.deepcopy(new_profile)
+
+        global_config.update(_global_config)
+        temp_global_config.update(_temp_global_config)
 
         # Automatically save global config to prevent loss if user does not press 'Save' button.
         save_global_config()
@@ -625,7 +629,11 @@ class wizardPage_create(QWizardPage):
         new_profile[profile_name]["onedrive"]["sync_dir"] = f'"{sync_dir}"'
 
         # Append new profile into running global profile
-        global_config.update(new_profile)
+        _global_config = copy.deepcopy(new_profile)
+        _temp_global_config = copy.deepcopy(new_profile)
+
+        global_config.update(_global_config)
+        temp_global_config.update(_temp_global_config)
 
         # Automatically save global config to prevent loss if user does not press 'Save' button.
         save_global_config()
@@ -776,10 +784,13 @@ class wizardPage_import(QWizardPage):
             new_profile[profile_name]["onedrive"][key] = value
 
         # Append new profile into running global profile
-        global_config.update(new_profile)
-        logging.debug("[GUI] new_profile: " + str(new_profile))
-        logging.debug("[GUI] global_config: " + str(global_config))
+        _global_config = copy.deepcopy(new_profile)
+        _temp_global_config = copy.deepcopy(new_profile)
 
+        global_config.update(_global_config)
+        temp_global_config.update(_temp_global_config)
+
+        # Update GUI with new profile
         profile_settings_window.listWidget_profiles.addItem(profile_name)
         self.setting_page = ProfileSettingsPage(profile_name)
         profile_settings_window.stackedLayout.addWidget(self.setting_page)
@@ -1133,7 +1144,6 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         # Set up the user interface from Designer.
         self.setupUi(self)
 
-        temp_global_config = copy.deepcopy(global_config)
         self.temp_profile_config = temp_global_config[self.profile]
 
         self.label_profile_name.setText(self.profile)
@@ -1304,6 +1314,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
 
         # Skip_file section
         self.skip_files = self.temp_profile_config["onedrive"]["skip_file"].strip('"').split("|")
+        self.listWidget_skip_file.clear()
         self.listWidget_skip_file.addItems(self.skip_files)
         self.listWidget_skip_file.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.pushButton_add_skip_file.clicked.connect(self.add_skip_file)
@@ -1312,6 +1323,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
 
         # Skip_dir section
         self.skip_dirs = self.temp_profile_config["onedrive"]["skip_dir"].strip('"').split("|")
+        self.listWidget_skip_dir.clear()
         self.listWidget_skip_dir.addItems(self.skip_dirs)
         self.listWidget_skip_dir.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.pushButton_add_skip_dir.clicked.connect(self.add_skip_dir)
@@ -2000,6 +2012,7 @@ class WorkerThread(QThread):
 
                     # Update profile file with Free Space
                     global_config[self.profile_name]["free_space"] = self.free_space_human
+                    temp_global_config[self.profile_name]["free_space"] = self.free_space_human
                     save_global_config()
 
                 elif "Account Type" in stdout:
@@ -2010,6 +2023,7 @@ class WorkerThread(QThread):
 
                     # Update profile file with account type
                     global_config[self.profile_name]["account_type"] = self.account_type.capitalize()
+                    temp_global_config[self.profile_name]["account_type"] = self.account_type.capitalize()
                     save_global_config()
 
                 elif "Initializing the OneDrive API" in stdout:
@@ -2649,17 +2663,17 @@ def save_global_config():
     for profile in _profile_config:
         _profile_config[profile].pop("onedrive", None)
 
-    # TODO: Re-write to better support future options.
-    _default_profile_config = {"auto_sync": False, "account_type": "", "free_space": ""}
+    # # TODO: Re-write to better support future options.
+    # _default_profile_config = {"auto_sync": False, "account_type": "", "free_space": ""}
 
-    if "auto_sync" not in _profile_config[profile]:  # add 'auto_sync' value if missing from older versions
-        _profile_config[profile]["auto_sync"] = _default_profile_config["auto_sync"]
+    # if "auto_sync" not in _profile_config[profile]:  # add 'auto_sync' value if missing from older versions
+    #     _profile_config[profile]["auto_sync"] = _default_profile_config["auto_sync"]
 
-    if "account_type" not in _profile_config[profile]:  # add 'account_type' value if missing from older versions
-        _profile_config[profile]["account_type"] = _default_profile_config["account_type"]
+    # if "account_type" not in _profile_config[profile]:  # add 'account_type' value if missing from older versions
+    #     _profile_config[profile]["account_type"] = _default_profile_config["account_type"]
 
-    if "free_space" not in _profile_config[profile]:  # add 'free_space' value if missing from older versions
-        _profile_config[profile]["free_space"] = _default_profile_config["free_space"]
+    # if "free_space" not in _profile_config[profile]:  # add 'free_space' value if missing from older versions
+    #     _profile_config[profile]["free_space"] = _default_profile_config["free_space"]
 
     profile_config = ConfigParser()
     profile_config.read_dict(_profile_config)
@@ -2801,6 +2815,8 @@ if __name__ == "__main__":
 
     if len(global_config) > 0:
         save_global_config()
+
+    temp_global_config = copy.deepcopy(global_config)
 
     app = QApplication(sys.argv)
     app.setApplicationName("OneDriveGUI")
