@@ -1529,6 +1529,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.pushButton_remove_business_folders.clicked.connect(self.remove_business_shared_folder)
 
         self.listWidget_available_business_folders.setDisabled(True)
+        self.listWidget_available_business_folders.clear
         self.listWidget_available_business_folders.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
         self.listWidget_selected_business_folders.setSelectionMode(QAbstractItemView.ExtendedSelection)
@@ -2234,12 +2235,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.auto_sync.start(1000)
 
     def mousePressEvent(self, event):
-        self.dragPos = event.globalPosition().toPoint()
+        if gui_settings["SETTINGS"]["frameless_window"] == "True":
+            self.dragPos = event.globalPosition().toPoint()
 
     def mouseMoveEvent(self, event):
-        self.move(self.pos() + event.globalPosition().toPoint() - self.dragPos)
-        self.dragPos = event.globalPosition().toPoint()
-        event.accept()
+        if gui_settings["SETTINGS"]["frameless_window"] == "True":
+            self.move(self.pos() + event.globalPosition().toPoint() - self.dragPos)
+            self.dragPos = event.globalPosition().toPoint()
+            event.accept()
 
     def tray_icon_clicked(self, reason):
         if reason == QSystemTrayIcon.Unknown:
