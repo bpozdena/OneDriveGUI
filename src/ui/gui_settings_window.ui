@@ -41,13 +41,20 @@
    <item>
     <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
-      <string>Experimental</string>
+      <string>Appearance (experimental)</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
        <widget class="QCheckBox" name="checkBox_frameless_window">
         <property name="text">
          <string>Frameless Window for X11</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="checkBox_combined_start_stop_button">
+        <property name="text">
+         <string>Combined Start/Stop button</string>
         </property>
        </widget>
       </item>

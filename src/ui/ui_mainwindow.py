@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'mainwindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.2
+## Created by: Qt User Interface Compiler version 6.2.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -73,8 +73,37 @@ class Ui_MainWindow(object):
         font.setBold(True)
         self.comboBox.setFont(font)
         self.comboBox.setContextMenuPolicy(Qt.DefaultContextMenu)
-        self.comboBox.setStyleSheet(u"background-color: rgb(0, 120, 212);\n"
+        self.comboBox.setStyleSheet(u"QComboBox\n"
+"{\n"
+"border : 0px black;\n"
+"border-radius : 0px;\n"
+"background-color: rgb(0, 120, 212);\n"
+"color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QComboBox::drop-down {\n"
+"	border : 0px black;\n"
+"	background-color: rgb(0, 120, 212);\n"
+"	text-transform: uppercase;\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item { \n"
+"	background-color: rgb(0, 120, 212);\n"
+"	text-transform: uppercase;\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow {\n"
+"    image: url(resources/images/user-account.png);\n"
+"    width: 20px;\n"
+"    height: 20px;\n"
+"}\n"
+"\n"
+"background-color: rgb(0, 120, 212);\n"
 "color: rgb(255, 255, 255);")
+        self.comboBox.setDuplicatesEnabled(False)
+        self.comboBox.setFrame(False)
 
         self.verticalLayout_2.addWidget(self.comboBox)
 
@@ -86,6 +115,7 @@ class Ui_MainWindow(object):
         self.pushButton_new_profile.setLayoutDirection(Qt.LeftToRight)
         self.pushButton_new_profile.setStyleSheet(u"alignment=Qt.AlignCenter\n"
 "")
+        self.pushButton_new_profile.setFlat(True)
 
         self.verticalLayout_3.addWidget(self.pushButton_new_profile)
 

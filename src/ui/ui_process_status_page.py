@@ -24,6 +24,7 @@ class Ui_status_page(object):
         if not status_page.objectName():
             status_page.setObjectName(u"status_page")
         status_page.resize(441, 763)
+        status_page.setStyleSheet(u"border: 0px;")
         self.verticalLayout = QVBoxLayout(status_page)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -31,7 +32,8 @@ class Ui_status_page(object):
         self.frame = QFrame(status_page)
         self.frame.setObjectName(u"frame")
         self.frame.setMinimumSize(QSize(0, 100))
-        self.frame.setStyleSheet(u"background-color: rgb(0, 120, 212);")
+        self.frame.setStyleSheet(u"background-color: rgb(0, 120, 212);\n"
+"border: 0px;")
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
         self.verticalLayout_2 = QVBoxLayout(self.frame)
@@ -45,6 +47,7 @@ class Ui_status_page(object):
         self.pushButton_quit = QPushButton(self.frame)
         self.pushButton_quit.setObjectName(u"pushButton_quit")
         self.pushButton_quit.setMaximumSize(QSize(40, 16777215))
+        self.pushButton_quit.setStyleSheet(u"QToolTip { color: white; }")
         self.pushButton_quit.setIconSize(QSize(20, 20))
         self.pushButton_quit.setFlat(True)
 
@@ -57,7 +60,8 @@ class Ui_status_page(object):
         self.pushButton_close = QPushButton(self.frame)
         self.pushButton_close.setObjectName(u"pushButton_close")
         self.pushButton_close.setMaximumSize(QSize(40, 16777215))
-        self.pushButton_close.setIconSize(QSize(26, 26))
+        self.pushButton_close.setStyleSheet(u"QToolTip { color: white; }")
+        self.pushButton_close.setIconSize(QSize(24, 24))
         self.pushButton_close.setFlat(True)
 
         self.horizontalLayout_3.addWidget(self.pushButton_close)
@@ -86,10 +90,12 @@ class Ui_status_page(object):
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setSpacing(0)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_2.setContentsMargins(5, -1, 5, 5)
+        self.horizontalLayout_2.setContentsMargins(5, -1, 0, 5)
         self.pushButton_start_stop = QPushButton(self.frame)
         self.pushButton_start_stop.setObjectName(u"pushButton_start_stop")
-        self.pushButton_start_stop.setMaximumSize(QSize(40, 16777215))
+        self.pushButton_start_stop.setMaximumSize(QSize(30, 16777215))
+        self.pushButton_start_stop.setStyleSheet(u"QToolTip { color: white; }")
+        self.pushButton_start_stop.setIconSize(QSize(22, 22))
         self.pushButton_start_stop.setFlat(True)
 
         self.horizontalLayout_2.addWidget(self.pushButton_start_stop)
@@ -97,7 +103,7 @@ class Ui_status_page(object):
         self.pushButton_start = QPushButton(self.frame)
         self.pushButton_start.setObjectName(u"pushButton_start")
         self.pushButton_start.setMaximumSize(QSize(30, 16777215))
-        self.pushButton_start.setStyleSheet(u"color: rgb(255, 255, 255);")
+        self.pushButton_start.setStyleSheet(u"QToolTip { color: white; }")
         self.pushButton_start.setIconSize(QSize(20, 20))
         self.pushButton_start.setFlat(True)
 
@@ -106,18 +112,11 @@ class Ui_status_page(object):
         self.pushButton_stop = QPushButton(self.frame)
         self.pushButton_stop.setObjectName(u"pushButton_stop")
         self.pushButton_stop.setMaximumSize(QSize(30, 16777215))
-        self.pushButton_stop.setStyleSheet(u"color: rgb(255, 255, 255);")
+        self.pushButton_stop.setStyleSheet(u"QToolTip { color: white; }")
         self.pushButton_stop.setIconSize(QSize(20, 20))
         self.pushButton_stop.setFlat(True)
 
         self.horizontalLayout_2.addWidget(self.pushButton_stop)
-
-        self.label_status = QLabel(self.frame)
-        self.label_status.setObjectName(u"label_status")
-        self.label_status.setMaximumSize(QSize(20, 16777215))
-        self.label_status.setStyleSheet(u"color: rgb(255, 255, 255);")
-
-        self.horizontalLayout_2.addWidget(self.label_status)
 
         self.label_version_check = QLabel(self.frame)
         self.label_version_check.setObjectName(u"label_version_check")
@@ -125,6 +124,10 @@ class Ui_status_page(object):
         self.label_version_check.setStyleSheet(u"QToolTip { color: white; }")
 
         self.horizontalLayout_2.addWidget(self.label_version_check)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
 
         self.label_free_space = QLabel(self.frame)
         self.label_free_space.setObjectName(u"label_free_space")
@@ -143,6 +146,14 @@ class Ui_status_page(object):
 
         self.horizontalLayout_2.addWidget(self.label_free_space_icon)
 
+        self.label_status = QLabel(self.frame)
+        self.label_status.setObjectName(u"label_status")
+        self.label_status.setMinimumSize(QSize(30, 0))
+        self.label_status.setMaximumSize(QSize(30, 16777215))
+        self.label_status.setStyleSheet(u"QToolTip { color: white; }")
+
+        self.horizontalLayout_2.addWidget(self.label_status)
+
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
 
@@ -158,6 +169,7 @@ class Ui_status_page(object):
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalLayout.setContentsMargins(-1, 5, -1, 5)
         self.pushButton_open_dir = QPushButton(status_page)
         self.pushButton_open_dir.setObjectName(u"pushButton_open_dir")
         sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
@@ -199,23 +211,38 @@ class Ui_status_page(object):
 
     def retranslateUi(self, status_page):
         status_page.setWindowTitle(QCoreApplication.translate("status_page", u"OneDriveGUI - Process Status", None))
+#if QT_CONFIG(tooltip)
+        self.pushButton_quit.setToolTip(QCoreApplication.translate("status_page", u"Quit", None))
+#endif // QT_CONFIG(tooltip)
         self.pushButton_quit.setText(QCoreApplication.translate("status_page", u"Quit", None))
+#if QT_CONFIG(tooltip)
+        self.pushButton_close.setToolTip(QCoreApplication.translate("status_page", u"Close to tray/dock", None))
+#endif // QT_CONFIG(tooltip)
         self.pushButton_close.setText(QCoreApplication.translate("status_page", u"Close", None))
         self.label_onedrive_status.setText(QCoreApplication.translate("status_page", u"Onedrive is sync not running", None))
         self.label_account_type.setText("")
         self.pushButton_start_stop.setText(QCoreApplication.translate("status_page", u"start/stop", None))
+#if QT_CONFIG(tooltip)
+        self.pushButton_start.setToolTip(QCoreApplication.translate("status_page", u"Start Sync", None))
+#endif // QT_CONFIG(tooltip)
         self.pushButton_start.setText(QCoreApplication.translate("status_page", u"Start", None))
+#if QT_CONFIG(tooltip)
+        self.pushButton_stop.setToolTip(QCoreApplication.translate("status_page", u"Stop Sync", None))
+#endif // QT_CONFIG(tooltip)
         self.pushButton_stop.setText(QCoreApplication.translate("status_page", u"Stop", None))
-        self.label_status.setText("")
         self.label_version_check.setText("")
 #if QT_CONFIG(tooltip)
-        self.label_free_space.setToolTip("")
+        self.label_free_space.setToolTip(QCoreApplication.translate("status_page", u"Free Space", None))
 #endif // QT_CONFIG(tooltip)
         self.label_free_space.setText("")
 #if QT_CONFIG(tooltip)
         self.label_free_space_icon.setToolTip(QCoreApplication.translate("status_page", u"Free Space", None))
 #endif // QT_CONFIG(tooltip)
         self.label_free_space_icon.setText(QCoreApplication.translate("status_page", u"TextLabel", None))
+#if QT_CONFIG(tooltip)
+        self.label_status.setToolTip(QCoreApplication.translate("status_page", u"Sync is stopped", None))
+#endif // QT_CONFIG(tooltip)
+        self.label_status.setText("")
         self.pushButton_open_dir.setText(QCoreApplication.translate("status_page", u"Open Sync Directory", None))
         self.pushButton_profiles.setText(QCoreApplication.translate("status_page", u"Profiles", None))
         self.pushButton_gui_settings.setText(QCoreApplication.translate("status_page", u"GUI Settings", None))

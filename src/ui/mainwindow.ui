@@ -63,8 +63,41 @@
          <enum>Qt::DefaultContextMenu</enum>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(0, 120, 212);
+         <string notr="true">QComboBox
+{
+border : 0px black;
+border-radius : 0px;
+background-color: rgb(0, 120, 212);
+color: rgb(255, 255, 255);
+}
+
+QComboBox::drop-down {
+	border : 0px black;
+	background-color: rgb(0, 120, 212);
+	text-transform: uppercase;
+	color: rgb(255, 255, 255);
+}
+
+QComboBox QAbstractItemView::item { 
+	background-color: rgb(0, 120, 212);
+	text-transform: uppercase;
+	color: rgb(255, 255, 255);
+}
+
+QComboBox::down-arrow {
+    image: url(resources/images/user-account.png);
+    width: 20px;
+    height: 20px;
+}
+
+background-color: rgb(0, 120, 212);
 color: rgb(255, 255, 255);</string>
+        </property>
+        <property name="duplicatesEnabled">
+         <bool>false</bool>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -87,6 +120,9 @@ color: rgb(255, 255, 255);</string>
           </property>
           <property name="text">
            <string>Create/ Import OneDrive profile</string>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
