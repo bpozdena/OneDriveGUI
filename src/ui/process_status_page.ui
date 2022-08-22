@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>OneDriveGUI - Process Status</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">border: 0px;</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>0</number>
@@ -38,7 +41,8 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(0, 120, 212);</string>
+      <string notr="true">background-color: rgb(0, 120, 212);
+border: 0px;</string>
      </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
@@ -84,6 +88,12 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Quit</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QToolTip { color: white; }</string>
+          </property>
           <property name="text">
            <string>Quit</string>
           </property>
@@ -119,13 +129,19 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Close to tray/dock</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QToolTip { color: white; }</string>
+          </property>
           <property name="text">
            <string>Close</string>
           </property>
           <property name="iconSize">
            <size>
-            <width>26</width>
-            <height>26</height>
+            <width>24</width>
+            <height>24</height>
            </size>
           </property>
           <property name="flat">
@@ -176,7 +192,7 @@
          <number>5</number>
         </property>
         <property name="rightMargin">
-         <number>5</number>
+         <number>0</number>
         </property>
         <property name="bottomMargin">
          <number>5</number>
@@ -185,12 +201,21 @@
          <widget class="QPushButton" name="pushButton_start_stop">
           <property name="maximumSize">
            <size>
-            <width>40</width>
+            <width>30</width>
             <height>16777215</height>
            </size>
           </property>
+          <property name="styleSheet">
+           <string notr="true">QToolTip { color: white; }</string>
+          </property>
           <property name="text">
            <string>start/stop</string>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>22</width>
+            <height>22</height>
+           </size>
           </property>
           <property name="flat">
            <bool>true</bool>
@@ -205,8 +230,11 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Start Sync</string>
+          </property>
           <property name="styleSheet">
-           <string notr="true">color: rgb(255, 255, 255);</string>
+           <string notr="true">QToolTip { color: white; }</string>
           </property>
           <property name="text">
            <string>Start</string>
@@ -230,8 +258,11 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Stop Sync</string>
+          </property>
           <property name="styleSheet">
-           <string notr="true">color: rgb(255, 255, 255);</string>
+           <string notr="true">QToolTip { color: white; }</string>
           </property>
           <property name="text">
            <string>Stop</string>
@@ -244,22 +275,6 @@
           </property>
           <property name="flat">
            <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_status">
-          <property name="maximumSize">
-           <size>
-            <width>20</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">color: rgb(255, 255, 255);</string>
-          </property>
-          <property name="text">
-           <string/>
           </property>
          </widget>
         </item>
@@ -280,6 +295,19 @@
          </widget>
         </item>
         <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
          <widget class="QLabel" name="label_free_space">
           <property name="font">
            <font>
@@ -287,7 +315,7 @@
            </font>
           </property>
           <property name="toolTip">
-           <string/>
+           <string>Free Space</string>
           </property>
           <property name="styleSheet">
            <string notr="true">color: rgb(255, 255, 255);</string>
@@ -319,6 +347,31 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QLabel" name="label_status">
+          <property name="minimumSize">
+           <size>
+            <width>30</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>30</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Sync is stopped</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QToolTip { color: white; }</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
@@ -336,6 +389,12 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="topMargin">
+      <number>5</number>
+     </property>
+     <property name="bottomMargin">
+      <number>5</number>
+     </property>
      <item>
       <widget class="QPushButton" name="pushButton_open_dir">
        <property name="sizePolicy">

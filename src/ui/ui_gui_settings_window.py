@@ -58,6 +58,11 @@ class Ui_gui_settings_window(object):
 
         self.gridLayout.addWidget(self.checkBox_frameless_window, 0, 0, 1, 1)
 
+        self.checkBox_combined_start_stop_button = QCheckBox(self.groupBox_3)
+        self.checkBox_combined_start_stop_button.setObjectName(u"checkBox_combined_start_stop_button")
+
+        self.gridLayout.addWidget(self.checkBox_combined_start_stop_button, 1, 0, 1, 1)
+
 
         self.verticalLayout_2.addWidget(self.groupBox_3)
 
@@ -180,8 +185,9 @@ class Ui_gui_settings_window(object):
         gui_settings_window.setWindowTitle(QCoreApplication.translate("gui_settings_window", u"OneDriveGUI - Settings", None))
         self.groupBox.setTitle(QCoreApplication.translate("gui_settings_window", u"OneDriveGUI behaviour", None))
         self.checkBox_start_minimized.setText(QCoreApplication.translate("gui_settings_window", u"Start OneDriveGUI minimized", None))
-        self.groupBox_3.setTitle(QCoreApplication.translate("gui_settings_window", u"Experimental", None))
+        self.groupBox_3.setTitle(QCoreApplication.translate("gui_settings_window", u"Appearance (experimental)", None))
         self.checkBox_frameless_window.setText(QCoreApplication.translate("gui_settings_window", u"Frameless Window for X11", None))
+        self.checkBox_combined_start_stop_button.setText(QCoreApplication.translate("gui_settings_window", u"Combined Start/Stop button", None))
         self.groupBox_2.setTitle(QCoreApplication.translate("gui_settings_window", u"Logging", None))
         self.label_debug_level.setText(QCoreApplication.translate("gui_settings_window", u"Debug level:               ", None))
         self.comboBox_debug_level.setItemText(0, QCoreApplication.translate("gui_settings_window", u"DEBUG", None))
