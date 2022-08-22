@@ -47,7 +47,8 @@ class Ui_status_page(object):
         self.pushButton_quit = QPushButton(self.frame)
         self.pushButton_quit.setObjectName(u"pushButton_quit")
         self.pushButton_quit.setMaximumSize(QSize(40, 16777215))
-        self.pushButton_quit.setStyleSheet(u"QToolTip { color: white; }")
+        self.pushButton_quit.setStyleSheet(u"QToolTip { color: white; }\n"
+"QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}")
         self.pushButton_quit.setIconSize(QSize(20, 20))
         self.pushButton_quit.setFlat(True)
 
@@ -60,7 +61,8 @@ class Ui_status_page(object):
         self.pushButton_close = QPushButton(self.frame)
         self.pushButton_close.setObjectName(u"pushButton_close")
         self.pushButton_close.setMaximumSize(QSize(40, 16777215))
-        self.pushButton_close.setStyleSheet(u"QToolTip { color: white; }")
+        self.pushButton_close.setStyleSheet(u"QToolTip { color: white; }\n"
+"QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}")
         self.pushButton_close.setIconSize(QSize(24, 24))
         self.pushButton_close.setFlat(True)
 
@@ -94,7 +96,8 @@ class Ui_status_page(object):
         self.pushButton_start_stop = QPushButton(self.frame)
         self.pushButton_start_stop.setObjectName(u"pushButton_start_stop")
         self.pushButton_start_stop.setMaximumSize(QSize(30, 16777215))
-        self.pushButton_start_stop.setStyleSheet(u"QToolTip { color: white; }")
+        self.pushButton_start_stop.setStyleSheet(u"QToolTip { color: white; }\n"
+"QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}")
         self.pushButton_start_stop.setIconSize(QSize(22, 22))
         self.pushButton_start_stop.setFlat(True)
 
@@ -103,7 +106,8 @@ class Ui_status_page(object):
         self.pushButton_start = QPushButton(self.frame)
         self.pushButton_start.setObjectName(u"pushButton_start")
         self.pushButton_start.setMaximumSize(QSize(30, 16777215))
-        self.pushButton_start.setStyleSheet(u"QToolTip { color: white; }")
+        self.pushButton_start.setStyleSheet(u"QToolTip { color: white; }\n"
+"QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}")
         self.pushButton_start.setIconSize(QSize(20, 20))
         self.pushButton_start.setFlat(True)
 
@@ -112,7 +116,8 @@ class Ui_status_page(object):
         self.pushButton_stop = QPushButton(self.frame)
         self.pushButton_stop.setObjectName(u"pushButton_stop")
         self.pushButton_stop.setMaximumSize(QSize(30, 16777215))
-        self.pushButton_stop.setStyleSheet(u"QToolTip { color: white; }")
+        self.pushButton_stop.setStyleSheet(u"QToolTip { color: white; }\n"
+"QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}")
         self.pushButton_stop.setIconSize(QSize(20, 20))
         self.pushButton_stop.setFlat(True)
 
@@ -168,8 +173,9 @@ class Ui_status_page(object):
         self.verticalLayout.addWidget(self.listWidget)
 
         self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalLayout.setContentsMargins(-1, 5, -1, 5)
+        self.horizontalLayout.setContentsMargins(-1, 0, -1, 0)
         self.pushButton_open_dir = QPushButton(status_page)
         self.pushButton_open_dir.setObjectName(u"pushButton_open_dir")
         sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
@@ -177,6 +183,7 @@ class Ui_status_page(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton_open_dir.sizePolicy().hasHeightForWidth())
         self.pushButton_open_dir.setSizePolicy(sizePolicy)
+        self.pushButton_open_dir.setStyleSheet(u"QPushButton:pressed { background-color: rgba(0, 0, 0, 10)}")
         self.pushButton_open_dir.setIconSize(QSize(26, 26))
         self.pushButton_open_dir.setFlat(True)
 
@@ -186,6 +193,7 @@ class Ui_status_page(object):
         self.pushButton_profiles.setObjectName(u"pushButton_profiles")
         sizePolicy.setHeightForWidth(self.pushButton_profiles.sizePolicy().hasHeightForWidth())
         self.pushButton_profiles.setSizePolicy(sizePolicy)
+        self.pushButton_profiles.setStyleSheet(u"QPushButton:pressed { background-color: rgba(0, 0, 0, 10)}")
         self.pushButton_profiles.setIconSize(QSize(26, 26))
         self.pushButton_profiles.setFlat(True)
 
@@ -195,6 +203,7 @@ class Ui_status_page(object):
         self.pushButton_gui_settings.setObjectName(u"pushButton_gui_settings")
         sizePolicy.setHeightForWidth(self.pushButton_gui_settings.sizePolicy().hasHeightForWidth())
         self.pushButton_gui_settings.setSizePolicy(sizePolicy)
+        self.pushButton_gui_settings.setStyleSheet(u"QPushButton:pressed { background-color: rgba(0, 0, 0, 10)}")
         self.pushButton_gui_settings.setIconSize(QSize(26, 26))
         self.pushButton_gui_settings.setFlat(True)
 

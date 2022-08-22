@@ -89,6 +89,7 @@ class Ui_MainWindow(object):
 "}\n"
 "\n"
 "QComboBox QAbstractItemView::item { \n"
+"	min-height: 20px;\n"
 "	background-color: rgb(0, 120, 212);\n"
 "	text-transform: uppercase;\n"
 "	color: rgb(255, 255, 255);\n"

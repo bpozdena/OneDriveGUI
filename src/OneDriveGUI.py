@@ -1174,7 +1174,11 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.label_profile_name.setText(self.profile)
         self.tabWidget.setCurrentIndex(0)
 
+        # Configures widget values
         self.configure_profile_settings_page()
+
+        # Configures widget connect actions
+        self.configure_connect_actions()
 
         # Buttons
         self.pushButton_discard.clicked.connect(self.discard_changes)
@@ -1323,126 +1327,52 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
             if self.profile in profile_settings_window.unsaved_profiles:
                 profile_settings_window.unsaved_profiles.remove(self.profile)
 
-    def configure_profile_settings_page(self):
-        """Sets all widgets values with values from profile config files"""
-
+    def configure_connect_actions(self):
         # Monitored files tab
-        self.lineEdit_sync_dir.setText(self.temp_profile_config["onedrive"]["sync_dir"].strip('"'))
         self.lineEdit_sync_dir.textChanged.connect(self.set_sync_dir)
-
-        self.checkBox_sync_root_files.setChecked(self.get_check_box_state("sync_root_files"))
         self.checkBox_sync_root_files.stateChanged.connect(self.set_check_box_state)
-
         self.pushButton_sync_dir_browse.clicked.connect(self.get_sync_dir_name)
 
-        # Excluded files tab
-
         # Skip_file section
-        self.skip_files = self.temp_profile_config["onedrive"]["skip_file"].strip('"').split("|")
-        self.listWidget_skip_file.clear()
-        self.listWidget_skip_file.addItems(self.skip_files)
-        self.listWidget_skip_file.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.pushButton_add_skip_file.clicked.connect(self.add_skip_file)
         self.pushButton_add_skip_file.clicked.connect(self.lineEdit_skip_file.clear)
         self.pushButton_rm_skip_file.clicked.connect(self.remove_skip_file)
 
         # Skip_dir section
-        self.skip_dirs = self.temp_profile_config["onedrive"]["skip_dir"].strip('"').split("|")
-        self.listWidget_skip_dir.clear()
-        self.listWidget_skip_dir.addItems(self.skip_dirs)
-        self.listWidget_skip_dir.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.pushButton_add_skip_dir.clicked.connect(self.add_skip_dir)
         self.pushButton_add_skip_dir.clicked.connect(self.lineEdit_skip_dir.clear)
         self.pushButton_rm_skip_dir.clicked.connect(self.remove_skip_dir)
-
-        self.checkBox_skip_dir_strict_match.setChecked(self.get_check_box_state("skip_dir_strict_match"))
         self.checkBox_skip_dir_strict_match.stateChanged.connect(self.set_check_box_state)
-
-        self.checkBox_check_nosync.setChecked(self.get_check_box_state("check_nosync"))
         self.checkBox_check_nosync.stateChanged.connect(self.set_check_box_state)
-
-        self.checkBox_skip_symlinks.setChecked(self.get_check_box_state("skip_symlinks"))
         self.checkBox_skip_symlinks.stateChanged.connect(self.set_check_box_state)
-
-        self.checkBox_skip_dotfiles.setChecked(self.get_check_box_state("skip_dotfiles"))
         self.checkBox_skip_dotfiles.stateChanged.connect(self.set_check_box_state)
 
         # Sync Options tab
-        self.spinBox_monitor_interval.setValue(int(self.temp_profile_config["onedrive"]["monitor_interval"].strip('"')))
         self.spinBox_monitor_interval.valueChanged.connect(self.set_spin_box_value)
-
-        self.spinBox_monitor_fullscan_frequency.setValue(int(self.temp_profile_config["onedrive"]["monitor_fullscan_frequency"].strip('"')))
         self.spinBox_monitor_fullscan_frequency.valueChanged.connect(self.set_spin_box_value)
-
-        self.spinBox_classify_as_big_delete.setValue(int(self.temp_profile_config["onedrive"]["classify_as_big_delete"].strip('"')))
         self.spinBox_classify_as_big_delete.valueChanged.connect(self.set_spin_box_value)
-
-        self.spinBox_sync_dir_permissions.setValue(int(self.temp_profile_config["onedrive"]["sync_dir_permissions"].strip('"')))
         self.spinBox_sync_dir_permissions.valueChanged.connect(self.set_spin_box_value)
-
-        self.spinBox_sync_file_permissions.setValue(int(self.temp_profile_config["onedrive"]["sync_file_permissions"].strip('"')))
         self.spinBox_sync_file_permissions.valueChanged.connect(self.set_spin_box_value)
-
-        self.spinBox_operation_timeout.setValue(int(self.temp_profile_config["onedrive"]["operation_timeout"].strip('"')))
         self.spinBox_operation_timeout.valueChanged.connect(self.set_spin_box_value)
-
-        self.checkBox_download_only.setChecked(self.get_check_box_state("download_only"))
-        self.checkBox_download_only.setDisabled(self.get_check_box_state("upload_only"))
         self.checkBox_download_only.stateChanged.connect(self.set_check_box_state)
         self.checkBox_download_only.stateChanged.connect(self.validate_checkbox_input)
-
-        self.checkBox_upload_only.setChecked(self.get_check_box_state("upload_only"))
-        self.checkBox_upload_only.setDisabled(self.get_check_box_state("download_only"))
         self.checkBox_upload_only.stateChanged.connect(self.set_check_box_state)
         self.checkBox_upload_only.stateChanged.connect(self.validate_checkbox_input)
-
-        if client_version < 2420:
-            self.checkBox_force_http_11.setEnabled(False)
-        else:
-            self.checkBox_force_http_11.setChecked(self.get_check_box_state("force_http_11"))
-            self.checkBox_force_http_11.stateChanged.connect(self.set_check_box_state)
-
-        self.checkBox_disable_upload_validation.setChecked(self.get_check_box_state("disable_upload_validation"))
+        self.checkBox_force_http_11.stateChanged.connect(self.set_check_box_state)
         self.checkBox_disable_upload_validation.stateChanged.connect(self.set_check_box_state)
-
-        self.checkBox_check_nomount.setChecked(self.get_check_box_state("check_nomount"))
         self.checkBox_check_nomount.stateChanged.connect(self.set_check_box_state)
-
-        self.checkBox_local_first.setChecked(self.get_check_box_state("local_first"))
         self.checkBox_local_first.stateChanged.connect(self.set_check_box_state)
-
-        self.checkBox_no_remote_delete.setChecked(self.get_check_box_state("no_remote_delete"))
-        self.checkBox_no_remote_delete.setEnabled(self.checkBox_upload_only.isChecked())
         self.checkBox_no_remote_delete.stateChanged.connect(self.set_check_box_state)
-
-        self.checkBox_dry_run.setChecked(self.get_check_box_state("dry_run"))
         self.checkBox_dry_run.stateChanged.connect(self.set_check_box_state)
-
-        self.checkBox_remove_source_files.setChecked(self.get_check_box_state("remove_source_files"))
         self.checkBox_remove_source_files.stateChanged.connect(self.set_check_box_state)
-
-        self.checkBox_resync.setChecked(self.get_check_box_state("resync"))
         self.checkBox_resync.stateChanged.connect(self.set_check_box_state)
-
-        self.checkBox_bypass_data_preservation.setChecked(self.get_check_box_state("bypass_data_preservation"))
         self.checkBox_bypass_data_preservation.stateChanged.connect(self.set_check_box_state)
-
-        self.lineEdit_user_agent.setText(self.temp_profile_config["onedrive"]["user_agent"].strip('"'))
         self.lineEdit_user_agent.textChanged.connect(self.set_line_edit_value)
-
-        self.lineEdit_azure_ad_endpoint.setText(self.temp_profile_config["onedrive"]["azure_ad_endpoint"].strip('"'))
         self.lineEdit_azure_ad_endpoint.textChanged.connect(self.set_line_edit_value)
-
-        self.lineEdit_azure_tenant_id.setText(self.temp_profile_config["onedrive"]["azure_tenant_id"].strip('"'))
         self.lineEdit_azure_tenant_id.textChanged.connect(self.set_line_edit_value)
-
-        self.lineEdit_drive_id.setText(self.temp_profile_config["onedrive"]["drive_id"].strip('"'))
         self.lineEdit_drive_id.textChanged.connect(self.set_line_edit_value)
 
         # Rate limit
-        self.spinBox_rate_limit.setValue(int(self.temp_profile_config["onedrive"]["rate_limit"].strip('"')))
-        self.horizontalSlider_rate_limit.setValue(int(self.temp_profile_config["onedrive"]["rate_limit"].strip('"')))
-        self.label_rate_limit_mbps.setText(str(round(self.spinBox_rate_limit.value() * 8 / 1000 / 1000, 2)) + " Mbit/s")
         self.spinBox_rate_limit.valueChanged.connect(self.set_spin_box_value)
         self.spinBox_rate_limit.valueChanged.connect(self.horizontalSlider_rate_limit.setValue)
         self.spinBox_rate_limit.valueChanged.connect(
@@ -1451,90 +1381,143 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.horizontalSlider_rate_limit.valueChanged.connect(self.spinBox_rate_limit.setValue)
 
         # Webhooks tab
-        self.checkBox_webhook_enabled.setChecked(self.get_check_box_state("webhook_enabled"))
         self.checkBox_webhook_enabled.stateChanged.connect(self.set_check_box_state)
         self.checkBox_webhook_enabled.stateChanged.connect(self.validate_checkbox_input)
-
-        self.spinBox_webhook_expiration_interval.setValue(int(self.temp_profile_config["onedrive"]["webhook_expiration_interval"].strip('"')))
-        self.spinBox_webhook_expiration_interval.setEnabled(self.checkBox_webhook_enabled.isChecked())
         self.spinBox_webhook_expiration_interval.valueChanged.connect(self.set_spin_box_value)
-
-        self.spinBox_webhook_renewal_interval.setValue(int(self.temp_profile_config["onedrive"]["webhook_renewal_interval"].strip('"')))
-        self.spinBox_webhook_renewal_interval.setEnabled(self.checkBox_webhook_enabled.isChecked())
         self.spinBox_webhook_renewal_interval.valueChanged.connect(self.set_spin_box_value)
-
-        self.spinBox_webhook_listening_port.setValue(int(self.temp_profile_config["onedrive"]["webhook_listening_port"].strip('"')))
-        self.spinBox_webhook_listening_port.setEnabled(self.checkBox_webhook_enabled.isChecked())
         self.spinBox_webhook_listening_port.valueChanged.connect(self.set_spin_box_value)
-
-        self.lineEdit_webhook_public_url.setText(self.temp_profile_config["onedrive"]["webhook_public_url"].strip('"'))
-        self.lineEdit_webhook_public_url.setEnabled(self.checkBox_webhook_enabled.isChecked())
         self.lineEdit_webhook_public_url.textChanged.connect(self.set_line_edit_value)
-
-        self.lineEdit_webhook_listening_host.setText(self.temp_profile_config["onedrive"]["webhook_listening_host"].strip('"'))
-        self.lineEdit_webhook_listening_host.setEnabled(self.checkBox_webhook_enabled.isChecked())
         self.lineEdit_webhook_listening_host.textChanged.connect(self.set_line_edit_value)
 
         # Logging tab
-        self.checkBox_enable_logging.setChecked(self.get_check_box_state("enable_logging"))
         self.checkBox_enable_logging.stateChanged.connect(self.set_check_box_state)
         self.checkBox_enable_logging.stateChanged.connect(self.validate_checkbox_input)
-
-        self.lineEdit_log_dir.setText(self.temp_profile_config["onedrive"]["log_dir"].strip('"'))
         self.lineEdit_log_dir.textChanged.connect(self.set_log_dir)
-        self.lineEdit_log_dir.setEnabled(self.checkBox_enable_logging.isChecked())
-
         self.pushButton_log_dir_browse.clicked.connect(self.get_log_dir_name)
-        self.pushButton_log_dir_browse.setEnabled(self.checkBox_enable_logging.isChecked())
-
-        self.checkBox_debug_https.setChecked(self.get_check_box_state("debug_https"))
         self.checkBox_debug_https.stateChanged.connect(self.set_check_box_state)
-        self.checkBox_debug_https.setEnabled(self.checkBox_enable_logging.isChecked())
-
-        self.spinBox_monitor_log_frequency.setValue(int(self.temp_profile_config["onedrive"]["monitor_log_frequency"].strip('"')))
-        self.spinBox_monitor_log_frequency.setEnabled(self.checkBox_enable_logging.isChecked())
         self.spinBox_monitor_log_frequency.valueChanged.connect(self.set_spin_box_value)
-
-        self.checkBox_disable_notifications.setChecked(self.get_check_box_state("disable_notifications"))
         self.checkBox_disable_notifications.stateChanged.connect(self.set_check_box_state)
         self.checkBox_disable_notifications.stateChanged.connect(self.validate_checkbox_input)
+        self.spinBox_min_notify_changes.valueChanged.connect(self.set_spin_box_value)
 
+        # Account tab
+        self.pushButton_login.clicked.connect(lambda: main_window.show_login(self.profile))
+        self.pushButton_logout.clicked.connect(self.logout)
+        self.checkBox_auto_sync.stateChanged.connect(self.set_check_box_state_profile)
+
+        # Business Shared Folders
+        self.checkBox_sync_business_shared_folders.stateChanged.connect(self.set_check_box_state)
+        self.groupBox_sync_business_shared_folders.clicked.connect(self.set_check_box_state)
+        self.pushButton_get_business_folders.clicked.connect(self.get_business_shared_folders)
+        self.pushButton_remove_business_folders.clicked.connect(self.remove_business_shared_folder)
+
+    def configure_profile_settings_page(self):
+        """Sets all widgets values with values from profile config files"""
+
+        # Monitored files tab
+        self.lineEdit_sync_dir.setText(self.temp_profile_config["onedrive"]["sync_dir"].strip('"'))
+        self.checkBox_sync_root_files.setChecked(self.get_check_box_state("sync_root_files"))
+
+        # Excluded files tab
+
+        # Skip_file section
+        self.skip_files = self.temp_profile_config["onedrive"]["skip_file"].strip('"').split("|")
+        self.listWidget_skip_file.clear()
+        self.listWidget_skip_file.addItems(self.skip_files)
+        self.listWidget_skip_file.setSelectionMode(QAbstractItemView.ExtendedSelection)
+
+        # Skip_dir section
+        self.skip_dirs = self.temp_profile_config["onedrive"]["skip_dir"].strip('"').split("|")
+        self.listWidget_skip_dir.clear()
+        self.listWidget_skip_dir.addItems(self.skip_dirs)
+        self.listWidget_skip_dir.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.checkBox_skip_dir_strict_match.setChecked(self.get_check_box_state("skip_dir_strict_match"))
+        self.checkBox_check_nosync.setChecked(self.get_check_box_state("check_nosync"))
+        self.checkBox_skip_symlinks.setChecked(self.get_check_box_state("skip_symlinks"))
+        self.checkBox_skip_dotfiles.setChecked(self.get_check_box_state("skip_dotfiles"))
+
+        # Sync Options tab
+        if client_version < 2420:
+            self.checkBox_force_http_11.setEnabled(False)
+        else:
+            self.checkBox_force_http_11.setChecked(self.get_check_box_state("force_http_11"))
+
+        self.spinBox_monitor_interval.setValue(int(self.temp_profile_config["onedrive"]["monitor_interval"].strip('"')))
+        self.spinBox_monitor_fullscan_frequency.setValue(int(self.temp_profile_config["onedrive"]["monitor_fullscan_frequency"].strip('"')))
+        self.spinBox_classify_as_big_delete.setValue(int(self.temp_profile_config["onedrive"]["classify_as_big_delete"].strip('"')))
+        self.spinBox_sync_dir_permissions.setValue(int(self.temp_profile_config["onedrive"]["sync_dir_permissions"].strip('"')))
+        self.spinBox_sync_file_permissions.setValue(int(self.temp_profile_config["onedrive"]["sync_file_permissions"].strip('"')))
+        self.spinBox_operation_timeout.setValue(int(self.temp_profile_config["onedrive"]["operation_timeout"].strip('"')))
+        self.checkBox_download_only.setChecked(self.get_check_box_state("download_only"))
+        self.checkBox_download_only.setDisabled(self.get_check_box_state("upload_only"))
+        self.checkBox_upload_only.setChecked(self.get_check_box_state("upload_only"))
+        self.checkBox_upload_only.setDisabled(self.get_check_box_state("download_only"))
+        self.checkBox_disable_upload_validation.setChecked(self.get_check_box_state("disable_upload_validation"))
+        self.checkBox_check_nomount.setChecked(self.get_check_box_state("check_nomount"))
+        self.checkBox_local_first.setChecked(self.get_check_box_state("local_first"))
+        self.checkBox_no_remote_delete.setChecked(self.get_check_box_state("no_remote_delete"))
+        self.checkBox_no_remote_delete.setEnabled(self.checkBox_upload_only.isChecked())
+        self.checkBox_dry_run.setChecked(self.get_check_box_state("dry_run"))
+        self.checkBox_remove_source_files.setChecked(self.get_check_box_state("remove_source_files"))
+        self.checkBox_resync.setChecked(self.get_check_box_state("resync"))
+        self.checkBox_bypass_data_preservation.setChecked(self.get_check_box_state("bypass_data_preservation"))
+        self.lineEdit_user_agent.setText(self.temp_profile_config["onedrive"]["user_agent"].strip('"'))
+        self.lineEdit_azure_ad_endpoint.setText(self.temp_profile_config["onedrive"]["azure_ad_endpoint"].strip('"'))
+        self.lineEdit_azure_tenant_id.setText(self.temp_profile_config["onedrive"]["azure_tenant_id"].strip('"'))
+        self.lineEdit_drive_id.setText(self.temp_profile_config["onedrive"]["drive_id"].strip('"'))
+
+        # Rate limit
+        self.spinBox_rate_limit.setValue(int(self.temp_profile_config["onedrive"]["rate_limit"].strip('"')))
+        self.horizontalSlider_rate_limit.setValue(int(self.temp_profile_config["onedrive"]["rate_limit"].strip('"')))
+        self.label_rate_limit_mbps.setText(str(round(self.spinBox_rate_limit.value() * 8 / 1000 / 1000, 2)) + " Mbit/s")
+
+        # Webhooks tab
+        self.checkBox_webhook_enabled.setChecked(self.get_check_box_state("webhook_enabled"))
+        self.spinBox_webhook_expiration_interval.setValue(int(self.temp_profile_config["onedrive"]["webhook_expiration_interval"].strip('"')))
+        self.spinBox_webhook_expiration_interval.setEnabled(self.checkBox_webhook_enabled.isChecked())
+        self.spinBox_webhook_renewal_interval.setValue(int(self.temp_profile_config["onedrive"]["webhook_renewal_interval"].strip('"')))
+        self.spinBox_webhook_renewal_interval.setEnabled(self.checkBox_webhook_enabled.isChecked())
+        self.spinBox_webhook_listening_port.setValue(int(self.temp_profile_config["onedrive"]["webhook_listening_port"].strip('"')))
+        self.spinBox_webhook_listening_port.setEnabled(self.checkBox_webhook_enabled.isChecked())
+        self.lineEdit_webhook_public_url.setText(self.temp_profile_config["onedrive"]["webhook_public_url"].strip('"'))
+        self.lineEdit_webhook_public_url.setEnabled(self.checkBox_webhook_enabled.isChecked())
+        self.lineEdit_webhook_listening_host.setText(self.temp_profile_config["onedrive"]["webhook_listening_host"].strip('"'))
+        self.lineEdit_webhook_listening_host.setEnabled(self.checkBox_webhook_enabled.isChecked())
+
+        # Logging tab
+        self.checkBox_enable_logging.setChecked(self.get_check_box_state("enable_logging"))
+        self.lineEdit_log_dir.setText(self.temp_profile_config["onedrive"]["log_dir"].strip('"'))
+        self.lineEdit_log_dir.setEnabled(self.checkBox_enable_logging.isChecked())
+        self.pushButton_log_dir_browse.setEnabled(self.checkBox_enable_logging.isChecked())
+        self.checkBox_debug_https.setChecked(self.get_check_box_state("debug_https"))
+        self.checkBox_debug_https.setEnabled(self.checkBox_enable_logging.isChecked())
+        self.spinBox_monitor_log_frequency.setValue(int(self.temp_profile_config["onedrive"]["monitor_log_frequency"].strip('"')))
+        self.spinBox_monitor_log_frequency.setEnabled(self.checkBox_enable_logging.isChecked())
+        self.checkBox_disable_notifications.setChecked(self.get_check_box_state("disable_notifications"))
         self.spinBox_min_notify_changes.setValue(int(self.temp_profile_config["onedrive"]["min_notify_changes"].strip('"')))
         self.spinBox_min_notify_changes.setEnabled(self.checkBox_disable_notifications.isChecked())
-        self.spinBox_min_notify_changes.valueChanged.connect(self.set_spin_box_value)
 
         # Account tab
         self.config_file = global_config[self.profile]["config_file"].strip('"')
         self.config_dir = re.search(r"(.+)/.+$", self.config_file).group(1)
-
-        self.pushButton_login.clicked.connect(lambda: main_window.show_login(self.profile))
         self.pushButton_login.hide()
-        self.pushButton_logout.clicked.connect(self.logout)
-
         self.checkBox_auto_sync.setChecked(self.get_check_box_state_profile("auto_sync"))
-        self.checkBox_auto_sync.stateChanged.connect(self.set_check_box_state_profile)
 
         # Sync List tab
         self.textEdit_sync_list.setText(self.read_sync_list())
 
         # Business Shared Folders
+        self.existing_business_shared_folders = self.read_business_shared_folders()
+
         self.checkBox_sync_business_shared_folders.setChecked(self.get_check_box_state("sync_business_shared_folders"))
-        self.checkBox_sync_business_shared_folders.stateChanged.connect(self.set_check_box_state)
         self.checkBox_sync_business_shared_folders.hide()
         self.groupBox_sync_business_shared_folders.setChecked(self.get_check_box_state("sync_business_shared_folders"))
-        self.groupBox_sync_business_shared_folders.clicked.connect(self.set_check_box_state)
-
-        existing_business_shared_folders = self.read_business_shared_folders()
-        self.pushButton_get_business_folders.clicked.connect(self.get_business_shared_folders)
-        self.pushButton_remove_business_folders.clicked.connect(self.remove_business_shared_folder)
-
         self.listWidget_available_business_folders.setDisabled(True)
-        self.listWidget_available_business_folders.clear
+        self.listWidget_available_business_folders.clear()
         self.listWidget_available_business_folders.setSelectionMode(QAbstractItemView.ExtendedSelection)
-
         self.listWidget_selected_business_folders.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.listWidget_selected_business_folders.clear()
-        self.listWidget_selected_business_folders.addItems(existing_business_shared_folders)
+        self.listWidget_selected_business_folders.addItems(self.existing_business_shared_folders)
 
         # Disable Business Shared Folder tab when account type is not Business
         # TODO: This should be a separate method. We only need to run this check on startup and when new account is created.
