@@ -73,36 +73,7 @@ class Ui_MainWindow(object):
         font.setBold(True)
         self.comboBox.setFont(font)
         self.comboBox.setContextMenuPolicy(Qt.DefaultContextMenu)
-        self.comboBox.setStyleSheet(u"QComboBox\n"
-"{\n"
-"border : 0px black;\n"
-"border-radius : 0px;\n"
-"background-color: rgb(0, 120, 212);\n"
-"color: rgb(255, 255, 255);\n"
-"}\n"
-"\n"
-"QComboBox::drop-down {\n"
-"	border : 0px black;\n"
-"	background-color: rgb(0, 120, 212);\n"
-"	text-transform: uppercase;\n"
-"	color: rgb(255, 255, 255);\n"
-"}\n"
-"\n"
-"QComboBox QAbstractItemView::item { \n"
-"	min-height: 20px;\n"
-"	background-color: rgb(0, 120, 212);\n"
-"	text-transform: uppercase;\n"
-"	color: rgb(255, 255, 255);\n"
-"}\n"
-"\n"
-"QComboBox::down-arrow {\n"
-"    image: url(resources/images/user-account.png);\n"
-"    width: 20px;\n"
-"    height: 20px;\n"
-"}\n"
-"\n"
-"background-color: rgb(0, 120, 212);\n"
-"color: rgb(255, 255, 255);")
+        self.comboBox.setStyleSheet(u"")
         self.comboBox.setDuplicatesEnabled(False)
         self.comboBox.setFrame(False)
 

@@ -2154,6 +2154,40 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.menubar.hide()
 
         self.comboBox.activated.connect(self.switch_account_status_page)
+        self.comboBox.setStyleSheet(
+            f"""
+        QComboBox {{
+            border : 0px black;
+            border-radius : 0px;
+            background-color: rgb(0, 120, 212);
+            color: rgb(255, 255, 255);
+        }}
+
+        QComboBox::drop-down {{
+            border : 0px black;
+            background-color: rgb(0, 120, 212);
+            text-transform: uppercase;
+            color: rgb(255, 255, 255);
+        }}
+
+        QComboBox QAbstractItemView::item {{ 
+            min-height: 20px;
+            background-color: rgb(0, 120, 212);
+            text-transform: uppercase;
+            color: rgb(255, 255, 255);
+        }}
+
+        QComboBox::down-arrow {{
+            image: url({DIR_PATH}/resources/images/user-account.png);
+            width: 20px;
+            height: 20px;
+        }}
+
+        background-color: rgb(0, 120, 212);
+        color: rgb(255, 255, 255);
+        
+        """
+        )
         self.stackedLayout = QStackedLayout()
 
         self.profile_status_pages = {}
