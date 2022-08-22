@@ -92,7 +92,8 @@ border: 0px;</string>
            <string>Quit</string>
           </property>
           <property name="styleSheet">
-           <string notr="true">QToolTip { color: white; }</string>
+           <string notr="true">QToolTip { color: white; }
+QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}</string>
           </property>
           <property name="text">
            <string>Quit</string>
@@ -133,7 +134,8 @@ border: 0px;</string>
            <string>Close to tray/dock</string>
           </property>
           <property name="styleSheet">
-           <string notr="true">QToolTip { color: white; }</string>
+           <string notr="true">QToolTip { color: white; }
+QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}</string>
           </property>
           <property name="text">
            <string>Close</string>
@@ -206,7 +208,8 @@ border: 0px;</string>
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">QToolTip { color: white; }</string>
+           <string notr="true">QToolTip { color: white; }
+QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}</string>
           </property>
           <property name="text">
            <string>start/stop</string>
@@ -234,7 +237,8 @@ border: 0px;</string>
            <string>Start Sync</string>
           </property>
           <property name="styleSheet">
-           <string notr="true">QToolTip { color: white; }</string>
+           <string notr="true">QToolTip { color: white; }
+QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}</string>
           </property>
           <property name="text">
            <string>Start</string>
@@ -262,7 +266,8 @@ border: 0px;</string>
            <string>Stop Sync</string>
           </property>
           <property name="styleSheet">
-           <string notr="true">QToolTip { color: white; }</string>
+           <string notr="true">QToolTip { color: white; }
+QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}</string>
           </property>
           <property name="text">
            <string>Stop</string>
@@ -389,11 +394,14 @@ border: 0px;</string>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <property name="topMargin">
-      <number>5</number>
+      <number>0</number>
      </property>
      <property name="bottomMargin">
-      <number>5</number>
+      <number>0</number>
      </property>
      <item>
       <widget class="QPushButton" name="pushButton_open_dir">
@@ -402,6 +410,9 @@ border: 0px;</string>
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton:pressed { background-color: rgba(0, 0, 0, 10)}</string>
        </property>
        <property name="text">
         <string>Open Sync Directory</string>
@@ -425,6 +436,9 @@ border: 0px;</string>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton:pressed { background-color: rgba(0, 0, 0, 10)}</string>
+       </property>
        <property name="text">
         <string>Profiles</string>
        </property>
@@ -446,6 +460,9 @@ border: 0px;</string>
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton:pressed { background-color: rgba(0, 0, 0, 10)}</string>
        </property>
        <property name="text">
         <string>GUI Settings</string>
