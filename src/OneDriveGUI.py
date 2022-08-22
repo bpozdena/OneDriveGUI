@@ -1130,6 +1130,7 @@ class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
         # Remove profile from main window.
         combo_box_index = main_window.comboBox.findText(selected_profile_name)
         main_window.comboBox.removeItem(combo_box_index)
+        main_window.stackedLayout.setCurrentIndex(0)
         main_window.profile_status_pages.pop(selected_profile_name, None)
         global_config.pop(selected_profile_name, None)
         logging.info(global_config)
