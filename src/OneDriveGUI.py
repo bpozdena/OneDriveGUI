@@ -1965,9 +1965,9 @@ class WorkerThread(QThread):
         Starts OneDrive and sends signals to GUI based on parsed information.
         """
 
-        file_name = None
+        self.file_name = None
 
-        tasks = [
+        self.tasks = [
             "Downloading file",
             "Downloading new file",
             "Uploading file",
@@ -1989,146 +1989,168 @@ class WorkerThread(QThread):
 
         while self.onedrive_process.poll() is None:
             if self.onedrive_process.stdout:
-                stdout = self.onedrive_process.stdout.readline()
-                if stdout == "":
-                    continue
+                # Capture stdout from OneDrive process.
+                self.read_stdout()
 
-                logging.info(f"[{self.profile_name}] " + stdout.strip())
+            elif self.onedrive_process.stderr:
+                # Capture stderr from OneDrive process.
+                self.read_stderr()
 
-                if "Calling Function: testNetwork()" in stdout:
-                    self.profile_status["status_message"] = "Cannot connect to Microsoft OneDrive Service"
-                    self.update_profile_status.emit(self.profile_status, self.profile_name)
+        # This helps monitor stdout and stderr for extra second after onedrive process stops. I could not find a smarter way.
+        timeout = time.time() + 1
+        while True:
+            if self.onedrive_process.stderr:
+                self.read_stderr()
 
-                if "Authorize this app visiting" in stdout:
-                    self.onedrive_process.kill()
-                    self.profile_status["status_message"] = "OneDrive login is required"
-                    self.update_profile_status.emit(self.profile_status, self.profile_name)
-                    self.update_credentials.emit(self.profile_name)
+            if time.time() > timeout:
+                break
 
-                elif "Sync with OneDrive is complete" in stdout:
-                    self.profile_status["status_message"] = "OneDrive sync is complete"
-                    self.update_profile_status.emit(self.profile_status, self.profile_name)
+    def read_stdout(self):
+        stdout = self.onedrive_process.stdout.readline().strip()
+        if stdout != "":
 
-                elif "Remaining Free Space" in stdout:
-                    try:
-                        self.free_space_bytes = re.search(r"([0-9]+)", stdout).group(1)
-                        self.free_space_human = str(humanize_file_size(int(self.free_space_bytes)))
-                    except:
-                        self.free_space_human = "Not Available"
+            logging.info(f"[{self.profile_name}] " + stdout)
 
-                    logging.info(f"[{self.profile_name}] Free Space: {self.free_space_human}")
-                    self.profile_status["free_space"] = f"{self.free_space_human}"
-                    self.update_profile_status.emit(self.profile_status, self.profile_name)
+            if "Calling Function: testNetwork()" in stdout:
+                self.profile_status["status_message"] = "Cannot connect to Microsoft OneDrive Service"
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-                    # Update profile file with Free Space
-                    global_config[self.profile_name]["free_space"] = self.free_space_human
-                    temp_global_config[self.profile_name]["free_space"] = self.free_space_human
-                    save_global_config()
+            if "Authorize this app visiting" in stdout:
+                self.onedrive_process.kill()
+                self.profile_status["status_message"] = "OneDrive login is required"
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
+                self.update_credentials.emit(self.profile_name)
 
-                elif "Account Type" in stdout:
-                    self.account_type = re.search(r"\s(\w+)$", stdout).group(1)
-                    self.profile_status["account_type"] = self.account_type.capitalize()
-                    logging.info(f"[{self.profile_name}] Account type: {self.account_type}")
-                    self.update_profile_status.emit(self.profile_status, self.profile_name)
+            elif "Sync with OneDrive is complete" in stdout:
+                self.profile_status["status_message"] = "OneDrive sync is complete"
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-                    # Update profile file with account type
-                    global_config[self.profile_name]["account_type"] = self.account_type.capitalize()
-                    temp_global_config[self.profile_name]["account_type"] = self.account_type.capitalize()
-                    save_global_config()
+            elif "Remaining Free Space" in stdout:
+                try:
+                    self.free_space_bytes = re.search(r"([0-9]+)", stdout).group(1)
+                    self.free_space_human = str(humanize_file_size(int(self.free_space_bytes)))
+                except:
+                    self.free_space_human = "Not Available"
 
-                elif "Initializing the OneDrive API" in stdout:
-                    self.profile_status["status_message"] = "Initializing the OneDrive API"
-                    self.update_profile_status.emit(self.profile_status, self.profile_name)
+                logging.info(f"[{self.profile_name}] Free Space: {self.free_space_human}")
+                self.profile_status["free_space"] = f"{self.free_space_human}"
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-                elif "Processing" in stdout:
-                    items_left = re.match(r"^Processing\s([0-9]+)\sOneDrive\sitems", stdout)
-                    if items_left != None:
-                        self.profile_status["status_message"] = f"OneDrive is processing {items_left.group(1)} items..."
-                    else:
-                        self.profile_status["status_message"] = "OneDrive is processing items..."
-                    self.update_profile_status.emit(self.profile_status, self.profile_name)
+                # Update profile file with Free Space
+                global_config[self.profile_name]["free_space"] = self.free_space_human
+                temp_global_config[self.profile_name]["free_space"] = self.free_space_human
+                save_global_config()
 
-                elif any(_ in stdout for _ in tasks):
-                    # Capture information about file that is being uploaded/downloaded/deleted by OneDrive.
-                    file_operation = re.search(r"\b([Uploading|Downloading|Deleting]+)*", stdout).group(1)
+            elif "Account Type" in stdout:
+                self.account_type = re.search(r"\s(\w+)$", stdout).group(1)
+                self.profile_status["account_type"] = self.account_type.capitalize()
+                logging.info(f"[{self.profile_name}] Account type: {self.account_type}")
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-                    if file_operation == "Deleting":
-                        file_name = re.search(r".*/(.+)$", stdout)
-                        file_path = re.search(r"\b[item|OneDrive:]+\s(.+)$", stdout)
+                # Update profile file with account type
+                global_config[self.profile_name]["account_type"] = self.account_type.capitalize()
+                temp_global_config[self.profile_name]["account_type"] = self.account_type.capitalize()
+                save_global_config()
 
-                    else:
-                        file_name = re.search(r".*/(.+)\s+\.+", stdout)
-                        file_path = re.search(r"\b[file]+\s(.+)\s+\.\.\.", stdout)
+            elif "Initializing the OneDrive API" in stdout:
+                self.profile_status["status_message"] = "Initializing the OneDrive API"
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-                    transfer_complete = any(["done" in stdout, "Deleting" in stdout])
-                    progress = "0"
+            elif "Processing" in stdout:
+                items_left = re.match(r"^Processing\s([0-9]+)\sOneDrive\sitems", stdout)
+                if items_left != None:
+                    self.profile_status["status_message"] = f"OneDrive is processing {items_left.group(1)} items..."
+                else:
+                    self.profile_status["status_message"] = "OneDrive is processing items..."
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-                    transfer_progress_new = {
-                        "file_operation": file_operation,
-                        "file_path": "unknown file name" if file_path is None else file_path.group(1),
-                        "progress": progress,
-                        "transfer_complete": transfer_complete,
-                    }
+            elif any(_ in stdout for _ in self.tasks):
+                # Capture information about file that is being uploaded/downloaded/deleted by OneDrive.
+                file_operation = re.search(r"\b([Uploading|Downloading|Deleting]+)*", stdout).group(1)
 
-                    # Update file transfer list
-                    logging.info(transfer_progress_new)
-                    self.update_progress_new.emit(transfer_progress_new, self.profile_name)
-
-                    # Update profile status message.
-                    if transfer_complete:
-                        pass
-                        # self.profile_status["status_message"] = "OneDrive sync is complete"
-                    else:
-                        self.profile_status["status_message"] = "OneDrive sync in progress..."
-
-                elif "% |" in stdout:
-                    # Capture upload/download progress status
-
-                    file_operation = re.search(r"\b([Uploading|Downloading]+)*", stdout).group(1)
-                    progress = re.search(r"\s([0-9]+)%", stdout).group(1)
-                    transfer_complete = progress == "100"
-
-                    transfer_progress_new = {
-                        "file_operation": file_operation,
-                        "file_path": "unknown file name" if file_path is None else file_path.group(1),
-                        "progress": progress,
-                        "transfer_complete": transfer_complete,
-                    }
-
-                    logging.info(transfer_progress_new)
-                    self.update_progress_new.emit(transfer_progress_new, self.profile_name)
-
-                    if transfer_complete:
-                        pass
-                        # self.profile_status["status_message"] = "OneDrive sync is complete"
-                    else:
-                        self.profile_status["status_message"] = "OneDrive sync in progress..."
-
-                    self.update_profile_status.emit(self.profile_status, self.profile_name)
+                if file_operation == "Deleting":
+                    self.file_name = re.search(r".*/(.+)$", stdout)
+                    self.file_path = re.search(r"\b[item|OneDrive:]+\s(.+)$", stdout)
 
                 else:
-                    # logging.debug(f"No rule matched: {stdout}")
+                    self.file_name = re.search(r".*/(.+)\s+\.+", stdout)
+                    self.file_path = re.search(r"\b[file]+\s(.+)\s+\.\.\.", stdout)
+
+                transfer_complete = any(["done" in stdout, "Deleting" in stdout])
+                progress = "0"
+
+                transfer_progress_new = {
+                    "file_operation": file_operation,
+                    "file_path": "unknown file name" if self.file_path is None else self.file_path.group(1),
+                    "progress": progress,
+                    "transfer_complete": transfer_complete,
+                }
+
+                # Update file transfer list
+                logging.info(transfer_progress_new)
+                self.update_progress_new.emit(transfer_progress_new, self.profile_name)
+
+                # Update profile status message.
+                if transfer_complete:
                     pass
-
-        if self.onedrive_process.stderr:
-            # Capture stderr from OneDrive process.
-
-            stderr = self.onedrive_process.stderr.readline()
-            if stderr != "":
-                if "command not found" in stderr:
-                    logging.info(
-                        """Onedrive does not seem to be installed. Please install it as per instruction at 
-                    https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md """
-                    )
-
-                elif "--resync is required" in stderr:
-                    # Ask user for resync authorization and stop the worker.
-                    logging.info(f"[{self.profile_name}] {str(stderr)}  - Asking for resync authorization.")
-
-                    self.trigger_resync.emit(self.profile_name)
-
+                    # self.profile_status["status_message"] = "OneDrive sync is complete"
                 else:
-                    logging.info("@ERROR " + stderr)
+                    self.profile_status["status_message"] = "OneDrive sync in progress..."
+
+            elif "% |" in stdout:
+                # Capture upload/download progress status
+
+                file_operation = re.search(r"\b([Uploading|Downloading]+)*", stdout).group(1)
+                progress = re.search(r"\s([0-9]+)%", stdout).group(1)
+                transfer_complete = progress == "100"
+
+                transfer_progress_new = {
+                    "file_operation": file_operation,
+                    "file_path": "unknown file name" if self.file_path is None else self.file_path.group(1),
+                    "progress": progress,
+                    "transfer_complete": transfer_complete,
+                }
+
+                logging.info(transfer_progress_new)
+                self.update_progress_new.emit(transfer_progress_new, self.profile_name)
+
+                if transfer_complete:
+                    pass
+                    # self.profile_status["status_message"] = "OneDrive sync is complete"
+                else:
+                    self.profile_status["status_message"] = "OneDrive sync in progress..."
+
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
+
+            else:
+                # logging.debug(f"No rule matched: {stdout}")
+                pass
+
+    def read_stderr(self):
+        stderr = self.onedrive_process.stderr.readline().strip()
+        if stderr != "":
+            if "command not found" in stderr:
+                logging.info(
+                    """Onedrive does not seem to be installed. Please install it as per instruction at 
+                https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md """
+                )
+
+            elif "--resync is required" in stderr:
+                # Ask user for resync authorization and stop the worker.
+                logging.info(f"[{self.profile_name}] {str(stderr)}  - Asking for resync authorization.")
+
+                self.trigger_resync.emit(self.profile_name)
+
+            elif "onedrive application is already running" in stderr:
+                self.profile_status["status_message"] = "OneDrive is already running outside OneDriveGUI!"
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
+
+            elif "Network Connection Issue" in stderr:
+                self.profile_status["status_message"] = "Cannot connect to Microsoft OneDrive Service."
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
+
+            else:
+                logging.info("@ERROR " + stderr)
 
 
 class AlignDelegate(QStyledItemDelegate):
@@ -2453,6 +2475,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.workers[profile_name].update_profile_status.connect(self.event_update_profile_status)
         self.workers[profile_name].started.connect(lambda: logging.info(f"started worker {profile_name}"))
         self.workers[profile_name].finished.connect(lambda: logging.info(f"finished worker {profile_name}"))
+        self.workers[profile_name].finished.connect(lambda: main_window.workers[profile_name].stop_worker())
 
     def resync_auth_dialog(self, profile_name):
         resync_question = QMessageBox.question(
