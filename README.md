@@ -12,27 +12,27 @@ A simple GUI for [OneDrive Linux client](https://github.com/abraunegg/onedrive),
 
 # Running as AppImage 
 1) Download .AppImage from the [release assets](https://github.com/bpozdena/OneDriveGUI/releases)
-2) Make the .AppImage file executable and run it. 
+1) Make the .AppImage file executable and run it. 
 
-# Installation from source
+# Running from source
 1) Ensure [OneDrive for Linux](https://abraunegg.github.io/) is installed based on [instructions](https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md) for your distro. 
 1) Ensure Python3 and [pip](https://pip.pypa.io/en/stable/installation/) are installed on your system. 
 1) Clone or download content this repository.
 1) Install dependencies:
 	```sh
-	python -m pip install -r requirements.txt
+	python3 -m pip3 install -r requirements.txt
 	```
 
 1) Start OneDrive GUI:
 	```sh
 	cd src/
-	python OneDriveGUI.py
+	python3 OneDriveGUI.py
 	```
 
     Optionally, you can detach the GUI from terminal by using the bellow command:
     ```sh
 	cd src/
-    nohup python OneDriveGUI.py > /dev/null 2>&1&
+    nohup python3 OneDriveGUI.py > /dev/null 2>&1&
     ```
 
 # Use
