@@ -165,7 +165,7 @@ QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}</string>
          <string notr="true">color: rgb(255, 255, 255);</string>
         </property>
         <property name="text">
-         <string>Onedrive is sync not running</string>
+         <string>OneDrive sync is not running</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
