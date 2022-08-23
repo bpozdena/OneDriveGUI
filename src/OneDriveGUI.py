@@ -2407,6 +2407,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 # Show Play icon when sync is stopped.
                 profile_status_page.pushButton_start_stop.setIcon(profile_status_page.start_icon)
                 profile_status_page.pushButton_start_stop.setToolTip("Start Sync")
+                profile_status_page.pushButton_start_stop.clicked.disconnect()
                 profile_status_page.pushButton_start_stop.clicked.connect(profile_status_page.start_monitor)
 
             else:
@@ -2418,6 +2419,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     # Show Stop icon when sync is running.
                     profile_status_page.pushButton_start_stop.setIcon(profile_status_page.stop_icon)
                     profile_status_page.pushButton_start_stop.setToolTip("Stop Sync")
+                    profile_status_page.pushButton_start_stop.clicked.disconnect()
                     profile_status_page.pushButton_start_stop.clicked.connect(profile_status_page.stop_monitor)
 
     def autostart_monitor(self):
