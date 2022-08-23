@@ -2142,7 +2142,7 @@ class WorkerThread(QThread):
                 self.trigger_resync.emit(self.profile_name)
 
             elif "onedrive application is already running" in stderr:
-                self.profile_status["status_message"] = "OneDrive is already running outside OneDriveGUI!"
+                self.profile_status["status_message"] = "OneDrive is already running outside OneDriveGUI !"
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif "Network Connection Issue" in stderr:
