@@ -14,6 +14,9 @@ A simple GUI for [OneDrive Linux client](https://github.com/abraunegg/onedrive),
 1) Download .AppImage from the [release assets](https://github.com/bpozdena/OneDriveGUI/releases)
 1) Make the .AppImage file executable and run it. 
 
+| :memo:        | Users of Ubuntu 22.04+ may also need to install FUSE2 with `sudo apt install libfuse2`      |
+|---------------|:--------------------------------------------------------------------------------------------|
+
 # Running from source
 1) Ensure [OneDrive for Linux](https://abraunegg.github.io/) is installed based on [instructions](https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md) for your distro. 
 1) Ensure Python3 and [pip](https://pip.pypa.io/en/stable/installation/) are installed on your system. 
