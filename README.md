@@ -5,7 +5,7 @@ A simple GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive),
 
 ## Feature highlights  
 - Management and configuration of multiple OneDrive accounts
-- Asynchronous real-time sync monitoring of multiple OneDrive accounts
+- Asynchronous real-time monitoring of multiple OneDrive accounts
 - Setup wizard for easy OneDrive profile creation and import
 - Auto-sync on GUI startup
 - Support for GUI based login process
@@ -36,8 +36,8 @@ A simple GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive),
 
 
 # Running and Installing OneDriveGUI
-**Note** 
-Ensure the latest version of [OneDrive for Linux](https://abraunegg.github.io/) is installed based on [instructions](https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md) for your distro. 
+| :exclamation:        |Ensure the latest version of [OneDrive for Linux](https://abraunegg.github.io/) is installed based on [instructions](https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md) for your distro. |
+|---------------|:--------------------------------------------------------------------------------------------|
 
 ## AppImage 
 1) Download the latest `OneDriveGUI-*-x86_64.AppImage` from the [release assets](https://github.com/bpozdena/OneDriveGUI/releases)
@@ -53,6 +53,9 @@ Ensure the latest version of [OneDrive for Linux](https://abraunegg.github.io/) 
 
 1) Ensure Python3 and [pip](https://pip.pypa.io/en/stable/installation/) are installed on your system. 
 1) Clone or download content of this repository.
+```
+git clone https://github.com/bpozdena/OneDriveGUI.git
+```
 1) Install dependencies:
 	```sh
 	python3 -m pip3 install -r requirements.txt
@@ -73,7 +76,7 @@ Ensure the latest version of [OneDrive for Linux](https://abraunegg.github.io/) 
 # Use
 - Once the GUI starts, you will be able to create a new OneDrive profile or import your pre-existing one. Just follow the wizard steps.
 - You can adjust your OneDrive profile options as needed. 
-- Start OneDrive sync in monitor mode via the GUI by pressing the Play button.
+- Start OneDrive sync in monitor mode via the GUI by pressing the `Play` button.
 
 
 
