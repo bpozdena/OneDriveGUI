@@ -1966,6 +1966,7 @@ class WorkerThread(QThread):
         """
 
         self.file_name = None
+        self.file_path = None
 
         self.tasks = [
             "Downloading file",
