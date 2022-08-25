@@ -1,26 +1,58 @@
 # OneDriveGUI
-A simple GUI for [OneDrive Linux client](https://github.com/abraunegg/onedrive), with multi-account support. 
+A simple GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive), with multi-account support.
 
-<img src=https://user-images.githubusercontent.com/24818591/153468329-30f14b63-0500-40bd-8e34-5910fcea7e05.png>
+![GUI_git](https://user-images.githubusercontent.com/24818591/186763925-34422d98-0894-42cb-ad7f-1134a57484ff.png)
 
-# Important notes
-- This project is currently in alpha stage.
-- Check for known [issues/limitations](https://github.com/bpozdena/OneDriveGUI/issues). 
-- Questions, suggestions and bug reports are welcome. 
+## Feature highlights  
+- Management and configuration of multiple OneDrive accounts
+- Asynchronous real-time sync monitoring of multiple OneDrive accounts
+- Setup wizard for easy OneDrive profile creation and import
+- Auto-sync on GUI startup
+- Support for GUI based login process
+- System tray (if supported by your desktop environment)
+- Start minimized to tray/dock 
+- Input validation to prevent configuration of incompatible OneDrive client options
+- Import and management of Business Shared Folders
+- Import and management of SharePoint Shared Libraries
+- ToolTips with brief explanation of various OneDrive Client configuration options.
+- Prompt for re-sync authorization to prevent unexpected data loss. 
+
+
+## Known Limitations
+- No window shadows for Wayland sessions
+- AppImage still requires the use of external browser for authentication
+- Check for other reported [issues/limitations](https://github.com/bpozdena/OneDriveGUI/issues). 
+
+## Compatibility
+- Minimum supported OneDrive client v2.4.15
+- You will be shown warnings when your OneDrive Client is not up to date.
+
+
+## Other notes
+- Questions, suggestions, contributions and bug reports are welcome. 
 - Backup your OneDrive config files before importing them to the GUI.
 - Backup your data before use to prevent accidental file deletion due to OneDrive misconfiguration. 
+- No warranty. 
 
-# Running as AppImage 
-1) Download .AppImage from the [release assets](https://github.com/bpozdena/OneDriveGUI/releases)
-1) Make the .AppImage file executable and run it. 
+
+# Running and Installing OneDriveGUI
+**Note** 
+Ensure the latest version of [OneDrive for Linux](https://abraunegg.github.io/) is installed based on [instructions](https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md) for your distro. 
+
+## AppImage 
+1) Download the latest `OneDriveGUI-*-x86_64.AppImage` from the [release assets](https://github.com/bpozdena/OneDriveGUI/releases)
+1) Make the .AppImage file executable with `chmod +x ./OneDriveGUI-<**version**>-x86_64.AppImage` and run it. 
 
 | :memo:        | Users of Ubuntu 22.04+ may also need to install FUSE2 with `sudo apt install libfuse2`      |
 |---------------|:--------------------------------------------------------------------------------------------|
 
-# Running from source
-1) Ensure [OneDrive for Linux](https://abraunegg.github.io/) is installed based on [instructions](https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md) for your distro. 
+## AUR
+- An AUR package [onedrivegui-git](https://aur.archlinux.org/packages/onedrivegui-git) is available. (maintainer: ZhangHua)
+
+## Running from source
+
 1) Ensure Python3 and [pip](https://pip.pypa.io/en/stable/installation/) are installed on your system. 
-1) Clone or download content this repository.
+1) Clone or download content of this repository.
 1) Install dependencies:
 	```sh
 	python3 -m pip3 install -r requirements.txt
@@ -40,13 +72,13 @@ A simple GUI for [OneDrive Linux client](https://github.com/abraunegg/onedrive),
 
 # Use
 - Once the GUI starts, you will be able to create a new OneDrive profile or import your pre-existing one. Just follow the wizard steps.
-- You can adjust your OneDrive profile options as needed. Most options are already available in the GUI.
-- Start OneDrive sync in monitor mode via the GUI. 
-- You can also run OneDrive as [systemd service](https://github.com/abraunegg/onedrive/blob/master/docs/USAGE.md#running-onedrive-as-a-system-service), however systemd/journal monitoring is not yet implemented in the GUI. 
+- You can adjust your OneDrive profile options as needed. 
+- Start OneDrive sync in monitor mode via the GUI by pressing the Play button.
+
 
 
 # Additional Notes
 - When importing OneDrive config file, all comments will be removed. Missing options will be replaced with [default values](src/resources/default_config).
-- List of managed OneDrive profiles is stored in "~/.config/onedrive-gui/profiles". You can manually rename your profile or path to config file there until it's possible via the GUI.
-- Newly created OneDrive config files are stored in "~/.config/onedrive/accounts/<profile_name>"
-- Debug logs are saved in "~/.config/onedrive-gui/onedrivegui.log" (location will be changed in the future).
+- List of managed OneDrive profiles is stored in `~/.config/onedrive-gui/profiles`. You can manually rename your profile or path to config file there.
+- Newly created OneDrive config files are stored in `~/.config/onedrive/accounts/<profile_name>`
+- Debug logs are saved in `/tmp/onedrive-gui/onedrive-gui.log`. Logging can be changed in the GUI settings. 
