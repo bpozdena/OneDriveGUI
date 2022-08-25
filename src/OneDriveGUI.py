@@ -2855,7 +2855,7 @@ def read_gui_settings():
             "save_debug": "True",
             "log_rotation_interval": 24,
             "log_backup_count": 3,
-            "log_file": "~/.config/onedrive-gui/onedrivegui.log",
+            "log_file": "/tmp/onedrive-gui/onedrive-gui.log",
             "debug_level": "DEBUG",
         }
     }
