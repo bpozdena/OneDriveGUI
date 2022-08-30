@@ -5,6 +5,7 @@ src/nohup.out
 nohup.out
 __pycache__/
 .vscode/
+OneDriveGUI.code-workspace
 
 AppDir/
 appimage-builder-cache/
