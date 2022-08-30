@@ -1,7 +1,8 @@
 # OneDriveGUI
 A simple GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive), with multi-account support.
 
-![GUI_git](https://user-images.githubusercontent.com/24818591/186763925-34422d98-0894-42cb-ad7f-1134a57484ff.png)
+![GUI_git](https://user-images.githubusercontent.com/24818591/187522951-bcfb05c6-8f8c-46ff-a213-80dce8f0d87a.png)
+
 
 ## Feature highlights  
 - Management and configuration of multiple OneDrive accounts
