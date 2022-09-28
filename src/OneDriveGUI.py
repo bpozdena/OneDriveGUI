@@ -2196,7 +2196,10 @@ class WorkerThread(QThread):
 
     def read_stderr(self):
         stderr = self.onedrive_process.stderr.readline().strip()
+
         if stderr != "":
+            logging.error(f"[{self.profile_name}] {str(stderr)}")
+
             if "command not found" in stderr:
                 logging.info(
                     """Onedrive does not seem to be installed. Please install it as per instruction at 
@@ -2205,8 +2208,7 @@ class WorkerThread(QThread):
 
             elif "--resync is required" in stderr:
                 # Ask user for resync authorization and stop the worker.
-                logging.info(f"[{self.profile_name}] {str(stderr)}  - Asking for resync authorization.")
-
+                logging.error(f"[{self.profile_name}] {str(stderr)}  - Asking for resync authorization.")
                 self.trigger_resync.emit(self.profile_name)
 
             elif "onedrive application is already running" in stderr:
@@ -2217,8 +2219,10 @@ class WorkerThread(QThread):
                 self.profile_status["status_message"] = "Cannot connect to Microsoft OneDrive Service."
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-            else:
-                logging.info("@ERROR " + stderr)
+            elif "refresh_token" in stderr:
+                self.profile_status["status_message"] = "Logon details expired. Please re-authenticate."
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
+                self.update_credentials.emit(self.profile_name)
 
 
 class AlignDelegate(QStyledItemDelegate):
@@ -2709,7 +2713,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if "nativeclient?code=" in response_url:
             logging.info("Login performed")
 
-            options = f'--auth-response "{response_url}"'
+            options = f'--reauth --auth-response "{response_url}"'
             self.login = MaintenanceWorker(profile, options)
             self.login.start()
             self.login.update_login_response.connect(self.login_failed_dialog)
