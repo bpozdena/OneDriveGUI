@@ -58,7 +58,7 @@ from ui.ui_gui_settings_window import Ui_gui_settings_window
 # Import for login windows.
 # Don't use WebEngine login window when running from AppImage.
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
-APPIMAGE = True if "tmp/.mount_One" in DIR_PATH else False
+APPIMAGE = True  # if "tmp/.mount_One" in DIR_PATH else False
 if APPIMAGE:
     from ui.ui_external_login import Ui_ExternalLoginWindow
 else:
@@ -459,7 +459,14 @@ class wizardPage_create_shared_library(QWizardPage):
         default_od_config = _default_od_config._sections
 
         # Construct dict with user profile settings.
-        new_profile = {profile_name: {"config_file": config_path, "auto_sync": False, "account_type": "", "free_space": ""}}
+        new_profile = {
+            profile_name: {
+                "config_file": config_path,
+                "auto_sync": False,
+                "account_type": "",
+                "free_space": "",
+            }
+        }
 
         # Load existing user profiles and add the new profile.
         _profiles = ConfigParser()
@@ -615,7 +622,14 @@ class wizardPage_create(QWizardPage):
         default_od_config = _default_od_config._sections
 
         # Construct dict with user profile settings.
-        new_profile = {profile_name: {"config_file": config_path, "auto_sync": False, "account_type": "", "free_space": ""}}
+        new_profile = {
+            profile_name: {
+                "config_file": config_path,
+                "auto_sync": False,
+                "account_type": "",
+                "free_space": "",
+            }
+        }
 
         # Load existing user profiles and add the new profile.
         _profiles = ConfigParser()
@@ -771,7 +785,14 @@ class wizardPage_import(QWizardPage):
         logging.debug("[GUI] new_od_config: " + str(new_od_config))
 
         # Construct dict with user profile settings.
-        new_profile = {profile_name: {"config_file": config_path, "auto_sync": False, "account_type": "", "free_space": ""}}
+        new_profile = {
+            profile_name: {
+                "config_file": config_path,
+                "auto_sync": False,
+                "account_type": "",
+                "free_space": "",
+            }
+        }
 
         # Load existing user profiles and add the new profile.
         _profiles = ConfigParser()
@@ -1775,6 +1796,7 @@ class MaintenanceWorker(QThread):
     update_sharepoint_site_list = Signal(list)
     update_library_list = Signal(dict)
     update_business_folder_list = Signal(list)
+    update_login_response = Signal(dict)
 
     def __init__(self, profile, options=""):
         super(MaintenanceWorker, self).__init__()
@@ -1802,7 +1824,25 @@ class MaintenanceWorker(QThread):
             universal_newlines=True,
         )
 
-        if "--get-O365-drive-id 'non-existent-library'" in self.options:
+        if "--auth-response" in self.options:
+            # exec onedrive --confdir="{config_dir}" --auth-response "{response_url}"
+            logging.info(f"[GUI] Trying login...")
+            self.login_response = "success"
+
+            while self.onedrive_maintainer.poll() is None:
+                self.perform_login()
+
+            timeout = time.time() + 1
+            while True:
+                # This helps monitor stdout for extra second after onedrive process stops. I could not find a smarter way.
+                self.perform_login()
+                if time.time() > timeout:
+                    break
+
+            logging.info(f"[GUI] - Login response: {self.login_response}")
+            self.update_login_response.emit({"profile_name": self.profile, "response": self.login_response})
+
+        elif "--get-O365-drive-id 'non-existent-library'" in self.options:
             # Trying to obtain Sharepoint Site list by searching a non-existent library name.
             logging.info(f"[GUI] Trying to get list of SharePoint Sites...")
             self.sharepoint_site_list = []
@@ -1852,6 +1892,29 @@ class MaintenanceWorker(QThread):
                     break
 
             self.update_business_folder_list.emit(self.business_folder_list)
+
+    def perform_login(self):
+        """
+        Performs OneDrive Login based on provided --auth-response url .
+        Validates if login was successful.
+        """
+        if self.onedrive_maintainer.stdout:
+            stdout = self.onedrive_maintainer.stdout.readline().strip()
+
+            if stdout == "":
+                pass
+            elif "error reason" in stdout.lower():
+                self.login_response = stdout
+                logging.error(stdout)
+
+            if self.onedrive_maintainer.stderr:
+                stderr = self.onedrive_maintainer.stderr.readline().strip()
+                if stderr != "":
+                    logging.error("@ERROR " + stderr)
+
+                if "error reason" in stderr.lower():
+                    self.login_response = stderr
+                    logging.error(stderr)
 
     def read_library_drive_ids(self):
         """
@@ -1978,7 +2041,11 @@ class WorkerThread(QThread):
             "Deleting item",
         ]
 
-        self.profile_status = {"status_message": "", "free_space": "", "account_type": ""}
+        self.profile_status = {
+            "status_message": "",
+            "free_space": "",
+            "account_type": "",
+        }
 
         self.onedrive_process = subprocess.Popen(
             self._command + "--resync" if resync else self._command,
@@ -2607,7 +2674,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lw.loginFrame.setUrl(QUrl(url))
 
         # Wait for user to login and obtain response URL
-        self.lw.loginFrame.urlChanged.connect(lambda: self.get_response_url(self.lw.loginFrame.url().toString(), self.config_dir, profile))
+        self.lw.loginFrame.urlChanged.connect(lambda: self.get_response_url(self.lw.loginFrame.url().toString(), profile))
 
     def show_external_login(self, profile):
         # Show external login window
@@ -2622,35 +2689,69 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.config_dir = re.search(r"(.+)/.+$", self.config_file).group(1)
 
         self.lw2.label_2.setOpenExternalLinks(True)
-        self.lw2.pushButton_save.setEnabled(False)
+        self.lw2.pushButton_login.setEnabled(False)
 
-        self.lw2.lineEdit_response_url.textChanged.connect(self.enable_save_button)
+        self.lw2.lineEdit_response_url.textChanged.connect(self.enable_login_button)
 
-        self.lw2.pushButton_save.clicked.connect(lambda: self.get_response_url(self.lw2.lineEdit_response_url.text(), self.config_dir, profile))
+        self.lw2.pushButton_login.clicked.connect(lambda: self.get_response_url(self.lw2.lineEdit_response_url.text(), profile))
 
-    def enable_save_button(self):
+    def enable_login_button(self):
         # Enable 'Save' button only when valid URL with login response code is provided.
         if "nativeclient?code=" in self.lw2.lineEdit_response_url.text():
             logging.debug(f"[GUI] Valid login response code provided. Enabling Save button.")
-            self.lw2.pushButton_save.setEnabled(True)
+            self.lw2.pushButton_login.setEnabled(True)
         else:
             logging.debug(f"[GUI] Invalid login response code provided. Disabling Save button.")
-            self.lw2.pushButton_save.setEnabled(False)
+            self.lw2.pushButton_login.setEnabled(False)
 
-    def get_response_url(self, response_url, config_dir, profile):
+    def get_response_url(self, response_url, profile):
         # Get response URL from OneDrive OAuth2
         if "nativeclient?code=" in response_url:
-            logging.info(f'exec onedrive --confdir="{config_dir}" --auth-response "{response_url}"')
-            os.system(f'exec onedrive --confdir="{config_dir}" --auth-response "{response_url}"')
             logging.info("Login performed")
-            if APPIMAGE:
-                self.window2.hide()
-            else:
-                self.window1.hide()
-            main_window.workers[profile].stop_worker()
-            main_window.profile_status_pages[profile].label_onedrive_status.setText("Login successful. Please, start sync manually.")
+
+            options = f'--auth-response "{response_url}"'
+            self.login = MaintenanceWorker(profile, options)
+            self.login.start()
+            self.login.update_login_response.connect(self.login_failed_dialog)
         else:
             pass
+
+    def login_failed_dialog(self, response: dict):
+        profile_name = response["profile_name"]
+        response_reason = response["response"]
+
+        if response_reason == "success":
+            main_window.profile_status_pages[profile_name].label_onedrive_status.setText("Login successful. Please, start sync manually.")
+
+            response_dialog = QMessageBox.information(
+                self,
+                "Login successful",
+                f"Login successful!  Please start sync manually.",
+                buttons=QMessageBox.Ok,
+                defaultButton=QMessageBox.Ok,
+            )
+        else:
+            main_window.profile_status_pages[profile_name].label_onedrive_status.setText("Login failed.")
+
+            response_dialog = QMessageBox.critical(
+                self,
+                "Login failed",
+                f"Login failed!  Please verify your response URL and try again." f"<br><br> {response_reason}",
+                buttons=QMessageBox.Ok,
+                defaultButton=QMessageBox.Ok,
+            )
+
+        if response_dialog == QMessageBox.Ok:
+            logging.info("[GUI] Login response message acknowledged.")
+
+            if APPIMAGE and response_reason == "success":
+                self.window2.hide()
+            elif response_reason == "success":
+                self.window1.hide()
+
+            else:
+                self.window2.activateWindow()
+                self.window2.raise_()
 
 
 def humanize_file_size(num, suffix="B"):
@@ -2881,7 +2982,12 @@ def config_logging_handlers():
         os.makedirs(log_dir)
 
     stdout_handler = logging.StreamHandler(sys.stdout)
-    timed_handler = handlers.TimedRotatingFileHandler(filename=log_file, when="H", interval=log_rotation_interval, backupCount=log_backup_count)
+    timed_handler = handlers.TimedRotatingFileHandler(
+        filename=log_file,
+        when="H",
+        interval=log_rotation_interval,
+        backupCount=log_backup_count,
+    )
 
     log_handlers = []
 
