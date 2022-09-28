@@ -58,7 +58,7 @@ from ui.ui_gui_settings_window import Ui_gui_settings_window
 # Import for login windows.
 # Don't use WebEngine login window when running from AppImage.
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
-APPIMAGE = True  # if "tmp/.mount_One" in DIR_PATH else False
+APPIMAGE = True if "tmp/.mount_One" in DIR_PATH else False
 if APPIMAGE:
     from ui.ui_external_login import Ui_ExternalLoginWindow
 else:
