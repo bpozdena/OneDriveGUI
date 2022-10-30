@@ -53,9 +53,10 @@ A simple GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive),
 ## Running from source
 
 1) Ensure Python3 and [pip](https://pip.pypa.io/en/stable/installation/) are installed on your system. 
-1) Clone or download content of this repository.
+1) Clone or download content of this repository and cd into the resultant folder.
 ```
 git clone https://github.com/bpozdena/OneDriveGUI.git
+cd OneDriveGUI
 ```
 1) Install dependencies:
 	```sh
