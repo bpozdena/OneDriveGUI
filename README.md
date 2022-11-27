@@ -84,6 +84,7 @@ cd OneDriveGUI
 
 # Additional Notes
 - When importing OneDrive config file, all comments will be removed. Missing options will be replaced with [default values](src/resources/default_config).
+- If multi-line options 'skip_file' and 'skip_dir' are used, they will be consolidated into a single line.
 - List of managed OneDrive profiles is stored in `~/.config/onedrive-gui/profiles`. You can manually rename your profile or path to config file there.
 - Newly created OneDrive config files are stored in `~/.config/onedrive/accounts/<profile_name>`
 - Debug logs are saved in `/tmp/onedrive-gui/onedrive-gui.log`. Logging can be changed in the GUI settings. 
