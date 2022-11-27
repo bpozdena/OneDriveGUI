@@ -2767,11 +2767,41 @@ def humanize_file_size(num, suffix="B"):
 
 
 def read_config(config_file):
+    """
+    OneDrive client doesn't use INI file format and can't be natively parsed by ConfigParser because:
+        -OneDrive config file does not contain section headers
+        -OneDrive client supports multi-line options, which are not supported by ConfigParser
+    """
     with open(config_file, "r") as f:
-        config_string = "[onedrive]\n" + f.read()
+        _config_string = f.read()
 
+    new_config_string = "[onedrive]\n"  # Add section header
+    _skip_file_list = []
+    _skip_dir_list = []
+
+    # Consolidate multi-line option 'skip_file' and 'skip_dir' into a single line.
+    # Values are separated by pipes as per OneDrive client requirements.
+    for line in _config_string.splitlines():
+        if line.startswith("skip_file "):
+            _skip_file_list.append(line.split('"')[1])
+            line = ""
+        if line.startswith("skip_dir "):
+            _skip_dir_list.append(line.split('"')[1])
+            line = ""
+
+        new_config_string += line + "\n"
+
+    if len(_skip_file_list) > 0:
+        joined_skip_file = f'skip_file = "{"|".join(_skip_file_list)}"'
+        new_config_string += joined_skip_file + "\n"
+
+    if len(_skip_dir_list) > 0:
+        joined_skip_dir = f'skip_dir = "{"|".join(_skip_dir_list)}"'
+        new_config_string += joined_skip_dir + "\n"
+
+    # Load modified OneDrive config file into ConfigParser.
     config = ConfigParser()
-    config.read_string(config_string)
+    config.read_string(new_config_string)
 
     return config
 
