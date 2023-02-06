@@ -933,7 +933,8 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
         _property = self.sender().objectName()
         property = re.search(r"checkBox_(.+)", _property).group(1)
 
-        if state == Qt.Checked:
+        # if state == Qt.Checked:
+        if self.sender().isChecked():
             logging.info(f"[GUI][SETTINGS] {property} is checked")
             gui_settings["SETTINGS"][property] = "True"
         else:
@@ -1685,7 +1686,8 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         _property = self.sender().objectName()
         property = re.search(r"checkBox_(.+)", _property).group(1)
 
-        if state == Qt.Checked:
+        # if state == Qt.Checked:
+        if self.sender().isChecked():
             logging.info(f"[GUI] [{self.profile}] {property} is checked.")
             self.temp_profile_config[f"{property}"] = "True"
         else:
