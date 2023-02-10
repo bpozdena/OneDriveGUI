@@ -929,11 +929,10 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
     def get_check_box_state(self, property):
         return "True" in gui_settings["SETTINGS"][property]
 
-    def set_check_box_state(self, state):
+    def set_check_box_state(self):
         _property = self.sender().objectName()
         property = re.search(r"checkBox_(.+)", _property).group(1)
 
-        # if state == Qt.Checked:
         if self.sender().isChecked():
             logging.info(f"[GUI][SETTINGS] {property} is checked")
             gui_settings["SETTINGS"][property] = "True"
@@ -1570,7 +1569,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         with open(self.sync_list_file, "w") as f:
             f.write(self.sync_list_new)
 
-    def validate_checkbox_input(self, state):
+    def validate_checkbox_input(self):
         """Disables incompatible settings"""
 
         if self.sender().objectName() == "checkBox_download_only" or "checkBox_upload_only":
@@ -1665,7 +1664,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         property = re.search(r"spinBox_(.+)", _property).group(1)
         self.temp_profile_config["onedrive"][f"{property}"] = f'"{value}"'
 
-    def set_check_box_state(self, state):
+    def set_check_box_state(self):
         sender = self.sender()
         _property = self.sender().objectName()
         print("test " + _property)
@@ -1674,7 +1673,6 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         except:
             property = re.search(r"groupBox_(.+)", _property).group(1)
 
-        # if state == Qt.Checked:
         if self.sender().isChecked():
             logging.info(f"[GUI] [{self.profile}] {property} is checked.")
             self.temp_profile_config["onedrive"][f"{property}"] = '"true"'
@@ -1682,11 +1680,10 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
             logging.info(f"[GUI] [{self.profile}] {property} is unchecked.")
             self.temp_profile_config["onedrive"][f"{property}"] = '"false"'
 
-    def set_check_box_state_profile(self, state):
+    def set_check_box_state_profile(self):
         _property = self.sender().objectName()
         property = re.search(r"checkBox_(.+)", _property).group(1)
 
-        # if state == Qt.Checked:
         if self.sender().isChecked():
             logging.info(f"[GUI] [{self.profile}] {property} is checked.")
             self.temp_profile_config[f"{property}"] = "True"
