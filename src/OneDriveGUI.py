@@ -158,7 +158,7 @@ class wizardPage_version_check(QWizardPage):
     def check_onedrive_version(self):
         # Check if OneDrive is installed
         try:
-            client_version_check = subprocess.check_output([gui_settings["SETTINGS"]["client_bin_path"], "--version"], stderr=subprocess.STDOUT)
+            client_version_check = subprocess.check_output(["onedrive", "--version"], stderr=subprocess.STDOUT)
             installed_client_version = re.search(r".\s(v[0-9.]+)", str(client_version_check)).group(1)
             installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
             min_supported_version_num = 2415
@@ -880,10 +880,6 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
         self.checkBox_start_minimized.setChecked(self.get_check_box_state("start_minimized"))
         self.checkBox_start_minimized.stateChanged.connect(self.set_check_box_state)
 
-        self.lineEdit_client_bin_path.setText(gui_settings["SETTINGS"]["client_bin_path"])
-        self.lineEdit_client_bin_path.textChanged.connect(self.set_client_bin_path)
-        self.pushButton_client_bin_path.clicked.connect(self.get_bin_path)
-
         self.checkBox_frameless_window.setChecked(self.get_check_box_state("frameless_window"))
         self.checkBox_frameless_window.stateChanged.connect(self.set_check_box_state)
 
@@ -908,32 +904,16 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
         self.lineEdit_log_file.setText(gui_settings["SETTINGS"]["log_file"])
         self.lineEdit_log_file.textChanged.connect(self.set_log_file)
 
-        self.pushButton_log_file.clicked.connect(self.get_log_dir_name)
+        self.pushButton_log_file.clicked.connect(self.get_dir_name)
 
         self.pushButton_save.clicked.connect(self.save_gui_settings)
 
-    def get_bin_path(self):
-        self.file_dialog = QFileDialog()
-        self.file_dialog.setFileMode(QFileDialog.ExistingFile)
-        self.file_dialog.setNameFilter("onedrive")
-
-        if self.file_dialog.exec():
-            file_path = self.file_dialog.selectedFiles()[0]
-            logging.info(file_path)
-            self.lineEdit_client_bin_path.setText(file_path)
-
-    def get_log_dir_name(self):
+    def get_dir_name(self):
         self.file_dialog = QFileDialog.getExistingDirectory(dir=os.path.expanduser("~/"))
 
         dir_name = self.file_dialog
         logging.info(dir_name)
-        self.lineEdit_client_bin_path.setText(dir_name)
-
-    def set_client_bin_path(self):
-        file_path = str(self.lineEdit_client_bin_path.text())
-        if file_path == "":
-            file_path = "onedrive"
-        gui_settings["SETTINGS"]["client_bin_path"] = file_path
+        self.lineEdit_log_file.setText(dir_name)
 
     def set_log_file(self):
         gui_settings["SETTINGS"]["log_file"] = str(self.lineEdit_log_file.text())
@@ -1647,7 +1627,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         return value.lower() in "true"
 
     def logout(self):
-        os.system(f"{client_bin_path} --confdir='{self.config_dir}' --logout")
+        os.system(f"onedrive --confdir='{self.config_dir}' --logout")
         logging.info(f"Profile {self.profile} has been logged out.")
 
         main_window.profile_status_pages[self.profile].stop_monitor()
@@ -1830,7 +1810,7 @@ class MaintenanceWorker(QThread):
         logging.debug(f"[GUI] OneDrive config file: {self.config_file}")
         logging.debug(f"[GUI] OneDrive config dir: {self.config_dir}")
 
-        self._command = f"exec {client_bin_path} --confdir='{self.config_dir}' -v {options}"
+        self._command = f"exec onedrive --confdir='{self.config_dir}' -v {options}"
         logging.debug(f"[GUI] Maintenance command: '{self._command}'")
 
     def run(self):
@@ -2025,7 +2005,7 @@ class WorkerThread(QThread):
         self.config_dir = re.search(r"(.+)/.+$", self.config_file)
         logging.debug(f"[GUI] OneDrive config file: {self.config_file}")
         logging.debug(f"[GUI] OneDrive config dir: {self.config_dir}")
-        self._command = f"exec {client_bin_path} --confdir='{self.config_dir.group(1)}' --monitor -v {options}"
+        self._command = f"exec onedrive --confdir='{self.config_dir.group(1)}' --monitor -v {options}"
         logging.debug(f"[GUI] Monitoring command: '{self._command}'")
         self.profile_name = profile
 
@@ -2455,7 +2435,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             latest_url = "https://api.github.com/repos/abraunegg/onedrive/releases/latest"
             latest_client_version = s.get(latest_url, timeout=1).json()["tag_name"]
-            client_version_check = subprocess.check_output([gui_settings["SETTINGS"]["client_bin_path"], "--version"], stderr=subprocess.STDOUT)
+            client_version_check = subprocess.check_output(["onedrive", "--version"], stderr=subprocess.STDOUT)
             installed_client_version = re.search(r".\s(v[0-9.]+)", str(client_version_check)).group(1)
             installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
             min_supported_version_num = 2415
@@ -2829,7 +2809,7 @@ def get_installed_client_version() -> int:
     try:
         # Checks installed client version. Later used to remove unsupported options from account config if needed.
         # TODO: Restructure and perform this in different function.
-        client_version_check = subprocess.check_output([gui_settings["SETTINGS"]["client_bin_path"], "--version"], stderr=subprocess.STDOUT)
+        client_version_check = subprocess.check_output(["onedrive", "--version"], stderr=subprocess.STDOUT)
         installed_client_version = re.search(r".\s(v[0-9.]+)", str(client_version_check)).group(1)
         installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
     except:
@@ -3011,7 +2991,6 @@ def read_gui_settings():
             "log_backup_count": 3,
             "log_file": "/tmp/onedrive-gui/onedrive-gui.log",
             "debug_level": "DEBUG",
-            "client_bin_path": "onedrive",
         }
     }
 
@@ -3068,16 +3047,6 @@ def config_debug_level():
         return logging.DEBUG
 
 
-def config_client_bin_path() -> str:
-    client_bin_path = gui_settings["SETTINGS"]["client_bin_path"]
-    logging.info(f"Onedrive client location: '{client_bin_path}'")
-
-    if client_bin_path == "":
-        return "onedrive"
-    else:
-        return gui_settings["SETTINGS"]["client_bin_path"]
-
-
 if __name__ == "__main__":
     gui_settings = read_gui_settings()
 
@@ -3087,7 +3056,6 @@ if __name__ == "__main__":
         level=config_debug_level(),
     )
 
-    client_bin_path = config_client_bin_path()
     client_version = get_installed_client_version()
     global_config = create_global_config()
 

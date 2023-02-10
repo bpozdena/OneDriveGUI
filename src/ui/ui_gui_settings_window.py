@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'gui_settings_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.2
+## Created by: Qt User Interface Compiler version 6.2.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -24,7 +24,7 @@ class Ui_gui_settings_window(object):
     def setupUi(self, gui_settings_window):
         if not gui_settings_window.objectName():
             gui_settings_window.setObjectName(u"gui_settings_window")
-        gui_settings_window.resize(640, 535)
+        gui_settings_window.resize(640, 480)
         self.verticalLayout_2 = QVBoxLayout(gui_settings_window)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout = QVBoxLayout()
@@ -48,28 +48,6 @@ class Ui_gui_settings_window(object):
 
 
         self.verticalLayout_2.addLayout(self.verticalLayout)
-
-        self.groupBox_4 = QGroupBox(gui_settings_window)
-        self.groupBox_4.setObjectName(u"groupBox_4")
-        self.horizontalLayout_6 = QHBoxLayout(self.groupBox_4)
-        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
-        self.label_client_bin_path = QLabel(self.groupBox_4)
-        self.label_client_bin_path.setObjectName(u"label_client_bin_path")
-
-        self.horizontalLayout_6.addWidget(self.label_client_bin_path)
-
-        self.lineEdit_client_bin_path = QLineEdit(self.groupBox_4)
-        self.lineEdit_client_bin_path.setObjectName(u"lineEdit_client_bin_path")
-
-        self.horizontalLayout_6.addWidget(self.lineEdit_client_bin_path)
-
-        self.pushButton_client_bin_path = QPushButton(self.groupBox_4)
-        self.pushButton_client_bin_path.setObjectName(u"pushButton_client_bin_path")
-
-        self.horizontalLayout_6.addWidget(self.pushButton_client_bin_path)
-
-
-        self.verticalLayout_2.addWidget(self.groupBox_4)
 
         self.groupBox_3 = QGroupBox(gui_settings_window)
         self.groupBox_3.setObjectName(u"groupBox_3")
@@ -207,9 +185,6 @@ class Ui_gui_settings_window(object):
         gui_settings_window.setWindowTitle(QCoreApplication.translate("gui_settings_window", u"OneDriveGUI - Settings", None))
         self.groupBox.setTitle(QCoreApplication.translate("gui_settings_window", u"OneDriveGUI behaviour", None))
         self.checkBox_start_minimized.setText(QCoreApplication.translate("gui_settings_window", u"Start OneDriveGUI minimized", None))
-        self.groupBox_4.setTitle(QCoreApplication.translate("gui_settings_window", u"OneDrive client options", None))
-        self.label_client_bin_path.setText(QCoreApplication.translate("gui_settings_window", u"Path to OneDrive client binary", None))
-        self.pushButton_client_bin_path.setText(QCoreApplication.translate("gui_settings_window", u"Browse", None))
         self.groupBox_3.setTitle(QCoreApplication.translate("gui_settings_window", u"Appearance (experimental)", None))
         self.checkBox_frameless_window.setText(QCoreApplication.translate("gui_settings_window", u"Frameless Window for X11", None))
         self.checkBox_combined_start_stop_button.setText(QCoreApplication.translate("gui_settings_window", u"Combined Start/Stop button", None))
