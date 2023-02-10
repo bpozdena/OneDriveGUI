@@ -158,7 +158,7 @@ class wizardPage_version_check(QWizardPage):
     def check_onedrive_version(self):
         # Check if OneDrive is installed
         try:
-            client_version_check = subprocess.check_output([gui_settings["SETTINGS"]["client_bin_path"], "--version"], stderr=subprocess.STDOUT)
+            client_version_check = subprocess.check_output([client_bin_path, "--version"], stderr=subprocess.STDOUT)
             installed_client_version = re.search(r".\s(v[0-9.]+)", str(client_version_check)).group(1)
             installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
             min_supported_version_num = 2415
@@ -2455,7 +2455,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             latest_url = "https://api.github.com/repos/abraunegg/onedrive/releases/latest"
             latest_client_version = s.get(latest_url, timeout=1).json()["tag_name"]
-            client_version_check = subprocess.check_output([gui_settings["SETTINGS"]["client_bin_path"], "--version"], stderr=subprocess.STDOUT)
+            client_version_check = subprocess.check_output([client_bin_path, "--version"], stderr=subprocess.STDOUT)
             installed_client_version = re.search(r".\s(v[0-9.]+)", str(client_version_check)).group(1)
             installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
             min_supported_version_num = 2415
@@ -2829,7 +2829,7 @@ def get_installed_client_version() -> int:
     try:
         # Checks installed client version. Later used to remove unsupported options from account config if needed.
         # TODO: Restructure and perform this in different function.
-        client_version_check = subprocess.check_output([gui_settings["SETTINGS"]["client_bin_path"], "--version"], stderr=subprocess.STDOUT)
+        client_version_check = subprocess.check_output([client_bin_path, "--version"], stderr=subprocess.STDOUT)
         installed_client_version = re.search(r".\s(v[0-9.]+)", str(client_version_check)).group(1)
         installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
     except:
