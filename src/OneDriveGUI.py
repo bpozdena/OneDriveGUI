@@ -1050,6 +1050,9 @@ class ProfileStatusPage(QWidget, Ui_status_page):
         # Show Account Type on GUI startup (when sync is not running)
         self.label_account_type.setText(global_config[self.profile_name]["account_type"])
 
+        # Allow hyperlinks in status messages
+        self.label_onedrive_status.setOpenExternalLinks(True)
+
         # Show last known Free Space on GUI startup (when sync is not running)
         _free_space = global_config[self.profile_name]["free_space"]
 
@@ -2220,11 +2223,17 @@ class WorkerThread(QThread):
         if stderr != "":
             logging.error(f"[{self.profile_name}] {str(stderr)}")
 
-            if "command not found" in stderr:
+            if "not found" in stderr:
                 logging.info(
                     """Onedrive does not seem to be installed. Please install it as per instruction at 
                 https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md """
                 )
+
+                self.profile_status[
+                    "status_message"
+                ] = 'OneDrive Client not found! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md" style="color:#FFFFFF;">install</a> it.'
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
+
 
             elif "--resync is required" in stderr:
                 # Ask user for resync authorization and stop the worker.
