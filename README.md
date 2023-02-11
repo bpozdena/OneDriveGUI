@@ -1,4 +1,6 @@
 # OneDriveGUI
+![GitHub all releases](https://img.shields.io/github/downloads/bpozdena/OneDriveGUI/total)
+
 A simple GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive), with multi-account support.
 
 ![GUI_git](https://user-images.githubusercontent.com/24818591/187522951-bcfb05c6-8f8c-46ff-a213-80dce8f0d87a.png)
