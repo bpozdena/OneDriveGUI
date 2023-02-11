@@ -197,10 +197,11 @@ class wizardPage_version_check(QWizardPage):
             return False
 
     def isComplete(self):
-        if "not" in self.label_4.text().lower():
-            return False
-        else:
-            return True
+        return True
+        # if "not" in self.label_4.text().lower():
+        #     return False
+        # else:
+        #     return True
 
 
 class wizardPage_create_import(QWizardPage):
