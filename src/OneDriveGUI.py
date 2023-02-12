@@ -2234,7 +2234,6 @@ class WorkerThread(QThread):
                 ] = 'OneDrive Client not found! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md" style="color:#FFFFFF;">install</a> it.'
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-
             elif "--resync is required" in stderr:
                 # Ask user for resync authorization and stop the worker.
                 logging.error(f"[{self.profile_name}] {str(stderr)}  - Asking for resync authorization.")
@@ -2340,7 +2339,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tray = QSystemTrayIcon()
         if self.tray.isSystemTrayAvailable():
 
-            icon = QIcon(DIR_PATH + "/resources/images/icons8-clouds-48.png")
+            icon = QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png")
             menu = QMenu()
 
             show_action = menu.addAction("Show/Hide")
