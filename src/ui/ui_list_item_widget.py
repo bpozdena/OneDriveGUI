@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'list_item_widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.3
+## Created by: Qt User Interface Compiler version 6.2.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -28,7 +28,7 @@ class Ui_list_item_widget(object):
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setHorizontalSpacing(5)
         self.gridLayout.setVerticalSpacing(2)
-        self.gridLayout.setContentsMargins(5, 2, 2, 6)
+        self.gridLayout.setContentsMargins(5, 4, 2, 4)
         self.toolButton = QToolButton(list_item_widget)
         self.toolButton.setObjectName(u"toolButton")
         self.toolButton.setEnabled(True)
@@ -53,6 +53,11 @@ class Ui_list_item_widget(object):
 
         self.ls_label_2 = QLabel(list_item_widget)
         self.ls_label_2.setObjectName(u"ls_label_2")
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.ls_label_2.sizePolicy().hasHeightForWidth())
+        self.ls_label_2.setSizePolicy(sizePolicy)
         self.ls_label_2.setMaximumSize(QSize(170, 16777215))
         self.ls_label_2.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
@@ -60,7 +65,12 @@ class Ui_list_item_widget(object):
 
         self.ls_label_1 = QLabel(list_item_widget)
         self.ls_label_1.setObjectName(u"ls_label_1")
-        self.ls_label_1.setMaximumSize(QSize(250, 16777215))
+        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.ls_label_1.sizePolicy().hasHeightForWidth())
+        self.ls_label_1.setSizePolicy(sizePolicy1)
+        self.ls_label_1.setMaximumSize(QSize(290, 16777215))
 
         self.gridLayout.addWidget(self.ls_label_1, 2, 1, 2, 1)
 
