@@ -2681,8 +2681,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         myQListWidgetItem.setSizeHint(myQCustomQWidget.sizeHint())
 
         # Add QListWidgetItem into QListWidget
-        self.profile_status_pages[profile].listWidget.insertItem(0, myQListWidgetItem)
-        self.profile_status_pages[profile].listWidget.setItemWidget(myQListWidgetItem, myQCustomQWidget)
+        listWidget = self.profile_status_pages[profile].listWidget
+        listWidget.insertItem(0, myQListWidgetItem)
+        listWidget.setItemWidget(myQListWidgetItem, myQCustomQWidget)
+        
+        # If the list is not scrolled all the way to the top, increment the scroll value so that the list stays in the same spot when new items are added.
+        scroll = listWidget.verticalScrollBar()
+        currentScrollValue = scroll.value()
+        if (currentScrollValue > 0):
+            scroll.setValue(currentScrollValue + 1)
 
     def show_login(self, profile):
         # Show login window with QT WebEngine
