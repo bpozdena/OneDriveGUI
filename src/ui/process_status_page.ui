@@ -72,13 +72,13 @@ border: 0px;</string>
          <number>0</number>
         </property>
         <property name="leftMargin">
-         <number>5</number>
+         <number>6</number>
         </property>
         <property name="topMargin">
-         <number>5</number>
+         <number>6</number>
         </property>
         <property name="rightMargin">
-         <number>5</number>
+         <number>6</number>
         </property>
         <item>
          <widget class="QPushButton" name="pushButton_quit">
@@ -158,6 +158,7 @@ QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}</string>
         <property name="font">
          <font>
           <pointsize>11</pointsize>
+          <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
@@ -188,16 +189,16 @@ QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}</string>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <property name="spacing">
-         <number>0</number>
+         <number>6</number>
         </property>
         <property name="leftMargin">
-         <number>5</number>
+         <number>6</number>
         </property>
         <property name="rightMargin">
          <number>0</number>
         </property>
         <property name="bottomMargin">
-         <number>5</number>
+         <number>6</number>
         </property>
         <item>
          <widget class="QPushButton" name="pushButton_start_stop">
@@ -316,6 +317,7 @@ QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}</string>
          <widget class="QLabel" name="label_free_space">
           <property name="font">
            <font>
+            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -424,10 +426,10 @@ QScrollBar::down-button, QScrollBar::add-line, QScrollBar::sub-line {
       <number>0</number>
      </property>
      <property name="topMargin">
-      <number>0</number>
+      <number>6</number>
      </property>
      <property name="bottomMargin">
-      <number>0</number>
+      <number>6</number>
      </property>
      <item>
       <widget class="QPushButton" name="pushButton_open_dir">
@@ -436,6 +438,9 @@ QScrollBar::down-button, QScrollBar::add-line, QScrollBar::sub-line {
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Open Sync Directory</string>
        </property>
        <property name="styleSheet">
         <string notr="true">QPushButton:pressed { background-color: rgba(0, 0, 0, 10)}</string>
@@ -462,6 +467,9 @@ QScrollBar::down-button, QScrollBar::add-line, QScrollBar::sub-line {
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="toolTip">
+        <string>Profiles</string>
+       </property>
        <property name="styleSheet">
         <string notr="true">QPushButton:pressed { background-color: rgba(0, 0, 0, 10)}</string>
        </property>
@@ -486,6 +494,9 @@ QScrollBar::down-button, QScrollBar::add-line, QScrollBar::sub-line {
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>OneDriveGUI Settings</string>
        </property>
        <property name="styleSheet">
         <string notr="true">QPushButton:pressed { background-color: rgba(0, 0, 0, 10)}</string>

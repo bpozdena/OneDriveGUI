@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'process_status_page.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.3
+## Created by: Qt User Interface Compiler version 6.2.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -43,7 +43,7 @@ class Ui_status_page(object):
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setSpacing(0)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.horizontalLayout_3.setContentsMargins(5, 5, 5, -1)
+        self.horizontalLayout_3.setContentsMargins(6, 6, 6, -1)
         self.pushButton_quit = QPushButton(self.frame)
         self.pushButton_quit.setObjectName(u"pushButton_quit")
         self.pushButton_quit.setMaximumSize(QSize(40, 16777215))
@@ -90,9 +90,9 @@ class Ui_status_page(object):
         self.verticalLayout_2.addWidget(self.label_account_type)
 
         self.horizontalLayout_2 = QHBoxLayout()
-        self.horizontalLayout_2.setSpacing(0)
+        self.horizontalLayout_2.setSpacing(6)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_2.setContentsMargins(5, -1, 0, 5)
+        self.horizontalLayout_2.setContentsMargins(6, -1, 0, 6)
         self.pushButton_start_stop = QPushButton(self.frame)
         self.pushButton_start_stop.setObjectName(u"pushButton_start_stop")
         self.pushButton_start_stop.setMaximumSize(QSize(30, 16777215))
@@ -199,7 +199,7 @@ class Ui_status_page(object):
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalLayout.setContentsMargins(-1, 0, -1, 0)
+        self.horizontalLayout.setContentsMargins(-1, 6, -1, 6)
         self.pushButton_open_dir = QPushButton(status_page)
         self.pushButton_open_dir.setObjectName(u"pushButton_open_dir")
         sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
@@ -252,7 +252,7 @@ class Ui_status_page(object):
         self.pushButton_close.setToolTip(QCoreApplication.translate("status_page", u"Close to tray/dock", None))
 #endif // QT_CONFIG(tooltip)
         self.pushButton_close.setText(QCoreApplication.translate("status_page", u"Close", None))
-        self.label_onedrive_status.setText(QCoreApplication.translate("status_page", u"Onedrive is sync not running", None))
+        self.label_onedrive_status.setText(QCoreApplication.translate("status_page", u"OneDrive sync is not running", None))
         self.label_account_type.setText("")
         self.pushButton_start_stop.setText(QCoreApplication.translate("status_page", u"start/stop", None))
 #if QT_CONFIG(tooltip)
@@ -276,8 +276,17 @@ class Ui_status_page(object):
         self.label_status.setToolTip(QCoreApplication.translate("status_page", u"Sync is stopped", None))
 #endif // QT_CONFIG(tooltip)
         self.label_status.setText("")
+#if QT_CONFIG(tooltip)
+        self.pushButton_open_dir.setToolTip(QCoreApplication.translate("status_page", u"Open Sync Directory", None))
+#endif // QT_CONFIG(tooltip)
         self.pushButton_open_dir.setText(QCoreApplication.translate("status_page", u"Open Sync Directory", None))
+#if QT_CONFIG(tooltip)
+        self.pushButton_profiles.setToolTip(QCoreApplication.translate("status_page", u"Profiles", None))
+#endif // QT_CONFIG(tooltip)
         self.pushButton_profiles.setText(QCoreApplication.translate("status_page", u"Profiles", None))
+#if QT_CONFIG(tooltip)
+        self.pushButton_gui_settings.setToolTip(QCoreApplication.translate("status_page", u"OneDriveGUI Settings", None))
+#endif // QT_CONFIG(tooltip)
         self.pushButton_gui_settings.setText(QCoreApplication.translate("status_page", u"GUI Settings", None))
     # retranslateUi
 
