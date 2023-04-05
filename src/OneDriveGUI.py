@@ -261,7 +261,6 @@ class wizardPage_create_import(QWizardPage):
                 self.checkBox_sharepoint_library.isChecked(),
             ]
         ):
-
             logging.info("Wizard page is complete.")
             return True
         else:
@@ -1161,7 +1160,6 @@ class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
         self.setup_wizard.show()
 
     def remove_profile(self):
-
         # Stop checking for unsaved changes while new profile is being removed.
         self.stop_unsaved_changes_timer()
 
@@ -2099,7 +2097,6 @@ class WorkerThread(QThread):
     def read_stdout(self):
         stdout = self.onedrive_process.stdout.readline().strip()
         if stdout != "":
-
             logging.info(f"[{self.profile_name}] " + stdout)
 
             if "Calling Function: testNetwork()" in stdout:
@@ -2338,7 +2335,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # System Tray
         self.tray = QSystemTrayIcon()
         if self.tray.isSystemTrayAvailable():
-
             icon = QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png")
             menu = QMenu()
 
@@ -2400,7 +2396,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             pass
 
     def graceful_shutdown(self):
-
         close_question = QMessageBox.question(
             self,
             "Quit OneDriveGUI ?",
@@ -2630,6 +2625,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         progress_data_human = humanize_file_size(progress_data)
         file_operation = data["file_operation"]
         transfer_complete = data["transfer_complete"]
+        move_scrollbar = True
 
         logging.info("absolute path " + absolute_path)
         logging.info("relative path " + relative_path_display)
@@ -2650,6 +2646,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             logging.info(f"The last list item's file name is : {last_file_name}")
 
             if file_name == last_file_name:
+                move_scrollbar = False
                 logging.info("Deleting last list item")
                 self.profile_status_pages[profile].listWidget.takeItem(0)
 
@@ -2687,11 +2684,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         listWidget = self.profile_status_pages[profile].listWidget
         listWidget.insertItem(0, myQListWidgetItem)
         listWidget.setItemWidget(myQListWidgetItem, myQCustomQWidget)
-        
+
         # If the list is not scrolled all the way to the top, increment the scroll value so that the list stays in the same spot when new items are added.
         scroll = listWidget.verticalScrollBar()
         currentScrollValue = scroll.value()
-        if (currentScrollValue > 0):
+        if move_scrollbar and (currentScrollValue > 0):
             scroll.setValue(currentScrollValue + 1)
 
     def show_login(self, profile):
@@ -2967,7 +2964,6 @@ def save_global_config():
         profile_config.write(profilefile)
 
     for profile in global_config:
-
         # Save OneDrive config changes
         od_config_file = os.path.expanduser(global_config[profile]["config_file"].strip('"'))
 
@@ -3096,70 +3092,71 @@ def config_client_bin_path() -> str:
     else:
         return gui_settings["SETTINGS"]["client_bin_path"]
 
+
 # Shorten a folder path to a given length by removing the middle of the path
 def shorten_path(path, limit):
-	# Split the path into individual segments
-	segments = path.split(os.path.sep)
-	num_segments = len(segments)
-	
-	# If the path is already shorter than the limit, return it as is
-	if len(path) <= limit:
-		return path
-	
-	# If there's only one segment, return it as is
-	if num_segments == 1:
-		return path
-	
-	# Keep track of the left and right halves of the path
-	left = segments[:-1]
-	right = [segments[-1]]
-	
-	# Join the left and right halves back together with "..." in the middle
-	def join(left, right):
-		# # If the right half is empty, return the left half plus "..."
-		if len(right) == 0:
-			return os.path.join(*left) + os.path.sep + '...'
-		
-		# If the left half is empty, return "..." plus the right half
-		if len(left) == 0:
-			return '...' + os.path.sep + os.path.join(*right)
-		
-		# Join the left and right halves back together with "..." in the middle
-		return os.path.join(*left) + os.path.sep + '...' + os.path.sep + os.path.join(*right)
-	
-	# Loop until we reach the limit or can no longer split the path
-	while len(path) > limit and len(segments) > 1:
-		# Find the middle of the path segments list
-		middle = num_segments // 2
-		
-		# Drop the path segment closest to the middle
-		if num_segments % 2 == 0:
-			# If there is only 1 element in each half, drop from the left half and exit the loop
-			if len(right) == 1 and len(left) == 1:
-				left.pop(middle-1)
-				path = join(left, right)
-				break
-			else:
-				# If the list has an even number of segments, choose the longer one
-				if len(left[middle-1]) >= len(right[0]):
-					left.pop(middle-1)
-				else:
-					right.pop(0)
-		else:
-			# If the list has an odd number of segments, just drop the middle one
-			left.pop(middle)
-		
-		# Update the segments, left, and right lists
-		segments = left + right
-		num_segments = len(segments)
-		
-		left = segments[:middle]
-		right = segments[middle:]
-		
-		# Update the total length of the path
-		path = join(left, right)
-	
-	return path
+    # Split the path into individual segments
+    segments = path.split(os.path.sep)
+    num_segments = len(segments)
+
+    # If the path is already shorter than the limit, return it as is
+    if len(path) <= limit:
+        return path
+
+    # If there's only one segment, return it as is
+    if num_segments == 1:
+        return path
+
+    # Keep track of the left and right halves of the path
+    left = segments[:-1]
+    right = [segments[-1]]
+
+    # Join the left and right halves back together with "..." in the middle
+    def join(left, right):
+        # # If the right half is empty, return the left half plus "..."
+        if len(right) == 0:
+            return os.path.join(*left) + os.path.sep + "..."
+
+        # If the left half is empty, return "..." plus the right half
+        if len(left) == 0:
+            return "..." + os.path.sep + os.path.join(*right)
+
+        # Join the left and right halves back together with "..." in the middle
+        return os.path.join(*left) + os.path.sep + "..." + os.path.sep + os.path.join(*right)
+
+    # Loop until we reach the limit or can no longer split the path
+    while len(path) > limit and len(segments) > 1:
+        # Find the middle of the path segments list
+        middle = num_segments // 2
+
+        # Drop the path segment closest to the middle
+        if num_segments % 2 == 0:
+            # If there is only 1 element in each half, drop from the left half and exit the loop
+            if len(right) == 1 and len(left) == 1:
+                left.pop(middle - 1)
+                path = join(left, right)
+                break
+            else:
+                # If the list has an even number of segments, choose the longer one
+                if len(left[middle - 1]) >= len(right[0]):
+                    left.pop(middle - 1)
+                else:
+                    right.pop(0)
+        else:
+            # If the list has an odd number of segments, just drop the middle one
+            left.pop(middle)
+
+        # Update the segments, left, and right lists
+        segments = left + right
+        num_segments = len(segments)
+
+        left = segments[:middle]
+        right = segments[middle:]
+
+        # Update the total length of the path
+        path = join(left, right)
+
+    return path
 
 
 if __name__ == "__main__":
