@@ -167,7 +167,30 @@ class Ui_status_page(object):
 
         self.listWidget = QListWidget(status_page)
         self.listWidget.setObjectName(u"listWidget")
-        self.listWidget.setStyleSheet(u"")
+        self.listWidget.setStyleSheet(u"QScrollBar:vertical {\n"
+"    background: white;\n"
+"	width: 12px;\n"
+"	padding: 2px 0px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {\n"
+"    background: darkgrey;\n"
+"	border-radius: 4px;\n"
+"	width: 8px;\n"
+"	margin: 0px 2px;\n"
+"	min-height: 20px;\n"
+"}\n"
+"QScrollBar::handle:vertical:hover {\n"
+"	width: 10px;\n"
+"	border-radius: 5px;\n"
+"	margin: 0px 1px;\n"
+"}\n"
+"\n"
+"QScrollBar::down-button, QScrollBar::add-line, QScrollBar::sub-line {\n"
+"	border: none;\n"
+"	width: 0px;\n"
+"	height: 0px;\n"
+"}")
         self.listWidget.setSelectionMode(QAbstractItemView.NoSelection)
         self.listWidget.setSortingEnabled(False)
 

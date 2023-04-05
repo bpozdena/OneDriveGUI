@@ -386,6 +386,32 @@ QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}</string>
    </item>
    <item>
     <widget class="QListWidget" name="listWidget">
+     <property name="styleSheet">
+      <string notr="true">QScrollBar:vertical {
+    background: white;
+	width: 12px;
+	padding: 2px 0px;
+}
+
+QScrollBar::handle:vertical {
+    background: darkgrey;
+	border-radius: 4px;
+	width: 8px;
+	margin: 0px 2px;
+	min-height: 20px;
+}
+QScrollBar::handle:vertical:hover {
+	width: 10px;
+	border-radius: 5px;
+	margin: 0px 1px;
+}
+
+QScrollBar::down-button, QScrollBar::add-line, QScrollBar::sub-line {
+	border: none;
+	width: 0px;
+	height: 0px;
+}</string>
+     </property>
      <property name="selectionMode">
       <enum>QAbstractItemView::NoSelection</enum>
      </property>
