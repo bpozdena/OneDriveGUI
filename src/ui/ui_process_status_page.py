@@ -168,7 +168,7 @@ class Ui_status_page(object):
         self.listWidget = QListWidget(status_page)
         self.listWidget.setObjectName(u"listWidget")
         self.listWidget.setStyleSheet(u"QScrollBar:vertical {\n"
-"    background: white;\n"
+"    background: none;\n"
 "	width: 12px;\n"
 "	padding: 2px 0px;\n"
 "}\n"

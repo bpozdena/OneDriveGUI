@@ -388,7 +388,7 @@ QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}</string>
     <widget class="QListWidget" name="listWidget">
      <property name="styleSheet">
       <string notr="true">QScrollBar:vertical {
-    background: white;
+    background: none;
 	width: 12px;
 	padding: 2px 0px;
 }
