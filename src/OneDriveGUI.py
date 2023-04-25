@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import json
 import time
 import os
 import re
@@ -848,6 +849,193 @@ class wizardPage_import(QWizardPage):
         self.pushButton_import.setDisabled(True)
         self.lineEdit_profile_name.setDisabled(True)
         self.lineEdit_config_path.setDisabled(True)
+        self.pushButton_browse.setDisabled(True)
+        self.completeChanged.emit()
+
+
+class wizardPage_rsync(QWizardPage):
+    def __init__(self, parent=None):
+        super(wizardPage_import, self).__init__(parent)
+        self.setTitle("Import rclone profile")
+
+        self.label_profile_name = QLabel()
+        self.label_profile_name.setText("Remote name")
+
+        self.label_config_path = QLabel()
+        self.label_config_path.setText("rclone config file path")
+
+        self.lineEdit_profile_name = QLineEdit()
+        self.lineEdit_profile_name.setPlaceholderText("E.g. john@live.com")
+        self.lineEdit_profile_name.textChanged.connect(self.enable_import_button)
+
+        self.lineEdit_config_path = QLineEdit()
+        self.lineEdit_config_path.setPlaceholderText("E.g. ~/.config/rclone/rclone.conf")
+        self.lineEdit_config_path.textChanged.connect(self.enable_import_button)
+
+        self.pushButton_browse = QPushButton()
+        self.pushButton_browse.setText("Browse")
+        self.pushButton_browse.clicked.connect(self.get_rcloneconf_name)
+
+        self.pushButton_import = QPushButton()
+        self.pushButton_import.setText("Import")
+        self.pushButton_import.setEnabled(False)
+        self.pushButton_import.clicked.connect(self.import_rclone)
+
+        layout = QGridLayout()
+        layout.addWidget(self.label_profile_name, 0, 0)
+        layout.addWidget(self.label_config_path, 1, 0)
+        layout.addWidget(self.lineEdit_profile_name, 0, 1)
+        layout.addWidget(self.lineEdit_config_path, 1, 1)
+        layout.addWidget(self.pushButton_browse, 1, 2)
+        layout.addWidget(self.pushButton_import, 2, 0, 2, 3)
+        self.setLayout(layout)
+
+    def isComplete(self):
+        # Enable 'Next' button only when profile config was successfully imported
+        if self.pushButton_import.text() == "Done":
+            return True
+        return False
+
+    def enable_import_button(self):
+        # Enable 'Import' button only when remote name and path to config file are valid.
+        profile_name_filled = self.lineEdit_profile_name.text().strip() != ""
+
+        config_specified = re.search(r"\.conf$", self.lineEdit_config_path.text().strip()) != None
+        config_path = os.path.expanduser(self.lineEdit_config_path.text().strip())
+        config_exists = os.path.exists(config_path)
+        unique_profile_name = self.lineEdit_profile_name.text() not in global_config.keys()
+
+        if all([profile_name_filled, config_specified, config_exists, unique_profile_name]):
+            self.pushButton_import.setEnabled(True)
+        else:
+            self.pushButton_import.setEnabled(False)
+            if not unique_profile_name:
+                logging.warning(f"[GUI] Profile name {self.lineEdit_profile_name.text()} is already used!")
+            if not config_specified:
+                logging.warning(f"[GUI] Path to config file not specified.")
+            if not config_exists:
+                logging.warning(f"[GUI] Specified rclone config file '{self.lineEdit_config_path.text().strip()}' not found!")
+
+    def get_rcloneconf_name(self):
+        self.file_dialog = QFileDialog.getOpenFileName(self, dir=os.path.expanduser("~/.config/rclone"))
+
+        file_name = self.file_dialog[0]
+
+        logging.info(file_name)
+        self.lineEdit_config_path.setText(file_name)
+
+    def import_rclone(self):
+        # Stop checking for unsaved changes while new profile is being created.
+        profile_settings_window.stop_unsaved_changes_timer()
+
+        profile_name = self.lineEdit_new_profile_name.text()
+        sync_dir = self.lineEdit_sync_dir.text()
+        config_path = os.path.expanduser(f"~/.config/onedrive/accounts/{profile_name}/config")
+
+        # Load all default values.
+        _default_od_config = read_config(DIR_PATH + "/resources/default_config")
+        default_od_config = _default_od_config._sections
+
+        #load rclone data
+        def parse_rclone_remote(rclone_path: ConfigParser, remote_name: str):
+            rclone = ConfigParser()
+            rclone.read_file(open(os.path.expanduser(rclone_path)))
+            if not rclone.has_section(remote_name):
+                logging.warn("[GUI] That remote does not exist in that rclone config file.")
+        
+            remote = rclone[remote_name]
+            if remote["type"]=="alias":
+                #TODO test
+                realremote = remote['remote'].split(':')[0]
+                include_dir = remote['remote'].split(':')[1]
+                remote = rclone[realremote]
+
+            if not remote["type"]=="onedrive":
+                logging.warn("[GUI] That rclone remote is not of type onedrive.")
+
+            drive_id = remote["drive_id"]
+            refresh_token = str(json.loads(remote["token"])['refresh_token'])
+            
+            return tuple[drive_id,include_dir,refresh_token]
+
+        remote_name = self.lineEdit_profile_name.text().strip()
+        rclone_path = os.path.expanduser(self.lineEdit_config_path.text())
+        (drive_id,include_dir,refresh_token) = parse_rclone_remote(rclone_path,remote_name)
+
+        # Construct dict with user profile settings.
+        new_profile = {
+            profile_name: {
+                "config_file": config_path,
+                "auto_sync": False,
+                "account_type": "",
+                "free_space": "",
+            }
+        }
+
+        # Load existing user profiles and add the new profile.
+        _profiles = ConfigParser()
+        _profiles.read(PROFILES_FILE)
+        _profiles[profile_name] = new_profile[profile_name]
+
+        # Create profile config file if it does not exist.
+        profiles_dir = re.search(r"(.+)/profiles$", PROFILES_FILE).group(1)
+        if not os.path.exists(profiles_dir):
+            os.makedirs(profiles_dir)
+
+        # Save the new profile.
+        with open(PROFILES_FILE, "w") as profilefile:
+            _profiles.write(profilefile)
+        
+        # if an rclone alias was provided, treat it as an "include" dir
+        if include_dir is not None:
+            sync_list_file = re.search(r"(.+)/.+$", config_path).group(1) + "/sync_list"
+            with open(sync_list_file, "w") as f:
+                f.write(include_dir)
+
+        # Append default OD config
+        new_profile[profile_name].update(default_od_config)
+
+        # Configure sync directory
+        new_profile[profile_name]["onedrive"]["sync_dir"] = f'"{sync_dir}"'
+        
+        # Configure rclone settings
+        new_profile[profile_name]["onedrive"]["drive_id"] = f'"{drive_id}"'
+
+        # Append new profile into running global profile
+        _global_config = copy.deepcopy(new_profile)
+        _temp_global_config = copy.deepcopy(new_profile)
+
+        global_config.update(_global_config)
+        temp_global_config.update(_temp_global_config)
+
+        # Automatically save global config to prevent loss if user does not press 'Save' button.
+        save_global_config()
+
+        # Add Setting page widget for new profile
+        profile_settings_window.listWidget_profiles.addItem(profile_name)
+        self.setting_page = ProfileSettingsPage(profile_name)
+        profile_settings_window.stackedLayout.addWidget(self.setting_page)
+
+        # Add status page widget for new profile
+        main_window.comboBox.addItem(profile_name)
+        main_window.profile_status_pages[profile_name] = ProfileStatusPage(profile_name)
+        main_window.stackedLayout.addWidget(main_window.profile_status_pages[profile_name])
+
+        # Show comboBox with profile list if more than one profiles exist
+        if len(global_config) > 1:
+            main_window.comboBox.show()
+
+        # Hide "Create profile" push button from main windows.
+        main_window.pushButton_new_profile.hide()
+
+        # Start checking for unsaved changes again after new profile has been created.
+        profile_settings_window.start_unsaved_changes_timer()
+
+        logging.info(f"Account {profile_name} has been created")
+        self.pushButton_create.setText("Done")
+        self.pushButton_create.setDisabled(True)
+        self.lineEdit_new_profile_name.setDisabled(True)
+        self.lineEdit_sync_dir.setDisabled(True)
         self.pushButton_browse.setDisabled(True)
         self.completeChanged.emit()
 
