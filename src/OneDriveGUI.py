@@ -985,6 +985,11 @@ class wizardPage_rsync(QWizardPage):
         # Save the new profile.
         with open(PROFILES_FILE, "w") as profilefile:
             _profiles.write(profilefile)
+
+        if refresh_token is not None:
+            refresh_token_file = re.search(r"(.+)/.+$", config_path).group(1) + "/refresh_token"
+            with open(refresh_token_file, "w") as f:
+                f.write(refresh_token)
         
         # if an rclone alias was provided, treat it as an "include" dir
         if include_dir is not None:
