@@ -1240,7 +1240,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         """
         Starts OneDrive with --list-shared-folders argument and populates QListWidget list of SharePoint Sites emitted by MaintenanceWorker.
         """
-        options = "--list-shared-folders --resync --resync-auth"
+        options = "--list-shared-folders"
 
         self.listWidget_available_business_folders.clear()
 
@@ -2909,7 +2909,11 @@ def create_global_config():
             profiles[profile]["free_space"] = _default_profile_config["free_space"]
 
         profiles[profile].update(default_od_config)
+        print("test1")
+        print(profiles[profile])
         profiles[profile].update(od_config)
+        print("test1")
+        print(profiles[profile])
 
         # this option is not supported since OneDrive v2.4.20 - #42
         # TODO: Remove after some time...
