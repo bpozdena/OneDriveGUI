@@ -2908,10 +2908,12 @@ def create_global_config():
         if "free_space" not in profiles[profile]:  # add 'free_space' value if missing from older versions
             profiles[profile]["free_space"] = _default_profile_config["free_space"]
 
-        # Load default Onedrive values
-        profiles[profile].update(default_od_config)
+        # # Load default Onedrive values
+        profiles[profile]["onedrive"] = {}
+        profiles[profile]["onedrive"].update(default_od_config["onedrive"])
 
-        # Load user values from config
+        # # Load user values from config
+
         profiles[profile]["onedrive"].update(od_config["onedrive"])
 
         # this option is not supported since OneDrive v2.4.20 - #42
