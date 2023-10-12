@@ -2983,6 +2983,13 @@ def save_global_config():
         od_config = ConfigParser()
         od_config.read_dict(_od_config)
 
+        # Remove keys with default values from config before it is saved on disk. OneDrive client can't start when config contains default/empty key values.
+        for section in od_config.sections():
+            if section in _default_od_config:
+                for option in od_config[section]:
+                    if option in _default_od_config[section] and od_config[section][option] == _default_od_config[section][option]:
+                        od_config.remove_option(section, option)
+
         # Backup last config
         os.system(f"cp {od_config_file} {od_config_file}_backup")
 
