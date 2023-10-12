@@ -2209,6 +2209,13 @@ class WorkerThread(QThread):
 
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
+            elif "The method to sync Business" in stdout:
+                self.profile_status[
+                    "status_message"
+                ] = 'The method to sync Business Shared Folder <a href="https://github.com/abraunegg/onedrive/blob/onedrive-v2.5.0-alpha-1/docs/business-shared-folders.md">has changed</a>.'
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
+                self.update_credentials.emit(self.profile_name)
+
             else:
                 # logging.debug(f"No rule matched: {stdout}")
                 pass
