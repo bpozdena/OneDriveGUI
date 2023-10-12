@@ -159,9 +159,12 @@ class wizardPage_version_check(QWizardPage):
         # Check if OneDrive is installed
         try:
             client_version_check = subprocess.check_output([client_bin_path, "--version"], stderr=subprocess.STDOUT)
-            installed_client_version = re.search(r".\s(v[0-9.]+)", str(client_version_check)).group(1)
+            installed_client_version = re.search(r"(v[0-9.]+)", str(client_version_check)).group(1)
             installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
-            min_supported_version_num = 2415
+            installed_client_version_num = (
+                installed_client_version_num if len(str(installed_client_version_num)) > 3 else installed_client_version_num * 10
+            )
+            min_supported_version_num = 2500
 
             if installed_client_version_num < min_supported_version_num:
                 logging.info(f"Unsupported OneDrive {installed_client_version} detected.")
@@ -1481,11 +1484,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_skip_dotfiles.setChecked(self.get_check_box_state("skip_dotfiles"))
 
         # Sync Options tab
-        if client_version < 2420:
-            self.checkBox_force_http_11.setEnabled(False)
-        else:
-            self.checkBox_force_http_11.setChecked(self.get_check_box_state("force_http_11"))
-
+        self.checkBox_force_http_11.setChecked(self.get_check_box_state("force_http_11"))
         self.spinBox_monitor_interval.setValue(int(self.temp_profile_config["onedrive"]["monitor_interval"].strip('"')))
         self.spinBox_monitor_fullscan_frequency.setValue(int(self.temp_profile_config["onedrive"]["monitor_fullscan_frequency"].strip('"')))
         self.spinBox_classify_as_big_delete.setValue(int(self.temp_profile_config["onedrive"]["classify_as_big_delete"].strip('"')))
@@ -2460,9 +2459,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             latest_url = "https://api.github.com/repos/abraunegg/onedrive/releases/latest"
             latest_client_version = s.get(latest_url, timeout=1).json()["tag_name"]
             client_version_check = subprocess.check_output([client_bin_path, "--version"], stderr=subprocess.STDOUT)
-            installed_client_version = re.search(r".\s(v[0-9.]+)", str(client_version_check)).group(1)
+            installed_client_version = re.search(r"(v[0-9.]+)", str(client_version_check)).group(1)
             installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
-            min_supported_version_num = 2415
+            installed_client_version_num = (
+                installed_client_version_num if len(str(installed_client_version_num)) > 3 else installed_client_version_num * 10
+            )
+            min_supported_version_num = 2500
             min_requirements_met = True
 
             result = {
@@ -2936,6 +2938,9 @@ def create_global_config():
 
 def save_global_config():
     # Save all OneDrive config files after configuration change.
+
+    # Load all default values. Needed for to remove all default/empty values from the config before it is saved on disk.
+    _default_od_config = read_config(DIR_PATH + "/resources/default_config")
 
     # Save GUI profile file changes
     _profile_config = copy.deepcopy(global_config)
