@@ -2108,7 +2108,7 @@ class WorkerThread(QThread):
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
                 self.update_credentials.emit(self.profile_name)
 
-            elif "Sync with OneDrive is complete" in stdout:
+            elif "Sync with OneDrive is complete" or "Sync with Microsoft OneDrive is complete" in stdout:
                 self.profile_status["status_message"] = "OneDrive sync is complete"
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
