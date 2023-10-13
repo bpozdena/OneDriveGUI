@@ -1063,19 +1063,6 @@ Do not upload local changes to OneDrive.</string>
             <string>Notifications</string>
            </property>
            <layout class="QFormLayout" name="formLayout_3">
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_min_notify_changes">
-              <property name="toolTip">
-               <string>Minimum number of pending incoming changes necessary to trigger a desktop notification.</string>
-              </property>
-              <property name="text">
-               <string>Minimum notify changes</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QSpinBox" name="spinBox_min_notify_changes"/>
-            </item>
             <item row="0" column="0">
              <widget class="QCheckBox" name="checkBox_disable_notifications">
               <property name="toolTip">

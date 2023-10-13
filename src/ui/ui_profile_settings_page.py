@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'profile_settings_page.ui'
+## Form generated from reading UI file 'profile_settings_pagetiWTyj.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.3
+## Created by: Qt User Interface Compiler version 6.2.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -692,16 +692,6 @@ class Ui_profile_settings(object):
         self.groupBox_6.setObjectName(u"groupBox_6")
         self.formLayout_3 = QFormLayout(self.groupBox_6)
         self.formLayout_3.setObjectName(u"formLayout_3")
-        self.label_min_notify_changes = QLabel(self.groupBox_6)
-        self.label_min_notify_changes.setObjectName(u"label_min_notify_changes")
-
-        self.formLayout_3.setWidget(1, QFormLayout.LabelRole, self.label_min_notify_changes)
-
-        self.spinBox_min_notify_changes = QSpinBox(self.groupBox_6)
-        self.spinBox_min_notify_changes.setObjectName(u"spinBox_min_notify_changes")
-
-        self.formLayout_3.setWidget(1, QFormLayout.FieldRole, self.spinBox_min_notify_changes)
-
         self.checkBox_disable_notifications = QCheckBox(self.groupBox_6)
         self.checkBox_disable_notifications.setObjectName(u"checkBox_disable_notifications")
 
@@ -947,10 +937,6 @@ class Ui_profile_settings(object):
 #endif // QT_CONFIG(tooltip)
         self.label_monitor_log_frequency.setText(QCoreApplication.translate("profile_settings", u"Monitor log frequency", None))
         self.groupBox_6.setTitle(QCoreApplication.translate("profile_settings", u"Notifications", None))
-#if QT_CONFIG(tooltip)
-        self.label_min_notify_changes.setToolTip(QCoreApplication.translate("profile_settings", u"Minimum number of pending incoming changes necessary to trigger a desktop notification.", None))
-#endif // QT_CONFIG(tooltip)
-        self.label_min_notify_changes.setText(QCoreApplication.translate("profile_settings", u"Minimum notify changes", None))
 #if QT_CONFIG(tooltip)
         self.checkBox_disable_notifications.setToolTip(QCoreApplication.translate("profile_settings", u"Do not use desktop notifications in monitor mode.", None))
 #endif // QT_CONFIG(tooltip)
