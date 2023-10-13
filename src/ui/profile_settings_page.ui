@@ -50,7 +50,7 @@
         <string/>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="monitored_tab_2">
         <attribute name="title">
@@ -559,6 +559,16 @@ Do not upload local changes to OneDrive.</string>
               </property>
               <property name="text">
                <string>Disable upload validation</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="2">
+             <widget class="QCheckBox" name="checkBox_disable_download_validation">
+              <property name="toolTip">
+               <string>This option determines whether the client will conduct integrity validation on files downloaded from Microsoft OneDrive. &lt;br&gt;Sometimes, when downloading files, particularly from SharePoint, there is a discrepancy between the file size reported by the OneDrive API and the byte count received from the SharePoint HTTP Server for the same file. &lt;br&gt;Enable this option to disable the integrity checks performed by this client.</string>
+              </property>
+              <property name="text">
+               <string>Disable download validation</string>
               </property>
              </widget>
             </item>
