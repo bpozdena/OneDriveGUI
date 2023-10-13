@@ -1445,7 +1445,6 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.spinBox_monitor_log_frequency.valueChanged.connect(self.set_spin_box_value)
         self.checkBox_disable_notifications.stateChanged.connect(self.set_check_box_state)
         self.checkBox_disable_notifications.stateChanged.connect(self.validate_checkbox_input)
-        self.spinBox_min_notify_changes.valueChanged.connect(self.set_spin_box_value)
 
         # Account tab
         self.pushButton_login.clicked.connect(lambda: main_window.show_login(self.profile))
@@ -1537,8 +1536,6 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.spinBox_monitor_log_frequency.setValue(int(self.temp_profile_config["onedrive"]["monitor_log_frequency"].strip('"')))
         self.spinBox_monitor_log_frequency.setEnabled(self.checkBox_enable_logging.isChecked())
         self.checkBox_disable_notifications.setChecked(self.get_check_box_state("disable_notifications"))
-        self.spinBox_min_notify_changes.setValue(int(self.temp_profile_config["onedrive"]["min_notify_changes"].strip('"')))
-        self.spinBox_min_notify_changes.setEnabled(self.checkBox_disable_notifications.isChecked())
 
         # Account tab
         self.config_file = global_config[self.profile]["config_file"].strip('"')
@@ -1620,12 +1617,6 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
                 self.spinBox_monitor_log_frequency.setEnabled(False)
                 self.checkBox_debug_https.setEnabled(False)
                 self.pushButton_log_dir_browse.setEnabled(False)
-
-        if self.sender().objectName() == "checkBox_disable_notifications":
-            if self.checkBox_disable_notifications.isChecked():
-                self.spinBox_min_notify_changes.setEnabled(True)
-            else:
-                self.spinBox_min_notify_changes.setEnabled(False)
 
         if self.sender().objectName() == "checkBox_webhook_enabled":
             if self.checkBox_webhook_enabled.isChecked():
