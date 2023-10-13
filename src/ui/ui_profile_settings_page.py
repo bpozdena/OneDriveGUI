@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'profile_settings_pagechPLhP.ui'
+## Form generated from reading UI file 'profile_settings_pageGUWant.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.2.2
 ##
@@ -198,15 +198,15 @@ class Ui_profile_settings(object):
 
         self.formLayout_4.setWidget(3, QFormLayout.FieldRole, self.spinBox_operation_timeout)
 
-        self.label_drive_id = QLabel(self.groupBox_4)
-        self.label_drive_id.setObjectName(u"label_drive_id")
+        self.label_connect_timeout = QLabel(self.groupBox_4)
+        self.label_connect_timeout.setObjectName(u"label_connect_timeout")
 
-        self.formLayout_4.setWidget(4, QFormLayout.LabelRole, self.label_drive_id)
+        self.formLayout_4.setWidget(4, QFormLayout.LabelRole, self.label_connect_timeout)
 
-        self.lineEdit_drive_id = QLineEdit(self.groupBox_4)
-        self.lineEdit_drive_id.setObjectName(u"lineEdit_drive_id")
+        self.spinBox_connect_timeout = QSpinBox(self.groupBox_4)
+        self.spinBox_connect_timeout.setObjectName(u"spinBox_connect_timeout")
 
-        self.formLayout_4.setWidget(4, QFormLayout.FieldRole, self.lineEdit_drive_id)
+        self.formLayout_4.setWidget(4, QFormLayout.FieldRole, self.spinBox_connect_timeout)
 
 
         self.horizontalLayout.addLayout(self.formLayout_4)
@@ -277,6 +277,16 @@ class Ui_profile_settings(object):
         self.lineEdit_azure_tenant_id.setMaximumSize(QSize(16777215, 16777215))
 
         self.formLayout_5.setWidget(4, QFormLayout.FieldRole, self.lineEdit_azure_tenant_id)
+
+        self.label_drive_id = QLabel(self.groupBox_4)
+        self.label_drive_id.setObjectName(u"label_drive_id")
+
+        self.formLayout_5.setWidget(5, QFormLayout.LabelRole, self.label_drive_id)
+
+        self.lineEdit_drive_id = QLineEdit(self.groupBox_4)
+        self.lineEdit_drive_id.setObjectName(u"lineEdit_drive_id")
+
+        self.formLayout_5.setWidget(5, QFormLayout.FieldRole, self.lineEdit_drive_id)
 
 
         self.horizontalLayout.addLayout(self.formLayout_5)
@@ -789,7 +799,7 @@ class Ui_profile_settings(object):
         self.label_operation_timeout.setToolTip(QCoreApplication.translate("profile_settings", u"Operation Timeout is the maximum amount of time (seconds) a file operation is allowed to take. This includes DNS resolution, connecting, data transfer, etc.", None))
 #endif // QT_CONFIG(tooltip)
         self.label_operation_timeout.setText(QCoreApplication.translate("profile_settings", u"Operation timeout", None))
-        self.label_drive_id.setText(QCoreApplication.translate("profile_settings", u"SharePoint Library Drive ID", None))
+        self.label_connect_timeout.setText(QCoreApplication.translate("profile_settings", u"Connect timeout", None))
 #if QT_CONFIG(tooltip)
         self.label_sync_file_permissions.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Utilise the <a href=\"https://chmod-calculator.com/\"><span style=\" text-decoration: underline; color:#5e81ac;\">Unix Permissions Calculator</span></a> to assist in determining the required permissions.</p><p><br/></p><p>Important: Special permission bits (setuid, setgid, sticky bit) are not supported. </p><p>Valid permission values are from <span style=\" font-weight:700;\">000</span> to <span style=\" font-weight:700;\">777</span> only.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
@@ -810,6 +820,7 @@ class Ui_profile_settings(object):
         self.label_azure_tenant_id.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Refer to the documentation for <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/USAGE.md#configuring-the-client-for-single-tenant-application-use\"><span style=\" text-decoration: underline; color:#5e81ac;\">single tenant application use</span></a>.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.label_azure_tenant_id.setText(QCoreApplication.translate("profile_settings", u"Azure tenant ID", None))
+        self.label_drive_id.setText(QCoreApplication.translate("profile_settings", u"SharePoint Library Drive ID", None))
 #if QT_CONFIG(tooltip)
         self.groupBox_5.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Perform a 'one-way' upload sync.<br/></p><p><span style=\" font-weight:700;\">Note</span>: If a file or folder is present on OneDrive, that does not exist locally, it will be removed. </p><p>If the data on OneDrive should be kept, please enable '<span style=\" font-weight:700;\">No remote delete</span>' option.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
