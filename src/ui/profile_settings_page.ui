@@ -307,14 +307,14 @@ locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seco
                </widget>
               </item>
               <item row="4" column="0">
-               <widget class="QLabel" name="label_drive_id">
+               <widget class="QLabel" name="label_connect_timeout">
                 <property name="text">
-                 <string>SharePoint Library Drive ID</string>
+                 <string>Connect timeout</string>
                 </property>
                </widget>
               </item>
               <item row="4" column="1">
-               <widget class="QLineEdit" name="lineEdit_drive_id"/>
+               <widget class="QSpinBox" name="spinBox_connect_timeout"/>
               </item>
              </layout>
             </item>
@@ -436,6 +436,16 @@ locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seco
                  </size>
                 </property>
                </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="label_drive_id">
+                <property name="text">
+                 <string>SharePoint Library Drive ID</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QLineEdit" name="lineEdit_drive_id"/>
               </item>
              </layout>
             </item>
