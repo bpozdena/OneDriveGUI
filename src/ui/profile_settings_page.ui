@@ -316,6 +316,16 @@ locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seco
               <item row="4" column="1">
                <widget class="QSpinBox" name="spinBox_connect_timeout"/>
               </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="label_data_timeout">
+                <property name="text">
+                 <string>Data timeout</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QSpinBox" name="spinBox_data_timeout"/>
+              </item>
              </layout>
             </item>
             <item>
