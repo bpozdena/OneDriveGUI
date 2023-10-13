@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'profile_settings_pageGUWant.ui'
+## Form generated from reading UI file 'profile_settings_pageYevUEg.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.2.2
 ##
@@ -207,6 +207,16 @@ class Ui_profile_settings(object):
         self.spinBox_connect_timeout.setObjectName(u"spinBox_connect_timeout")
 
         self.formLayout_4.setWidget(4, QFormLayout.FieldRole, self.spinBox_connect_timeout)
+
+        self.label_data_timeout = QLabel(self.groupBox_4)
+        self.label_data_timeout.setObjectName(u"label_data_timeout")
+
+        self.formLayout_4.setWidget(5, QFormLayout.LabelRole, self.label_data_timeout)
+
+        self.spinBox_data_timeout = QSpinBox(self.groupBox_4)
+        self.spinBox_data_timeout.setObjectName(u"spinBox_data_timeout")
+
+        self.formLayout_4.setWidget(5, QFormLayout.FieldRole, self.spinBox_data_timeout)
 
 
         self.horizontalLayout.addLayout(self.formLayout_4)
@@ -800,6 +810,7 @@ class Ui_profile_settings(object):
 #endif // QT_CONFIG(tooltip)
         self.label_operation_timeout.setText(QCoreApplication.translate("profile_settings", u"Operation timeout", None))
         self.label_connect_timeout.setText(QCoreApplication.translate("profile_settings", u"Connect timeout", None))
+        self.label_data_timeout.setText(QCoreApplication.translate("profile_settings", u"Data timeout", None))
 #if QT_CONFIG(tooltip)
         self.label_sync_file_permissions.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Utilise the <a href=\"https://chmod-calculator.com/\"><span style=\" text-decoration: underline; color:#5e81ac;\">Unix Permissions Calculator</span></a> to assist in determining the required permissions.</p><p><br/></p><p>Important: Special permission bits (setuid, setgid, sticky bit) are not supported. </p><p>Valid permission values are from <span style=\" font-weight:700;\">000</span> to <span style=\" font-weight:700;\">777</span> only.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
