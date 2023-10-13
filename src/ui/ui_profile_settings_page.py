@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'profile_settings_pageYevUEg.ui'
+## Form generated from reading UI file 'profile_settings_pagefMheBy.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.2.2
 ##
@@ -308,41 +308,6 @@ class Ui_profile_settings(object):
         self.groupBox_5.setObjectName(u"groupBox_5")
         self.gridLayout_4 = QGridLayout(self.groupBox_5)
         self.gridLayout_4.setObjectName(u"gridLayout_4")
-        self.checkBox_force_http_11 = QCheckBox(self.groupBox_5)
-        self.checkBox_force_http_11.setObjectName(u"checkBox_force_http_11")
-
-        self.gridLayout_4.addWidget(self.checkBox_force_http_11, 4, 1, 1, 1)
-
-        self.checkBox_upload_only = QCheckBox(self.groupBox_5)
-        self.checkBox_upload_only.setObjectName(u"checkBox_upload_only")
-
-        self.gridLayout_4.addWidget(self.checkBox_upload_only, 2, 1, 1, 1)
-
-        self.checkBox_no_remote_delete = QCheckBox(self.groupBox_5)
-        self.checkBox_no_remote_delete.setObjectName(u"checkBox_no_remote_delete")
-
-        self.gridLayout_4.addWidget(self.checkBox_no_remote_delete, 3, 1, 1, 1)
-
-        self.checkBox_check_nomount = QCheckBox(self.groupBox_5)
-        self.checkBox_check_nomount.setObjectName(u"checkBox_check_nomount")
-
-        self.gridLayout_4.addWidget(self.checkBox_check_nomount, 5, 1, 1, 1)
-
-        self.checkBox_download_only = QCheckBox(self.groupBox_5)
-        self.checkBox_download_only.setObjectName(u"checkBox_download_only")
-
-        self.gridLayout_4.addWidget(self.checkBox_download_only, 1, 1, 1, 1)
-
-        self.checkBox_local_first = QCheckBox(self.groupBox_5)
-        self.checkBox_local_first.setObjectName(u"checkBox_local_first")
-
-        self.gridLayout_4.addWidget(self.checkBox_local_first, 0, 1, 1, 1)
-
-        self.checkBox_dry_run = QCheckBox(self.groupBox_5)
-        self.checkBox_dry_run.setObjectName(u"checkBox_dry_run")
-
-        self.gridLayout_4.addWidget(self.checkBox_dry_run, 0, 2, 1, 1)
-
         self.checkBox_resync = QCheckBox(self.groupBox_5)
         self.checkBox_resync.setObjectName(u"checkBox_resync")
 
@@ -353,20 +318,60 @@ class Ui_profile_settings(object):
 
         self.gridLayout_4.addWidget(self.checkBox_bypass_data_preservation, 2, 2, 1, 1)
 
-        self.checkBox_remove_source_files = QCheckBox(self.groupBox_5)
-        self.checkBox_remove_source_files.setObjectName(u"checkBox_remove_source_files")
+        self.checkBox_download_only = QCheckBox(self.groupBox_5)
+        self.checkBox_download_only.setObjectName(u"checkBox_download_only")
 
-        self.gridLayout_4.addWidget(self.checkBox_remove_source_files, 3, 2, 1, 1)
+        self.gridLayout_4.addWidget(self.checkBox_download_only, 1, 1, 1, 1)
+
+        self.checkBox_check_nomount = QCheckBox(self.groupBox_5)
+        self.checkBox_check_nomount.setObjectName(u"checkBox_check_nomount")
+
+        self.gridLayout_4.addWidget(self.checkBox_check_nomount, 5, 1, 1, 1)
+
+        self.checkBox_force_http_11 = QCheckBox(self.groupBox_5)
+        self.checkBox_force_http_11.setObjectName(u"checkBox_force_http_11")
+
+        self.gridLayout_4.addWidget(self.checkBox_force_http_11, 4, 1, 1, 1)
 
         self.checkBox_disable_upload_validation = QCheckBox(self.groupBox_5)
         self.checkBox_disable_upload_validation.setObjectName(u"checkBox_disable_upload_validation")
 
         self.gridLayout_4.addWidget(self.checkBox_disable_upload_validation, 4, 2, 1, 1)
 
+        self.checkBox_upload_only = QCheckBox(self.groupBox_5)
+        self.checkBox_upload_only.setObjectName(u"checkBox_upload_only")
+
+        self.gridLayout_4.addWidget(self.checkBox_upload_only, 2, 1, 1, 1)
+
+        self.checkBox_remove_source_files = QCheckBox(self.groupBox_5)
+        self.checkBox_remove_source_files.setObjectName(u"checkBox_remove_source_files")
+
+        self.gridLayout_4.addWidget(self.checkBox_remove_source_files, 3, 2, 1, 1)
+
+        self.checkBox_dry_run = QCheckBox(self.groupBox_5)
+        self.checkBox_dry_run.setObjectName(u"checkBox_dry_run")
+
+        self.gridLayout_4.addWidget(self.checkBox_dry_run, 0, 2, 1, 1)
+
+        self.checkBox_local_first = QCheckBox(self.groupBox_5)
+        self.checkBox_local_first.setObjectName(u"checkBox_local_first")
+
+        self.gridLayout_4.addWidget(self.checkBox_local_first, 0, 1, 1, 1)
+
+        self.checkBox_no_remote_delete = QCheckBox(self.groupBox_5)
+        self.checkBox_no_remote_delete.setObjectName(u"checkBox_no_remote_delete")
+
+        self.gridLayout_4.addWidget(self.checkBox_no_remote_delete, 3, 1, 1, 1)
+
         self.checkBox_disable_download_validation = QCheckBox(self.groupBox_5)
         self.checkBox_disable_download_validation.setObjectName(u"checkBox_disable_download_validation")
 
         self.gridLayout_4.addWidget(self.checkBox_disable_download_validation, 5, 2, 1, 1)
+
+        self.checkBox_display_running_config = QCheckBox(self.groupBox_5)
+        self.checkBox_display_running_config.setObjectName(u"checkBox_display_running_config")
+
+        self.gridLayout_4.addWidget(self.checkBox_display_running_config, 6, 2, 1, 1)
 
 
         self.verticalLayout_8.addWidget(self.groupBox_5)
@@ -837,23 +842,10 @@ class Ui_profile_settings(object):
 #endif // QT_CONFIG(tooltip)
         self.groupBox_5.setTitle(QCoreApplication.translate("profile_settings", u"Advanced options", None))
 #if QT_CONFIG(tooltip)
-        self.checkBox_force_http_11.setToolTip(QCoreApplication.translate("profile_settings", u"Forces the use of HTTP/1.1 instead of the default HTTP/2 .", None))
+        self.checkBox_resync.setToolTip(QCoreApplication.translate("profile_settings", u"Forget the last saved state, perform a full sync.", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBox_force_http_11.setText(QCoreApplication.translate("profile_settings", u"Force HTTP 1.1", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_upload_only.setToolTip(QCoreApplication.translate("profile_settings", u"Replicate the locally configured sync_dir state to OneDrive, by only uploading local changes to OneDrive. \n"
-"\n"
-"Do not download changes from OneDrive.", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_upload_only.setText(QCoreApplication.translate("profile_settings", u"Upload only", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_no_remote_delete.setToolTip(QCoreApplication.translate("profile_settings", u"Do not delete local file 'deletes' from OneDrive when using --upload-only", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_no_remote_delete.setText(QCoreApplication.translate("profile_settings", u"No remote delete", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_check_nomount.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><pre style=\" margin-top:0px; margin-bottom:16px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:145%;\"><span style=\" font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; color:#c9d1d9; background-color:transparent;\">Check for the presence of </span><span style=\" font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; font-weight:700; color:#c9d1d9; background-color:transparent;\">.nosync</span><span style=\" font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; color:#c9d1d9; background-color:transparent;\"> in the syncdir root. If found, do not perform sync.</span></pre></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_check_nomount.setText(QCoreApplication.translate("profile_settings", u"Check for .nomount", None))
+        self.checkBox_resync.setText(QCoreApplication.translate("profile_settings", u"Full re-sync", None))
+        self.checkBox_bypass_data_preservation.setText(QCoreApplication.translate("profile_settings", u"Bypass data preservation", None))
 #if QT_CONFIG(tooltip)
         self.checkBox_download_only.setToolTip(QCoreApplication.translate("profile_settings", u"Replicate the OneDrive online state locally, by only downloading changes from OneDrive. \n"
 "\n"
@@ -861,30 +853,44 @@ class Ui_profile_settings(object):
 #endif // QT_CONFIG(tooltip)
         self.checkBox_download_only.setText(QCoreApplication.translate("profile_settings", u"Download only", None))
 #if QT_CONFIG(tooltip)
-        self.checkBox_local_first.setToolTip(QCoreApplication.translate("profile_settings", u"Synchronize from the local directory source first, before downloading changes from OneDrive.", None))
+        self.checkBox_check_nomount.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><pre style=\" margin-top:0px; margin-bottom:16px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:145%;\"><span style=\" font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; color:#c9d1d9; background-color:transparent;\">Check for the presence of </span><span style=\" font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; font-weight:700; color:#c9d1d9; background-color:transparent;\">.nosync</span><span style=\" font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; color:#c9d1d9; background-color:transparent;\"> in the syncdir root. If found, do not perform sync.</span></pre></body></html>", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBox_local_first.setText(QCoreApplication.translate("profile_settings", u"Local first", None))
+        self.checkBox_check_nomount.setText(QCoreApplication.translate("profile_settings", u"Check for .nomount", None))
 #if QT_CONFIG(tooltip)
-        self.checkBox_dry_run.setToolTip(QCoreApplication.translate("profile_settings", u"Perform a trial sync with no changes made.", None))
+        self.checkBox_force_http_11.setToolTip(QCoreApplication.translate("profile_settings", u"Forces the use of HTTP/1.1 instead of the default HTTP/2 .", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBox_dry_run.setText(QCoreApplication.translate("profile_settings", u"Dry run", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_resync.setToolTip(QCoreApplication.translate("profile_settings", u"Forget the last saved state, perform a full sync.", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_resync.setText(QCoreApplication.translate("profile_settings", u"Full re-sync", None))
-        self.checkBox_bypass_data_preservation.setText(QCoreApplication.translate("profile_settings", u"Bypass data preservation", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_remove_source_files.setToolTip(QCoreApplication.translate("profile_settings", u"Remove source file after successful transfer to OneDrive when using --upload-only .", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_remove_source_files.setText(QCoreApplication.translate("profile_settings", u"Remove source files", None))
+        self.checkBox_force_http_11.setText(QCoreApplication.translate("profile_settings", u"Force HTTP 1.1", None))
 #if QT_CONFIG(tooltip)
         self.checkBox_disable_upload_validation.setToolTip(QCoreApplication.translate("profile_settings", u"Disable download validation when downloading from OneDrive.", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_disable_upload_validation.setText(QCoreApplication.translate("profile_settings", u"Disable upload validation", None))
 #if QT_CONFIG(tooltip)
+        self.checkBox_upload_only.setToolTip(QCoreApplication.translate("profile_settings", u"Replicate the locally configured sync_dir state to OneDrive, by only uploading local changes to OneDrive. \n"
+"\n"
+"Do not download changes from OneDrive.", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_upload_only.setText(QCoreApplication.translate("profile_settings", u"Upload only", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_remove_source_files.setToolTip(QCoreApplication.translate("profile_settings", u"Remove source file after successful transfer to OneDrive when using --upload-only .", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_remove_source_files.setText(QCoreApplication.translate("profile_settings", u"Remove source files", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_dry_run.setToolTip(QCoreApplication.translate("profile_settings", u"Perform a trial sync with no changes made.", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_dry_run.setText(QCoreApplication.translate("profile_settings", u"Dry run", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_local_first.setToolTip(QCoreApplication.translate("profile_settings", u"Synchronize from the local directory source first, before downloading changes from OneDrive.", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_local_first.setText(QCoreApplication.translate("profile_settings", u"Local first", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_no_remote_delete.setToolTip(QCoreApplication.translate("profile_settings", u"Do not delete local file 'deletes' from OneDrive when using --upload-only", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_no_remote_delete.setText(QCoreApplication.translate("profile_settings", u"No remote delete", None))
+#if QT_CONFIG(tooltip)
         self.checkBox_disable_download_validation.setToolTip(QCoreApplication.translate("profile_settings", u"This option determines whether the client will conduct integrity validation on files downloaded from Microsoft OneDrive. <br>Sometimes, when downloading files, particularly from SharePoint, there is a discrepancy between the file size reported by the OneDrive API and the byte count received from the SharePoint HTTP Server for the same file. <br>Enable this option to disable the integrity checks performed by this client.", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_disable_download_validation.setText(QCoreApplication.translate("profile_settings", u"Disable download validation", None))
+        self.checkBox_display_running_config.setText(QCoreApplication.translate("profile_settings", u"Display running config", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("profile_settings", u"Sync Options", None))
 #if QT_CONFIG(tooltip)
         self.groupBox.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>This option is used to 'skip' certain files and supports pattern matching.</p><p>Patterns are case insensitive. <span style=\" font-weight:700;\">*</span> and <span style=\" font-weight:700;\">? </span><a href=\"https://technet.microsoft.com/en-us/library/bb490639.aspx\"><span style=\" text-decoration: underline; color:#5e81ac;\">wildcards characters</span></a> are supported. </p><p>Use <span style=\" font-weight:700;\">|</span> to separate multiple patterns.<br/></p><p><span style=\" text-decoration: underline;\">Files can be skipped in the following fashion:</span></p><p>-Specify a wildcard, eg: '<span style=\" font-weight:700;\">*.txt</span>' (skip all txt files)</p><p>-Explicitly specify the filename and it's full path relative to your sync_dir, eg: '<span style=\" font-weight:700;\">path/to/file/filename.ext</span>'</p><p>-Explicitly specify the filename only and skip every instance of this filename, eg: '<span style=\" font-weight:700;\">filename.ext</span>'</p><p><br/></p><p><span "
