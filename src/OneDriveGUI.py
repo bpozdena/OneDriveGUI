@@ -349,10 +349,10 @@ class wizardPage_create_shared_library(QWizardPage):
 
     def get_sharepoint_site_list(self):
         """
-        Starts OneDrive with --get-O365-drive-id argument and populates comboBox list of SharePoint Sites emitted by MaintenanceWorker.
+        Starts OneDrive with --get-sharepoint-drive-id argument and populates comboBox list of SharePoint Sites emitted by MaintenanceWorker.
         """
         profile_name = self.comboBox_profile_list.currentText()
-        options = "--get-O365-drive-id 'non-existent-library'"
+        options = "--get-sharepoint-drive-id 'non-existent-library'"
 
         self.pushButton_get_sites.setDisabled(True)
         self.pushButton_get_sites.setText("Please wait...")
@@ -389,14 +389,14 @@ class wizardPage_create_shared_library(QWizardPage):
 
     def get_library_drive_ids(self):
         """
-        Starts OneDrive with --get-O365-drive-id argument to obtain names and drive_ids
+        Starts OneDrive with --get-sharepoint-drive-id argument to obtain names and drive_ids
         of available SharePoint Shared Libraries within selected SharePoint Site.
 
         Once libraries are obtained, the worker emits dict {'Documents': 'b!SeGaP5QU4UWy...', 'test': 'b!SeGaP5QU4UWySy...'}
         """
         profile_name = self.comboBox_profile_list.currentText()
         library_name = self.comboBox_sharepoint_site_list.currentText()
-        options = f"--get-O365-drive-id '{library_name}'"
+        options = f"--get-sharepoint-drive-id '{library_name}'"
 
         self.pushButton_get_libraries.setText("Please wait...")
         self.pushButton_get_libraries.setDisabled(True)
@@ -1861,7 +1861,7 @@ class MaintenanceWorker(QThread):
             logging.info(f"[GUI] - Login response: {self.login_response}")
             self.update_login_response.emit({"profile_name": self.profile, "response": self.login_response})
 
-        elif "--get-O365-drive-id 'non-existent-library'" in self.options:
+        elif "--get-sharepoint-drive-id 'non-existent-library'" in self.options:
             # Trying to obtain Sharepoint Site list by searching a non-existent library name.
             logging.info(f"[GUI] Trying to get list of SharePoint Sites...")
             self.sharepoint_site_list = []
@@ -1879,7 +1879,7 @@ class MaintenanceWorker(QThread):
             logging.info(f"[GUI] - Number of retrieved Shared libraries: {len(self.sharepoint_site_list)}")
             self.update_sharepoint_site_list.emit(self.sharepoint_site_list)
 
-        elif "--get-O365-drive-id '" in self.options:
+        elif "--get-sharepoint-drive-id '" in self.options:
             self.library_ids_dict = {}
 
             # Obtain Drive ID of a specific Shared Library.
