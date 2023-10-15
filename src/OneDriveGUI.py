@@ -2101,7 +2101,7 @@ class WorkerThread(QThread):
                 self.profile_status["status_message"] = "Cannot connect to Microsoft OneDrive Service"
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-            if "Authorize this app visiting" in stdout:
+            if "Authorise this application by visiting" in stdout:
                 self.onedrive_process.kill()
                 self.profile_status["status_message"] = "OneDrive login is required"
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
