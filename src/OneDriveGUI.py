@@ -449,10 +449,10 @@ class wizardPage_create_shared_library(QWizardPage):
         profile_settings_window.stop_unsaved_changes_timer()
 
         logging.info(f"[GUI] Available Libraries:  {self.library_dict}")
-        _site_name = self.comboBox_sharepoint_site_list.currentText().replace(" ", "_")
-        _library_name = self.comboBox_sharepoint_library_list.currentText().replace(" ", "_")
+        _site_name = self.comboBox_sharepoint_site_list.currentText()
+        _library_name = self.comboBox_sharepoint_library_list.currentText()
         _library_id = self.library_dict[_library_name]
-        profile_name = f"SharePoint_{_site_name}_{_library_name}"
+        profile_name = f'SharePoint_{_site_name.replace(" ", "_")}_{_library_name.replace(" ", "_")}'
 
         sync_dir = os.path.expanduser(f"~/{profile_name}")
         config_path = os.path.expanduser(f"~/.config/onedrive/accounts/{profile_name}/config")
