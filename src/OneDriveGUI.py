@@ -72,7 +72,7 @@ GUI_SETTINGS_FILE = os.path.expanduser("~/.config/onedrive-gui/gui_settings")
 class SetupWizard(QWizard):
     def __init__(self, parent=None):
         super(SetupWizard, self).__init__(parent)
-        self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-48.png"))
+        self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png"))
 
         self.setPage(1, WizardPage_welcome(self))
         self.setPage(2, wizardPage_version_check(self))
@@ -878,7 +878,7 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
         super(GuiSettingsWindow, self).__init__()
 
         self.setupUi(self)
-        self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-48.png"))
+        self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png"))
 
         self.checkBox_start_minimized.setChecked(self.get_check_box_state("start_minimized"))
         self.checkBox_start_minimized.stateChanged.connect(self.set_check_box_state)
@@ -1091,7 +1091,7 @@ class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
         self.unsaved_profiles = []
 
         self.setupUi(self)
-        self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-48.png"))
+        self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png"))
         self.delegate = ListItemDelegate()
         self.listWidget_profiles.setItemDelegate(self.delegate)
 
@@ -2267,7 +2267,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         super(MainWindow, self).__init__()
         self.setupUi(self)
-        self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-48.png"))
+        self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png"))
 
         if gui_settings["SETTINGS"]["frameless_window"] == "True":
             self.setWindowFlags(Qt.FramelessWindowHint)
@@ -2702,7 +2702,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def show_login(self, profile):
         # Show login window with QT WebEngine
         self.window1 = QWidget()
-        self.window1.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-48.png"))
+        self.window1.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png"))
         self.lw = Ui_LoginWindow()
         self.lw.setupUi(self.window1)
         self.window1.show()
@@ -2726,7 +2726,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def show_external_login(self, profile):
         # Show external login window
         self.window2 = QWidget()
-        self.window2.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-48.png"))
+        self.window2.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png"))
         self.lw2 = Ui_ExternalLoginWindow()
         self.lw2.setupUi(self.window2)
         self.window2.show()
@@ -3202,7 +3202,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     app.setApplicationName("OneDriveGUI")
-    app.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-48.png"))
+    app.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png"))
 
     main_window = MainWindow()
     main_window_start_state()

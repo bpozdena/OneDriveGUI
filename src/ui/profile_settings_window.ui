@@ -55,6 +55,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="pushButton_rename">
+         <property name="text">
+          <string>Rename profile</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pushButton_create_import">
          <property name="toolTip">
           <string>Opens wizard which allows creation of new profiles or import of existing ones.</string>
