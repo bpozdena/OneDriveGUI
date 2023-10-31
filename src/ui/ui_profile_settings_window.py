@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'profile_settings_window.ui'
+## Form generated from reading UI file 'profile_settings_windowCPOFHG.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.3
+## Created by: Qt User Interface Compiler version 6.2.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -48,6 +48,11 @@ class Ui_profile_settings_window(object):
 
         self.verticalLayout.addWidget(self.pushButton_remove)
 
+        self.pushButton_rename = QPushButton(profile_settings_window)
+        self.pushButton_rename.setObjectName(u"pushButton_rename")
+
+        self.verticalLayout.addWidget(self.pushButton_rename)
+
         self.pushButton_create_import = QPushButton(profile_settings_window)
         self.pushButton_create_import.setObjectName(u"pushButton_create_import")
 
@@ -72,6 +77,7 @@ class Ui_profile_settings_window(object):
         self.pushButton_remove.setToolTip(QCoreApplication.translate("profile_settings_window", u"<html><head/><body><p>Removes selected profile from OneDriveGUI only.</p><p>The OneDrive client config files and synced files will remain untouched and can be re-imported again.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.pushButton_remove.setText(QCoreApplication.translate("profile_settings_window", u"Remove profile", None))
+        self.pushButton_rename.setText(QCoreApplication.translate("profile_settings_window", u"Rename profile", None))
 #if QT_CONFIG(tooltip)
         self.pushButton_create_import.setToolTip(QCoreApplication.translate("profile_settings_window", u"Opens wizard which allows creation of new profiles or import of existing ones.", None))
 #endif // QT_CONFIG(tooltip)
