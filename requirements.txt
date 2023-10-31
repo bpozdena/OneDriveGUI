@@ -1,2 +1,2 @@
-PySide6==6.2.2.1
-requests==2.27.1
+PySide6=6.6.0
+requests=2.31.0
