@@ -2113,7 +2113,7 @@ class WorkerThread(QThread):
 
             elif "Remaining Free Space" in stdout:
                 try:
-                    self.free_space_bytes = re.search(r"([0-9]+)", stdout).group(1)
+                    self.free_space_bytes = re.search(r"([0-9]+)\sbytes", stdout).group(1)
                     self.free_space_human = str(humanize_file_size(int(self.free_space_bytes)))
                 except:
                     self.free_space_human = "Not Available"
