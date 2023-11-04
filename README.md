@@ -62,7 +62,7 @@ A simple GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive),
 	```
 1) Install dependencies:
 	```sh
-	python3 -m pip3 install -r requirements.txt
+	python3 -m pip install -r requirements.txt
 	```
 
 1) Start OneDrive GUI:
