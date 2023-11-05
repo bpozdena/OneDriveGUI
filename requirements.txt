@@ -1,2 +1,5 @@
-PySide6=6.6.0
-requests=2.31.0
+PySide6==6.2.2.1; python_version <= '3.7'
+requests==2.27.1; python_version <= '3.7'
+
+PySide6==6.6.0; python_version >= '3.8'
+requests==2.31.0; python_version >= '3.8'
