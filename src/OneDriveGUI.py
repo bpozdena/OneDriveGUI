@@ -2420,18 +2420,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             logging.debug("[GUI] Keeping OneDriveGUI running.")
 
     def closeEvent(self, event):
-        # Minimize main window to system tray if it is available. Otherwise minimize to taskbar.
+        # Minimize main window to system tray if it is available. If not, minimize to taskbar if it is available. otherwise, just close.
         event.ignore()
-        try:
-            if self.tray.isSystemTrayAvailable():
-                self.hide()
-                logging.info("[GUI] Minimizing main window to tray")
-            else:
-                self.setWindowState(Qt.WindowMinimized)
-                logging.info("[GUI] Minimizing main window to taskbar/dock")
-        except:
+        if self.tray and self.tray.isSystemTrayAvailable():
+            self.hide()
+            logging.info("[GUI] Minimizing main window to tray")
+        else:
             self.setWindowState(Qt.WindowMinimized)
             logging.info("[GUI] Minimizing main window to taskbar/dock")
+
+            if self.isVisible():
+                logging.info("Quitting OneDriveGUI")
+                workers_to_stop = []
+
+                for worker in self.workers:
+                    workers_to_stop.append(worker)
+
+                for worker in workers_to_stop:
+                    self.workers[worker].stop_worker()
+
+                sys.exit()
 
     def show_setup_wizard(self):
         self.setup_wizard = SetupWizard()
