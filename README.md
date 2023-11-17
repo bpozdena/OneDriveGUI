@@ -1,8 +1,10 @@
-:exclamation:   This branch aims to provide compatibility with the upcoming OneDrive v2.5.0-alpha. 
+:exclamation:   This branch aims to provide compatibility with the upcoming OneDrive client [v2.5.0-alpha3](https://github.com/abraunegg/onedrive/discussions/2521). 
 
-- If you are using `sync_business_shared_folders` in your config file, you will need manually remove it. Check the [client documentation](https://github.com/abraunegg/onedrive/blob/onedrive-v2.5.0-alpha-2/docs/business-shared-folders.md) for more details.
+- If you are using `sync_business_shared_folders` in your config file, you will need manually remove it. Check the [client documentation](https://github.com/abraunegg/onedrive/blob/onedrive-v2.5.0-alpha-3/docs/business-shared-folders.md) for more details.
 
-- This branch is only compatible with the Onedrive client v2.5.0_alphaX. The path of client binary  must be manually specified in the GUI settings.
+- There is no backwards compatibility with OneDrive client 2.4.x or older. 
+- This GUI branch is only compatible with the Onedrive client v2.5.0_alphaX. The path of OneDrive client binary  must be manually specified in the GUI settings.
+
 
     Example:
     
