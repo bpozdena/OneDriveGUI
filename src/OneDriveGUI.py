@@ -2186,7 +2186,7 @@ class MaintenanceWorker(QThread):
         logging.debug(f"[GUI] OneDrive config dir: {self.config_dir}")
 
         self._command = (
-            f"exec {client_bin_path} --confdir='{self.config_dir}' -v {options}"
+            f"exec {client_bin_path} --confdir='{self.config_dir}' {options}"
         )
         logging.debug(f"[GUI] Maintenance command: '{self._command}'")
 
@@ -2583,36 +2583,42 @@ class WorkerThread(QThread):
                         "status_message"
                     ] = "OneDrive sync in progress..."
 
-            elif "% |" in stdout:
-                # Capture upload/download progress status
+            elif "% " in stdout:
+                # Capture download progress status
 
-                file_operation = re.search(
-                    r"\b([Uploading|Downloading]+)*", stdout
-                ).group(1)
-                progress = re.search(r"\s([0-9]+)%", stdout).group(1)
-                transfer_complete = progress == "100"
+                match = re.search(
+                    r"(\w[Downloading|Uploading]+)\:\s(.+)\s\.+\s?(\d{1,3})", stdout
+                ).groups()
+                if match:
+                    file_operation = match[0]
+                    file_name = match[1]
+                    progress = match[2]
 
-                transfer_progress_new = {
-                    "file_operation": file_operation,
-                    "file_path": "unknown file name"
-                    if self.file_path is None
-                    else self.file_path.group(1),
-                    "progress": progress,
-                    "transfer_complete": transfer_complete,
-                }
+                    transfer_complete = progress == "100"
 
-                logging.info(transfer_progress_new)
-                self.update_progress_new.emit(transfer_progress_new, self.profile_name)
+                    transfer_progress_new = {
+                        "file_operation": file_operation,
+                        "file_path": file_name,
+                        "progress": progress,
+                        "transfer_complete": transfer_complete,
+                    }
 
-                if transfer_complete:
-                    pass
-                    # self.profile_status["status_message"] = "OneDrive sync is complete"
-                else:
-                    self.profile_status[
-                        "status_message"
-                    ] = "OneDrive sync in progress..."
+                    logging.info(transfer_progress_new)
+                    self.update_progress_new.emit(
+                        transfer_progress_new, self.profile_name
+                    )
 
-                self.update_profile_status.emit(self.profile_status, self.profile_name)
+                    if transfer_complete:
+                        pass
+                        # self.profile_status["status_message"] = "OneDrive sync is complete"
+                    else:
+                        self.profile_status[
+                            "status_message"
+                        ] = "OneDrive sync in progress..."
+
+                    self.update_profile_status.emit(
+                        self.profile_status, self.profile_name
+                    )
 
             elif "The method to sync Business" in stdout:
                 self.profile_status[
