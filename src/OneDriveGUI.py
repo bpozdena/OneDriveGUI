@@ -2237,25 +2237,31 @@ class WorkerThread(QThread):
                     file_name = match[1]
                     progress = match[2]
 
-                    transfer_complete = progress == "100"
+                    if progress != "100":
+                        transfer_complete = progress == "100"
 
-                    transfer_progress_new = {
-                        "file_operation": file_operation,
-                        "file_path": file_name,
-                        "progress": progress,
-                        "transfer_complete": transfer_complete,
-                    }
+                        transfer_progress_new = {
+                            "file_operation": file_operation,
+                            "file_path": file_name,
+                            "progress": progress,
+                            "transfer_complete": transfer_complete,
+                        }
 
-                    logging.info(transfer_progress_new)
-                    self.update_progress_new.emit(transfer_progress_new, self.profile_name)
+                        logging.info(transfer_progress_new)
+                        self.update_progress_new.emit(transfer_progress_new, self.profile_name)
 
-                    if transfer_complete:
+                        if transfer_complete:
+                            pass
+                            # self.profile_status["status_message"] = "OneDrive sync is complete"
+                        else:
+                            self.profile_status["status_message"] = "OneDrive sync in progress..."
+
+                        self.update_profile_status.emit(self.profile_status, self.profile_name)
+                    elif progress == "100":
+                        # Ignore progress 100% message to prevent duplicate entries.
+                        # It will always be followed by another confirmation.
+                        # Example: "Downloading file ./200MB.zip ... done"
                         pass
-                        # self.profile_status["status_message"] = "OneDrive sync is complete"
-                    else:
-                        self.profile_status["status_message"] = "OneDrive sync in progress..."
-
-                    self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif "The method to sync Business" in stdout:
                 self.profile_status["status_message"] = (
@@ -2714,7 +2720,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 item_widget = self.profile_status_pages[profile].listWidget.itemWidget(item)
                 item_file_name = item_widget.get_file_name()
                 item_incomplete = item_widget.ls_progressBar.isVisible()
-                logging.debug(f"The list item's file name is : {item_file_name}")
 
                 if file_name == item_file_name and item_incomplete:
                     # If current file is already in the list and progress bar is not complete, update the existing item.
@@ -2751,17 +2756,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     break
 
         if new_list_item:
-            # Delete last item list if it has the same file name.
-            if self.profile_status_pages[profile].listWidget.item(0) != None:
-                last_item = self.profile_status_pages[profile].listWidget.item(0)
-                last_item_widget = self.profile_status_pages[profile].listWidget.itemWidget(last_item)
-                last_file_name = last_item_widget.get_file_name()
-                logging.info(f"The last list item's file name is : {last_file_name}")
+            # # Delete last item list if it has the same file name.
+            # if self.profile_status_pages[profile].listWidget.item(0) != None:
+            #     last_item = self.profile_status_pages[profile].listWidget.item(0)
+            #     last_item_widget = self.profile_status_pages[profile].listWidget.itemWidget(last_item)
+            #     last_file_name = last_item_widget.get_file_name()
+            #     logging.info(f"The last list item's file name is : {last_file_name}")
 
-                if file_name == last_file_name:
-                    move_scrollbar = False
-                    logging.info("Deleting last list item")
-                    self.profile_status_pages[profile].listWidget.takeItem(0)
+            #     if file_name == last_file_name:
+            #         move_scrollbar = False
+            #         logging.info("Deleting last list item")
+            #         self.profile_status_pages[profile].listWidget.takeItem(0)
 
             logging.info(f"Adding new list item for file {file_name}")
             myQCustomQWidget = TaskList()
