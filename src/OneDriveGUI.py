@@ -2231,11 +2231,11 @@ class WorkerThread(QThread):
 
                 # Line Example for regex:
                 # Uploading: 200MB.zip ....................................................... 85.00% | ETA 00:00:09
-                match = re.search(r"(\w[Downloading|Uploading]+)\:\s(.+)\s\.+\s?(\d{1,3})", stdout).groups()
+                match = re.search(r"(\w[Downloading|Uploading]+)\:\s+(.+?)\s+[\.]*\s?(\d{1,3})", stdout)
                 if match:
-                    file_operation = match[0]
-                    file_name = match[1]
-                    progress = match[2]
+                    file_operation = match.group(1)
+                    file_name = match.group(2)
+                    progress = match.group(3)
 
                     if progress != "100":
                         transfer_complete = progress == "100"
@@ -2693,7 +2693,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
         file_size_human = humanize_file_size(file_size)
         file_name = QFileInfo(file_path).fileName()
-        file_path2 = QFileInfo(file_path).filePath()
         progress = data["progress"]
         progress_data = file_size / 100 * int(progress)
         progress_data_human = humanize_file_size(progress_data)
@@ -2701,17 +2700,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         transfer_complete = data["transfer_complete"]
         move_scrollbar = True
         new_list_item = True
-
-        logging.debug("absolute path " + absolute_path)
-        logging.debug("relative path " + relative_path_display)
-
-        logging.debug("parent dir " + parent_dir)
-        logging.debug("progress: " + progress)
-        logging.debug("progress data: " + humanize_file_size(progress_data))
-        logging.debug("file path: " + file_path)
-        logging.debug("file size: " + humanize_file_size(file_size))
-        logging.debug("file name: " + file_name)
-        logging.debug("file path2: " + file_path2)
 
         for row in range(20):
             # Check last 20 entries to see if the file is already in the list.
@@ -2756,18 +2744,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     break
 
         if new_list_item:
-            # # Delete last item list if it has the same file name.
-            # if self.profile_status_pages[profile].listWidget.item(0) != None:
-            #     last_item = self.profile_status_pages[profile].listWidget.item(0)
-            #     last_item_widget = self.profile_status_pages[profile].listWidget.itemWidget(last_item)
-            #     last_file_name = last_item_widget.get_file_name()
-            #     logging.info(f"The last list item's file name is : {last_file_name}")
-
-            #     if file_name == last_file_name:
-            #         move_scrollbar = False
-            #         logging.info("Deleting last list item")
-            #         self.profile_status_pages[profile].listWidget.takeItem(0)
-
             logging.info(f"Adding new list item for file {file_name}")
             myQCustomQWidget = TaskList()
             myQCustomQWidget.set_file_name(file_name)
