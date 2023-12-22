@@ -2258,9 +2258,10 @@ class WorkerThread(QThread):
                     self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif "The method to sync Business" in stdout:
-                self.profile_status[
-                    "status_message"
-                ] = 'The method to sync Business Shared Folder <a href="https://github.com/abraunegg/onedrive/blob/onedrive-v2.5.0-alpha-1/docs/business-shared-folders.md">has changed</a>.'
+                self.profile_status["status_message"] = (
+                    "The method to sync Business Shared Folder "
+                    '<a href="https://github.com/abraunegg/onedrive/blob/onedrive-v2.5.0-alpha-1/docs/business-shared-folders.md">has changed</a>.'
+                )
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
                 self.update_credentials.emit(self.profile_name)
 
@@ -2750,6 +2751,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     break
 
         if new_list_item:
+            # Delete last item list if it has the same file name.
+            if self.profile_status_pages[profile].listWidget.item(0) != None:
+                last_item = self.profile_status_pages[profile].listWidget.item(0)
+                last_item_widget = self.profile_status_pages[profile].listWidget.itemWidget(last_item)
+                last_file_name = last_item_widget.get_file_name()
+                logging.info(f"The last list item's file name is : {last_file_name}")
+
+                if file_name == last_file_name:
+                    move_scrollbar = False
+                    logging.info("Deleting last list item")
+                    self.profile_status_pages[profile].listWidget.takeItem(0)
+
             logging.info(f"Adding new list item for file {file_name}")
             myQCustomQWidget = TaskList()
             myQCustomQWidget.set_file_name(file_name)
