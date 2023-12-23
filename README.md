@@ -1,4 +1,4 @@
-:exclamation:   This branch aims to provide compatibility with the upcoming OneDrive client [v2.5.0-alpha3](https://github.com/abraunegg/onedrive/discussions/2521). 
+:exclamation:   This branch aims to provide compatibility with the upcoming OneDrive client [v2.5.0-alpha](https://github.com/abraunegg/onedrive/discussions/2521). 
 
 - If you are using `sync_business_shared_folders` in your config file, you will need manually remove it. Check the [client documentation](https://github.com/abraunegg/onedrive/blob/onedrive-v2.5.0-alpha-3/docs/business-shared-folders.md) for more details.
 
