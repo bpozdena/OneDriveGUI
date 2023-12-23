@@ -2701,8 +2701,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         move_scrollbar = True
         new_list_item = True
 
-        for row in range(20):
-            # Check last 20 entries to see if the file is already in the list.
+        for row in range(50):
+            # Check last 50 entries to see if the file is already in the list.
             if self.profile_status_pages[profile].listWidget.item(row) != None:
                 item = self.profile_status_pages[profile].listWidget.item(row)
                 item_widget = self.profile_status_pages[profile].listWidget.itemWidget(item)
