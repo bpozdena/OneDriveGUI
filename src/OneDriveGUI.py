@@ -2104,6 +2104,9 @@ class WorkerThread(QThread):
             "account_type": "",
         }
 
+        self.profile_status["status_message"] = "OneDrive sync is starting..."
+        self.update_profile_status.emit(self.profile_status, self.profile_name)
+
         self.onedrive_process = subprocess.Popen(
             self._command + "--resync" if resync else self._command,
             stdout=subprocess.PIPE,
@@ -2263,13 +2266,20 @@ class WorkerThread(QThread):
                         # Example: "Downloading file ./200MB.zip ... done"
                         pass
 
-            elif "The method to sync Business" in stdout:
+            elif "Unknown key in config file: sync_business_shared_folders" in stdout:
                 self.profile_status["status_message"] = (
                     "The method to sync Business Shared Folder "
-                    '<a href="https://github.com/abraunegg/onedrive/blob/onedrive-v2.5.0-alpha-1/docs/business-shared-folders.md">has changed</a>.'
+                    '<a href="https://github.com/abraunegg/onedrive/blob/onedrive-v2.5.0-alpha-1/docs/business-shared-folders.md">changed</a>.'
                 )
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
-                self.update_credentials.emit(self.profile_name)
+
+            elif "Network Connection Issue" in stdout:
+                self.profile_status["status_message"] = "Cannot connect to Microsoft OneDrive Service."
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
+
+            elif "onedrive application is already running" in stdout:
+                self.profile_status["status_message"] = "OneDrive is already running outside OneDriveGUI !"
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             else:
                 # logging.debug(f"No rule matched: {stdout}")
@@ -2282,7 +2292,7 @@ class WorkerThread(QThread):
             logging.error(f"[{self.profile_name}] {str(stderr)}")
 
             if "not found" in stderr:
-                logging.info(
+                logging.error(
                     """Onedrive does not seem to be installed. Please install it as per instruction at 
                 https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md """
                 )
@@ -2298,6 +2308,10 @@ class WorkerThread(QThread):
 
             elif "Network Connection Issue" in stderr:
                 self.profile_status["status_message"] = "Cannot connect to Microsoft OneDrive Service."
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
+
+            elif "/dlang/" in stderr:
+                self.profile_status["status_message"] = "OneDrive client crashed. Please check logs."
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif "refresh_token" in stderr:
@@ -2636,11 +2650,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.workers[profile_name].update_credentials.connect(self.show_login)
 
         self.workers[profile_name].trigger_resync.connect(self.resync_auth_dialog)
-        self.workers[profile_name].update_progress_new.connect(self.event_update_progress_new)
+        self.workers[profile_name].update_progress_new.connect(self.event_update_progress)
         self.workers[profile_name].update_profile_status.connect(self.event_update_profile_status)
         self.workers[profile_name].started.connect(lambda: logging.info(f"started worker {profile_name}"))
         self.workers[profile_name].finished.connect(lambda: logging.info(f"finished worker {profile_name}"))
-        self.workers[profile_name].finished.connect(lambda: main_window.workers[profile_name].stop_worker())
+        try:
+            self.workers[profile_name].finished.connect(lambda: main_window.workers[profile_name].stop_worker())
+        except KeyError:
+            logging.debug(f"[GUI] The worker for profile {profile_name} is already stopped.")
 
     def resync_auth_dialog(self, profile_name):
         resync_question = QMessageBox.question(
@@ -2669,7 +2686,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.profile_status_pages[profile].label_free_space.setText(data["free_space"])
         self.profile_status_pages[profile].label_account_type.setText(data["account_type"])
 
-    def event_update_progress_new(self, data, profile):
+    def event_update_progress(self, data, profile):
         """
         data:
         transfer_progress = {
@@ -2952,6 +2969,7 @@ def get_installed_client_version() -> int:
         installed_client_version = re.search(r".\s(v[0-9.]+)", str(client_version_check)).group(1)
         installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
     except:
+        logging.error(f"[GUI] Onedrive client not found!")
         installed_client_version_num = 0
 
     logging.debug(f"[GUI] Installed client version is {installed_client_version_num}")
@@ -3018,20 +3036,6 @@ def create_global_config():
         # Load user values from config
 
         profiles[profile]["onedrive"].update(od_config["onedrive"])
-
-        # this option is not supported since OneDrive v2.4.20 - #42
-        # TODO: Remove after some time...
-        if client_version >= 2420 and "force_http_2" in profiles[profile]["onedrive"]:
-            logging.debug("[GUI] - replacing obsolete option 'force_http_2' with 'force_http_11'")
-            profiles[profile]["onedrive"].pop("force_http_2")
-            profiles[profile]["onedrive"]["force_http_11"] = '"false"'
-
-        # Support bad boys with outdated version of OneDrive Client
-        # TODO: Remove after some time...
-        if client_version < 2420 and "force_http_11" in profiles[profile]["onedrive"]:
-            logging.debug("[GUI] - replacing option 'force_http_11' with 'force_http_2'")
-            profiles[profile]["onedrive"].pop("force_http_11")
-            profiles[profile]["onedrive"]["force_http_2"] = '"false"'
 
     logging.debug(f"[GUI]{profiles}")
     return profiles
