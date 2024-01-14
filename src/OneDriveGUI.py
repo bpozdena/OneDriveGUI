@@ -2280,7 +2280,7 @@ class WorkerThread(QThread):
                 self.profile_status["status_message"] = "OneDrive is already running outside OneDriveGUI !"
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-            elif "not found" in stdout:
+            elif "command not found" in stdout:
                 logging.error(
                     """Onedrive does not seem to be installed. Please install it as per instruction at 
                 https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md """
