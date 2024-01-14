@@ -2140,7 +2140,7 @@ class WorkerThread(QThread):
                 self.profile_status["status_message"] = "Cannot connect to Microsoft OneDrive Service"
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-            if "Authorise this application by visiting" in stdout:
+            elif "Authorise this application by visiting" in stdout:
                 self.onedrive_process.kill()
                 self.profile_status["status_message"] = "OneDrive login is required"
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
@@ -2724,9 +2724,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         item_widget.set_label_1(f"Deleted from {parent_dir}")
                         item_widget.set_label_2(f"")
 
-                    elif transfer_complete:
+                    elif transfer_complete and file_operation == "Uploading":
                         shortened_path = shorten_path(relative_path_display, 32)
-                        item_widget.set_label_1(f"Available in <a href=file:///{absolute_path}>{shortened_path}</a>")
+                        item_widget.set_label_1(f"Uploaded from <a href=file:///{absolute_path}>{shortened_path}</a>")
+                        item_widget.set_label_2(f"{file_size_human}")
+
+                    elif transfer_complete and file_operation == "Downloading":
+                        shortened_path = shorten_path(relative_path_display, 32)
+                        item_widget.set_label_1(f"Downloaded from <a href=file:///{absolute_path}>{shortened_path}</a>")
                         item_widget.set_label_2(f"{file_size_human}")
 
                     elif file_operation == "Downloading":
