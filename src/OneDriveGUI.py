@@ -2231,12 +2231,12 @@ class WorkerThread(QThread):
                 # Capture download progress status
                 """
                 # Line Example for regex:
-                # Uploading: 200MB.zip ....................................................... 85.00% | ETA 00:00:09
+                # Uploading: dir1/another dir 2 - 123/dir3/50MBa.zip ... 80%  |  ETA    00:00:04
                 """
-                match = re.search(r"(\w[Downloading|Uploading]+)\:\s+(.+?)\s+[\.]*\s?(\d{1,3})", stdout)
+                match = re.search(r"(\w[Downloading|Uploading]+)\:\s+(.+?)[\.]*\s(\d{1,3})\%", stdout)
                 if match:
                     file_operation = match.group(1)
-                    file_name = match.group(2)
+                    file_path = match.group(2).strip()
                     progress = match.group(3)
 
                     if progress != "100":
@@ -2244,7 +2244,7 @@ class WorkerThread(QThread):
 
                         transfer_progress_new = {
                             "file_operation": file_operation,
-                            "file_path": file_name,
+                            "file_path": file_path,
                             "progress": progress,
                             "transfer_complete": transfer_complete,
                         }
