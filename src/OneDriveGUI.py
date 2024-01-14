@@ -2110,19 +2110,17 @@ class WorkerThread(QThread):
         self.onedrive_process = subprocess.Popen(
             self._command + "--resync" if resync else self._command,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             shell=True,
             universal_newlines=True,
+            encoding="utf-8",
+            errors="replace",
         )
 
         while self.onedrive_process.poll() is None:
             if self.onedrive_process.stdout:
-                # Capture stdout from OneDrive process.
+                # Capture stdout and stderr from OneDrive process.
                 self.read_stdout()
-
-            elif self.onedrive_process.stderr:
-                # Capture stderr from OneDrive process.
-                self.read_stderr()
 
         # This helps monitor stdout and stderr for extra second after onedrive process stops. I could not find a smarter way.
         timeout = time.time() + 1
@@ -2231,9 +2229,10 @@ class WorkerThread(QThread):
 
             elif "% " in stdout:
                 # Capture download progress status
-
+                """
                 # Line Example for regex:
                 # Uploading: 200MB.zip ....................................................... 85.00% | ETA 00:00:09
+                """
                 match = re.search(r"(\w[Downloading|Uploading]+)\:\s+(.+?)\s+[\.]*\s?(\d{1,3})", stdout)
                 if match:
                     file_operation = match.group(1)
@@ -2281,17 +2280,7 @@ class WorkerThread(QThread):
                 self.profile_status["status_message"] = "OneDrive is already running outside OneDriveGUI !"
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-            else:
-                # logging.debug(f"No rule matched: {stdout}")
-                pass
-
-    def read_stderr(self):
-        stderr = self.onedrive_process.stderr.readline().strip()
-
-        if stderr != "":
-            logging.error(f"[{self.profile_name}] {str(stderr)}")
-
-            if "not found" in stderr:
+            elif "not found" in stdout:
                 logging.error(
                     """Onedrive does not seem to be installed. Please install it as per instruction at 
                 https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md """
@@ -2302,22 +2291,18 @@ class WorkerThread(QThread):
                 ] = 'OneDrive Client not found! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md" style="color:#FFFFFF;">install</a> it.'
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-            elif "onedrive application is already running" in stderr:
-                self.profile_status["status_message"] = "OneDrive is already running outside OneDriveGUI !"
-                self.update_profile_status.emit(self.profile_status, self.profile_name)
-
-            elif "Network Connection Issue" in stderr:
-                self.profile_status["status_message"] = "Cannot connect to Microsoft OneDrive Service."
-                self.update_profile_status.emit(self.profile_status, self.profile_name)
-
-            elif "/dlang/" in stderr:
+            elif "/dlang/" in stdout:
                 self.profile_status["status_message"] = "OneDrive client crashed. Please check logs."
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-            elif "refresh_token" in stderr:
+            elif "refresh_token" in stdout:
                 self.profile_status["status_message"] = "Logon details expired. Please re-authenticate."
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
                 self.update_credentials.emit(self.profile_name)
+
+            else:
+                # logging.debug(f"No rule matched: {stdout}")
+                pass
 
 
 class AlignDelegate(QStyledItemDelegate):
