@@ -2054,6 +2054,7 @@ class WorkerThread(QThread):
     update_progress_new = Signal(dict, str)
     update_profile_status = Signal(dict, str)
     trigger_resync = Signal(str)
+    trigger_big_delete = Signal(str)
 
     def __init__(self, profile, options=""):
         super(WorkerThread, self).__init__()
@@ -2194,13 +2195,20 @@ class WorkerThread(QThread):
                 logging.warning(f"[{self.profile_name}] {str(stdout)}  - Asking for resync authorization.")
                 self.trigger_resync.emit(self.profile_name)
 
+            elif "To delete a large volume of data use" in stdout:
+                # Ask user for big delete authorization and stop the worker.
+                logging.warning(f"[{self.profile_name}] {str(stdout)}  - Asking for big delete authorization.")
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
+                self.profile_status["status_message"] = "Sync stopped due to big delete detected."
+                self.trigger_big_delete.emit(self.profile_name)
+
             elif any(_ in stdout for _ in self.tasks):
                 # Capture information about file that is being uploaded/downloaded/deleted by OneDrive.
                 file_operation = re.search(r"\b([Uploading|Downloading|Deleting]+)*", stdout).group(1)
 
                 if file_operation == "Deleting":
                     self.file_name = re.search(r".*/(.+)$", stdout)
-                    self.file_path = re.search(r"\b[item|OneDrive:]+\s(.+)$", stdout)
+                    self.file_path = re.search(r"\b[item|OneDrive:]\s(.+)$", stdout)
 
                 else:
                     self.file_name = re.search(r".*/(.+)\s+\.+", stdout)
@@ -2635,6 +2643,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.workers[profile_name].update_credentials.connect(self.show_login)
 
         self.workers[profile_name].trigger_resync.connect(self.resync_auth_dialog)
+        self.workers[profile_name].trigger_big_delete.connect(self.big_delete_auth_dialog)
         self.workers[profile_name].update_progress_new.connect(self.event_update_progress)
         self.workers[profile_name].update_profile_status.connect(self.event_update_profile_status)
         self.workers[profile_name].started.connect(lambda: logging.info(f"started worker {profile_name}"))
@@ -2665,6 +2674,29 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         elif resync_question == QMessageBox.No:
             logging.info("Authorize sync: No")
             main_window.profile_status_pages[profile_name].stop_monitor()
+
+    def big_delete_auth_dialog(self, profile_name):
+        big_delete_question = QMessageBox.question(
+            self,
+            f"Big Delete detected for profile {profile_name}",
+            "An attempt to remove a large volume of data from OneDrive has been detected. <br><br>"
+            "This has the potential to delete a large volume of data from your OneDrive which can lead to <b>data loss</b>. <br><br>"
+            "If in-doubt, backup your OneDrive data first before proceeding with big delete.<br><br><br>"
+            f"Would you like to proceed with big delete for profile <b>{profile_name}</b>?",
+            buttons=QMessageBox.Yes | QMessageBox.No,
+            defaultButton=QMessageBox.No,
+        )
+
+        if big_delete_question == QMessageBox.Yes:
+            logging.info("Authorize big delete: Yes")
+            main_window.profile_status_pages[profile_name].stop_monitor()
+            self.start_onedrive_monitor(profile_name, "--force")
+            self.profile_status_pages[profile_name].label_onedrive_status.setText("Big delete approved")
+
+        elif big_delete_question == QMessageBox.No:
+            logging.info("Authorize big delete: No")
+            main_window.profile_status_pages[profile_name].stop_monitor()
+            self.profile_status_pages[profile_name].label_onedrive_status.setText("Big delete denied")
 
     def event_update_profile_status(self, data, profile):
         self.profile_status_pages[profile].label_onedrive_status.setText(data["status_message"])
@@ -2762,9 +2794,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 myQCustomQWidget.set_label_1(f"Deleted from {parent_dir}")
                 myQCustomQWidget.set_label_2(f"")
 
-            elif transfer_complete:
+            elif transfer_complete and file_operation == "Uploading":
                 shortened_path = shorten_path(relative_path_display, 32)
-                myQCustomQWidget.set_label_1(f"Available in <a href=file:///{absolute_path}>{shortened_path}</a>")
+                myQCustomQWidget.set_label_1(f"Uploaded from <a href=file:///{absolute_path}>{shortened_path}</a>")
+                myQCustomQWidget.set_label_2(f"{file_size_human}")
+
+            elif transfer_complete and file_operation == "Downloading":
+                shortened_path = shorten_path(relative_path_display, 32)
+                myQCustomQWidget.set_label_1(f"Downloaded from <a href=file:///{absolute_path}>{shortened_path}</a>")
                 myQCustomQWidget.set_label_2(f"{file_size_human}")
 
             elif file_operation == "Downloading":
