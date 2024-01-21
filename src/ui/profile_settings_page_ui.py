@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'profile_settings_pageHpWMwv.ui'
+## Form generated from reading UI file 'profile_settings_page.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.6.0
 ##
