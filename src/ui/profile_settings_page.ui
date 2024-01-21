@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>820</width>
-    <height>692</height>
+    <width>899</width>
+    <height>786</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -325,6 +325,44 @@ locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seco
               </item>
               <item row="5" column="1">
                <widget class="QSpinBox" name="spinBox_data_timeout"/>
+              </item>
+              <item row="6" column="0">
+               <widget class="QLabel" name="label_ip_protocol_version">
+                <property name="toolTip">
+                 <string>
+    A value of 0 will mean the client will use IPv4 and IPv6. This is the default.
+    A value of 1 will mean the client will use IPv4 only.
+    A value of 2 will mean the client will use IPv6 only.
+</string>
+                </property>
+                <property name="text">
+                 <string>IP Protocol</string>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="0">
+               <widget class="QLabel" name="label_threads">
+                <property name="text">
+                 <string>Threads</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="1">
+               <widget class="QSpinBox" name="spinBox_ip_protocol_version">
+                <property name="maximum">
+                 <number>2</number>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="1">
+               <widget class="QSpinBox" name="spinBox_threads">
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>16</number>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>

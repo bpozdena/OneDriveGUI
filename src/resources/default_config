@@ -46,3 +46,6 @@ disable_download_validation = "false"
 connect_timeout = "30"
 data_timeout = "240"
 display_running_config = "false"
+ip_protocol_version = "1"
+threads = "8"
+

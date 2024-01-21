@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'profile_settings_pagefMheBy.ui'
+## Form generated from reading UI file 'profile_settings_pageHpWMwv.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.2
+## Created by: Qt User Interface Compiler version 6.6.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -25,7 +25,7 @@ class Ui_profile_settings(object):
     def setupUi(self, profile_settings):
         if not profile_settings.objectName():
             profile_settings.setObjectName(u"profile_settings")
-        profile_settings.resize(820, 692)
+        profile_settings.resize(899, 786)
         self.verticalLayout_2 = QVBoxLayout(profile_settings)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout_2.setContentsMargins(-1, 0, -1, 0)
@@ -217,6 +217,29 @@ class Ui_profile_settings(object):
         self.spinBox_data_timeout.setObjectName(u"spinBox_data_timeout")
 
         self.formLayout_4.setWidget(5, QFormLayout.FieldRole, self.spinBox_data_timeout)
+
+        self.label_ip_protocol_version = QLabel(self.groupBox_4)
+        self.label_ip_protocol_version.setObjectName(u"label_ip_protocol_version")
+
+        self.formLayout_4.setWidget(6, QFormLayout.LabelRole, self.label_ip_protocol_version)
+
+        self.label_threads = QLabel(self.groupBox_4)
+        self.label_threads.setObjectName(u"label_threads")
+
+        self.formLayout_4.setWidget(7, QFormLayout.LabelRole, self.label_threads)
+
+        self.spinBox_ip_protocol_version = QSpinBox(self.groupBox_4)
+        self.spinBox_ip_protocol_version.setObjectName(u"spinBox_ip_protocol_version")
+        self.spinBox_ip_protocol_version.setMaximum(2)
+
+        self.formLayout_4.setWidget(6, QFormLayout.FieldRole, self.spinBox_ip_protocol_version)
+
+        self.spinBox_threads = QSpinBox(self.groupBox_4)
+        self.spinBox_threads.setObjectName(u"spinBox_threads")
+        self.spinBox_threads.setMinimum(1)
+        self.spinBox_threads.setMaximum(16)
+
+        self.formLayout_4.setWidget(7, QFormLayout.FieldRole, self.spinBox_threads)
 
 
         self.horizontalLayout.addLayout(self.formLayout_4)
@@ -816,6 +839,15 @@ class Ui_profile_settings(object):
         self.label_operation_timeout.setText(QCoreApplication.translate("profile_settings", u"Operation timeout", None))
         self.label_connect_timeout.setText(QCoreApplication.translate("profile_settings", u"Connect timeout", None))
         self.label_data_timeout.setText(QCoreApplication.translate("profile_settings", u"Data timeout", None))
+#if QT_CONFIG(tooltip)
+        self.label_ip_protocol_version.setToolTip(QCoreApplication.translate("profile_settings", u"\n"
+"    A value of 0 will mean the client will use IPv4 and IPv6. This is the default.\n"
+"    A value of 1 will mean the client will use IPv4 only.\n"
+"    A value of 2 will mean the client will use IPv6 only.\n"
+"", None))
+#endif // QT_CONFIG(tooltip)
+        self.label_ip_protocol_version.setText(QCoreApplication.translate("profile_settings", u"IP Protocol", None))
+        self.label_threads.setText(QCoreApplication.translate("profile_settings", u"Threads", None))
 #if QT_CONFIG(tooltip)
         self.label_sync_file_permissions.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Utilise the <a href=\"https://chmod-calculator.com/\"><span style=\" text-decoration: underline; color:#5e81ac;\">Unix Permissions Calculator</span></a> to assist in determining the required permissions.</p><p><br/></p><p>Important: Special permission bits (setuid, setgid, sticky bit) are not supported. </p><p>Valid permission values are from <span style=\" font-weight:700;\">000</span> to <span style=\" font-weight:700;\">777</span> only.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
