@@ -2147,7 +2147,7 @@ class WorkerThread(QThread):
                 self.profile_status["status_message"] = "Cannot connect to Microsoft OneDrive Service"
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-            elif "Authorise this application by visiting" in stdout:
+            elif "Authorise this application by" in stdout or "--reauth and re-authorise this client" in stdout:
                 self.onedrive_process.kill()
                 self.profile_status["status_message"] = "OneDrive login is required"
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
@@ -2300,9 +2300,9 @@ class WorkerThread(QThread):
                 https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md """
                 )
 
-                self.profile_status[
-                    "status_message"
-                ] = 'OneDrive Client not found! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md" style="color:#FFFFFF;">install</a> it.'
+                self.profile_status["status_message"] = (
+                    'OneDrive Client not found! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md" style="color:#FFFFFF;">install</a> it.'
+                )
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif "/dlang/" in stdout:
