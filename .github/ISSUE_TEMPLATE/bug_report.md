@@ -29,7 +29,7 @@ If applicable, add relevant output from log file `/tmp/onedrive-gui/onedrive-gui
  - Python version: [e.g. 3.11]
  - Version of OneDrive client [e.g. v2.4.25]
 
-or output of bellow commands:
+or output of below commands:
 ```sh
 lsb_release -a
 echo $XDG_CURRENT_DESKTOP
