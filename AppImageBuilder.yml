@@ -40,6 +40,7 @@ AppDir:
       - libxcb-keysyms1
       - libxcb-render-util0
       - libxkbcommon-x11-0
+      - libxcb-cursor0
     exclude: []
 
   runtime:
