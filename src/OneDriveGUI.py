@@ -2217,7 +2217,7 @@ class WorkerThread(QThread):
 
                 else:
                     self.file_name = re.search(r".*/(.+)\s+\.+", stdout)
-                    self.file_path = re.search(r"\b[file]+\s(.+)\s+\.\.\.", stdout)
+                    self.file_path = re.search(r"\b[file:]+\s(.+)\s+\.\.\.", stdout)
 
                 transfer_complete = any(["done" in stdout, "Deleting" in stdout])
                 progress = "0"
