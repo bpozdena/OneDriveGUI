@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'profile_settings_pageHpWMwv.ui'
+## Form generated from reading UI file 'profile_settings_pagensfIdu.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.6.0
 ##
@@ -72,6 +72,11 @@ class Ui_profile_settings(object):
 
         self.gridLayout_9.addLayout(self.gridLayout_5, 1, 0, 1, 1)
 
+        self.checkBox_sync_business_shared_items = QCheckBox(self.groupBox_8)
+        self.checkBox_sync_business_shared_items.setObjectName(u"checkBox_sync_business_shared_items")
+
+        self.gridLayout_9.addWidget(self.checkBox_sync_business_shared_items, 2, 0, 1, 1)
+
 
         self.verticalLayout_5.addWidget(self.groupBox_8)
 
@@ -121,6 +126,15 @@ class Ui_profile_settings(object):
 
         self.gridLayout_11.addWidget(self.spinBox_rate_limit, 0, 1, 1, 1)
 
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.gridLayout_11.addItem(self.horizontalSpacer, 0, 3, 1, 1)
+
+        self.label_rate_limit_mbps = QLabel(self.groupBox_10)
+        self.label_rate_limit_mbps.setObjectName(u"label_rate_limit_mbps")
+
+        self.gridLayout_11.addWidget(self.label_rate_limit_mbps, 0, 2, 1, 1)
+
         self.label_rate_limit = QLabel(self.groupBox_10)
         self.label_rate_limit.setObjectName(u"label_rate_limit")
 
@@ -135,15 +149,6 @@ class Ui_profile_settings(object):
         self.horizontalSlider_rate_limit.setOrientation(Qt.Horizontal)
 
         self.gridLayout_11.addWidget(self.horizontalSlider_rate_limit, 1, 0, 1, 4)
-
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.gridLayout_11.addItem(self.horizontalSpacer, 0, 3, 1, 1)
-
-        self.label_rate_limit_mbps = QLabel(self.groupBox_10)
-        self.label_rate_limit_mbps.setObjectName(u"label_rate_limit_mbps")
-
-        self.gridLayout_11.addWidget(self.label_rate_limit_mbps, 0, 2, 1, 1)
 
 
         self.verticalLayout_8.addWidget(self.groupBox_10)
@@ -547,74 +552,6 @@ class Ui_profile_settings(object):
         self.verticalLayout_10.addWidget(self.groupBox_11)
 
         self.tabWidget.addTab(self.tab_3, "")
-        self.tab_4 = QWidget()
-        self.tab_4.setObjectName(u"tab_4")
-        self.verticalLayout = QVBoxLayout(self.tab_4)
-        self.verticalLayout.setObjectName(u"verticalLayout")
-        self.groupBox_sync_business_shared_folders = QGroupBox(self.tab_4)
-        self.groupBox_sync_business_shared_folders.setObjectName(u"groupBox_sync_business_shared_folders")
-        self.groupBox_sync_business_shared_folders.setCheckable(True)
-        self.groupBox_sync_business_shared_folders.setChecked(True)
-        self.gridLayout_12 = QGridLayout(self.groupBox_sync_business_shared_folders)
-        self.gridLayout_12.setObjectName(u"gridLayout_12")
-        self.label_business_available = QLabel(self.groupBox_sync_business_shared_folders)
-        self.label_business_available.setObjectName(u"label_business_available")
-
-        self.gridLayout_12.addWidget(self.label_business_available, 3, 0, 1, 1)
-
-        self.checkBox_sync_business_shared_folders = QCheckBox(self.groupBox_sync_business_shared_folders)
-        self.checkBox_sync_business_shared_folders.setObjectName(u"checkBox_sync_business_shared_folders")
-
-        self.gridLayout_12.addWidget(self.checkBox_sync_business_shared_folders, 0, 0, 1, 1)
-
-        self.listWidget_available_business_folders = QListWidget(self.groupBox_sync_business_shared_folders)
-        self.listWidget_available_business_folders.setObjectName(u"listWidget_available_business_folders")
-
-        self.gridLayout_12.addWidget(self.listWidget_available_business_folders, 6, 0, 1, 1)
-
-        self.label_business_selected = QLabel(self.groupBox_sync_business_shared_folders)
-        self.label_business_selected.setObjectName(u"label_business_selected")
-
-        self.gridLayout_12.addWidget(self.label_business_selected, 3, 2, 1, 1)
-
-        self.verticalLayout_14 = QVBoxLayout()
-        self.verticalLayout_14.setObjectName(u"verticalLayout_14")
-        self.verticalSpacer_5 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        self.verticalLayout_14.addItem(self.verticalSpacer_5)
-
-        self.pushButton_add_business_folder = QPushButton(self.groupBox_sync_business_shared_folders)
-        self.pushButton_add_business_folder.setObjectName(u"pushButton_add_business_folder")
-        self.pushButton_add_business_folder.setMaximumSize(QSize(50, 16777215))
-
-        self.verticalLayout_14.addWidget(self.pushButton_add_business_folder)
-
-        self.verticalSpacer_6 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        self.verticalLayout_14.addItem(self.verticalSpacer_6)
-
-
-        self.gridLayout_12.addLayout(self.verticalLayout_14, 6, 1, 1, 1)
-
-        self.listWidget_selected_business_folders = QListWidget(self.groupBox_sync_business_shared_folders)
-        self.listWidget_selected_business_folders.setObjectName(u"listWidget_selected_business_folders")
-
-        self.gridLayout_12.addWidget(self.listWidget_selected_business_folders, 6, 2, 1, 1)
-
-        self.pushButton_get_business_folders = QPushButton(self.groupBox_sync_business_shared_folders)
-        self.pushButton_get_business_folders.setObjectName(u"pushButton_get_business_folders")
-
-        self.gridLayout_12.addWidget(self.pushButton_get_business_folders, 4, 0, 1, 1)
-
-        self.pushButton_remove_business_folders = QPushButton(self.groupBox_sync_business_shared_folders)
-        self.pushButton_remove_business_folders.setObjectName(u"pushButton_remove_business_folders")
-
-        self.gridLayout_12.addWidget(self.pushButton_remove_business_folders, 4, 2, 1, 1)
-
-
-        self.verticalLayout.addWidget(self.groupBox_sync_business_shared_folders)
-
-        self.tabWidget.addTab(self.tab_4, "")
         self.tab_5 = QWidget()
         self.tab_5.setObjectName(u"tab_5")
         self.gridLayout = QGridLayout(self.tab_5)
@@ -777,7 +714,7 @@ class Ui_profile_settings(object):
 
         self.retranslateUi(profile_settings)
 
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(profile_settings)
@@ -795,6 +732,10 @@ class Ui_profile_settings(object):
         self.label_sync_dir.setToolTip(QCoreApplication.translate("profile_settings", u"Specify local sync directory location for this profile.", None))
 #endif // QT_CONFIG(tooltip)
         self.label_sync_dir.setText(QCoreApplication.translate("profile_settings", u"Sync Directory:", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_sync_business_shared_items.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Refer to <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/BusinessSharedFolders.md\"><span style=\" text-decoration: underline; color:#5e81ac;\">Business Shared Folders</span></a> for configuration assistance.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_sync_business_shared_items.setText(QCoreApplication.translate("profile_settings", u"Sync business shared items", None))
         self.groupBox_12.setTitle(QCoreApplication.translate("profile_settings", u"Account actions", None))
 #if QT_CONFIG(tooltip)
         self.checkBox_auto_sync.setToolTip(QCoreApplication.translate("profile_settings", u"Automatically start sync for this profile when OneDriveGUI starts.", None))
@@ -810,8 +751,8 @@ class Ui_profile_settings(object):
         self.groupBox_10.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>To minimise the Internet bandwidth for upload and download operations, you can configure the bandwidth limit option. </p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.groupBox_10.setTitle(QCoreApplication.translate("profile_settings", u"Account Bandwidth Limit", None))
-        self.label_rate_limit.setText(QCoreApplication.translate("profile_settings", u"Rate Limit [B/s]", None))
         self.label_rate_limit_mbps.setText(QCoreApplication.translate("profile_settings", u"(Mb/s)", None))
+        self.label_rate_limit.setText(QCoreApplication.translate("profile_settings", u"Rate Limit [B/s]", None))
         self.groupBox_4.setTitle(QCoreApplication.translate("profile_settings", u"Advanced Properties", None))
 #if QT_CONFIG(tooltip)
         self.label_monitor_interval.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>The monitor interval is defined as the wait time 'between' sync's when running in monitor mode. </p><p>When this interval expires, the client will check OneDrive for changes online, performing data </p><p>integrity checks and scanning the local <span style=\" font-weight:700;\">Sync Directory</span> for new content.</p><p><br/></p><p>By default without configuration, monitor interval is set to <span style=\" font-weight:700;\">300</span> seconds. Setting this value </p><p>to <span style=\" font-weight:700;\">600</span> will run the sync process every <span style=\" font-weight:700;\">10 minutes</span>.</p></body></html>", None))
@@ -962,17 +903,6 @@ class Ui_profile_settings(object):
         self.textEdit_sync_list.setToolTip("")
 #endif // QT_CONFIG(tooltip)
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), QCoreApplication.translate("profile_settings", u"Selective Sync", None))
-        self.groupBox_sync_business_shared_folders.setTitle(QCoreApplication.translate("profile_settings", u"Sync business shared folders", None))
-        self.label_business_available.setText(QCoreApplication.translate("profile_settings", u"Available Business Shared Folders:", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_sync_business_shared_folders.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Refer to <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/BusinessSharedFolders.md\"><span style=\" text-decoration: underline; color:#5e81ac;\">Business Shared Folders</span></a> for configuration assistance.</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_sync_business_shared_folders.setText(QCoreApplication.translate("profile_settings", u"Sync business shared folders", None))
-        self.label_business_selected.setText(QCoreApplication.translate("profile_settings", u"Selected Business Shared Folders:", None))
-        self.pushButton_add_business_folder.setText(QCoreApplication.translate("profile_settings", u">>", None))
-        self.pushButton_get_business_folders.setText(QCoreApplication.translate("profile_settings", u"Get Shared Folders", None))
-        self.pushButton_remove_business_folders.setText(QCoreApplication.translate("profile_settings", u"Remove", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), QCoreApplication.translate("profile_settings", u"Shared Folders", None))
 #if QT_CONFIG(tooltip)
         self.groupBox_9.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Refer to <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/USAGE.md#use-webhook-to-subscribe-to-remote-updates-in-monitor-mode\"><span style=\" text-decoration: underline; color:#5e81ac;\">webhook documentation</span></a> for more details. </p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
