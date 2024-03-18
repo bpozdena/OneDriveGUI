@@ -1234,97 +1234,12 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.pushButton_discard.clicked.connect(self.discard_changes)
         self.pushButton_save.clicked.connect(self.save_profile_settings)
         self.pushButton_save.clicked.connect(self.save_sync_list)
-        self.pushButton_save.clicked.connect(self.save_business_shared_folders)
 
         # Time which periodically checks for unsaved changes.
         self.timer_unsaved_changes = QTimer()
         self.timer_unsaved_changes.setSingleShot(False)
         self.timer_unsaved_changes.timeout.connect(self.check_for_unsaved_changes)
         self.timer_unsaved_changes.stop()
-
-    def get_business_shared_folders(self):
-        """
-        Starts OneDrive with --list-shared-folders argument and populates QListWidget list of SharePoint Sites emitted by MaintenanceWorker.
-        """
-        options = "--list-shared-folders"
-
-        self.listWidget_available_business_folders.clear()
-
-        self.pushButton_get_business_folders.setDisabled(True)
-        self.pushButton_get_business_folders.setText("Please wait...")
-
-        self.pushButton_add_business_folder.clicked.connect(self.add_business_shared_folder)
-
-        self.worker_business_shared_folders = MaintenanceWorker(self.profile, options)
-        self.worker_business_shared_folders.start()
-        self.worker_business_shared_folders.update_business_folder_list.connect(
-            self.populate_listWidget_available_business_folders
-        )
-
-    def read_business_shared_folders(self):
-        self.existing_shared_folders = []
-        self.business_shared_folders_file = (
-            re.search(r"(.+)/.+$", self.config_file).group(1) + "/business_shared_folders"
-        )
-
-        try:
-            with open(self.business_shared_folders_file, "r") as f:
-                self.raw_existing_shared_folders = f.read().splitlines(True)
-
-            for line in self.raw_existing_shared_folders:
-                if line.strip() == "":
-                    pass
-                elif line.strip()[0] == "#":
-                    pass
-                else:
-                    self.existing_shared_folders.append(line.strip())
-
-        except:
-            pass
-
-        # logging.info(f"[GUI] - Content of business_shared_folders_file: {self.existing_shared_folders}")
-        return self.existing_shared_folders
-
-    def save_business_shared_folders(self):
-        self.all_selected_business_folders = []
-        self.business_shared_folders_file = (
-            re.search(r"(.+)/.+$", self.config_file).group(1) + "/business_shared_folders"
-        )
-
-        for row in range(self.listWidget_selected_business_folders.count()):
-            self.all_selected_business_folders.append(self.listWidget_selected_business_folders.item(row).text())
-
-        with open(self.business_shared_folders_file, "w") as f:
-            for item in self.all_selected_business_folders:
-                f.writelines(item + "\n")
-
-    def add_business_shared_folder(self):
-        for available_selected_item in self.listWidget_available_business_folders.selectedItems():
-            if not self.listWidget_selected_business_folders.findItems(available_selected_item.text(), Qt.MatchExactly):
-                self.listWidget_selected_business_folders.addItem(available_selected_item.text())
-
-    def remove_business_shared_folder(self):
-        logging.info("[GUI] Removing list item")
-        for selected_item_index in self.listWidget_selected_business_folders.selectedItems():
-            self.listWidget_selected_business_folders.takeItem(
-                self.listWidget_selected_business_folders.row(selected_item_index)
-            )
-
-    def populate_listWidget_available_business_folders(self, business_folder_list):
-        """
-        Populates listWidget_available_business_folders with a list of emitted Business Shared Folders.
-        """
-        if len(business_folder_list) == 0:
-            self.listWidget_available_business_folders.setDisabled(True)
-            self.pushButton_get_business_folders.setDisabled(False)
-            self.pushButton_get_business_folders.setText("Retry getting Business Shared Folders")
-
-        else:
-            self.listWidget_available_business_folders.addItems(sorted(business_folder_list, key=str.casefold))
-            self.listWidget_available_business_folders.setDisabled(False)
-
-            self.pushButton_get_business_folders.setText("Update Business Shared Folders")
-            self.pushButton_get_business_folders.setDisabled(False)
 
     def check_for_unsaved_changes(self):
         """
@@ -1335,7 +1250,6 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
 
         config_changed = False
         sync_list_changed = False
-        business_shared_folders_changed = False
         pixmap_warning = QPixmap(DIR_PATH + "/resources/images/warning.png").scaled(20, 20, Qt.KeepAspectRatio)
         unsaved_profile = profile_settings_window.listWidget_profiles.findItems(self.profile, Qt.MatchExactly)[0]
 
@@ -1355,21 +1269,8 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
             # No changes to OneDrive sync_list file detected.
             sync_list_changed = False
 
-        # Unsaved changes to business_shared_folders file?
-        existing_business_shared_folders = self.read_business_shared_folders()
-        new_business_shared_folders = []
-        for row in range(self.listWidget_selected_business_folders.count()):
-            new_business_shared_folders.append(self.listWidget_selected_business_folders.item(row).text())
-
-        if existing_business_shared_folders != new_business_shared_folders:
-            # Unsaved changes to OneDrive business_shared_folders file detected.
-            business_shared_folders_changed = True
-        else:
-            # No changes to OneDrive business_shared_folders file detected.
-            business_shared_folders_changed = False
-
         # Show warning if any configuration change was detected.
-        if any([config_changed, sync_list_changed, business_shared_folders_changed]):
+        if any([config_changed, sync_list_changed]):
             unsaved_profile.setIcon(pixmap_warning)
             unsaved_profile.setToolTip("This profile has unsaved configuration changes.")
 
@@ -1390,6 +1291,15 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.lineEdit_sync_dir.textChanged.connect(self.set_sync_dir)
         self.checkBox_sync_root_files.stateChanged.connect(self.set_check_box_state)
         self.pushButton_sync_dir_browse.clicked.connect(self.get_sync_dir_name)
+        self.checkBox_sync_business_shared_items.stateChanged.connect(self.set_check_box_state)
+
+        # Disable Business Shared Folder tab when account type is not Business
+        if global_config[self.profile]["account_type"] == "Business":
+            self.checkBox_sync_business_shared_items.setEnabled(True)
+        elif global_config[self.profile]["onedrive"]["sync_business_shared_items"].strip('"') == "true":
+            self.checkBox_sync_business_shared_items.setEnabled(True)
+        else:
+            self.checkBox_sync_business_shared_items.setEnabled(False)
 
         # Skip_file section
         self.pushButton_add_skip_file.clicked.connect(self.add_skip_file)
@@ -1470,18 +1380,13 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.pushButton_logout.clicked.connect(self.logout)
         self.checkBox_auto_sync.stateChanged.connect(self.set_check_box_state_profile)
 
-        # Business Shared Folders
-        self.checkBox_sync_business_shared_folders.stateChanged.connect(self.set_check_box_state)
-        self.groupBox_sync_business_shared_folders.clicked.connect(self.set_check_box_state)
-        self.pushButton_get_business_folders.clicked.connect(self.get_business_shared_folders)
-        self.pushButton_remove_business_folders.clicked.connect(self.remove_business_shared_folder)
-
     def configure_profile_settings_page(self):
         """Sets all widgets values with values from profile config files"""
 
         # Monitored files tab
         self.lineEdit_sync_dir.setText(self.temp_profile_config["onedrive"]["sync_dir"].strip('"'))
         self.checkBox_sync_root_files.setChecked(self.get_check_box_state("sync_root_files"))
+        self.checkBox_sync_business_shared_items.setChecked(self.get_check_box_state("sync_business_shared_items"))
 
         # Excluded files tab
 
@@ -1593,30 +1498,6 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         # Sync List tab
         self.textEdit_sync_list.setText(self.read_sync_list())
 
-        # Business Shared Folders
-        self.existing_business_shared_folders = self.read_business_shared_folders()
-
-        self.checkBox_sync_business_shared_folders.setChecked(self.get_check_box_state("sync_business_shared_folders"))
-        self.checkBox_sync_business_shared_folders.hide()
-        self.groupBox_sync_business_shared_folders.setChecked(self.get_check_box_state("sync_business_shared_folders"))
-        self.listWidget_available_business_folders.setDisabled(True)
-        self.listWidget_available_business_folders.clear()
-        self.listWidget_available_business_folders.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        self.listWidget_selected_business_folders.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        self.listWidget_selected_business_folders.clear()
-        self.listWidget_selected_business_folders.addItems(self.existing_business_shared_folders)
-
-        # Disable Business Shared Folder tab when account type is not Business
-        # TODO: This should be a separate method. We only need to run this check on startup and when new account is created.
-        # TODO: Since we do not know the account type when the profile is created, the tab will be disabled by default.
-        # TODO: We also keep the tab enabled when imported profile has sync_business_shared_folders set to True.
-        if global_config[self.profile]["account_type"] == "Business":
-            self.tabWidget.setTabEnabled(4, True)
-        elif global_config[self.profile]["onedrive"]["sync_business_shared_folders"].strip('"') == "true":
-            self.tabWidget.setTabEnabled(4, True)
-        else:
-            self.tabWidget.setTabEnabled(4, False)
-
     def read_sync_list(self):
         self.sync_list_file = re.search(r"(.+)/.+$", self.config_file).group(1) + "/sync_list"
 
@@ -1678,9 +1559,6 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
                 self.spinBox_webhook_listening_port.setEnabled(False)
                 self.lineEdit_webhook_public_url.setEnabled(False)
                 self.lineEdit_webhook_listening_host.setEnabled(False)
-
-        # if self.sender().objectName() == "checkBox_sync_business_shared_folders":
-        #     if self.checkBox_sync_business_shared_folders.isChecked():
 
     def str2bool(self, value):
         return value.lower() in "true"
@@ -1940,7 +1818,7 @@ class MaintenanceWorker(QThread):
 
             self.update_library_list.emit(self.library_ids_dict)
 
-        elif "--list-shared-folders" in self.options:
+        elif "--list-shared-items" in self.options:
             self.business_folder_list = []
 
             while self.onedrive_maintainer.poll() is None:

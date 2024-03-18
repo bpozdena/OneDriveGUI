@@ -50,7 +50,7 @@
         <string/>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="monitored_tab_2">
         <attribute name="title">
@@ -86,6 +86,16 @@
                <widget class="QLineEdit" name="lineEdit_sync_dir"/>
               </item>
              </layout>
+            </item>
+            <item row="2" column="0">
+             <widget class="QCheckBox" name="checkBox_sync_business_shared_items">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://github.com/abraunegg/onedrive/blob/master/docs/BusinessSharedFolders.md&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#5e81ac;&quot;&gt;Business Shared Folders&lt;/span&gt;&lt;/a&gt; for configuration assistance.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Sync business shared items</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -173,6 +183,26 @@
               </property>
              </widget>
             </item>
+            <item row="0" column="3">
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="2">
+             <widget class="QLabel" name="label_rate_limit_mbps">
+              <property name="text">
+               <string>(Mb/s)</string>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="0">
              <widget class="QLabel" name="label_rate_limit">
               <property name="text">
@@ -196,26 +226,6 @@
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="3">
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="0" column="2">
-             <widget class="QLabel" name="label_rate_limit_mbps">
-              <property name="text">
-               <string>(Mb/s)</string>
               </property>
              </widget>
             </item>
@@ -837,115 +847,6 @@ Do not download changes from OneDrive.</string>
              <widget class="QTextEdit" name="textEdit_sync_list">
               <property name="toolTip">
                <string/>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_4">
-        <attribute name="title">
-         <string>Shared Folders</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <widget class="QGroupBox" name="groupBox_sync_business_shared_folders">
-           <property name="title">
-            <string>Sync business shared folders</string>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_12">
-            <item row="3" column="0">
-             <widget class="QLabel" name="label_business_available">
-              <property name="text">
-               <string>Available Business Shared Folders:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QCheckBox" name="checkBox_sync_business_shared_folders">
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://github.com/abraunegg/onedrive/blob/master/docs/BusinessSharedFolders.md&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#5e81ac;&quot;&gt;Business Shared Folders&lt;/span&gt;&lt;/a&gt; for configuration assistance.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="text">
-               <string>Sync business shared folders</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="0">
-             <widget class="QListWidget" name="listWidget_available_business_folders"/>
-            </item>
-            <item row="3" column="2">
-             <widget class="QLabel" name="label_business_selected">
-              <property name="text">
-               <string>Selected Business Shared Folders:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="1">
-             <layout class="QVBoxLayout" name="verticalLayout_14">
-              <item>
-               <spacer name="verticalSpacer_5">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>40</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButton_add_business_folder">
-                <property name="maximumSize">
-                 <size>
-                  <width>50</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>&gt;&gt;</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="verticalSpacer_6">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>40</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </item>
-            <item row="6" column="2">
-             <widget class="QListWidget" name="listWidget_selected_business_folders"/>
-            </item>
-            <item row="4" column="0">
-             <widget class="QPushButton" name="pushButton_get_business_folders">
-              <property name="text">
-               <string>Get Shared Folders</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="2">
-             <widget class="QPushButton" name="pushButton_remove_business_folders">
-              <property name="text">
-               <string>Remove</string>
               </property>
              </widget>
             </item>
