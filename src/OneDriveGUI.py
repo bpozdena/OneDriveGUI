@@ -56,15 +56,11 @@ from ui.ui_profile_settings_page import Ui_profile_settings
 from ui.ui_gui_settings_window import Ui_gui_settings_window
 
 # Import for login windows.
-# Don't use WebEngine login window when running from AppImage.
+from ui.ui_external_login import Ui_ExternalLoginWindow
+from ui.ui_login import Ui_LoginWindow
+
+
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
-APPIMAGE = True  # if "mount_one" in DIR_PATH.lower() else False
-if APPIMAGE:
-    from ui.ui_external_login import Ui_ExternalLoginWindow
-else:
-    from ui.ui_login import Ui_LoginWindow
-
-
 PROFILES_FILE = os.path.expanduser("~/.config/onedrive-gui/profiles")
 GUI_SETTINGS_FILE = os.path.expanduser("~/.config/onedrive-gui/gui_settings")
 
@@ -896,6 +892,9 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
 
         self.checkBox_combined_start_stop_button.setChecked(self.get_check_box_state("combined_start_stop_button"))
         self.checkBox_combined_start_stop_button.stateChanged.connect(self.set_check_box_state)
+
+        self.checkBox_QWebEngine_login.setChecked(self.get_check_box_state("QWebEngine_login"))
+        self.checkBox_QWebEngine_login.stateChanged.connect(self.set_check_box_state)
 
         self.checkBox_show_debug.setChecked(self.get_check_box_state("show_debug"))
         self.checkBox_show_debug.stateChanged.connect(self.set_check_box_state)
@@ -2639,7 +2638,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             logging.info(f"Worker for profile {profile_name} is already running. Please stop it first.")
             logging.info(f"Running workers: {main_window.workers}")
 
-        if APPIMAGE:
+        if "True" not in gui_settings["SETTINGS"]["QWebEngine_login"]:
             # Assume GUI runs as AppImage. Force login in external browser as a workaround for #37 .
             logging.info(f"[GUI] Opening external login window")
             self.workers[profile_name].update_credentials.connect(self.show_external_login)
@@ -2936,7 +2935,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if response_dialog == QMessageBox.Ok:
             logging.info("[GUI] Login response message acknowledged.")
 
-            if APPIMAGE and response_reason == "success":
+            if "True " not in gui_settings["SETTINGS"]["QWebEngine_login"] and response_reason == "success":
                 self.window2.hide()
             elif response_reason == "success":
                 self.window1.hide()
@@ -3185,6 +3184,7 @@ def read_gui_settings():
             "log_file": "/tmp/onedrive-gui/onedrive-gui.log",
             "debug_level": "DEBUG",
             "client_bin_path": "onedrive",
+            "QWebEngine_login": "False",
         }
     }
 

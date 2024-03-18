@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'gui_settings_window.ui'
+## Form generated from reading UI file 'gui_settings_windowPzMlSm.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.2
+## Created by: Qt User Interface Compiler version 6.6.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -24,7 +24,7 @@ class Ui_gui_settings_window(object):
     def setupUi(self, gui_settings_window):
         if not gui_settings_window.objectName():
             gui_settings_window.setObjectName(u"gui_settings_window")
-        gui_settings_window.resize(640, 535)
+        gui_settings_window.resize(640, 610)
         self.verticalLayout_2 = QVBoxLayout(gui_settings_window)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout = QVBoxLayout()
@@ -84,6 +84,11 @@ class Ui_gui_settings_window(object):
         self.checkBox_combined_start_stop_button.setObjectName(u"checkBox_combined_start_stop_button")
 
         self.gridLayout.addWidget(self.checkBox_combined_start_stop_button, 1, 0, 1, 1)
+
+        self.checkBox_QWebEngine_login = QCheckBox(self.groupBox_3)
+        self.checkBox_QWebEngine_login.setObjectName(u"checkBox_QWebEngine_login")
+
+        self.gridLayout.addWidget(self.checkBox_QWebEngine_login, 2, 0, 1, 1)
 
 
         self.verticalLayout_2.addWidget(self.groupBox_3)
@@ -213,6 +218,7 @@ class Ui_gui_settings_window(object):
         self.groupBox_3.setTitle(QCoreApplication.translate("gui_settings_window", u"Appearance (experimental)", None))
         self.checkBox_frameless_window.setText(QCoreApplication.translate("gui_settings_window", u"Frameless Window for X11", None))
         self.checkBox_combined_start_stop_button.setText(QCoreApplication.translate("gui_settings_window", u"Combined Start/Stop button", None))
+        self.checkBox_QWebEngine_login.setText(QCoreApplication.translate("gui_settings_window", u"Use QWebEngine for login", None))
         self.groupBox_2.setTitle(QCoreApplication.translate("gui_settings_window", u"Logging", None))
         self.label_debug_level.setText(QCoreApplication.translate("gui_settings_window", u"Debug level:               ", None))
         self.comboBox_debug_level.setItemText(0, QCoreApplication.translate("gui_settings_window", u"DEBUG", None))

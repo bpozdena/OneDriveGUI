@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>640</width>
-    <height>535</height>
+    <height>610</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -81,6 +81,13 @@
        <widget class="QCheckBox" name="checkBox_combined_start_stop_button">
         <property name="text">
          <string>Combined Start/Stop button</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="checkBox_QWebEngine_login">
+        <property name="text">
+         <string>Use QWebEngine for login</string>
         </property>
        </widget>
       </item>
