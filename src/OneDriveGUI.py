@@ -1482,7 +1482,6 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.lineEdit_log_dir.setEnabled(self.checkBox_enable_logging.isChecked())
         self.pushButton_log_dir_browse.setEnabled(self.checkBox_enable_logging.isChecked())
         self.checkBox_debug_https.setChecked(self.get_check_box_state("debug_https"))
-        self.checkBox_debug_https.setEnabled(self.checkBox_enable_logging.isChecked())
         self.spinBox_monitor_log_frequency.setValue(
             int(self.temp_profile_config["onedrive"]["monitor_log_frequency"].strip('"'))
         )
@@ -1538,12 +1537,10 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
             if self.checkBox_enable_logging.isChecked():
                 self.lineEdit_log_dir.setEnabled(True)
                 self.spinBox_monitor_log_frequency.setEnabled(True)
-                self.checkBox_debug_https.setEnabled(True)
                 self.pushButton_log_dir_browse.setEnabled(True)
             else:
                 self.lineEdit_log_dir.setEnabled(False)
                 self.spinBox_monitor_log_frequency.setEnabled(False)
-                self.checkBox_debug_https.setEnabled(False)
                 self.pushButton_log_dir_browse.setEnabled(False)
 
         if self.sender().objectName() == "checkBox_webhook_enabled":
