@@ -2432,14 +2432,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 version_tooltip_text = f"OneDrive Client version not supported! Please upgrade it. \n Installed: {installed_client_version} \n Latest: {latest_client_version}"
                 min_requirements_met = False
 
-        except FileNotFoundError as e:
-            logging.error(f"OneDrive Client not found: {e}")
+        except Exception as e:
+            logging.error(f"Client version check failed: {e}")
             version_label_text = 'OneDrive Client not found! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md" style="color:#FFFFFF;">install</a> it.'
             version_tooltip_text = f"OneDrive Client not found! Please install it."
             min_requirements_met = False
-
-        except Exception as e:
-            logging.error(f"Client version check failed: {e}")
 
         finally:
             for profile_name in global_config:
