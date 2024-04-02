@@ -2153,10 +2153,10 @@ class WorkerThread(QThread):
                         # Example: "Downloading file ./200MB.zip ... done"
                         pass
 
-            elif "Unknown key in config file: sync_business_shared_folders" in stdout:
+            elif "sync_business_shared_folders" in stdout:
                 self.profile_status["status_message"] = (
-                    "The method to sync Business Shared Folder "
-                    '<a href="https://github.com/abraunegg/onedrive/blob/onedrive-v2.5.0-alpha-1/docs/business-shared-folders.md">changed</a>.'
+                    "Business Shared Folder "
+                    '<a href="https://github.com/abraunegg/onedrive/blob/master/docs/business-shared-items.md"> has been deprecated</a>.'
                 )
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
