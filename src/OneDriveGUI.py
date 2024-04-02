@@ -57,7 +57,11 @@ from ui.ui_gui_settings_window import Ui_gui_settings_window
 
 # Import for login windows.
 from ui.ui_external_login import Ui_ExternalLoginWindow
-from ui.ui_login import Ui_LoginWindow
+
+try:
+    from ui.ui_login import Ui_LoginWindow
+except ImportError:
+    logging.warning("Failed to import ui_login. This is expected if you are running AppImage version.")
 
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
