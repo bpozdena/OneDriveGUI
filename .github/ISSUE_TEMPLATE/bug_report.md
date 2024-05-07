@@ -35,6 +35,7 @@ lsb_release -a
 echo $XDG_CURRENT_DESKTOP
 loginctl show-session $(awk '/tty/ {print $1}' <(loginctl)) -p Type | awk -F= '{print $2}'
 python --version
+which onedrive
 onedrive --version
 ```
 
