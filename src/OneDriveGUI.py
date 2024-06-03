@@ -2402,46 +2402,67 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         s = requests.Session()
         version_label_text = ""
         version_tooltip_text = ""
+        min_requirements_met = True
+        min_supported_version = 2500
+
+        def get_latest_client_version():
+            latest_url = "https://api.github.com/repos/abraunegg/onedrive/releases/latest"
+            try:
+                latest_client_version = s.get(latest_url, timeout=1).json()["tag_name"]
+                return latest_client_version
+
+            except Exception as e:
+                logging.error(e)
+                return None
+
+        def get_installed_client_version():
+            try:
+                client_version_check = subprocess.check_output([client_bin_path, "--version"], stderr=subprocess.STDOUT)
+                installed_client_version = re.search(r"(v[0-9.]+)", str(client_version_check)).group(1)
+
+                installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
+                installed_client_version_num = (
+                    installed_client_version_num
+                    if len(str(installed_client_version_num)) > 3
+                    else installed_client_version_num * 10
+                )
+
+                return installed_client_version, installed_client_version_num
+
+            except Exception as e:
+                logging.error(e)
+                return None
 
         try:
-            latest_url = "https://api.github.com/repos/abraunegg/onedrive/releases/latest"
-            latest_client_version = s.get(latest_url, timeout=1).json()["tag_name"]
-            client_version_check = subprocess.check_output([client_bin_path, "--version"], stderr=subprocess.STDOUT)
-            installed_client_version = re.search(r"(v[0-9.]+)", str(client_version_check)).group(1)
-            installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
-            installed_client_version_num = (
-                installed_client_version_num
-                if len(str(installed_client_version_num)) > 3
-                else installed_client_version_num * 10
+            latest_client_version = get_latest_client_version()
+            installed_client_version = get_installed_client_version()
+
+            logging.debug(
+                f"[GUI] Client version check: Installed: {installed_client_version[0]} | Latest: {latest_client_version}"
             )
-            min_supported_version_num = 2500
-            min_requirements_met = True
 
-            result = {
-                "latest_client_version": latest_client_version,
-                "installed_client_version": installed_client_version,
-            }
-            logging.debug(f"[GUI] Client version check: {result}")
-
-            if latest_client_version not in installed_client_version:
-                version_label_text = "OneDrive client is out of date!"
-                version_tooltip_text = f"OneDrive client is out of date! \n Installed: {installed_client_version} \n Latest: {latest_client_version}"
-
-            if installed_client_version_num < min_supported_version_num:
-                version_label_text = 'Unsupported OneDrive client! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md" style="color:#FFFFFF;">upgrade</a> it.'
-                version_tooltip_text = f"OneDrive Client version not supported! Please upgrade it. \n Installed: {installed_client_version} \n Latest: {latest_client_version}"
+            if not installed_client_version:
+                version_label_text = "OneDrive client not found!"
+                version_tooltip_text = "OneDrive client not found!"
                 min_requirements_met = False
 
-        except Exception as e:
-            logging.error(f"Client version check failed: {e}")
-            version_label_text = 'OneDrive Client not found! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md" style="color:#FFFFFF;">install</a> it.'
-            version_tooltip_text = f"OneDrive Client not found! Please install it."
-            min_requirements_met = False
+            elif not latest_client_version:
+                version_label_text = "Unable to check for latest OneDrive client version!"
+                version_tooltip_text = "Unable to check for latest OneDrive client version!"
 
-        finally:
+            elif installed_client_version[1] < min_supported_version:
+                version_label_text = 'Unsupported OneDrive client! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md" style="color:#FFFFFF;">upgrade</a> it.'
+                version_tooltip_text = f"Your OneDrive Client version not supported! Please upgrade it. \n Installed: {installed_client_version[0]} \n Latest: {latest_client_version}"
+                min_requirements_met = False
+
+            elif latest_client_version not in installed_client_version[1]:
+                version_label_text = "OneDrive client is out of date!"
+                version_tooltip_text = f"OneDrive client is out of date! \n Installed: {installed_client_version[0]} \n Latest: {latest_client_version}"
+
             for profile_name in global_config:
                 self.profile_status_pages[profile_name].label_onedrive_status.setOpenExternalLinks(True)
-                if version_label_text != "":
+
+                if version_label_text:
                     self.profile_status_pages[profile_name].label_onedrive_status.setText(version_label_text)
 
                 if not min_requirements_met:
@@ -2456,6 +2477,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     # Display warning in GUI when installed OneDrive client is not up to date.
                     self.profile_status_pages[profile_name].label_version_check.setToolTip(version_tooltip_text)
                     self.profile_status_pages[profile_name].label_version_check.setPixmap(pixmap_warning)
+
+        except Exception as e:
+            logging.error(f"Client version check failed: {e}")
 
     def onedrive_process_status(self):
         # Check OneDrive status and start/stop sync button.
