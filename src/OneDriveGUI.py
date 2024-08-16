@@ -2035,6 +2035,10 @@ class WorkerThread(QThread):
                 self.profile_status["status_message"] = "OneDrive sync is complete"
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
+            elif "Sync with Microsoft OneDrive has completed, however there are items that failed to sync" in stdout:
+                self.profile_status["status_message"] = "Sync completed with errors. Check the log file."
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
+
             elif "Remaining Free Space" in stdout:
                 try:
                     self.free_space_bytes = re.search(r"([0-9]+)\sbytes", stdout).group(1)
