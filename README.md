@@ -8,9 +8,9 @@
 > [!NOTE]
 > If your OneDrive client v2.5 is not installed system wide, you can manually define the path to the OneDrive binary in the GUI settings.  
 
-    Example:
-    
-    ![image](https://github.com/bpozdena/OneDriveGUI/assets/24818591/9595886f-850a-4f6a-a1b4-e0bd872eb5cc)
+Example:
+
+![image](https://github.com/bpozdena/OneDriveGUI/assets/24818591/9595886f-850a-4f6a-a1b4-e0bd872eb5cc)
 
 
 
