@@ -2459,7 +2459,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 version_tooltip_text = f"Your OneDrive Client version not supported! Please upgrade it. \n Installed: {installed_client_version[0]} \n Latest: {latest_client_version}"
                 min_requirements_met = False
 
-            elif latest_client_version not in installed_client_version[1]:
+            elif latest_client_version not in installed_client_version[0]:
                 version_label_text = "OneDrive client is out of date!"
                 version_tooltip_text = f"OneDrive client is out of date! \n Installed: {installed_client_version[0]} \n Latest: {latest_client_version}"
 
