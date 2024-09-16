@@ -19,6 +19,7 @@ Example:
 # OneDriveGUI
 ![GitHub all releases](https://img.shields.io/github/downloads/bpozdena/OneDriveGUI/total)
 
+## About
 A simple GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive) with multi-account support.
 ![image](https://github.com/user-attachments/assets/00769399-1a65-4648-8705-7dee81ee4f52)
 
@@ -34,9 +35,9 @@ A simple GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive) 
 - System tray (if supported by your desktop environment)
 - Start minimized to tray/dock 
 - Input validation to prevent configuration of incompatible OneDrive client options
-- Import and management of Business Shared Folders
+- Progress monitoring of multiple simultaneous file transfers. 
 - Import and management of SharePoint Shared Libraries
-- ToolTips with brief explanation of various OneDrive Client configuration options.
+- Tooltips with brief explanation of various OneDrive Client configuration options.
 - Prompt for re-sync authorization to prevent unexpected data loss. 
 
 
