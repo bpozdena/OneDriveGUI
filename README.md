@@ -1,10 +1,12 @@
-:exclamation:   This branch aims to provide compatibility with the upcoming OneDrive client [v2.5.0-rc3](https://github.com/abraunegg/onedrive/discussions/2770). 
+> [!WARNING]
+> OneDriveGUI v1.1.0 is only compatible with [OneDrive client v2.5.0](https://github.com/abraunegg/onedrive) . 
+> There is no backward compatibility with older OneDrive client versions. Please use [OneDriveGUI v1.0.3](https://github.com/bpozdena/OneDriveGUI/releases/tag/v1.0.3) for OneDrive client v2.4.x . 
 
-- If you are using `sync_business_shared_folders` in your config file, you will need manually remove it. Check the [client documentation](https://github.com/abraunegg/onedrive/blob/onedrive-v2.5.0-release-candidate-1/docs/business-shared-items.md) for more details.
+> [!IMPORTANT]
+> If you are using `sync_business_shared_folders` in of OneDrive v2.4.0, you will need to manually remove it from the config file. Check the [client documentation](https://github.com/abraunegg/onedrive/blob/onedrive-v2.5.0-release-candidate-1/docs/business-shared-items.md) for more details. 
 
-- There is no backwards compatibility with OneDrive client 2.4.x or older. 
-- This GUI branch is only compatible with the Onedrive client v2.5.0. The path of OneDrive client binary  must be manually specified in the GUI settings.
-
+> [!NOTE]
+> If your OneDrive client v2.5 is not installed system wide, you can manually define the path to the OneDrive binary in the GUI settings.  
 
     Example:
     
