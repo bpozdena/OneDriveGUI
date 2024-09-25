@@ -146,7 +146,7 @@ class wizardPage_version_check(QWizardPage):
         self.label_5.setOpenExternalLinks(True)
         self.label_5.setText(
             "OneDrive Client for Linux does not seem to be installed. Please install it by following "
-            "<a href='https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md'>instructions</a> for your distro. "
+            "<a href='https://github.com/abraunegg/onedrive/blob/master/docs/install.md'>instructions</a> for your distro. "
         )
 
         layout = QVBoxLayout()
@@ -172,7 +172,7 @@ class wizardPage_version_check(QWizardPage):
                 logging.info(f"Unsupported OneDrive {installed_client_version} detected.")
                 self.label_4.setOpenExternalLinks(True)
                 self.label_4.setText(
-                    f'OneDrive {installed_client_version} is not supported. Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md">upgrade</a> it.'
+                    f'OneDrive {installed_client_version} is not supported. Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/install.md">upgrade</a> it.'
                 )
                 self.label_4.setStyleSheet("color: red;")
                 self.label_5.hide()
@@ -2179,11 +2179,11 @@ class WorkerThread(QThread):
             elif "command not found" in stdout:
                 logging.error(
                     """Onedrive does not seem to be installed. Please install it as per instruction at 
-                https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md """
+                https://github.com/abraunegg/onedrive/blob/master/docs/install.md """
                 )
 
                 self.profile_status["status_message"] = (
-                    'OneDrive Client not found! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md" style="color:#FFFFFF;">install</a> it.'
+                    'OneDrive Client not found! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/install.md" style="color:#FFFFFF;">install</a> it.'
                 )
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
@@ -2455,7 +2455,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 version_tooltip_text = "Unable to check for latest OneDrive client version!"
 
             elif installed_client_version[1] < min_supported_version:
-                version_label_text = 'Unsupported OneDrive client! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md" style="color:#FFFFFF;">upgrade</a> it.'
+                version_label_text = 'Unsupported OneDrive client! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/install.md" style="color:#FFFFFF;">upgrade</a> it.'
                 version_tooltip_text = f"Your OneDrive Client version not supported! Please upgrade it. \n Installed: {installed_client_version[0]} \n Latest: {latest_client_version}"
                 min_requirements_met = False
 
