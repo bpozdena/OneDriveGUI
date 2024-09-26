@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>420</width>
+    <width>428</width>
     <height>800</height>
    </rect>
   </property>
@@ -14,12 +14,6 @@
    <size>
     <width>420</width>
     <height>0</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>420</width>
-    <height>16777215</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -60,7 +54,7 @@
          </font>
         </property>
         <property name="contextMenuPolicy">
-         <enum>Qt::DefaultContextMenu</enum>
+         <enum>Qt::ContextMenuPolicy::DefaultContextMenu</enum>
         </property>
         <property name="styleSheet">
          <string notr="true"/>
@@ -84,7 +78,7 @@
            </size>
           </property>
           <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
+           <enum>Qt::LayoutDirection::LeftToRight</enum>
           </property>
           <property name="styleSheet">
            <string notr="true">alignment=Qt.AlignCenter
@@ -109,7 +103,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>420</width>
+     <width>428</width>
      <height>22</height>
     </rect>
    </property>
