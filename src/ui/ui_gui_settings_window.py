@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'gui_settings_windowPzMlSm.ui'
+## Form generated from reading UI file 'gui_settings_windowfuZzTA.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.6.0
+## Created by: Qt User Interface Compiler version 6.7.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -17,19 +17,25 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFormLayout,
     QGridLayout, QGroupBox, QHBoxLayout, QLabel,
-    QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
-    QSpinBox, QVBoxLayout, QWidget)
+    QLineEdit, QPushButton, QScrollArea, QSizePolicy,
+    QSpacerItem, QSpinBox, QVBoxLayout, QWidget)
 
 class Ui_gui_settings_window(object):
     def setupUi(self, gui_settings_window):
         if not gui_settings_window.objectName():
             gui_settings_window.setObjectName(u"gui_settings_window")
-        gui_settings_window.resize(640, 610)
+        gui_settings_window.resize(640, 750)
         self.verticalLayout_2 = QVBoxLayout(gui_settings_window)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-        self.verticalLayout = QVBoxLayout()
-        self.verticalLayout.setObjectName(u"verticalLayout")
-        self.groupBox = QGroupBox(gui_settings_window)
+        self.scrollArea = QScrollArea(gui_settings_window)
+        self.scrollArea.setObjectName(u"scrollArea")
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollAreaWidgetContents = QWidget()
+        self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 620, 691))
+        self.verticalLayout_5 = QVBoxLayout(self.scrollAreaWidgetContents)
+        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.groupBox = QGroupBox(self.scrollAreaWidgetContents)
         self.groupBox.setObjectName(u"groupBox")
         self.verticalLayout_3 = QVBoxLayout(self.groupBox)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
@@ -44,12 +50,9 @@ class Ui_gui_settings_window(object):
         self.verticalLayout_3.addLayout(self.formLayout)
 
 
-        self.verticalLayout.addWidget(self.groupBox)
+        self.verticalLayout_5.addWidget(self.groupBox)
 
-
-        self.verticalLayout_2.addLayout(self.verticalLayout)
-
-        self.groupBox_4 = QGroupBox(gui_settings_window)
+        self.groupBox_4 = QGroupBox(self.scrollAreaWidgetContents)
         self.groupBox_4.setObjectName(u"groupBox_4")
         self.horizontalLayout_6 = QHBoxLayout(self.groupBox_4)
         self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
@@ -69,9 +72,9 @@ class Ui_gui_settings_window(object):
         self.horizontalLayout_6.addWidget(self.pushButton_client_bin_path)
 
 
-        self.verticalLayout_2.addWidget(self.groupBox_4)
+        self.verticalLayout_5.addWidget(self.groupBox_4)
 
-        self.groupBox_3 = QGroupBox(gui_settings_window)
+        self.groupBox_3 = QGroupBox(self.scrollAreaWidgetContents)
         self.groupBox_3.setObjectName(u"groupBox_3")
         self.gridLayout = QGridLayout(self.groupBox_3)
         self.gridLayout.setObjectName(u"gridLayout")
@@ -91,9 +94,9 @@ class Ui_gui_settings_window(object):
         self.gridLayout.addWidget(self.checkBox_QWebEngine_login, 2, 0, 1, 1)
 
 
-        self.verticalLayout_2.addWidget(self.groupBox_3)
+        self.verticalLayout_5.addWidget(self.groupBox_3)
 
-        self.groupBox_2 = QGroupBox(gui_settings_window)
+        self.groupBox_2 = QGroupBox(self.scrollAreaWidgetContents)
         self.groupBox_2.setObjectName(u"groupBox_2")
         self.verticalLayout_4 = QVBoxLayout(self.groupBox_2)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
@@ -114,7 +117,7 @@ class Ui_gui_settings_window(object):
 
         self.horizontalLayout_3.addWidget(self.comboBox_debug_level)
 
-        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer_3)
 
@@ -168,7 +171,7 @@ class Ui_gui_settings_window(object):
 
         self.horizontalLayout.addWidget(self.spinBox_log_rotation_interval)
 
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
 
@@ -187,7 +190,7 @@ class Ui_gui_settings_window(object):
 
         self.horizontalLayout_2.addWidget(self.spinBox_log_backup_count)
 
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
 
@@ -195,7 +198,20 @@ class Ui_gui_settings_window(object):
         self.verticalLayout_4.addLayout(self.horizontalLayout_2)
 
 
-        self.verticalLayout_2.addWidget(self.groupBox_2)
+        self.verticalLayout_5.addWidget(self.groupBox_2)
+
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_5.addItem(self.verticalSpacer)
+
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+
+        self.verticalLayout_2.addWidget(self.scrollArea)
+
+        self.verticalLayout = QVBoxLayout()
+        self.verticalLayout.setObjectName(u"verticalLayout")
+
+        self.verticalLayout_2.addLayout(self.verticalLayout)
 
         self.pushButton_save = QPushButton(gui_settings_window)
         self.pushButton_save.setObjectName(u"pushButton_save")
