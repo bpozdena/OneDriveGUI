@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'mainwindow.ui'
+## Form generated from reading UI file 'mainwindowqGOXqC.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.3
+## Created by: Qt User Interface Compiler version 6.7.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -24,11 +24,10 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(420, 800)
+        MainWindow.resize(428, 800)
         MainWindow.setMinimumSize(QSize(420, 0))
-        MainWindow.setMaximumSize(QSize(420, 16777215))
         icon = QIcon()
-        icon.addFile(u"../../../OneDriveGUI_POC_recovered-multi/icons8-clouds-48.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(u"../../../OneDriveGUI_POC_recovered-multi/icons8-clouds-48.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         MainWindow.setWindowIcon(icon)
         self.actionfghgfh = QAction(MainWindow)
         self.actionfghgfh.setObjectName(u"actionfghgfh")
@@ -72,7 +71,7 @@ class Ui_MainWindow(object):
         font.setPointSize(10)
         font.setBold(True)
         self.comboBox.setFont(font)
-        self.comboBox.setContextMenuPolicy(Qt.DefaultContextMenu)
+        self.comboBox.setContextMenuPolicy(Qt.ContextMenuPolicy.DefaultContextMenu)
         self.comboBox.setStyleSheet(u"")
         self.comboBox.setDuplicatesEnabled(False)
         self.comboBox.setFrame(False)
@@ -84,7 +83,7 @@ class Ui_MainWindow(object):
         self.pushButton_new_profile = QPushButton(self.centralwidget)
         self.pushButton_new_profile.setObjectName(u"pushButton_new_profile")
         self.pushButton_new_profile.setMaximumSize(QSize(9999, 9999))
-        self.pushButton_new_profile.setLayoutDirection(Qt.LeftToRight)
+        self.pushButton_new_profile.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.pushButton_new_profile.setStyleSheet(u"alignment=Qt.AlignCenter\n"
 "")
         self.pushButton_new_profile.setFlat(True)
@@ -100,7 +99,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 420, 22))
+        self.menubar.setGeometry(QRect(0, 0, 428, 22))
         self.menuAdvanced = QMenu(self.menubar)
         self.menuAdvanced.setObjectName(u"menuAdvanced")
         MainWindow.setMenuBar(self.menubar)
