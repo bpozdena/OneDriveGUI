@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'profile_settings_pagensfIdu.ui'
+## Form generated from reading UI file 'profile_settings_pageYvRguo.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.6.0
+## Created by: Qt User Interface Compiler version 6.7.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -17,15 +17,15 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QFormLayout, QGridLayout,
     QGroupBox, QHBoxLayout, QLabel, QLineEdit,
-    QListWidget, QListWidgetItem, QPushButton, QSizePolicy,
-    QSlider, QSpacerItem, QSpinBox, QTabWidget,
-    QTextEdit, QVBoxLayout, QWidget)
+    QListWidget, QListWidgetItem, QPushButton, QScrollArea,
+    QSizePolicy, QSlider, QSpacerItem, QSpinBox,
+    QTabWidget, QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_profile_settings(object):
     def setupUi(self, profile_settings):
         if not profile_settings.objectName():
             profile_settings.setObjectName(u"profile_settings")
-        profile_settings.resize(899, 786)
+        profile_settings.resize(1019, 800)
         self.verticalLayout_2 = QVBoxLayout(profile_settings)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout_2.setContentsMargins(-1, 0, -1, 0)
@@ -35,7 +35,7 @@ class Ui_profile_settings(object):
         font.setPointSize(12)
         font.setBold(True)
         self.label_profile_name.setFont(font)
-        self.label_profile_name.setAlignment(Qt.AlignCenter)
+        self.label_profile_name.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout_2.addWidget(self.label_profile_name)
 
@@ -43,7 +43,7 @@ class Ui_profile_settings(object):
         self.verticalLayout_13.setObjectName(u"verticalLayout_13")
         self.tabWidget = QTabWidget(profile_settings)
         self.tabWidget.setObjectName(u"tabWidget")
-        self.tabWidget.setMinimumSize(QSize(800, 600))
+        self.tabWidget.setMinimumSize(QSize(800, 500))
         self.monitored_tab_2 = QWidget()
         self.monitored_tab_2.setObjectName(u"monitored_tab_2")
         self.verticalLayout_5 = QVBoxLayout(self.monitored_tab_2)
@@ -105,7 +105,7 @@ class Ui_profile_settings(object):
 
         self.verticalLayout_5.addWidget(self.groupBox_12)
 
-        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_3)
 
@@ -114,7 +114,15 @@ class Ui_profile_settings(object):
         self.tab_2.setObjectName(u"tab_2")
         self.verticalLayout_8 = QVBoxLayout(self.tab_2)
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
-        self.groupBox_10 = QGroupBox(self.tab_2)
+        self.scrollArea = QScrollArea(self.tab_2)
+        self.scrollArea.setObjectName(u"scrollArea")
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollAreaWidgetContents_5 = QWidget()
+        self.scrollAreaWidgetContents_5.setObjectName(u"scrollAreaWidgetContents_5")
+        self.scrollAreaWidgetContents_5.setGeometry(QRect(0, 0, 975, 657))
+        self.verticalLayout_15 = QVBoxLayout(self.scrollAreaWidgetContents_5)
+        self.verticalLayout_15.setObjectName(u"verticalLayout_15")
+        self.groupBox_10 = QGroupBox(self.scrollAreaWidgetContents_5)
         self.groupBox_10.setObjectName(u"groupBox_10")
         self.gridLayout_11 = QGridLayout(self.groupBox_10)
         self.gridLayout_11.setObjectName(u"gridLayout_11")
@@ -126,7 +134,7 @@ class Ui_profile_settings(object):
 
         self.gridLayout_11.addWidget(self.spinBox_rate_limit, 0, 1, 1, 1)
 
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.gridLayout_11.addItem(self.horizontalSpacer, 0, 3, 1, 1)
 
@@ -146,14 +154,14 @@ class Ui_profile_settings(object):
         self.horizontalSlider_rate_limit.setMaximum(125000000)
         self.horizontalSlider_rate_limit.setSingleStep(12500)
         self.horizontalSlider_rate_limit.setPageStep(12500)
-        self.horizontalSlider_rate_limit.setOrientation(Qt.Horizontal)
+        self.horizontalSlider_rate_limit.setOrientation(Qt.Orientation.Horizontal)
 
         self.gridLayout_11.addWidget(self.horizontalSlider_rate_limit, 1, 0, 1, 4)
 
 
-        self.verticalLayout_8.addWidget(self.groupBox_10)
+        self.verticalLayout_15.addWidget(self.groupBox_10)
 
-        self.groupBox_4 = QGroupBox(self.tab_2)
+        self.groupBox_4 = QGroupBox(self.scrollAreaWidgetContents_5)
         self.groupBox_4.setObjectName(u"groupBox_4")
         self.horizontalLayout = QHBoxLayout(self.groupBox_4)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -228,30 +236,18 @@ class Ui_profile_settings(object):
 
         self.formLayout_4.setWidget(6, QFormLayout.LabelRole, self.label_ip_protocol_version)
 
-        self.label_threads = QLabel(self.groupBox_4)
-        self.label_threads.setObjectName(u"label_threads")
-
-        self.formLayout_4.setWidget(7, QFormLayout.LabelRole, self.label_threads)
-
         self.spinBox_ip_protocol_version = QSpinBox(self.groupBox_4)
         self.spinBox_ip_protocol_version.setObjectName(u"spinBox_ip_protocol_version")
         self.spinBox_ip_protocol_version.setMaximum(2)
 
         self.formLayout_4.setWidget(6, QFormLayout.FieldRole, self.spinBox_ip_protocol_version)
 
-        self.spinBox_threads = QSpinBox(self.groupBox_4)
-        self.spinBox_threads.setObjectName(u"spinBox_threads")
-        self.spinBox_threads.setMinimum(1)
-        self.spinBox_threads.setMaximum(16)
-
-        self.formLayout_4.setWidget(7, QFormLayout.FieldRole, self.spinBox_threads)
-
 
         self.horizontalLayout.addLayout(self.formLayout_4)
 
         self.gridLayout_10 = QGridLayout()
         self.gridLayout_10.setObjectName(u"gridLayout_10")
-        self.horizontalSpacer_2 = QSpacerItem(20, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+        self.horizontalSpacer_2 = QSpacerItem(20, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
 
         self.gridLayout_10.addItem(self.horizontalSpacer_2, 0, 0, 1, 1)
 
@@ -263,150 +259,166 @@ class Ui_profile_settings(object):
         self.label_sync_file_permissions = QLabel(self.groupBox_4)
         self.label_sync_file_permissions.setObjectName(u"label_sync_file_permissions")
 
-        self.formLayout_5.setWidget(0, QFormLayout.LabelRole, self.label_sync_file_permissions)
+        self.formLayout_5.setWidget(1, QFormLayout.LabelRole, self.label_sync_file_permissions)
 
         self.spinBox_sync_file_permissions = QSpinBox(self.groupBox_4)
         self.spinBox_sync_file_permissions.setObjectName(u"spinBox_sync_file_permissions")
         self.spinBox_sync_file_permissions.setMaximum(777)
 
-        self.formLayout_5.setWidget(0, QFormLayout.FieldRole, self.spinBox_sync_file_permissions)
+        self.formLayout_5.setWidget(1, QFormLayout.FieldRole, self.spinBox_sync_file_permissions)
 
         self.label_sync_dir_permissions = QLabel(self.groupBox_4)
         self.label_sync_dir_permissions.setObjectName(u"label_sync_dir_permissions")
 
-        self.formLayout_5.setWidget(1, QFormLayout.LabelRole, self.label_sync_dir_permissions)
+        self.formLayout_5.setWidget(2, QFormLayout.LabelRole, self.label_sync_dir_permissions)
 
         self.spinBox_sync_dir_permissions = QSpinBox(self.groupBox_4)
         self.spinBox_sync_dir_permissions.setObjectName(u"spinBox_sync_dir_permissions")
         self.spinBox_sync_dir_permissions.setMaximum(777)
 
-        self.formLayout_5.setWidget(1, QFormLayout.FieldRole, self.spinBox_sync_dir_permissions)
+        self.formLayout_5.setWidget(2, QFormLayout.FieldRole, self.spinBox_sync_dir_permissions)
 
         self.label_user_agent = QLabel(self.groupBox_4)
         self.label_user_agent.setObjectName(u"label_user_agent")
 
-        self.formLayout_5.setWidget(2, QFormLayout.LabelRole, self.label_user_agent)
+        self.formLayout_5.setWidget(3, QFormLayout.LabelRole, self.label_user_agent)
 
         self.lineEdit_user_agent = QLineEdit(self.groupBox_4)
         self.lineEdit_user_agent.setObjectName(u"lineEdit_user_agent")
         self.lineEdit_user_agent.setMaximumSize(QSize(16777215, 16777215))
         self.lineEdit_user_agent.setMaxLength(32767)
 
-        self.formLayout_5.setWidget(2, QFormLayout.FieldRole, self.lineEdit_user_agent)
+        self.formLayout_5.setWidget(3, QFormLayout.FieldRole, self.lineEdit_user_agent)
 
         self.label_azure_ad_endpoint = QLabel(self.groupBox_4)
         self.label_azure_ad_endpoint.setObjectName(u"label_azure_ad_endpoint")
 
-        self.formLayout_5.setWidget(3, QFormLayout.LabelRole, self.label_azure_ad_endpoint)
+        self.formLayout_5.setWidget(4, QFormLayout.LabelRole, self.label_azure_ad_endpoint)
 
         self.lineEdit_azure_ad_endpoint = QLineEdit(self.groupBox_4)
         self.lineEdit_azure_ad_endpoint.setObjectName(u"lineEdit_azure_ad_endpoint")
         self.lineEdit_azure_ad_endpoint.setMaximumSize(QSize(16777215, 16777215))
 
-        self.formLayout_5.setWidget(3, QFormLayout.FieldRole, self.lineEdit_azure_ad_endpoint)
+        self.formLayout_5.setWidget(4, QFormLayout.FieldRole, self.lineEdit_azure_ad_endpoint)
 
         self.label_azure_tenant_id = QLabel(self.groupBox_4)
         self.label_azure_tenant_id.setObjectName(u"label_azure_tenant_id")
 
-        self.formLayout_5.setWidget(4, QFormLayout.LabelRole, self.label_azure_tenant_id)
+        self.formLayout_5.setWidget(5, QFormLayout.LabelRole, self.label_azure_tenant_id)
 
         self.lineEdit_azure_tenant_id = QLineEdit(self.groupBox_4)
         self.lineEdit_azure_tenant_id.setObjectName(u"lineEdit_azure_tenant_id")
         self.lineEdit_azure_tenant_id.setMaximumSize(QSize(16777215, 16777215))
 
-        self.formLayout_5.setWidget(4, QFormLayout.FieldRole, self.lineEdit_azure_tenant_id)
+        self.formLayout_5.setWidget(5, QFormLayout.FieldRole, self.lineEdit_azure_tenant_id)
 
         self.label_drive_id = QLabel(self.groupBox_4)
         self.label_drive_id.setObjectName(u"label_drive_id")
 
-        self.formLayout_5.setWidget(5, QFormLayout.LabelRole, self.label_drive_id)
+        self.formLayout_5.setWidget(6, QFormLayout.LabelRole, self.label_drive_id)
 
         self.lineEdit_drive_id = QLineEdit(self.groupBox_4)
         self.lineEdit_drive_id.setObjectName(u"lineEdit_drive_id")
 
-        self.formLayout_5.setWidget(5, QFormLayout.FieldRole, self.lineEdit_drive_id)
+        self.formLayout_5.setWidget(6, QFormLayout.FieldRole, self.lineEdit_drive_id)
+
+        self.label_threads = QLabel(self.groupBox_4)
+        self.label_threads.setObjectName(u"label_threads")
+
+        self.formLayout_5.setWidget(0, QFormLayout.LabelRole, self.label_threads)
+
+        self.spinBox_threads = QSpinBox(self.groupBox_4)
+        self.spinBox_threads.setObjectName(u"spinBox_threads")
+        self.spinBox_threads.setMinimum(1)
+        self.spinBox_threads.setMaximum(16)
+
+        self.formLayout_5.setWidget(0, QFormLayout.FieldRole, self.spinBox_threads)
 
 
         self.horizontalLayout.addLayout(self.formLayout_5)
 
 
-        self.verticalLayout_8.addWidget(self.groupBox_4)
+        self.verticalLayout_15.addWidget(self.groupBox_4)
 
-        self.groupBox_5 = QGroupBox(self.tab_2)
+        self.groupBox_5 = QGroupBox(self.scrollAreaWidgetContents_5)
         self.groupBox_5.setObjectName(u"groupBox_5")
         self.gridLayout_4 = QGridLayout(self.groupBox_5)
         self.gridLayout_4.setObjectName(u"gridLayout_4")
-        self.checkBox_resync = QCheckBox(self.groupBox_5)
-        self.checkBox_resync.setObjectName(u"checkBox_resync")
+        self.checkBox_upload_only = QCheckBox(self.groupBox_5)
+        self.checkBox_upload_only.setObjectName(u"checkBox_upload_only")
 
-        self.gridLayout_4.addWidget(self.checkBox_resync, 1, 2, 1, 1)
+        self.gridLayout_4.addWidget(self.checkBox_upload_only, 2, 1, 1, 1)
 
-        self.checkBox_bypass_data_preservation = QCheckBox(self.groupBox_5)
-        self.checkBox_bypass_data_preservation.setObjectName(u"checkBox_bypass_data_preservation")
+        self.checkBox_no_remote_delete = QCheckBox(self.groupBox_5)
+        self.checkBox_no_remote_delete.setObjectName(u"checkBox_no_remote_delete")
 
-        self.gridLayout_4.addWidget(self.checkBox_bypass_data_preservation, 2, 2, 1, 1)
+        self.gridLayout_4.addWidget(self.checkBox_no_remote_delete, 4, 1, 1, 1)
 
         self.checkBox_download_only = QCheckBox(self.groupBox_5)
         self.checkBox_download_only.setObjectName(u"checkBox_download_only")
 
         self.gridLayout_4.addWidget(self.checkBox_download_only, 1, 1, 1, 1)
 
-        self.checkBox_check_nomount = QCheckBox(self.groupBox_5)
-        self.checkBox_check_nomount.setObjectName(u"checkBox_check_nomount")
-
-        self.gridLayout_4.addWidget(self.checkBox_check_nomount, 5, 1, 1, 1)
-
-        self.checkBox_force_http_11 = QCheckBox(self.groupBox_5)
-        self.checkBox_force_http_11.setObjectName(u"checkBox_force_http_11")
-
-        self.gridLayout_4.addWidget(self.checkBox_force_http_11, 4, 1, 1, 1)
-
-        self.checkBox_disable_upload_validation = QCheckBox(self.groupBox_5)
-        self.checkBox_disable_upload_validation.setObjectName(u"checkBox_disable_upload_validation")
-
-        self.gridLayout_4.addWidget(self.checkBox_disable_upload_validation, 4, 2, 1, 1)
-
-        self.checkBox_upload_only = QCheckBox(self.groupBox_5)
-        self.checkBox_upload_only.setObjectName(u"checkBox_upload_only")
-
-        self.gridLayout_4.addWidget(self.checkBox_upload_only, 2, 1, 1, 1)
-
-        self.checkBox_remove_source_files = QCheckBox(self.groupBox_5)
-        self.checkBox_remove_source_files.setObjectName(u"checkBox_remove_source_files")
-
-        self.gridLayout_4.addWidget(self.checkBox_remove_source_files, 3, 2, 1, 1)
-
-        self.checkBox_dry_run = QCheckBox(self.groupBox_5)
-        self.checkBox_dry_run.setObjectName(u"checkBox_dry_run")
-
-        self.gridLayout_4.addWidget(self.checkBox_dry_run, 0, 2, 1, 1)
-
         self.checkBox_local_first = QCheckBox(self.groupBox_5)
         self.checkBox_local_first.setObjectName(u"checkBox_local_first")
 
         self.gridLayout_4.addWidget(self.checkBox_local_first, 0, 1, 1, 1)
 
-        self.checkBox_no_remote_delete = QCheckBox(self.groupBox_5)
-        self.checkBox_no_remote_delete.setObjectName(u"checkBox_no_remote_delete")
+        self.checkBox_check_nomount = QCheckBox(self.groupBox_5)
+        self.checkBox_check_nomount.setObjectName(u"checkBox_check_nomount")
 
-        self.gridLayout_4.addWidget(self.checkBox_no_remote_delete, 3, 1, 1, 1)
+        self.gridLayout_4.addWidget(self.checkBox_check_nomount, 3, 1, 1, 1)
+
+        self.checkBox_dry_run = QCheckBox(self.groupBox_5)
+        self.checkBox_dry_run.setObjectName(u"checkBox_dry_run")
+
+        self.gridLayout_4.addWidget(self.checkBox_dry_run, 0, 3, 1, 1)
+
+        self.checkBox_resync = QCheckBox(self.groupBox_5)
+        self.checkBox_resync.setObjectName(u"checkBox_resync")
+
+        self.gridLayout_4.addWidget(self.checkBox_resync, 1, 3, 1, 1)
+
+        self.checkBox_bypass_data_preservation = QCheckBox(self.groupBox_5)
+        self.checkBox_bypass_data_preservation.setObjectName(u"checkBox_bypass_data_preservation")
+
+        self.gridLayout_4.addWidget(self.checkBox_bypass_data_preservation, 2, 3, 1, 1)
+
+        self.checkBox_remove_source_files = QCheckBox(self.groupBox_5)
+        self.checkBox_remove_source_files.setObjectName(u"checkBox_remove_source_files")
+
+        self.gridLayout_4.addWidget(self.checkBox_remove_source_files, 0, 2, 1, 1)
+
+        self.checkBox_disable_upload_validation = QCheckBox(self.groupBox_5)
+        self.checkBox_disable_upload_validation.setObjectName(u"checkBox_disable_upload_validation")
+
+        self.gridLayout_4.addWidget(self.checkBox_disable_upload_validation, 1, 2, 1, 1)
 
         self.checkBox_disable_download_validation = QCheckBox(self.groupBox_5)
         self.checkBox_disable_download_validation.setObjectName(u"checkBox_disable_download_validation")
 
-        self.gridLayout_4.addWidget(self.checkBox_disable_download_validation, 5, 2, 1, 1)
+        self.gridLayout_4.addWidget(self.checkBox_disable_download_validation, 2, 2, 1, 1)
 
         self.checkBox_display_running_config = QCheckBox(self.groupBox_5)
         self.checkBox_display_running_config.setObjectName(u"checkBox_display_running_config")
 
-        self.gridLayout_4.addWidget(self.checkBox_display_running_config, 6, 2, 1, 1)
+        self.gridLayout_4.addWidget(self.checkBox_display_running_config, 3, 2, 1, 1)
+
+        self.checkBox_force_http_11 = QCheckBox(self.groupBox_5)
+        self.checkBox_force_http_11.setObjectName(u"checkBox_force_http_11")
+
+        self.gridLayout_4.addWidget(self.checkBox_force_http_11, 3, 3, 1, 1)
 
 
-        self.verticalLayout_8.addWidget(self.groupBox_5)
+        self.verticalLayout_15.addWidget(self.groupBox_5)
 
-        self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
-        self.verticalLayout_8.addItem(self.verticalSpacer_4)
+        self.verticalLayout_15.addItem(self.verticalSpacer_4)
+
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents_5)
+
+        self.verticalLayout_8.addWidget(self.scrollArea)
 
         self.tabWidget.addTab(self.tab_2, "")
         self.tab = QWidget()
@@ -431,7 +443,7 @@ class Ui_profile_settings(object):
 
         self.pushButton_rm_skip_file = QPushButton(self.groupBox)
         self.pushButton_rm_skip_file.setObjectName(u"pushButton_rm_skip_file")
-        sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton_rm_skip_file.sizePolicy().hasHeightForWidth())
@@ -463,7 +475,7 @@ class Ui_profile_settings(object):
         self.gridLayout_7.setObjectName(u"gridLayout_7")
         self.pushButton_rm_skip_dir = QPushButton(self.groupBox_2)
         self.pushButton_rm_skip_dir.setObjectName(u"pushButton_rm_skip_dir")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Minimum)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Minimum)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.pushButton_rm_skip_dir.sizePolicy().hasHeightForWidth())
@@ -473,7 +485,7 @@ class Ui_profile_settings(object):
 
         self.listWidget_skip_dir = QListWidget(self.groupBox_2)
         self.listWidget_skip_dir.setObjectName(u"listWidget_skip_dir")
-        sizePolicy2 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Expanding)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.listWidget_skip_dir.sizePolicy().hasHeightForWidth())
@@ -488,7 +500,7 @@ class Ui_profile_settings(object):
 
         self.pushButton_add_skip_dir = QPushButton(self.groupBox_2)
         self.pushButton_add_skip_dir.setObjectName(u"pushButton_add_skip_dir")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         sizePolicy3.setHorizontalStretch(0)
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.pushButton_add_skip_dir.sizePolicy().hasHeightForWidth())
@@ -622,7 +634,7 @@ class Ui_profile_settings(object):
 
         self.gridLayout.addWidget(self.groupBox_9, 0, 0, 1, 1)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.gridLayout.addItem(self.verticalSpacer, 1, 0, 1, 1)
 
@@ -690,7 +702,7 @@ class Ui_profile_settings(object):
 
         self.verticalLayout_6.addWidget(self.groupBox_6)
 
-        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_6.addItem(self.verticalSpacer_2)
 
@@ -788,7 +800,6 @@ class Ui_profile_settings(object):
 "", None))
 #endif // QT_CONFIG(tooltip)
         self.label_ip_protocol_version.setText(QCoreApplication.translate("profile_settings", u"IP Protocol", None))
-        self.label_threads.setText(QCoreApplication.translate("profile_settings", u"Threads", None))
 #if QT_CONFIG(tooltip)
         self.label_sync_file_permissions.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Utilise the <a href=\"https://chmod-calculator.com/\"><span style=\" text-decoration: underline; color:#5e81ac;\">Unix Permissions Calculator</span></a> to assist in determining the required permissions.</p><p><br/></p><p>Important: Special permission bits (setuid, setgid, sticky bit) are not supported. </p><p>Valid permission values are from <span style=\" font-weight:700;\">000</span> to <span style=\" font-weight:700;\">777</span> only.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
@@ -810,33 +821,11 @@ class Ui_profile_settings(object):
 #endif // QT_CONFIG(tooltip)
         self.label_azure_tenant_id.setText(QCoreApplication.translate("profile_settings", u"Azure tenant ID", None))
         self.label_drive_id.setText(QCoreApplication.translate("profile_settings", u"SharePoint Library Drive ID", None))
+        self.label_threads.setText(QCoreApplication.translate("profile_settings", u"Threads", None))
 #if QT_CONFIG(tooltip)
         self.groupBox_5.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Perform a 'one-way' upload sync.<br/></p><p><span style=\" font-weight:700;\">Note</span>: If a file or folder is present on OneDrive, that does not exist locally, it will be removed. </p><p>If the data on OneDrive should be kept, please enable '<span style=\" font-weight:700;\">No remote delete</span>' option.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.groupBox_5.setTitle(QCoreApplication.translate("profile_settings", u"Advanced options", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_resync.setToolTip(QCoreApplication.translate("profile_settings", u"Forget the last saved state, perform a full sync.", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_resync.setText(QCoreApplication.translate("profile_settings", u"Full re-sync", None))
-        self.checkBox_bypass_data_preservation.setText(QCoreApplication.translate("profile_settings", u"Bypass data preservation", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_download_only.setToolTip(QCoreApplication.translate("profile_settings", u"Replicate the OneDrive online state locally, by only downloading changes from OneDrive. \n"
-"\n"
-"Do not upload local changes to OneDrive.", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_download_only.setText(QCoreApplication.translate("profile_settings", u"Download only", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_check_nomount.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><pre style=\" margin-top:0px; margin-bottom:16px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:145%;\"><span style=\" font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; color:#c9d1d9; background-color:transparent;\">Check for the presence of </span><span style=\" font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; font-weight:700; color:#c9d1d9; background-color:transparent;\">.nosync</span><span style=\" font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; color:#c9d1d9; background-color:transparent;\"> in the syncdir root. If found, do not perform sync.</span></pre></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_check_nomount.setText(QCoreApplication.translate("profile_settings", u"Check for .nomount", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_force_http_11.setToolTip(QCoreApplication.translate("profile_settings", u"Forces the use of HTTP/1.1 instead of the default HTTP/2 .", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_force_http_11.setText(QCoreApplication.translate("profile_settings", u"Force HTTP 1.1", None))
-#if QT_CONFIG(tooltip)
-        self.checkBox_disable_upload_validation.setToolTip(QCoreApplication.translate("profile_settings", u"Disable download validation when downloading from OneDrive.", None))
-#endif // QT_CONFIG(tooltip)
-        self.checkBox_disable_upload_validation.setText(QCoreApplication.translate("profile_settings", u"Disable upload validation", None))
 #if QT_CONFIG(tooltip)
         self.checkBox_upload_only.setToolTip(QCoreApplication.translate("profile_settings", u"Replicate the locally configured sync_dir state to OneDrive, by only uploading local changes to OneDrive. \n"
 "\n"
@@ -844,26 +833,49 @@ class Ui_profile_settings(object):
 #endif // QT_CONFIG(tooltip)
         self.checkBox_upload_only.setText(QCoreApplication.translate("profile_settings", u"Upload only", None))
 #if QT_CONFIG(tooltip)
-        self.checkBox_remove_source_files.setToolTip(QCoreApplication.translate("profile_settings", u"Remove source file after successful transfer to OneDrive when using --upload-only .", None))
+        self.checkBox_no_remote_delete.setToolTip(QCoreApplication.translate("profile_settings", u"Do not delete local file 'deletes' from OneDrive when using --upload-only", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBox_remove_source_files.setText(QCoreApplication.translate("profile_settings", u"Remove source files", None))
+        self.checkBox_no_remote_delete.setText(QCoreApplication.translate("profile_settings", u"No remote delete", None))
 #if QT_CONFIG(tooltip)
-        self.checkBox_dry_run.setToolTip(QCoreApplication.translate("profile_settings", u"Perform a trial sync with no changes made.", None))
+        self.checkBox_download_only.setToolTip(QCoreApplication.translate("profile_settings", u"Replicate the OneDrive online state locally, by only downloading changes from OneDrive. \n"
+"\n"
+"Do not upload local changes to OneDrive.", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBox_dry_run.setText(QCoreApplication.translate("profile_settings", u"Dry run", None))
+        self.checkBox_download_only.setText(QCoreApplication.translate("profile_settings", u"Download only", None))
 #if QT_CONFIG(tooltip)
         self.checkBox_local_first.setToolTip(QCoreApplication.translate("profile_settings", u"Synchronize from the local directory source first, before downloading changes from OneDrive.", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_local_first.setText(QCoreApplication.translate("profile_settings", u"Local first", None))
 #if QT_CONFIG(tooltip)
-        self.checkBox_no_remote_delete.setToolTip(QCoreApplication.translate("profile_settings", u"Do not delete local file 'deletes' from OneDrive when using --upload-only", None))
+        self.checkBox_check_nomount.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><pre style=\" margin-top:0px; margin-bottom:16px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:145%;\"><span style=\" font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; color:#c9d1d9; background-color:transparent;\">Check for the presence of </span><span style=\" font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; font-weight:700; color:#c9d1d9; background-color:transparent;\">.nosync</span><span style=\" font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; color:#c9d1d9; background-color:transparent;\"> in the syncdir root. If found, do not perform sync.</span></pre></body></html>", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBox_no_remote_delete.setText(QCoreApplication.translate("profile_settings", u"No remote delete", None))
+        self.checkBox_check_nomount.setText(QCoreApplication.translate("profile_settings", u"Check for .nomount", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_dry_run.setToolTip(QCoreApplication.translate("profile_settings", u"Perform a trial sync with no changes made.", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_dry_run.setText(QCoreApplication.translate("profile_settings", u"Dry run", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_resync.setToolTip(QCoreApplication.translate("profile_settings", u"Forget the last saved state, perform a full sync.", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_resync.setText(QCoreApplication.translate("profile_settings", u"Full re-sync", None))
+        self.checkBox_bypass_data_preservation.setText(QCoreApplication.translate("profile_settings", u"Bypass data preservation", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_remove_source_files.setToolTip(QCoreApplication.translate("profile_settings", u"Remove source file after successful transfer to OneDrive when using --upload-only .", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_remove_source_files.setText(QCoreApplication.translate("profile_settings", u"Remove source files", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_disable_upload_validation.setToolTip(QCoreApplication.translate("profile_settings", u"Disable download validation when downloading from OneDrive.", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_disable_upload_validation.setText(QCoreApplication.translate("profile_settings", u"Disable upload validation", None))
 #if QT_CONFIG(tooltip)
         self.checkBox_disable_download_validation.setToolTip(QCoreApplication.translate("profile_settings", u"This option determines whether the client will conduct integrity validation on files downloaded from Microsoft OneDrive. <br>Sometimes, when downloading files, particularly from SharePoint, there is a discrepancy between the file size reported by the OneDrive API and the byte count received from the SharePoint HTTP Server for the same file. <br>Enable this option to disable the integrity checks performed by this client.", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_disable_download_validation.setText(QCoreApplication.translate("profile_settings", u"Disable download validation", None))
         self.checkBox_display_running_config.setText(QCoreApplication.translate("profile_settings", u"Display running config", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_force_http_11.setToolTip(QCoreApplication.translate("profile_settings", u"Forces the use of HTTP/1.1 instead of the default HTTP/2 .", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_force_http_11.setText(QCoreApplication.translate("profile_settings", u"Force HTTP 1.1", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("profile_settings", u"Sync Options", None))
 #if QT_CONFIG(tooltip)
         self.groupBox.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>This option is used to 'skip' certain files and supports pattern matching.</p><p>Patterns are case insensitive. <span style=\" font-weight:700;\">*</span> and <span style=\" font-weight:700;\">? </span><a href=\"https://technet.microsoft.com/en-us/library/bb490639.aspx\"><span style=\" text-decoration: underline; color:#5e81ac;\">wildcards characters</span></a> are supported. </p><p>Use <span style=\" font-weight:700;\">|</span> to separate multiple patterns.<br/></p><p><span style=\" text-decoration: underline;\">Files can be skipped in the following fashion:</span></p><p>-Specify a wildcard, eg: '<span style=\" font-weight:700;\">*.txt</span>' (skip all txt files)</p><p>-Explicitly specify the filename and it's full path relative to your sync_dir, eg: '<span style=\" font-weight:700;\">path/to/file/filename.ext</span>'</p><p>-Explicitly specify the filename only and skip every instance of this filename, eg: '<span style=\" font-weight:700;\">filename.ext</span>'</p><p><br/></p><p><span "
