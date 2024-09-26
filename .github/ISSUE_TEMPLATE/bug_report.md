@@ -37,5 +37,5 @@ If applicable, add relevant output from log file `/tmp/onedrive-gui/onedrive-gui
  - Version of OneDrive client: [e.g. 2.5.0]
 
 **OneDriveGUI info**
-How did you install OneDriveGUI?: [e.g. AppImage]
+How did you install OneDriveGUI?: [e.g. AppImage, AUR(package name), etc.]
 What is the name of the AppImage file (if applicable)? : [e.g.  OneDriveGUI-1.1.0-x86_64.AppImage ]
