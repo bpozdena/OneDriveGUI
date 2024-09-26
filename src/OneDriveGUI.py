@@ -11,7 +11,6 @@ import copy
 import logging.handlers as handlers
 from configparser import ConfigParser
 
-from version import __version__
 from PySide6.QtCore import QThread, QTimer, QUrl, Signal, QFileInfo, Qt
 from PySide6.QtGui import QIcon, QPixmap, QDesktopServices
 from PySide6.QtWidgets import (
@@ -64,7 +63,7 @@ from ui.ui_external_login import Ui_ExternalLoginWindow
 # except ImportError:
 #     logging.warning("Failed to import ui_login. This is expected if you are running AppImage version.")
 
-
+__version__ = "1.1.1"
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 PROFILES_FILE = os.path.expanduser("~/.config/onedrive-gui/profiles")
 GUI_SETTINGS_FILE = os.path.expanduser("~/.config/onedrive-gui/gui_settings")
