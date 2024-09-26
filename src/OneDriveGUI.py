@@ -11,6 +11,7 @@ import copy
 import logging.handlers as handlers
 from configparser import ConfigParser
 
+from version import __version__
 from PySide6.QtCore import QThread, QTimer, QUrl, Signal, QFileInfo, Qt
 from PySide6.QtGui import QIcon, QPixmap, QDesktopServices
 from PySide6.QtWidgets import (
@@ -2213,6 +2214,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         super(MainWindow, self).__init__()
         self.setupUi(self)
+        self.setWindowTitle(f"OneDriveGUI v{__version__}")
         self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png"))
 
         if gui_settings["SETTINGS"]["frameless_window"] == "True":
@@ -3229,6 +3231,8 @@ if __name__ == "__main__":
         handlers=config_logging_handlers(),
         level=config_debug_level(),
     )
+
+    logging.info(f"Starting OneDriveGUI v{__version__}")
 
     client_bin_path = config_client_bin_path()
     client_version = get_installed_client_version()
