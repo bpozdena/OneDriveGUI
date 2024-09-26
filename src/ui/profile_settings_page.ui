@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>899</width>
-    <height>786</height>
+    <width>1019</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,7 +32,7 @@
       <string>Profile name</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
     </widget>
    </item>
@@ -43,7 +43,7 @@
        <property name="minimumSize">
         <size>
          <width>800</width>
-         <height>600</height>
+         <height>500</height>
         </size>
        </property>
        <property name="toolTip">
@@ -144,7 +144,7 @@
          <item>
           <spacer name="verticalSpacer_3">
            <property name="orientation">
-            <enum>Qt::Vertical</enum>
+            <enum>Qt::Orientation::Vertical</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -162,105 +162,120 @@
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_8">
          <item>
-          <widget class="QGroupBox" name="groupBox_10">
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To minimise the Internet bandwidth for upload and download operations, you can configure the bandwidth limit option. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <widget class="QScrollArea" name="scrollArea">
+           <property name="widgetResizable">
+            <bool>true</bool>
            </property>
-           <property name="title">
-            <string>Account Bandwidth Limit</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_11">
-            <item row="0" column="1">
-             <widget class="QSpinBox" name="spinBox_rate_limit">
-              <property name="minimum">
-               <number>131072</number>
-              </property>
-              <property name="maximum">
-               <number>125000000</number>
-              </property>
-              <property name="singleStep">
-               <number>12500</number>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="3">
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="0" column="2">
-             <widget class="QLabel" name="label_rate_limit_mbps">
-              <property name="text">
-               <string>(Mb/s)</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_rate_limit">
-              <property name="text">
-               <string>Rate Limit [B/s]</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0" colspan="4">
-             <widget class="QSlider" name="horizontalSlider_rate_limit">
-              <property name="minimum">
-               <number>125000</number>
-              </property>
-              <property name="maximum">
-               <number>125000000</number>
-              </property>
-              <property name="singleStep">
-               <number>12500</number>
-              </property>
-              <property name="pageStep">
-               <number>12500</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <widget class="QGroupBox" name="groupBox_4">
-           <property name="title">
-            <string>Advanced Properties</string>
-           </property>
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <item>
-             <layout class="QFormLayout" name="formLayout_4">
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_monitor_interval">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The monitor interval is defined as the wait time 'between' sync's when running in monitor mode. &lt;/p&gt;&lt;p&gt;When this interval expires, the client will check OneDrive for changes online, performing data &lt;/p&gt;&lt;p&gt;integrity checks and scanning the local &lt;span style=&quot; font-weight:700;&quot;&gt;Sync Directory&lt;/span&gt; for new content.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;By default without configuration, monitor interval is set to &lt;span style=&quot; font-weight:700;&quot;&gt;300&lt;/span&gt; seconds. Setting this value &lt;/p&gt;&lt;p&gt;to &lt;span style=&quot; font-weight:700;&quot;&gt;600&lt;/span&gt; will run the sync process every &lt;span style=&quot; font-weight:700;&quot;&gt;10 minutes&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string>Monitor interval</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QSpinBox" name="spinBox_monitor_interval">
-                <property name="maximum">
-                 <number>1000000</number>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_monitor_fullscan_frequency">
-                <property name="toolTip">
-                 <string>This configuration option controls the number of 'monitor_interval' iterations between when a 
+           <widget class="QWidget" name="scrollAreaWidgetContents_5">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>975</width>
+              <height>657</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_15">
+             <item>
+              <widget class="QGroupBox" name="groupBox_10">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To minimise the Internet bandwidth for upload and download operations, you can configure the bandwidth limit option. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="title">
+                <string>Account Bandwidth Limit</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_11">
+                <item row="0" column="1">
+                 <widget class="QSpinBox" name="spinBox_rate_limit">
+                  <property name="minimum">
+                   <number>131072</number>
+                  </property>
+                  <property name="maximum">
+                   <number>125000000</number>
+                  </property>
+                  <property name="singleStep">
+                   <number>12500</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="3">
+                 <spacer name="horizontalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Orientation::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="2">
+                 <widget class="QLabel" name="label_rate_limit_mbps">
+                  <property name="text">
+                   <string>(Mb/s)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_rate_limit">
+                  <property name="text">
+                   <string>Rate Limit [B/s]</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0" colspan="4">
+                 <widget class="QSlider" name="horizontalSlider_rate_limit">
+                  <property name="minimum">
+                   <number>125000</number>
+                  </property>
+                  <property name="maximum">
+                   <number>125000000</number>
+                  </property>
+                  <property name="singleStep">
+                   <number>12500</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>12500</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Orientation::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="groupBox_4">
+               <property name="title">
+                <string>Advanced Properties</string>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout">
+                <item>
+                 <layout class="QFormLayout" name="formLayout_4">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_monitor_interval">
+                    <property name="toolTip">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The monitor interval is defined as the wait time 'between' sync's when running in monitor mode. &lt;/p&gt;&lt;p&gt;When this interval expires, the client will check OneDrive for changes online, performing data &lt;/p&gt;&lt;p&gt;integrity checks and scanning the local &lt;span style=&quot; font-weight:700;&quot;&gt;Sync Directory&lt;/span&gt; for new content.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;By default without configuration, monitor interval is set to &lt;span style=&quot; font-weight:700;&quot;&gt;300&lt;/span&gt; seconds. Setting this value &lt;/p&gt;&lt;p&gt;to &lt;span style=&quot; font-weight:700;&quot;&gt;600&lt;/span&gt; will run the sync process every &lt;span style=&quot; font-weight:700;&quot;&gt;10 minutes&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="text">
+                     <string>Monitor interval</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QSpinBox" name="spinBox_monitor_interval">
+                    <property name="maximum">
+                     <number>1000000</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="label_monitor_fullscan_frequency">
+                    <property name="toolTip">
+                     <string>This configuration option controls the number of 'monitor_interval' iterations between when a 
 full scan of your data is performed to ensure data integrity and consistency.
 
 By default without configuration, 'monitor_fullscan_frequency' is set to 12. In this default state,
@@ -269,399 +284,403 @@ This is only applicable when running in --monitor mode.
 
 Setting this value to 24 means that the full scan of OneDrive and checking the integrity of the data stored 
 locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seconds).</string>
-                </property>
-                <property name="text">
-                 <string>Monitor full-scan frequency</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QSpinBox" name="spinBox_monitor_fullscan_frequency">
-                <property name="maximum">
-                 <number>1000000</number>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_classify_as_big_delete">
-                <property name="toolTip">
-                 <string>Number of children in a path that is locally removed which will be classified as a 'big data delete'</string>
-                </property>
-                <property name="text">
-                 <string>Clasify as big delete</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QSpinBox" name="spinBox_classify_as_big_delete">
-                <property name="maximum">
-                 <number>1000000</number>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_operation_timeout">
-                <property name="toolTip">
-                 <string>Operation Timeout is the maximum amount of time (seconds) a file operation is allowed to take. This includes DNS resolution, connecting, data transfer, etc.</string>
-                </property>
-                <property name="text">
-                 <string>Operation timeout</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QSpinBox" name="spinBox_operation_timeout">
-                <property name="maximum">
-                 <number>1000000</number>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="label_connect_timeout">
-                <property name="text">
-                 <string>Connect timeout</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="1">
-               <widget class="QSpinBox" name="spinBox_connect_timeout"/>
-              </item>
-              <item row="5" column="0">
-               <widget class="QLabel" name="label_data_timeout">
-                <property name="text">
-                 <string>Data timeout</string>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="1">
-               <widget class="QSpinBox" name="spinBox_data_timeout"/>
-              </item>
-              <item row="6" column="0">
-               <widget class="QLabel" name="label_ip_protocol_version">
-                <property name="toolTip">
-                 <string>
+                    </property>
+                    <property name="text">
+                     <string>Monitor full-scan frequency</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QSpinBox" name="spinBox_monitor_fullscan_frequency">
+                    <property name="maximum">
+                     <number>1000000</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="label_classify_as_big_delete">
+                    <property name="toolTip">
+                     <string>Number of children in a path that is locally removed which will be classified as a 'big data delete'</string>
+                    </property>
+                    <property name="text">
+                     <string>Clasify as big delete</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QSpinBox" name="spinBox_classify_as_big_delete">
+                    <property name="maximum">
+                     <number>1000000</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="label_operation_timeout">
+                    <property name="toolTip">
+                     <string>Operation Timeout is the maximum amount of time (seconds) a file operation is allowed to take. This includes DNS resolution, connecting, data transfer, etc.</string>
+                    </property>
+                    <property name="text">
+                     <string>Operation timeout</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QSpinBox" name="spinBox_operation_timeout">
+                    <property name="maximum">
+                     <number>1000000</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0">
+                   <widget class="QLabel" name="label_connect_timeout">
+                    <property name="text">
+                     <string>Connect timeout</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QSpinBox" name="spinBox_connect_timeout"/>
+                  </item>
+                  <item row="5" column="0">
+                   <widget class="QLabel" name="label_data_timeout">
+                    <property name="text">
+                     <string>Data timeout</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="1">
+                   <widget class="QSpinBox" name="spinBox_data_timeout"/>
+                  </item>
+                  <item row="6" column="0">
+                   <widget class="QLabel" name="label_ip_protocol_version">
+                    <property name="toolTip">
+                     <string>
     A value of 0 will mean the client will use IPv4 and IPv6. This is the default.
     A value of 1 will mean the client will use IPv4 only.
     A value of 2 will mean the client will use IPv6 only.
 </string>
-                </property>
-                <property name="text">
-                 <string>IP Protocol</string>
-                </property>
-               </widget>
-              </item>
-              <item row="7" column="0">
-               <widget class="QLabel" name="label_threads">
-                <property name="text">
-                 <string>Threads</string>
-                </property>
-               </widget>
-              </item>
-              <item row="6" column="1">
-               <widget class="QSpinBox" name="spinBox_ip_protocol_version">
-                <property name="maximum">
-                 <number>2</number>
-                </property>
-               </widget>
-              </item>
-              <item row="7" column="1">
-               <widget class="QSpinBox" name="spinBox_threads">
-                <property name="minimum">
-                 <number>1</number>
-                </property>
-                <property name="maximum">
-                 <number>16</number>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QGridLayout" name="gridLayout_10">
-              <item row="0" column="0">
-               <spacer name="horizontalSpacer_2">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QFormLayout" name="formLayout_5">
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_sync_file_permissions">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Utilise the &lt;a href=&quot;https://chmod-calculator.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#5e81ac;&quot;&gt;Unix Permissions Calculator&lt;/span&gt;&lt;/a&gt; to assist in determining the required permissions.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Important: Special permission bits (setuid, setgid, sticky bit) are not supported. &lt;/p&gt;&lt;p&gt;Valid permission values are from &lt;span style=&quot; font-weight:700;&quot;&gt;000&lt;/span&gt; to &lt;span style=&quot; font-weight:700;&quot;&gt;777&lt;/span&gt; only.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string>Sync file permissions</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QSpinBox" name="spinBox_sync_file_permissions">
-                <property name="maximum">
-                 <number>777</number>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_sync_dir_permissions">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Utilise the &lt;a href=&quot;https://chmod-calculator.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#5e81ac;&quot;&gt;Unix Permissions Calculator&lt;/span&gt;&lt;/a&gt; to assist in determining the required permissions.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Important: Special permission bits (setuid, setgid, sticky bit) are not supported. &lt;/p&gt;&lt;p&gt;Valid permission values are from &lt;span style=&quot; font-weight:700;&quot;&gt;000&lt;/span&gt; to &lt;span style=&quot; font-weight:700;&quot;&gt;777&lt;/span&gt; only.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string>Sync dir permissions</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QSpinBox" name="spinBox_sync_dir_permissions">
-                <property name="maximum">
-                 <number>777</number>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_user_agent">
-                <property name="toolTip">
-                 <string>Specify a User Agent string to the http client</string>
-                </property>
-                <property name="text">
-                 <string>User-agent</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QLineEdit" name="lineEdit_user_agent">
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="maxLength">
-                 <number>32767</number>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_azure_ad_endpoint">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Refer to the documentation for &lt;a href=&quot;https://github.com/abraunegg/onedrive/blob/master/docs/USAGE.md#configuring-the-client-for-single-tenant-application-use&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#5e81ac;&quot;&gt;single tenant application use&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string>Azure AD endpoint</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QLineEdit" name="lineEdit_azure_ad_endpoint">
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="label_azure_tenant_id">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Refer to the documentation for &lt;a href=&quot;https://github.com/abraunegg/onedrive/blob/master/docs/USAGE.md#configuring-the-client-for-single-tenant-application-use&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#5e81ac;&quot;&gt;single tenant application use&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string>Azure tenant ID</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="1">
-               <widget class="QLineEdit" name="lineEdit_azure_tenant_id">
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="0">
-               <widget class="QLabel" name="label_drive_id">
-                <property name="text">
-                 <string>SharePoint Library Drive ID</string>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="1">
-               <widget class="QLineEdit" name="lineEdit_drive_id"/>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <widget class="QGroupBox" name="groupBox_5">
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Perform a 'one-way' upload sync.&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Note&lt;/span&gt;: If a file or folder is present on OneDrive, that does not exist locally, it will be removed. &lt;/p&gt;&lt;p&gt;If the data on OneDrive should be kept, please enable '&lt;span style=&quot; font-weight:700;&quot;&gt;No remote delete&lt;/span&gt;' option.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="title">
-            <string>Advanced options</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_4">
-            <item row="1" column="2">
-             <widget class="QCheckBox" name="checkBox_resync">
-              <property name="toolTip">
-               <string>Forget the last saved state, perform a full sync.</string>
-              </property>
-              <property name="text">
-               <string>Full re-sync</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="2">
-             <widget class="QCheckBox" name="checkBox_bypass_data_preservation">
-              <property name="text">
-               <string>Bypass data preservation</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QCheckBox" name="checkBox_download_only">
-              <property name="toolTip">
-               <string>Replicate the OneDrive online state locally, by only downloading changes from OneDrive. 
-
-Do not upload local changes to OneDrive.</string>
-              </property>
-              <property name="text">
-               <string>Download only</string>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="1">
-             <widget class="QCheckBox" name="checkBox_check_nomount">
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:0px; margin-bottom:16px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:145%;&quot;&gt;&lt;span style=&quot; font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; color:#c9d1d9; background-color:transparent;&quot;&gt;Check for the presence of &lt;/span&gt;&lt;span style=&quot; font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; font-weight:700; color:#c9d1d9; background-color:transparent;&quot;&gt;.nosync&lt;/span&gt;&lt;span style=&quot; font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; color:#c9d1d9; background-color:transparent;&quot;&gt; in the syncdir root. If found, do not perform sync.&lt;/span&gt;&lt;/pre&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="text">
-               <string>Check for .nomount</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QCheckBox" name="checkBox_force_http_11">
-              <property name="toolTip">
-               <string>Forces the use of HTTP/1.1 instead of the default HTTP/2 .</string>
-              </property>
-              <property name="text">
-               <string>Force HTTP 1.1</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="2">
-             <widget class="QCheckBox" name="checkBox_disable_upload_validation">
-              <property name="toolTip">
-               <string>Disable download validation when downloading from OneDrive.</string>
-              </property>
-              <property name="text">
-               <string>Disable upload validation</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QCheckBox" name="checkBox_upload_only">
-              <property name="toolTip">
-               <string>Replicate the locally configured sync_dir state to OneDrive, by only uploading local changes to OneDrive. 
+                    </property>
+                    <property name="text">
+                     <string>IP Protocol</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="1">
+                   <widget class="QSpinBox" name="spinBox_ip_protocol_version">
+                    <property name="maximum">
+                     <number>2</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QGridLayout" name="gridLayout_10">
+                  <item row="0" column="0">
+                   <spacer name="horizontalSpacer_2">
+                    <property name="orientation">
+                     <enum>Qt::Orientation::Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::Policy::Fixed</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QFormLayout" name="formLayout_5">
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="label_sync_file_permissions">
+                    <property name="toolTip">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Utilise the &lt;a href=&quot;https://chmod-calculator.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#5e81ac;&quot;&gt;Unix Permissions Calculator&lt;/span&gt;&lt;/a&gt; to assist in determining the required permissions.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Important: Special permission bits (setuid, setgid, sticky bit) are not supported. &lt;/p&gt;&lt;p&gt;Valid permission values are from &lt;span style=&quot; font-weight:700;&quot;&gt;000&lt;/span&gt; to &lt;span style=&quot; font-weight:700;&quot;&gt;777&lt;/span&gt; only.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="text">
+                     <string>Sync file permissions</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QSpinBox" name="spinBox_sync_file_permissions">
+                    <property name="maximum">
+                     <number>777</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="label_sync_dir_permissions">
+                    <property name="toolTip">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Utilise the &lt;a href=&quot;https://chmod-calculator.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#5e81ac;&quot;&gt;Unix Permissions Calculator&lt;/span&gt;&lt;/a&gt; to assist in determining the required permissions.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Important: Special permission bits (setuid, setgid, sticky bit) are not supported. &lt;/p&gt;&lt;p&gt;Valid permission values are from &lt;span style=&quot; font-weight:700;&quot;&gt;000&lt;/span&gt; to &lt;span style=&quot; font-weight:700;&quot;&gt;777&lt;/span&gt; only.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="text">
+                     <string>Sync dir permissions</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QSpinBox" name="spinBox_sync_dir_permissions">
+                    <property name="maximum">
+                     <number>777</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="label_user_agent">
+                    <property name="toolTip">
+                     <string>Specify a User Agent string to the http client</string>
+                    </property>
+                    <property name="text">
+                     <string>User-agent</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QLineEdit" name="lineEdit_user_agent">
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="maxLength">
+                     <number>32767</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0">
+                   <widget class="QLabel" name="label_azure_ad_endpoint">
+                    <property name="toolTip">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Refer to the documentation for &lt;a href=&quot;https://github.com/abraunegg/onedrive/blob/master/docs/USAGE.md#configuring-the-client-for-single-tenant-application-use&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#5e81ac;&quot;&gt;single tenant application use&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="text">
+                     <string>Azure AD endpoint</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QLineEdit" name="lineEdit_azure_ad_endpoint">
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="0">
+                   <widget class="QLabel" name="label_azure_tenant_id">
+                    <property name="toolTip">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Refer to the documentation for &lt;a href=&quot;https://github.com/abraunegg/onedrive/blob/master/docs/USAGE.md#configuring-the-client-for-single-tenant-application-use&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#5e81ac;&quot;&gt;single tenant application use&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="text">
+                     <string>Azure tenant ID</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="1">
+                   <widget class="QLineEdit" name="lineEdit_azure_tenant_id">
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="0">
+                   <widget class="QLabel" name="label_drive_id">
+                    <property name="text">
+                     <string>SharePoint Library Drive ID</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="1">
+                   <widget class="QLineEdit" name="lineEdit_drive_id"/>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_threads">
+                    <property name="text">
+                     <string>Threads</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QSpinBox" name="spinBox_threads">
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>16</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="groupBox_5">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Perform a 'one-way' upload sync.&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Note&lt;/span&gt;: If a file or folder is present on OneDrive, that does not exist locally, it will be removed. &lt;/p&gt;&lt;p&gt;If the data on OneDrive should be kept, please enable '&lt;span style=&quot; font-weight:700;&quot;&gt;No remote delete&lt;/span&gt;' option.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="title">
+                <string>Advanced options</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_4">
+                <item row="2" column="1">
+                 <widget class="QCheckBox" name="checkBox_upload_only">
+                  <property name="toolTip">
+                   <string>Replicate the locally configured sync_dir state to OneDrive, by only uploading local changes to OneDrive. 
 
 Do not download changes from OneDrive.</string>
-              </property>
-              <property name="text">
-               <string>Upload only</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="2">
-             <widget class="QCheckBox" name="checkBox_remove_source_files">
-              <property name="toolTip">
-               <string>Remove source file after successful transfer to OneDrive when using --upload-only .</string>
-              </property>
-              <property name="text">
-               <string>Remove source files</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="2">
-             <widget class="QCheckBox" name="checkBox_dry_run">
-              <property name="toolTip">
-               <string>Perform a trial sync with no changes made.</string>
-              </property>
-              <property name="text">
-               <string>Dry run</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QCheckBox" name="checkBox_local_first">
-              <property name="toolTip">
-               <string>Synchronize from the local directory source first, before downloading changes from OneDrive.</string>
-              </property>
-              <property name="text">
-               <string>Local first</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QCheckBox" name="checkBox_no_remote_delete">
-              <property name="toolTip">
-               <string>Do not delete local file 'deletes' from OneDrive when using --upload-only</string>
-              </property>
-              <property name="text">
-               <string>No remote delete</string>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="2">
-             <widget class="QCheckBox" name="checkBox_disable_download_validation">
-              <property name="toolTip">
-               <string>This option determines whether the client will conduct integrity validation on files downloaded from Microsoft OneDrive. &lt;br&gt;Sometimes, when downloading files, particularly from SharePoint, there is a discrepancy between the file size reported by the OneDrive API and the byte count received from the SharePoint HTTP Server for the same file. &lt;br&gt;Enable this option to disable the integrity checks performed by this client.</string>
-              </property>
-              <property name="text">
-               <string>Disable download validation</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="2">
-             <widget class="QCheckBox" name="checkBox_display_running_config">
-              <property name="text">
-               <string>Display running config</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+                  </property>
+                  <property name="text">
+                   <string>Upload only</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="1">
+                 <widget class="QCheckBox" name="checkBox_no_remote_delete">
+                  <property name="toolTip">
+                   <string>Do not delete local file 'deletes' from OneDrive when using --upload-only</string>
+                  </property>
+                  <property name="text">
+                   <string>No remote delete</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QCheckBox" name="checkBox_download_only">
+                  <property name="toolTip">
+                   <string>Replicate the OneDrive online state locally, by only downloading changes from OneDrive. 
+
+Do not upload local changes to OneDrive.</string>
+                  </property>
+                  <property name="text">
+                   <string>Download only</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QCheckBox" name="checkBox_local_first">
+                  <property name="toolTip">
+                   <string>Synchronize from the local directory source first, before downloading changes from OneDrive.</string>
+                  </property>
+                  <property name="text">
+                   <string>Local first</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QCheckBox" name="checkBox_check_nomount">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:0px; margin-bottom:16px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:145%;&quot;&gt;&lt;span style=&quot; font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; color:#c9d1d9; background-color:transparent;&quot;&gt;Check for the presence of &lt;/span&gt;&lt;span style=&quot; font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; font-weight:700; color:#c9d1d9; background-color:transparent;&quot;&gt;.nosync&lt;/span&gt;&lt;span style=&quot; font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; color:#c9d1d9; background-color:transparent;&quot;&gt; in the syncdir root. If found, do not perform sync.&lt;/span&gt;&lt;/pre&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Check for .nomount</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="3">
+                 <widget class="QCheckBox" name="checkBox_dry_run">
+                  <property name="toolTip">
+                   <string>Perform a trial sync with no changes made.</string>
+                  </property>
+                  <property name="text">
+                   <string>Dry run</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="3">
+                 <widget class="QCheckBox" name="checkBox_resync">
+                  <property name="toolTip">
+                   <string>Forget the last saved state, perform a full sync.</string>
+                  </property>
+                  <property name="text">
+                   <string>Full re-sync</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="3">
+                 <widget class="QCheckBox" name="checkBox_bypass_data_preservation">
+                  <property name="text">
+                   <string>Bypass data preservation</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2">
+                 <widget class="QCheckBox" name="checkBox_remove_source_files">
+                  <property name="toolTip">
+                   <string>Remove source file after successful transfer to OneDrive when using --upload-only .</string>
+                  </property>
+                  <property name="text">
+                   <string>Remove source files</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="2">
+                 <widget class="QCheckBox" name="checkBox_disable_upload_validation">
+                  <property name="toolTip">
+                   <string>Disable download validation when downloading from OneDrive.</string>
+                  </property>
+                  <property name="text">
+                   <string>Disable upload validation</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="2">
+                 <widget class="QCheckBox" name="checkBox_disable_download_validation">
+                  <property name="toolTip">
+                   <string>This option determines whether the client will conduct integrity validation on files downloaded from Microsoft OneDrive. &lt;br&gt;Sometimes, when downloading files, particularly from SharePoint, there is a discrepancy between the file size reported by the OneDrive API and the byte count received from the SharePoint HTTP Server for the same file. &lt;br&gt;Enable this option to disable the integrity checks performed by this client.</string>
+                  </property>
+                  <property name="text">
+                   <string>Disable download validation</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="2">
+                 <widget class="QCheckBox" name="checkBox_display_running_config">
+                  <property name="text">
+                   <string>Display running config</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="3">
+                 <widget class="QCheckBox" name="checkBox_force_http_11">
+                  <property name="toolTip">
+                   <string>Forces the use of HTTP/1.1 instead of the default HTTP/2 .</string>
+                  </property>
+                  <property name="text">
+                   <string>Force HTTP 1.1</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Orientation::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
           </widget>
-         </item>
-         <item>
-          <spacer name="verticalSpacer_4">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
          </item>
         </layout>
        </widget>
@@ -947,7 +966,7 @@ Do not download changes from OneDrive.</string>
          <item row="1" column="0">
           <spacer name="verticalSpacer">
            <property name="orientation">
-            <enum>Qt::Vertical</enum>
+            <enum>Qt::Orientation::Vertical</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -1055,7 +1074,7 @@ Do not download changes from OneDrive.</string>
          <item>
           <spacer name="verticalSpacer_2">
            <property name="orientation">
-            <enum>Qt::Vertical</enum>
+            <enum>Qt::Orientation::Vertical</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>

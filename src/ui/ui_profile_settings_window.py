@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'profile_settings_windowCPOFHG.ui'
+## Form generated from reading UI file 'profile_settings_windowsinRqy.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.2
+## Created by: Qt User Interface Compiler version 6.7.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -23,7 +23,7 @@ class Ui_profile_settings_window(object):
     def setupUi(self, profile_settings_window):
         if not profile_settings_window.objectName():
             profile_settings_window.setObjectName(u"profile_settings_window")
-        profile_settings_window.resize(322, 800)
+        profile_settings_window.resize(1272, 851)
         self.verticalLayout_2 = QVBoxLayout(profile_settings_window)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.horizontalLayout = QHBoxLayout()
