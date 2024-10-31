@@ -58,6 +58,10 @@ from ui.ui_gui_settings_window import Ui_gui_settings_window
 # Import for login windows.
 from ui.ui_external_login import Ui_ExternalLoginWindow
 
+from settings.gui_settings import gui_settings
+from utils.logger import logger
+from utils.utils import humanize_file_size, shorten_path
+
 # try:
 #     from ui.ui_login import Ui_LoginWindow
 # except ImportError:
@@ -66,7 +70,6 @@ from ui.ui_external_login import Ui_ExternalLoginWindow
 __version__ = "1.1.1"
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 PROFILES_FILE = os.path.expanduser("~/.config/onedrive-gui/profiles")
-GUI_SETTINGS_FILE = os.path.expanduser("~/.config/onedrive-gui/gui_settings")
 
 
 class SetupWizard(QWizard):
@@ -887,7 +890,7 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
         self.checkBox_start_minimized.setChecked(self.get_check_box_state("start_minimized"))
         self.checkBox_start_minimized.stateChanged.connect(self.set_check_box_state)
 
-        self.lineEdit_client_bin_path.setText(gui_settings["SETTINGS"]["client_bin_path"])
+        self.lineEdit_client_bin_path.setText(gui_settings.get("client_bin_path"))
         self.lineEdit_client_bin_path.textChanged.connect(self.set_client_bin_path)
         self.pushButton_client_bin_path.clicked.connect(self.get_bin_path)
 
@@ -906,21 +909,21 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
         self.checkBox_save_debug.setChecked(self.get_check_box_state("save_debug"))
         self.checkBox_save_debug.stateChanged.connect(self.set_check_box_state)
 
-        self.spinBox_log_rotation_interval.setValue(int(gui_settings["SETTINGS"]["log_rotation_interval"]))
+        self.spinBox_log_rotation_interval.setValue(int(gui_settings.get("log_rotation_interval")))
         self.spinBox_log_rotation_interval.valueChanged.connect(self.set_spin_box_value)
 
-        self.spinBox_log_backup_count.setValue(int(gui_settings["SETTINGS"]["log_backup_count"]))
+        self.spinBox_log_backup_count.setValue(int(gui_settings.get("log_backup_count")))
         self.spinBox_log_backup_count.valueChanged.connect(self.set_spin_box_value)
 
-        self.comboBox_debug_level.setCurrentText(gui_settings["SETTINGS"]["debug_level"].upper())
+        self.comboBox_debug_level.setCurrentText(gui_settings.get("debug_level").upper())
         self.comboBox_debug_level.activated.connect(self.set_debug_level)
 
-        self.lineEdit_log_file.setText(gui_settings["SETTINGS"]["log_file"])
+        self.lineEdit_log_file.setText(gui_settings.get("log_file"))
         self.lineEdit_log_file.textChanged.connect(self.set_log_file)
 
         self.pushButton_log_file.clicked.connect(self.get_log_dir_name)
 
-        self.pushButton_save.clicked.connect(self.save_gui_settings)
+        self.pushButton_save.clicked.connect(self.save_settings)
 
     def get_bin_path(self):
         self.file_dialog = QFileDialog()
@@ -943,21 +946,21 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
         file_path = str(self.lineEdit_client_bin_path.text())
         if file_path == "":
             file_path = "onedrive"
-        gui_settings["SETTINGS"]["client_bin_path"] = file_path
+        gui_settings.set("client_bin_path", file_path)
 
     def set_log_file(self):
-        gui_settings["SETTINGS"]["log_file"] = str(self.lineEdit_log_file.text())
+        gui_settings.set("log_file", str(self.lineEdit_log_file.text()))
 
     def set_debug_level(self):
-        gui_settings["SETTINGS"]["debug_level"] = self.comboBox_debug_level.currentText()
+        gui_settings.set("debug_level", self.comboBox_debug_level.currentText())
 
     def set_spin_box_value(self, value):
         _property = self.sender().objectName()
         property = re.search(r"spinBox_(.+)", _property).group(1)
-        gui_settings["SETTINGS"][property] = str(value)
+        gui_settings.set(property, str(value))
 
     def get_check_box_state(self, property):
-        return "True" in gui_settings["SETTINGS"][property]
+        return "True" in gui_settings.get(property)
 
     def set_check_box_state(self):
         _property = self.sender().objectName()
@@ -965,18 +968,13 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
 
         if self.sender().isChecked():
             logging.info(f"[GUI][SETTINGS] {property} is checked")
-            gui_settings["SETTINGS"][property] = "True"
+            gui_settings.set(property, "True")
         else:
             logging.info(f"[GUI][SETTINGS] {property} is unchecked")
-            gui_settings["SETTINGS"][property] = "False"
+            gui_settings.set(property, "False")
 
-    def save_gui_settings(self):
-        logging.debug(f"[GUI][SETTINGS] Saving new GUI settings: {gui_settings._sections}")
-
-        with open(GUI_SETTINGS_FILE, "w") as f:
-            gui_settings.write(f)
-
-        self.hide()
+    def save_settings(self):
+        gui_settings.save()
 
 
 class ProfileStatusPage(QWidget, Ui_status_page):
@@ -1000,7 +998,7 @@ class ProfileStatusPage(QWidget, Ui_status_page):
         self.settings_icon = QIcon(DIR_PATH + "/resources/images/gear.png")
 
         # Show Start/Stop buttons
-        if gui_settings["SETTINGS"]["combined_start_stop_button"] == "True":
+        if gui_settings.get("combined_start_stop_button") == "True":
             self.pushButton_start_stop.show()
             self.pushButton_start.hide()
             self.pushButton_stop.hide()
@@ -1029,7 +1027,7 @@ class ProfileStatusPage(QWidget, Ui_status_page):
         self.pushButton_quit.clicked.connect(lambda: main_window.graceful_shutdown())
 
         # Close Button
-        if gui_settings["SETTINGS"]["frameless_window"] == "True":
+        if gui_settings.get("frameless_window") == "True":
             self.pushButton_close.setIcon(self.close_icon)
             self.pushButton_close.setText("")
             self.pushButton_close.clicked.connect(lambda: main_window.close())
@@ -2216,7 +2214,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowTitle(f"OneDriveGUI v{__version__}")
         self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png"))
 
-        if gui_settings["SETTINGS"]["frameless_window"] == "True":
+        if gui_settings.get("frameless_window") == "True":
             self.setWindowFlags(Qt.FramelessWindowHint)
 
         if len(global_config) == 0:
@@ -2323,11 +2321,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.auto_sync.start(1000)
 
     def mousePressEvent(self, event):
-        if gui_settings["SETTINGS"]["frameless_window"] == "True":
+        if gui_settings.get("frameless_window") == "True":
             self.dragPos = event.globalPosition().toPoint()
 
     def mouseMoveEvent(self, event):
-        if gui_settings["SETTINGS"]["frameless_window"] == "True":
+        if gui_settings.get("frameless_window") == "True":
             self.move(self.pos() + event.globalPosition().toPoint() - self.dragPos)
             self.dragPos = event.globalPosition().toPoint()
             event.accept()
@@ -2543,7 +2541,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             logging.info(f"Worker for profile {profile_name} is already running. Please stop it first.")
             logging.info(f"Running workers: {main_window.workers}")
 
-        if "True" not in gui_settings["SETTINGS"]["QWebEngine_login"]:
+        if "True" not in gui_settings.get("QWebEngine_login"):
             # Assume GUI runs as AppImage. Force login in external browser as a workaround for #37 .
             logging.info(f"[GUI] Opening external login window")
             self.workers[profile_name].update_credentials.connect(self.show_external_login)
@@ -2840,7 +2838,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if response_dialog == QMessageBox.Ok:
             logging.info("[GUI] Login response message acknowledged.")
 
-            if "True " not in gui_settings["SETTINGS"]["QWebEngine_login"] and response_reason == "success":
+            if "True " not in gui_settings.get("QWebEngine_login") and response_reason == "success":
                 self.window2.hide()
             elif response_reason == "success":
                 self.window1.hide()
@@ -2848,14 +2846,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             else:
                 self.window2.activateWindow()
                 self.window2.raise_()
-
-
-def humanize_file_size(num, suffix="B"):
-    for unit in ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"]:
-        if abs(num) < 1024.0:
-            return f"{num:3.1f}{unit}{suffix}"
-        num /= 1024.0
-    return f"{num:.1f}Yi{suffix}"
 
 
 def read_config(config_file):
@@ -3062,7 +3052,7 @@ def main_window_start_state():
     # Determine if OneDriveGUI should start maximized, minimized to tray or minimized to taskbar/dock.
     # This should help ensure the GUI does not just disappear on Gnome without system tray extension.
 
-    if gui_settings["SETTINGS"]["start_minimized"] == "True" or len(global_config) == 0:
+    if gui_settings.get("start_minimized") == "True" or len(global_config) == 0:
         try:
             if main_window.tray.isSystemTrayAvailable():
                 main_window.hide()
@@ -3076,160 +3066,18 @@ def main_window_start_state():
         logging.info("[GUI] Starting OneDriveGUI maximized")
 
 
-def read_gui_settings():
-    default_gui_settings = {
-        "SETTINGS": {
-            "start_minimized": "False",
-            "frameless_window": "False",
-            "combined_start_stop_button": "True",
-            "show_debug": "True",
-            "save_debug": "True",
-            "log_rotation_interval": 24,
-            "log_backup_count": 3,
-            "log_file": "/tmp/onedrive-gui/onedrive-gui.log",
-            "debug_level": "DEBUG",
-            "client_bin_path": "onedrive",
-            "QWebEngine_login": "False",
-        }
-    }
-
-    gui_settings = ConfigParser()
-    gui_settings.read_dict(default_gui_settings)  # Read default settings and use them when config file does not exist.
-    gui_settings.read(GUI_SETTINGS_FILE)  # Read user settings from file and overwrite defaults.
-
-    return gui_settings
-
-
-def config_logging_handlers():
-    # Allow stdout logging and logging into rotating log file based on user settings.
-    show_debug = gui_settings["SETTINGS"]["show_debug"]
-    save_debug = gui_settings["SETTINGS"]["save_debug"]
-    log_rotation_interval = int(gui_settings["SETTINGS"]["log_rotation_interval"])
-    log_backup_count = int(gui_settings["SETTINGS"]["log_backup_count"])
-    log_file = os.path.expanduser(gui_settings["SETTINGS"]["log_file"])
-    _log_dir = re.search(r"(.+)/.+$", log_file).group(1)
-    log_dir = os.path.expanduser(_log_dir)
-
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-
-    stdout_handler = logging.StreamHandler(sys.stdout)
-    timed_handler = handlers.TimedRotatingFileHandler(
-        filename=log_file,
-        when="H",
-        interval=log_rotation_interval,
-        backupCount=log_backup_count,
-    )
-
-    log_handlers = []
-
-    if show_debug == "True":
-        log_handlers.append(stdout_handler)
-    if save_debug == "True":
-        log_handlers.append(timed_handler)
-
-    return log_handlers
-
-
-def config_debug_level():
-    debug_level = gui_settings["SETTINGS"]["debug_level"].upper()
-
-    if debug_level == "DEBUG":
-        return logging.DEBUG
-    elif debug_level == "INFO":
-        return logging.INFO
-    elif debug_level == "WARNING":
-        return logging.WARNING
-    elif debug_level == "ERROR":
-        return logging.ERROR
-    else:
-        return logging.DEBUG
-
-
 def config_client_bin_path() -> str:
-    client_bin_path = gui_settings["SETTINGS"]["client_bin_path"]
+    client_bin_path = gui_settings.get("client_bin_path")
     logging.info(f"Onedrive client location: '{client_bin_path}'")
 
     if client_bin_path == "":
         return "onedrive"
     else:
-        return gui_settings["SETTINGS"]["client_bin_path"]
-
-
-# Shorten a folder path to a given length by removing the middle of the path
-def shorten_path(path, limit):
-    # Split the path into individual segments
-    segments = path.split(os.path.sep)
-    num_segments = len(segments)
-
-    # If the path is already shorter than the limit, return it as is
-    if len(path) <= limit:
-        return path
-
-    # If there's only one segment, return it as is
-    if num_segments == 1:
-        return path
-
-    # Keep track of the left and right halves of the path
-    left = segments[:-1]
-    right = [segments[-1]]
-
-    # Join the left and right halves back together with "..." in the middle
-    def join(left, right):
-        # # If the right half is empty, return the left half plus "..."
-        if len(right) == 0:
-            return os.path.join(*left) + os.path.sep + "..."
-
-        # If the left half is empty, return "..." plus the right half
-        if len(left) == 0:
-            return "..." + os.path.sep + os.path.join(*right)
-
-        # Join the left and right halves back together with "..." in the middle
-        return os.path.join(*left) + os.path.sep + "..." + os.path.sep + os.path.join(*right)
-
-    # Loop until we reach the limit or can no longer split the path
-    while len(path) > limit and len(segments) > 1:
-        # Find the middle of the path segments list
-        middle = num_segments // 2
-
-        # Drop the path segment closest to the middle
-        if num_segments % 2 == 0:
-            # If there is only 1 element in each half, drop from the left half and exit the loop
-            if len(right) == 1 and len(left) == 1:
-                left.pop(middle - 1)
-                path = join(left, right)
-                break
-            else:
-                # If the list has an even number of segments, choose the longer one
-                if len(left[middle - 1]) >= len(right[0]):
-                    left.pop(middle - 1)
-                else:
-                    right.pop(0)
-        else:
-            # If the list has an odd number of segments, just drop the middle one
-            left.pop(middle)
-
-        # Update the segments, left, and right lists
-        segments = left + right
-        num_segments = len(segments)
-
-        left = segments[:middle]
-        right = segments[middle:]
-
-        # Update the total length of the path
-        path = join(left, right)
-
-    return path
+        return gui_settings.get("client_bin_path")
 
 
 if __name__ == "__main__":
-    gui_settings = read_gui_settings()
-
-    logging.basicConfig(
-        format="%(asctime)s [%(filename)s:%(lineno)s][fn=%(funcName)s][%(levelname)s] - %(message)s",
-        handlers=config_logging_handlers(),
-        level=config_debug_level(),
-    )
+    # gui_settings = GuiSettings(GUI_SETTINGS_FILE)
 
     logging.info(f"Starting OneDriveGUI v{__version__}")
 
