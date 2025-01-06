@@ -92,7 +92,7 @@ A simple GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive) 
 	python3 OneDriveGUI.py
 	```
 
-    Optionally, you can detach the GUI from terminal by using the bellow command:
+    Optionally, you can detach the GUI from terminal by using the below command:
     ```sh
 	cd src/
     nohup python3 OneDriveGUI.py > /dev/null 2>&1&
