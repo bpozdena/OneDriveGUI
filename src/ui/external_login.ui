@@ -19,7 +19,7 @@
      <item>
       <widget class="QLabel" name="label_1">
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:700; text-decoration: underline;&quot;&gt;OneDrive login has been requested&lt;/span&gt;&lt;/p&gt;&lt;p&gt;You will be asked to open a specific URL by using your web browser where you will have to login into your Microsoft Account and give &lt;br/&gt;OneDrive client the permission to access your files. &lt;/p&gt;&lt;p&gt;After giving permission to OneDrive client, you will be redirected to a blank page. Copy the URI of the blank page into the bellow field.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:700; text-decoration: underline;&quot;&gt;OneDrive login has been requested&lt;/span&gt;&lt;/p&gt;&lt;p&gt;You will be asked to open a specific URL by using your web browser where you will have to login into your Microsoft Account and give &lt;br/&gt;OneDrive client the permission to access your files. &lt;/p&gt;&lt;p&gt;After giving permission to OneDrive client, you will be redirected to a blank page. Copy the URI of the blank page into the below field.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
@@ -42,7 +42,7 @@
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;1)Login to OneDrive in your browser by &lt;a href=&quot;https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=d50ca740-c83f-4d1b-b616-12c519384f0c&amp;amp;scope=Files.ReadWrite%20Files.ReadWrite.all%20Sites.Read.All%20Sites.ReadWrite.All%20offline_access&amp;amp;response_type=code&amp;amp;prompt=login&amp;amp;redirect_uri=https://login.microsoftonline.com/common/oauth2/nativeclient&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#5e81ac;&quot;&gt;clicking this link.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;2)Copy the response URI from your browser's address bar to the bellow field. &lt;/p&gt;&lt;p&gt;3)Press Save.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;1) Login to OneDrive in your browser by &lt;a href=&quot;https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=d50ca740-c83f-4d1b-b616-12c519384f0c&amp;amp;scope=Files.ReadWrite%20Files.ReadWrite.all%20Sites.Read.All%20Sites.ReadWrite.All%20offline_access&amp;amp;response_type=code&amp;amp;prompt=login&amp;amp;redirect_uri=https://login.microsoftonline.com/common/oauth2/nativeclient&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#5e81ac;&quot;&gt;clicking this link.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;2) Copy the response URI from your browser's address bar into the below field. &lt;/p&gt;&lt;p&gt;3) Press Save.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
@@ -52,7 +52,7 @@
      <item>
       <widget class="QPushButton" name="pushButton_login">
        <property name="text">
-        <string>Login</string>
+        <string>Save</string>
        </property>
       </widget>
      </item>
