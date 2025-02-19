@@ -45,4 +45,5 @@ class GuiSettings:
 
 
 GUI_SETTINGS_FILE = os.path.expanduser("~/.config/onedrive-gui/gui_settings")
+
 gui_settings = GuiSettings(GUI_SETTINGS_FILE)
