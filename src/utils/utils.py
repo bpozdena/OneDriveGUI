@@ -1,4 +1,11 @@
 import os
+import subprocess
+import re
+
+import logging
+# from logger import logger
+
+from settings.gui_settings import gui_settings
 
 
 def humanize_file_size(num, suffix="B"):
@@ -73,3 +80,28 @@ def shorten_path(path, limit):
         path = join(left, right)
 
     return path
+
+
+def get_installed_client_version(client_bin_path: str) -> int:
+    try:
+        # Checks installed client version. Later used to remove unsupported options from account config if needed.
+        # TODO: Restructure and perform this in different function.
+        client_version_check = subprocess.check_output([client_bin_path, "--version"], stderr=subprocess.STDOUT)
+        installed_client_version = re.search(r".\s(v[0-9.]+)", str(client_version_check)).group(1)
+        installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
+    except:
+        logging.error(f"[GUI] Onedrive client not found!")
+        installed_client_version_num = 0
+
+    logging.debug(f"[GUI] Installed client version is {installed_client_version_num}")
+    return installed_client_version_num
+
+
+def config_client_bin_path() -> str:
+    client_bin_path = gui_settings.get("client_bin_path")
+    logging.info(f"Onedrive client location: '{client_bin_path}'")
+
+    if client_bin_path == "":
+        return "onedrive"
+    else:
+        return gui_settings.get("client_bin_path")
