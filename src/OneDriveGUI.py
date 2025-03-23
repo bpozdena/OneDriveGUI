@@ -2550,7 +2550,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             # Use QT WebEngine for a more convenient login.
             logging.info(f"[GUI] Opening WebEngine login window")
-            self.workers[profile_name].update_credentials.connect(self.show_login)
+            self.workers[profile_name].update_credentials.connect(self.show_external_login)
 
         self.workers[profile_name].trigger_resync.connect(self.resync_auth_dialog)
         self.workers[profile_name].trigger_big_delete.connect(self.big_delete_auth_dialog)
