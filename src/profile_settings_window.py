@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QStyledItemDelegate,
     QStyleOptionViewItem,
+    QInputDialog,
 )
 
 # Imports for Profiles windows.
@@ -19,13 +20,16 @@ import os
 import copy
 from configparser import ConfigParser
 
-from wizard import setup_wizard
+# Import setup_wizard after importing wizard, keeping it at the bottom to avoid circular imports
+import wizard
 from global_config import save_global_config
 
-# from main_window import main_window
+# Import main_window (lazy import to avoid circular references)
+import main_window
 from options import client_bin_path, global_config
-from options import temp_global_config  # , profile_settings_window
+from options import temp_global_config
 
+from workers import workers
 
 import logging
 
@@ -35,13 +39,14 @@ from global_config import DIR_PATH, PROFILES_FILE
 
 class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
     remove_profile_signal = Signal(str)
+    rename_profile_signal = Signal(str, str)  # Signal to emit old_name, new_name
 
     def __init__(self):
         super(ProfileSettingsWindow, self).__init__()
 
         # Listen for Signals from wizard
-        # self.setup_wizard = setup_wizard
-        setup_wizard.add_profile_signal.connect(self.add_profile)
+        # Access setup_wizard through the wizard module to avoid circular imports
+        wizard.setup_wizard.add_profile_signal.connect(self.add_profile)
 
         self.unsaved_profiles = []
 
@@ -64,6 +69,7 @@ class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
         self.listWidget_profiles.itemSelectionChanged.connect(self.switch_account_settings_page)
 
         self.pushButton_remove.clicked.connect(self.remove_profile)
+        self.pushButton_rename.clicked.connect(self.rename_profile)
         self.pushButton_create_import.clicked.connect(self.show_setup_wizard)
 
     def add_profile(self, profile):
@@ -120,36 +126,124 @@ class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
         self.stackedLayout.setCurrentIndex(self.listWidget_profiles.currentRow())
 
     def show_setup_wizard(self):
-        # self.setup_wizard = SetupWizard()
-        setup_wizard.setStartId(3)
-        setup_wizard.show()
+        # Access setup_wizard through the wizard module to avoid circular imports
+        wizard.setup_wizard.setStartId(3)
+        wizard.setup_wizard.show()
 
     def remove_profile(self):
         # Stop checking for unsaved changes while new profile is being removed.
         self.stop_unsaved_changes_timer()
 
-        # Remove profile from settings window.
         selected_profile_name = self.listWidget_profiles.currentItem().text()
-        selected_profile_index = self.listWidget_profiles.currentRow()
-        selected_profile_widget = self.stackedLayout.currentWidget()
-        self.listWidget_profiles.takeItem(selected_profile_index)
-        self.stackedLayout.removeWidget(selected_profile_widget)
 
-        # Remove profile from main window.
-        print(f"emit removal of profile {selected_profile_name}")
-        self.remove_profile_signal.emit(selected_profile_name)
+        # Add confirmation dialog
+        confirm_removal = QMessageBox.question(
+            self,
+            "Confirm Profile Removal",
+            f"Are you sure you want to remove the profile <b>{selected_profile_name}</b>?",
+            buttons=QMessageBox.Yes | QMessageBox.No,
+            defaultButton=QMessageBox.No,
+        )
 
-        # Load existing user profiles and remove the new profile.
-        _profiles = ConfigParser()
-        _profiles.read(PROFILES_FILE)
-        _profiles.remove_section(selected_profile_name)
+        if confirm_removal == QMessageBox.Yes:
+            logging.info(f"[GUI] Removing profile: {selected_profile_name}")
+            # Remove profile from settings window.
+            selected_profile_index = self.listWidget_profiles.currentRow()
+            selected_profile_widget = self.stackedLayout.currentWidget()
+            self.listWidget_profiles.takeItem(selected_profile_index)
+            self.stackedLayout.removeWidget(selected_profile_widget)
 
-        # Save the new profiles file.
-        with open(PROFILES_FILE, "w") as profilefile:
-            _profiles.write(profilefile)
+            # Remove profile from main window.
+            print(f"emit removal of profile {selected_profile_name}")
+            self.remove_profile_signal.emit(selected_profile_name)
 
-        # Start checking for unsaved changes again after profile has been removed.
-        self.start_unsaved_changes_timer()
+            # Load existing user profiles and remove the new profile.
+            _profiles = ConfigParser()
+            _profiles.read(PROFILES_FILE)
+            _profiles.remove_section(selected_profile_name)
+
+            # Save the new profiles file.
+            with open(PROFILES_FILE, "w") as profilefile:
+                _profiles.write(profilefile)
+
+            # Start checking for unsaved changes again after profile has been removed.
+            self.start_unsaved_changes_timer()
+        else:
+            logging.info(f"[GUI] Profile removal cancelled for: {selected_profile_name}")
+            # If removal is cancelled, restart the timer as no changes were made
+            self.start_unsaved_changes_timer()
+
+    def rename_profile(self):
+        selected_item = self.listWidget_profiles.currentItem()
+        if not selected_item:
+            QMessageBox.warning(self, "Rename Profile", "Please select a profile to rename.")
+            return
+
+        old_name = selected_item.text()
+
+        new_name, ok = QInputDialog.getText(
+            self, "Rename Profile", f"Enter new name for profile '{old_name}':", text=old_name
+        )
+
+        if ok and new_name:
+            new_name = new_name.strip()
+            if not new_name:
+                QMessageBox.warning(self, "Rename Profile", "Profile name cannot be empty.")
+                return
+            if new_name == old_name:
+                logging.info("[GUI] Rename cancelled: New name is the same as the old name.")
+                return
+            if new_name in global_config:
+                QMessageBox.warning(self, "Rename Profile", f"Profile '{new_name}' already exists.")
+                return
+
+            logging.info(f"[GUI] Renaming profile '{old_name}' to '{new_name}'.")
+
+            # Stop checking for unsaved changes during rename
+            self.stop_unsaved_changes_timer()
+
+            # 4. Update global_config and temp_global_config.
+            global_config[new_name] = global_config.pop(old_name)
+            temp_global_config[new_name] = temp_global_config.pop(old_name)
+
+            # 5. Rename section in PROFILES_FILE.
+            _profiles = ConfigParser()
+            _profiles.read(PROFILES_FILE)
+            if _profiles.has_section(old_name):
+                items = _profiles.items(old_name)
+                _profiles.add_section(new_name)
+                for key, value in items:
+                    _profiles.set(new_name, key, value)
+                _profiles.remove_section(old_name)
+                with open(PROFILES_FILE, "w") as profilefile:
+                    _profiles.write(profilefile)
+            else:
+                logging.warning(f"[GUI] Section '{old_name}' not found in {PROFILES_FILE}.")
+
+            # 6. Update listWidget_profiles item.
+            selected_item.setText(new_name)
+
+            # 7. Update label_profile_name in the corresponding ProfileSettingsPage.
+            current_index = self.listWidget_profiles.currentRow()
+            page_widget = self.stackedLayout.widget(current_index)
+            if isinstance(page_widget, ProfileSettingsPage):
+                page_widget.profile = new_name  # Update the profile name stored in the page widget
+                page_widget.label_profile_name.setText(new_name)
+                # Update the temp_profile_config reference in the page widget
+                page_widget.temp_profile_config = temp_global_config[new_name]
+
+            # 8. Signal main_window to update profile name display.
+            self.rename_profile_signal.emit(old_name, new_name)
+
+            # Save the updated global config
+            save_global_config(global_config)
+
+            # Restart checking for unsaved changes
+            self.start_unsaved_changes_timer()
+
+        elif not ok:
+            logging.info("[GUI] Rename profile dialog cancelled.")
+        # If ok is True but new_name is empty, the validation message box is shown.
 
 
 class ListItemDelegate(QStyledItemDelegate):
@@ -203,7 +297,19 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         config_changed = False
         sync_list_changed = False
         pixmap_warning = QPixmap(DIR_PATH + "/resources/images/warning.png").scaled(20, 20, Qt.KeepAspectRatio)
-        unsaved_profile = profile_settings_window.listWidget_profiles.findItems(self.profile, Qt.MatchExactly)[0]
+
+        # Check if profile exists in listWidget
+        matching_items = profile_settings_window.listWidget_profiles.findItems(self.profile, Qt.MatchExactly)
+        if not matching_items:
+            logging.warning(f"[PROFILE_SETTINGS] Profile {self.profile} not found in UI list, skipping check")
+            return
+
+        unsaved_profile = matching_items[0]
+
+        # Check if profile exists in global_config
+        if self.profile not in global_config:
+            logging.warning(f"[PROFILE_SETTINGS] Profile {self.profile} not found in global_config, skipping check")
+            return
 
         # Unsaved changes to config file?
         if global_config[self.profile] != self.temp_profile_config:
@@ -328,7 +434,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_disable_notifications.stateChanged.connect(self.validate_checkbox_input)
 
         # Account tab
-        self.pushButton_login.clicked.connect(lambda: main_window.show_login(self.profile))
+        self.pushButton_login.clicked.connect(lambda: main_window.main_window_instance.show_login(self.profile))
         self.pushButton_logout.clicked.connect(self.logout)
         self.checkBox_auto_sync.stateChanged.connect(self.set_check_box_state_profile)
 
@@ -516,17 +622,19 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         os.system(f"{client_bin_path} --confdir='{self.config_dir}' --logout")
         logging.info(f"Profile {self.profile} has been logged out.")
 
-        main_window.profile_status_pages[self.profile].stop_monitor()
-        if self.profile in main_window.workers:
-            main_window.workers[self.profile].stop_worker()
-            main_window.profile_status_pages[self.profile].label_onedrive_status.setText(
+        main_window.main_window_instance.profile_status_pages[self.profile].stop_monitor()
+        if self.profile in workers:
+            workers[self.profile].stop_worker()
+            main_window.main_window_instance.profile_status_pages[self.profile].label_onedrive_status.setText(
                 "OneDrive sync has been stopped"
             )
             logging.info(f"OneDrive sync for profile {self.profile} has been stopped.")
         else:
             logging.info(f"OneDrive for profile {self.profile} is not running.")
 
-        main_window.profile_status_pages[self.profile].label_onedrive_status.setText("You have been logged out")
+        main_window.main_window_instance.profile_status_pages[self.profile].label_onedrive_status.setText(
+            "You have been logged out"
+        )
 
     def get_sync_dir_name(self):
         self.file_dialog = QFileDialog.getExistingDirectory(dir=os.path.expanduser("~/"))

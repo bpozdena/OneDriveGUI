@@ -48,18 +48,28 @@ import logging
 # from logger import logger
 from global_config import DIR_PATH, PROFILES_FILE
 
-# try:
-#     from ui.ui_login import Ui_LoginWindow
-# except ImportError:
-#     logging.warning("Failed to import ui_login. This is expected if you are running AppImage version.")
+try:
+    from ui.ui_login import Ui_LoginWindow
+except ImportError:
+    logging.warning("Failed to import ui_login. This is expected if you are running AppImage version.")
+
+    # Define a dummy class to avoid errors when this UI component isn't available
+    class Ui_LoginWindow:
+        def setupUi(self, window):
+            logging.error("LoginWindow UI is not available in this environment")
+            window.hide()
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
-        # self.setup_wizard = setup_wizard
-        self.setup_wizard.show_main_window_signal.connect(self.show)
+        # Access setup_wizard from wizard module to avoid circular imports
+        import wizard
+
+        wizard.setup_wizard.show_main_window_signal.connect(self.show)
+        wizard.setup_wizard.add_profile_signal.connect(self.add_profile)
 
         profile_settings_window.remove_profile_signal.connect(self.remove_profile)
+        profile_settings_window.rename_profile_signal.connect(self.rename_profile_in_main_window)
 
         super(MainWindow, self).__init__()
         self.setupUi(self)
@@ -357,6 +367,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
 
         for profile_name in global_config:
+            # Check if profile exists in profile_status_pages, if not add it
+            if profile_name not in self.profile_status_pages:
+                logging.info(f"Profile {profile_name} found in global_config but not in UI, adding it now")
+                self.add_profile(profile_name)
+
             profile_status_page = self.profile_status_pages[profile_name]
 
             if profile_name not in workers:
@@ -693,7 +708,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             response_dialog = QMessageBox.critical(
                 self,
                 "Login failed",
-                f"Login failed!  Please verify your response URL and try again." f"<br><br> {response_reason}",
+                f"Login failed!  Please verify your response URL and try again.<br><br> {response_reason}",
                 buttons=QMessageBox.Ok,
                 defaultButton=QMessageBox.Ok,
             )
@@ -715,11 +730,97 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         workers.pop(profile_name, None)
         logging.info(f"[GUI] Remaining running workers: {workers}")
 
+    def add_profile(self, profile_name):
+        """
+        Adds a new profile to the main window UI.
+        Called when a new profile is created through the wizard.
+        """
+        logging.info(f"[MAIN_WINDOW] Adding profile {profile_name} to main window UI")
+
+        # Check if profile already exists in UI
+        if profile_name in self.profile_status_pages:
+            logging.info(f"[MAIN_WINDOW] Profile {profile_name} already exists in UI, skipping add")
+            return
+
+        # Create a profile status page and add it to the UI
+        self.comboBox.addItem(profile_name)
+        self.profile_status_pages[profile_name] = ProfileStatusPage(profile_name)
+        self.profile_status_pages[profile_name].start_sync_signal.connect(self.start_onedrive_monitor)
+        self.profile_status_pages[profile_name].stop_sync_signal.connect(self.stop_onedrive_monitor)
+        self.profile_status_pages[profile_name].quit_gui_signal.connect(self.graceful_shutdown)
+        self.stackedLayout.addWidget(self.profile_status_pages[profile_name])
+
+        # Select the newly added profile
+        index = self.comboBox.findText(profile_name)
+        if index >= 0:
+            self.comboBox.setCurrentIndex(index)
+            self.stackedLayout.setCurrentIndex(index)
+            logging.info(f"[MAIN_WINDOW] Selected profile {profile_name} at index {index}")
+
+        # Show comboBox if more than one profile exists
+        if len(self.profile_status_pages) > 1:
+            self.comboBox.show()
+
+        # Force update the UI
+        self.comboBox.update()
+        self.update()
+
+        # Make the profile visible and force a layout refresh
+        self.comboBox.show()
+        self.stackedLayout.update()
+        self.verticalLayout_2.update()
+
+        # Process events to ensure UI updates immediately
+        from PySide6.QtCore import QCoreApplication
+
+        QCoreApplication.processEvents()
+
+    @Slot(str, str)
+    def rename_profile_in_main_window(self, old_name, new_name):
+        """
+        Updates the profile name in the main window UI elements.
+        """
+        logging.info(f"[MAIN_WINDOW] Renaming profile '{old_name}' to '{new_name}' in main window UI.")
+
+        # 1. Update the item text in the comboBox.
+        index = self.comboBox.findText(old_name)
+        if index >= 0:
+            self.comboBox.setItemText(index, new_name)
+            logging.debug(f"[MAIN_WINDOW] Updated comboBox item at index {index} from '{old_name}' to '{new_name}'.")
+        else:
+            logging.warning(f"[MAIN_WINDOW] Profile '{old_name}' not found in comboBox.")
+
+        # 2. Update the key in the self.profile_status_pages dictionary.
+        if old_name in self.profile_status_pages:
+            self.profile_status_pages[new_name] = self.profile_status_pages.pop(old_name)
+            # Also update the profile_name attribute within the ProfileStatusPage instance
+            self.profile_status_pages[new_name].profile_name = new_name
+            logging.debug(f"[MAIN_WINDOW] Updated profile_status_pages key from '{old_name}' to '{new_name}'.")
+        else:
+            logging.warning(f"[MAIN_WINDOW] Profile '{old_name}' not found in profile_status_pages.")
+
+        # 3. Update the key in the workers dictionary if a worker exists.
+        if old_name in workers:
+            workers[new_name] = workers.pop(old_name)
+            # Also update the profile_name attribute within the WorkerThread instance
+            workers[new_name].profile_name = new_name
+            logging.debug(f"[MAIN_WINDOW] Updated workers key from '{old_name}' to '{new_name}'.")
+        else:
+            logging.debug(f"[MAIN_WINDOW] No worker found for profile '{old_name}'.")
+
+        # Force update the UI
+        self.comboBox.update()
+        self.update()
+
+        # Process events to ensure UI updates immediately
+        from PySide6.QtCore import QCoreApplication
+
+        QCoreApplication.processEvents()
+
     def remove_profile(self, profile_name):
         """
         Removes onedrive profile from the GUI.
         """
-        print("AAAAA")
         combo_box_index = self.comboBox.findText(profile_name)
         self.comboBox.removeItem(combo_box_index)
         self.stackedLayout.setCurrentIndex(0)
