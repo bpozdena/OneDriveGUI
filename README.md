@@ -37,7 +37,7 @@ A GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive) with mu
 - No warranty.
 
 # Running and Installing OneDriveGUI
-| :exclamation:        | Ensure the latest version of [OneDrive for Linux](https://abraunegg.github.io/) is installed based on [instructions](https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md) for your distro. |
+| :exclamation:        | Ensure the latest version of [OneDrive for Linux](https://abraunegg.github.io/) is installed based on [instructions](https://github.com/abraunegg/onedrive/blob/master/docs/install.md) for your distro. |
 |-----------------------|:----------------------------------------------------------------------------------------------------------------|
 
 ## AppImage 
