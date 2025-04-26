@@ -14,9 +14,6 @@ from PySide6.QtWidgets import (
     QComboBox,
 )
 
-# from profile_settings_window import profile_settings_page
-# from main_window import ProfileStatusPage
-
 import re
 import os
 import sys
@@ -25,11 +22,7 @@ import requests
 import subprocess
 from configparser import ConfigParser
 
-# from wizard import SetupWizard
 from global_config import save_global_config, read_config
-
-# from profile_settings_window import profile_settings_window, ProfileSettingsPage
-# from main_window import main_window
 from options import (
     global_config,
     temp_global_config,
@@ -38,26 +31,17 @@ from options import (
     version,
 )
 
-
 from workers import MaintenanceWorker
-
-
 import logging
-
-# from logger import logger
 from global_config import DIR_PATH, PROFILES_FILE
 
 
 class SetupWizard(QWizard):
     show_main_window_signal = Signal()
+    add_profile_signal = Signal(str)
 
     def __init__(self, parent=None):
         super(SetupWizard, self).__init__(parent)
-        # Lazy import
-        from profile_settings_window import ProfileSettingsWindow
-        self.profile_settings_window = ProfileSettingsWindow()        
-        
-        
         self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png"))
 
         self.setPage(1, WizardPage_welcome(self))
@@ -73,6 +57,45 @@ class SetupWizard(QWizard):
 
         self.currentIdChanged.connect(self.on_page_change)
         # self.profile_settings_window = profile_settings_window
+
+    def showEvent(self, event):
+        """Reset form fields when wizard is shown"""
+        super(SetupWizard, self).showEvent(event)
+
+        # Always restart at the first page (Welcome)
+        self.restart()
+
+        # Reset the create profile page
+        create_page = self.page(4)
+        if hasattr(create_page, "lineEdit_new_profile_name"):
+            create_page.lineEdit_new_profile_name.setText("")
+            create_page.lineEdit_sync_dir.setText("")
+            create_page.pushButton_create.setText("Create new profile")
+            create_page.pushButton_create.setEnabled(False)
+            create_page.lineEdit_new_profile_name.setEnabled(True)
+            create_page.lineEdit_sync_dir.setEnabled(True)
+            create_page.pushButton_browse.setEnabled(True)
+
+        # Reset the import profile page
+        import_page = self.page(5)
+        if hasattr(import_page, "lineEdit_profile_name"):
+            import_page.lineEdit_profile_name.setText("")
+            import_page.lineEdit_config_path.setText("")
+            import_page.pushButton_import.setText("Import")
+            import_page.pushButton_import.setEnabled(False)
+            import_page.lineEdit_profile_name.setEnabled(True)
+            import_page.lineEdit_config_path.setEnabled(True)
+            import_page.pushButton_browse.setEnabled(True)
+
+        # Reset the create/import selection page
+        selection_page = self.page(3)
+        if hasattr(selection_page, "checkBox_create"):
+            selection_page.checkBox_create.setChecked(False)
+            selection_page.checkBox_import.setChecked(False)
+            selection_page.checkBox_sharepoint_library.setChecked(False)
+            selection_page.checkBox_create.setEnabled(True)
+            selection_page.checkBox_import.setEnabled(True)
+            selection_page.checkBox_sharepoint_library.setEnabled(True)
 
     def on_page_change(self):
         if self.currentId() == 2:
@@ -348,11 +371,21 @@ class wizardPage_create_shared_library(QWizardPage):
 
         logging.info(f"[GUI] Starting maintenance worker to obtain SharePoint Library List for profile {profile_name}.")
 
+        # Create and configure the worker before connecting signals
         self.obtain_sharepoint_site_list = MaintenanceWorker(profile_name, options)
-        self.obtain_sharepoint_site_list.start()
+
+        # Connect signals before starting the worker
         self.obtain_sharepoint_site_list.update_sharepoint_site_list.connect(
             self.populate_comboBox_sharepoint_site_list
         )
+
+        # Process events to ensure UI stays responsive
+        from PySide6.QtCore import QCoreApplication
+
+        QCoreApplication.processEvents()
+
+        # Start the worker after all connections are set up
+        self.obtain_sharepoint_site_list.start()
 
     def populate_comboBox_sharepoint_site_list(self, sharepoint_site_list):
         """
@@ -443,7 +476,7 @@ class wizardPage_create_shared_library(QWizardPage):
         _site_name = self.comboBox_sharepoint_site_list.currentText()
         _library_name = self.comboBox_sharepoint_library_list.currentText()
         _library_id = self.library_dict[_library_name]
-        profile_name = f'SharePoint_{_site_name.replace(" ", "_")}_{_library_name.replace(" ", "_")}'
+        profile_name = f"SharePoint_{_site_name.replace(' ', '_')}_{_library_name.replace(' ', '_')}"
 
         sync_dir = os.path.expanduser(f"~/{profile_name}")
         config_path = os.path.expanduser(f"~/.config/onedrive/accounts/{profile_name}/config")
@@ -516,6 +549,16 @@ class wizardPage_create_shared_library(QWizardPage):
         self.pushButton_create_profile.setText("Done")
         self.pushButton_create_profile.setDisabled(True)
         self.comboBox_sharepoint_library_list.setDisabled(True)
+
+        # Emit signal to add the profile to profile settings window and main window
+        logging.info(f"[WIZARD] Emitting add_profile_signal for {profile_name}")
+        wizard_instance = self.wizard()
+        logging.info(f"[WIZARD] wizard_instance: {wizard_instance}")
+        if wizard_instance:
+            wizard_instance.add_profile_signal.emit(profile_name)
+            logging.info(f"[WIZARD] Signal emitted successfully")
+        else:
+            logging.error(f"[WIZARD] Failed to get wizard instance!")
 
         self.completeChanged.emit()
 
@@ -658,7 +701,15 @@ class wizardPage_create(QWizardPage):
         save_global_config(global_config)
 
         # Add Setting page widget for new profile
-        self.add_profile_signal.emit(profile_name)
+        # Emit signal to add the profile to profile settings window and main window
+        logging.info(f"[WIZARD] Emitting add_profile_signal for {profile_name}")
+        wizard_instance = self.wizard()
+        logging.info(f"[WIZARD] wizard_instance: {wizard_instance}")
+        if wizard_instance:
+            wizard_instance.add_profile_signal.emit(profile_name)
+            logging.info(f"[WIZARD] Signal emitted successfully")
+        else:
+            logging.error(f"[WIZARD] Failed to get wizard instance!")
         # self.profile_settings_window.listWidget_profiles.addItem(profile_name)
         # # self.setting_page = ProfileSettingsPage(profile_name)
         # self.profile_settings_window.stackedLayout.addWidget(self.setting_page)
@@ -684,7 +735,16 @@ class wizardPage_create(QWizardPage):
         self.lineEdit_new_profile_name.setDisabled(True)
         self.lineEdit_sync_dir.setDisabled(True)
         self.pushButton_browse.setDisabled(True)
+
+        # Force UI update immediately
+        from PySide6.QtCore import QCoreApplication
+
+        QCoreApplication.processEvents()
+
+        # Signal that this page is complete so the wizard can move to the next page
         self.completeChanged.emit()
+        # Force the wizard to advance to the next page
+        self.wizard().next()
 
 
 class wizardPage_import(QWizardPage):
@@ -837,6 +897,15 @@ class wizardPage_import(QWizardPage):
         # Automatically save global config to prevent loss if user does not press 'Save' button.
         save_global_config(global_config)
 
+        # Emit signal to add the profile to main window and profile settings window
+        logging.info(f"[WIZARD] Emitting add_profile_signal for imported profile {profile_name}")
+        wizard_instance = self.wizard()
+        if wizard_instance:
+            wizard_instance.add_profile_signal.emit(profile_name)
+            logging.info(f"[WIZARD] Signal emitted successfully for imported profile")
+        else:
+            logging.error(f"[WIZARD] Failed to get wizard instance!")
+
         # Start checking for unsaved changes again after new profile has being created.
         # self.profile_settings_window.start_unsaved_changes_timer()
 
@@ -867,4 +936,5 @@ class wizardPage_finish(QWizardPage):
         self.setLayout(layout)
 
 
+# Create a single instance of the wizard
 setup_wizard = SetupWizard()

@@ -48,14 +48,10 @@ workers = {}
 
 
 if __name__ == "__main__":
-    # gui_settings = GuiSettings(GUI_SETTINGS_FILE)
-
     logging.info(f"Starting OneDriveGUI v{version}")
 
     if len(global_config) > 0:
         save_global_config(global_config)
-
-    # setup_wizard = SetupWizard(profile_settings_window=profile_settings_window)
 
     main_window = MainWindow()
     main_window_start_state()
