@@ -264,8 +264,7 @@ class WorkerThread(QThread):
 
             elif "sync_business_shared_folders" in stdout:
                 self.profile_status["status_message"] = (
-                    "Business Shared Folder "
-                    '<a href="https://github.com/abraunegg/onedrive/blob/master/docs/business-shared-items.md"> has been deprecated</a>.'
+                    'Business Shared Folder <a href="https://github.com/abraunegg/onedrive/blob/master/docs/business-shared-items.md"> has been deprecated</a>.'
                 )
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
@@ -280,11 +279,11 @@ class WorkerThread(QThread):
             elif "command not found" in stdout:
                 logging.error(
                     """Onedrive does not seem to be installed. Please install it as per instruction at 
-                https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md """
+                https://github.com/abraunegg/onedrive/blob/master/docs/install.md """
                 )
 
                 self.profile_status["status_message"] = (
-                    'OneDrive Client not found! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md" style="color:#FFFFFF;">install</a> it.'
+                    'OneDrive Client not found! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/install.md" style="color:#FFFFFF;">install</a> it.'
                 )
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
