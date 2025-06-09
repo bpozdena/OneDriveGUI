@@ -156,7 +156,7 @@ class wizardPage_version_check(QWizardPage):
         self.label_5.setOpenExternalLinks(True)
         self.label_5.setText(
             "OneDrive Client for Linux does not seem to be installed. Please install it by following "
-            "<a href='https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md'>instructions</a> for your distro. "
+            "<a href='https://github.com/abraunegg/onedrive/blob/master/docs/install.md'>instructions</a> for your distro. "
         )
 
         layout = QVBoxLayout()
@@ -171,18 +171,14 @@ class wizardPage_version_check(QWizardPage):
             client_version_check = subprocess.check_output([client_bin_path, "--version"], stderr=subprocess.STDOUT)
             installed_client_version = re.search(r"(v[0-9.]+)", str(client_version_check)).group(1)
             installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
-            installed_client_version_num = (
-                installed_client_version_num
-                if len(str(installed_client_version_num)) > 3
-                else installed_client_version_num * 10
-            )
+            installed_client_version_num = installed_client_version_num if len(str(installed_client_version_num)) > 3 else installed_client_version_num * 10
             min_supported_version_num = 2500
 
             if installed_client_version_num < min_supported_version_num:
                 logging.info(f"Unsupported OneDrive {installed_client_version} detected.")
                 self.label_4.setOpenExternalLinks(True)
                 self.label_4.setText(
-                    f'OneDrive {installed_client_version} is not supported. Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md">upgrade</a> it.'
+                    f'OneDrive {installed_client_version} is not supported. Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/install.md">upgrade</a> it.'
                 )
                 self.label_4.setStyleSheet("color: red;")
                 self.label_5.hide()
@@ -375,9 +371,7 @@ class wizardPage_create_shared_library(QWizardPage):
         self.obtain_sharepoint_site_list = MaintenanceWorker(profile_name, options)
 
         # Connect signals before starting the worker
-        self.obtain_sharepoint_site_list.update_sharepoint_site_list.connect(
-            self.populate_comboBox_sharepoint_site_list
-        )
+        self.obtain_sharepoint_site_list.update_sharepoint_site_list.connect(self.populate_comboBox_sharepoint_site_list)
 
         # Process events to ensure UI stays responsive
         from PySide6.QtCore import QCoreApplication
@@ -426,9 +420,7 @@ class wizardPage_create_shared_library(QWizardPage):
         self.pushButton_get_libraries.setDisabled(True)
         self.comboBox_sharepoint_site_list.setDisabled(True)
 
-        logging.info(
-            f"[GUI] Starting maintenance worker to obtain SharePoint Library Drive ID for library {library_name} from profile {profile_name}."
-        )
+        logging.info(f"[GUI] Starting maintenance worker to obtain SharePoint Library Drive ID for library {library_name} from profile {profile_name}.")
 
         self.obtain_library_drive_ids = MaintenanceWorker(profile_name, options)
         self.obtain_library_drive_ids.start()

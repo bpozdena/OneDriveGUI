@@ -297,11 +297,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 installed_client_version = re.search(r"(v[0-9.]+)", str(client_version_check)).group(1)
 
                 installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
-                installed_client_version_num = (
-                    installed_client_version_num
-                    if len(str(installed_client_version_num)) > 3
-                    else installed_client_version_num * 10
-                )
+                installed_client_version_num = installed_client_version_num if len(str(installed_client_version_num)) > 3 else installed_client_version_num * 10
 
                 return installed_client_version, installed_client_version_num
 
@@ -313,9 +309,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             latest_client_version = get_latest_client_version()
             installed_client_version = get_installed_client_version()
 
-            logging.debug(
-                f"[GUI] Client version check: Installed: {installed_client_version[0]} | Latest: {latest_client_version}"
-            )
+            logging.debug(f"[GUI] Client version check: Installed: {installed_client_version[0]} | Latest: {latest_client_version}")
 
             if not installed_client_version:
                 version_label_text = "OneDrive client not found!"
@@ -327,8 +321,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 version_tooltip_text = "Unable to check for latest OneDrive client version!"
 
             elif installed_client_version[1] < min_supported_version:
-                version_label_text = 'Unsupported OneDrive client! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/INSTALL.md" style="color:#FFFFFF;">upgrade</a> it.'
-                version_tooltip_text = f"Your OneDrive Client version not supported! Please upgrade it. \n Installed: {installed_client_version[0]} \n Latest: {latest_client_version}"
+                version_label_text = (
+                    'Unsupported OneDrive client! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/install.md" style="color:#FFFFFF;">upgrade</a> it.'
+                )
+                version_tooltip_text = (
+                    f"Your OneDrive Client version not supported! Please upgrade it. \n Installed: {installed_client_version[0]} \n Latest: {latest_client_version}"
+                )
                 min_requirements_met = False
 
             elif latest_client_version not in installed_client_version[0]:
@@ -359,12 +357,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def onedrive_process_status(self):
         # Check OneDrive status and start/stop sync button.
-        pixmap_running = QPixmap(DIR_PATH + "/resources/images/icons8-green-circle-48.png").scaled(
-            24, 24, Qt.KeepAspectRatio
-        )
-        pixmap_stopped = QPixmap(DIR_PATH + "/resources/images/icons8-red-circle-48.png").scaled(
-            24, 24, Qt.KeepAspectRatio
-        )
+        pixmap_running = QPixmap(DIR_PATH + "/resources/images/icons8-green-circle-48.png").scaled(24, 24, Qt.KeepAspectRatio)
+        pixmap_stopped = QPixmap(DIR_PATH + "/resources/images/icons8-red-circle-48.png").scaled(24, 24, Qt.KeepAspectRatio)
 
         for profile_name in global_config:
             # Check if profile exists in profile_status_pages, if not add it
@@ -400,15 +394,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def autostart_monitor(self):
         # Auto-start sync if compatible version of OneDrive client is installed.
         for profile_name in global_config:
-            logging.debug(
-                f"[{profile_name}] Compatible client version found: {self.profile_status_pages[profile_name].pushButton_start.isEnabled()}"
-            )
+            logging.debug(f"[{profile_name}] Compatible client version found: {self.profile_status_pages[profile_name].pushButton_start.isEnabled()}")
             logging.debug(f"[{profile_name}] Auto-sync enabled for profile: {global_config[profile_name]['auto_sync']}")
 
-            if (
-                self.profile_status_pages[profile_name].pushButton_start.isEnabled()
-                and global_config[profile_name]["auto_sync"] == "True"
-            ):
+            if self.profile_status_pages[profile_name].pushButton_start.isEnabled() and global_config[profile_name]["auto_sync"] == "True":
                 self.start_onedrive_monitor(profile_name)
 
     def start_onedrive_monitor(self, profile_name, options=""):
@@ -506,11 +495,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         absolute_path = QFileInfo(file_path).absolutePath().replace(" ", "%20")
         relative_path_display = os.path.relpath(QFileInfo(file_path).absolutePath(), _sync_dir + os.path.sep)
         parent_dir = re.search(r".+/([^/]+)/.+$", file_path).group(1)
-        file_size = (
-            QFileInfo(file_path + ".partial").size()
-            if QFileInfo(file_path).size() == 0
-            else QFileInfo(file_path).size()
-        )
+        file_size = QFileInfo(file_path + ".partial").size() if QFileInfo(file_path).size() == 0 else QFileInfo(file_path).size()
         file_size_human = humanize_file_size(file_size)
         file_name = QFileInfo(file_path).fileName()
         progress = data["progress"]
@@ -556,9 +541,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         # Estimate final size of file before download completes
                         # Adding 5% to progress as the OD client report status 5% behind.
                         item_widget.set_label_1(file_operation)
-                        item_widget.set_label_2(
-                            f"{humanize_file_size(file_size)} of ~{humanize_file_size(int(file_size) / (int(progress) + 5) * 100)}"
-                        )
+                        item_widget.set_label_2(f"{humanize_file_size(file_size)} of ~{humanize_file_size(int(file_size) / (int(progress) + 5) * 100)}")
                     else:
                         item_widget.set_label_1(file_operation)
                         item_widget.set_label_2(f"{progress_data_human} of {file_size_human}")
@@ -594,9 +577,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 # Estimate final size of file before download completes
                 # Adding 5% to progress as the OD client report status 5% behind.
                 myQCustomQWidget.set_label_1(file_operation)
-                myQCustomQWidget.set_label_2(
-                    f"{humanize_file_size(file_size)} of ~{humanize_file_size(int(file_size) / (int(progress) + 5) * 100)}"
-                )
+                myQCustomQWidget.set_label_2(f"{humanize_file_size(file_size)} of ~{humanize_file_size(int(file_size) / (int(progress) + 5) * 100)}")
             else:
                 myQCustomQWidget.set_label_1(file_operation)
                 myQCustomQWidget.set_label_2(f"{progress_data_human} of {file_size_human}")
@@ -640,9 +621,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lw.loginFrame.setUrl(QUrl(url))
 
         # Wait for user to login and obtain response URL
-        self.lw.loginFrame.urlChanged.connect(
-            lambda: self.get_response_url(self.lw.loginFrame.url().toString(), profile)
-        )
+        self.lw.loginFrame.urlChanged.connect(lambda: self.get_response_url(self.lw.loginFrame.url().toString(), profile))
 
     def show_external_login(self, profile):
         # Show external login window
@@ -661,9 +640,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.lw2.lineEdit_response_url.textChanged.connect(self.enable_login_button)
 
-        self.lw2.pushButton_login.clicked.connect(
-            lambda: self.get_response_url(self.lw2.lineEdit_response_url.text(), profile)
-        )
+        self.lw2.pushButton_login.clicked.connect(lambda: self.get_response_url(self.lw2.lineEdit_response_url.text(), profile))
 
     def enable_login_button(self):
         # Enable 'Save' button only when valid URL with login response code is provided.
@@ -691,9 +668,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         response_reason = response["response"]
 
         if response_reason == "success":
-            self.profile_status_pages[profile_name].label_onedrive_status.setText(
-                "Login successful. Please, start sync manually."
-            )
+            self.profile_status_pages[profile_name].label_onedrive_status.setText("Login successful. Please, start sync manually.")
 
             response_dialog = QMessageBox.information(
                 self,
