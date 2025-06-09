@@ -1,4 +1,4 @@
-from PySide6.QtCore import QTimer, QUrl, QFileInfo, Qt, Signal, Slot
+from PySide6.QtCore import QTimer, QUrl, QFileInfo, Qt, Signal, Slot, QTimer
 from PySide6.QtGui import QIcon, QPixmap, QDesktopServices
 from PySide6.QtWidgets import (
     QWidget,
@@ -429,25 +429,43 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             logging.debug(f"[GUI] The worker for profile {profile_name} is already stopped.")
 
     def resync_auth_dialog(self, profile_name):
-        resync_question = QMessageBox.question(
-            self,
+        resync_question = QMessageBox(
+            QMessageBox.Question,
             f"Resync required for profile {profile_name}",
             "An application configuration change has been detected where a resync is required. <br><br>"
             "The use of resync will remove your local 'onedrive' client state, thus no record will exist regarding your current 'sync status'. <br><br>"
             "This has the potential to overwrite local versions of files with potentially older versions downloaded from OneDrive which can lead to <b>data loss</b>. <br><br>"
             "If in-doubt, backup your local data first before proceeding with resync.<br><br><br>"
             f"Would you like to perform resync for profile <b>{profile_name}</b>?",
-            buttons=QMessageBox.Yes | QMessageBox.No,
-            defaultButton=QMessageBox.No,
+            QMessageBox.Yes | QMessageBox.No,
         )
+        yes_button = resync_question.button(QMessageBox.Yes)
+        yes_button.setEnabled(False)
+        self.countdown_timer = QTimer(self)
+        self.countdown_value = 5
 
-        if resync_question == QMessageBox.Yes:
+        def update_button_text():
+            yes_button.setText(f"Yes ({self.countdown_value})")
+            self.countdown_value -= 1
+            if self.countdown_value < 0:
+                self.countdown_timer.stop()
+                yes_button.setText("Yes")
+                yes_button.setEnabled(True)
+
+        self.countdown_timer.timeout.connect(update_button_text)
+        self.countdown_timer.start(1000)  # Update every 1 second
+
+        resync_question.setDefaultButton(QMessageBox.No)
+        result = resync_question.exec()
+
+        if result == QMessageBox.Yes:
             logging.info("Authorize sync: Yes")
             self.profile_status_pages[profile_name].stop_monitor()
             self.start_onedrive_monitor(profile_name, "--resync --resync-auth")
 
-        elif resync_question == QMessageBox.No:
+        elif result == QMessageBox.No:
             logging.info("Authorize sync: No")
+            self.countdown_timer.stop()
             self.profile_status_pages[profile_name].stop_monitor()
 
     def big_delete_auth_dialog(self, profile_name):
