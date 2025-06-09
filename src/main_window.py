@@ -527,6 +527,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         item_widget.set_label_1(f"Deleted from {parent_dir}")
                         item_widget.set_label_2(f"")
 
+                    elif file_operation == "Moving":
+                        item_widget.set_label_1(f"Trashed from {parent_dir}")
+                        item_widget.set_label_2(f"")
+
                     elif transfer_complete and file_operation == "Uploading":
                         shortened_path = shorten_path(relative_path_display, 32)
                         item_widget.set_label_1(f"Uploaded from <a href=file:///{absolute_path}>{shortened_path}</a>")
@@ -561,6 +565,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             if file_operation == "Deleting":
                 myQCustomQWidget.set_label_1(f"Deleted from {parent_dir}")
+                myQCustomQWidget.set_label_2(f"")
+
+            elif file_operation == "Moving":
+                myQCustomQWidget.set_label_1(f"Trashed from {parent_dir}")
                 myQCustomQWidget.set_label_2(f"")
 
             elif transfer_complete and file_operation == "Uploading":
