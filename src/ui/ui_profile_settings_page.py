@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'profile_settings_pageYvRguo.ui'
+## Form generated from reading UI file 'profile_settings_pageNqWFgH.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.2
+## Created by: Qt User Interface Compiler version 6.9.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -25,7 +25,7 @@ class Ui_profile_settings(object):
     def setupUi(self, profile_settings):
         if not profile_settings.objectName():
             profile_settings.setObjectName(u"profile_settings")
-        profile_settings.resize(1019, 800)
+        profile_settings.resize(1344, 994)
         self.verticalLayout_2 = QVBoxLayout(profile_settings)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout_2.setContentsMargins(-1, 0, -1, 0)
@@ -80,6 +80,34 @@ class Ui_profile_settings(object):
 
         self.verticalLayout_5.addWidget(self.groupBox_8)
 
+        self.groupBox_recycle_bin = QGroupBox(self.monitored_tab_2)
+        self.groupBox_recycle_bin.setObjectName(u"groupBox_recycle_bin")
+        self.groupBox_recycle_bin.setCheckable(False)
+        self.gridLayout_12 = QGridLayout(self.groupBox_recycle_bin)
+        self.gridLayout_12.setObjectName(u"gridLayout_12")
+        self.checkBox_use_recycle_bin = QCheckBox(self.groupBox_recycle_bin)
+        self.checkBox_use_recycle_bin.setObjectName(u"checkBox_use_recycle_bin")
+
+        self.gridLayout_12.addWidget(self.checkBox_use_recycle_bin, 0, 0, 1, 1)
+
+        self.lineEdit_recycle_bin_path = QLineEdit(self.groupBox_recycle_bin)
+        self.lineEdit_recycle_bin_path.setObjectName(u"lineEdit_recycle_bin_path")
+
+        self.gridLayout_12.addWidget(self.lineEdit_recycle_bin_path, 2, 1, 1, 1)
+
+        self.label_recycle_bin_path = QLabel(self.groupBox_recycle_bin)
+        self.label_recycle_bin_path.setObjectName(u"label_recycle_bin_path")
+
+        self.gridLayout_12.addWidget(self.label_recycle_bin_path, 2, 0, 1, 1)
+
+        self.pushButton_recycle_bin_path_browse = QPushButton(self.groupBox_recycle_bin)
+        self.pushButton_recycle_bin_path_browse.setObjectName(u"pushButton_recycle_bin_path_browse")
+
+        self.gridLayout_12.addWidget(self.pushButton_recycle_bin_path_browse, 2, 2, 1, 1)
+
+
+        self.verticalLayout_5.addWidget(self.groupBox_recycle_bin)
+
         self.groupBox_12 = QGroupBox(self.monitored_tab_2)
         self.groupBox_12.setObjectName(u"groupBox_12")
         self.gridLayout_3 = QGridLayout(self.groupBox_12)
@@ -119,7 +147,7 @@ class Ui_profile_settings(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents_5 = QWidget()
         self.scrollAreaWidgetContents_5.setObjectName(u"scrollAreaWidgetContents_5")
-        self.scrollAreaWidgetContents_5.setGeometry(QRect(0, 0, 975, 657))
+        self.scrollAreaWidgetContents_5.setGeometry(QRect(0, 0, 1312, 812))
         self.verticalLayout_15 = QVBoxLayout(self.scrollAreaWidgetContents_5)
         self.verticalLayout_15.setObjectName(u"verticalLayout_15")
         self.groupBox_10 = QGroupBox(self.scrollAreaWidgetContents_5)
@@ -170,77 +198,77 @@ class Ui_profile_settings(object):
         self.label_monitor_interval = QLabel(self.groupBox_4)
         self.label_monitor_interval.setObjectName(u"label_monitor_interval")
 
-        self.formLayout_4.setWidget(0, QFormLayout.LabelRole, self.label_monitor_interval)
+        self.formLayout_4.setWidget(0, QFormLayout.ItemRole.LabelRole, self.label_monitor_interval)
 
         self.spinBox_monitor_interval = QSpinBox(self.groupBox_4)
         self.spinBox_monitor_interval.setObjectName(u"spinBox_monitor_interval")
         self.spinBox_monitor_interval.setMaximum(1000000)
 
-        self.formLayout_4.setWidget(0, QFormLayout.FieldRole, self.spinBox_monitor_interval)
+        self.formLayout_4.setWidget(0, QFormLayout.ItemRole.FieldRole, self.spinBox_monitor_interval)
 
         self.label_monitor_fullscan_frequency = QLabel(self.groupBox_4)
         self.label_monitor_fullscan_frequency.setObjectName(u"label_monitor_fullscan_frequency")
 
-        self.formLayout_4.setWidget(1, QFormLayout.LabelRole, self.label_monitor_fullscan_frequency)
+        self.formLayout_4.setWidget(1, QFormLayout.ItemRole.LabelRole, self.label_monitor_fullscan_frequency)
 
         self.spinBox_monitor_fullscan_frequency = QSpinBox(self.groupBox_4)
         self.spinBox_monitor_fullscan_frequency.setObjectName(u"spinBox_monitor_fullscan_frequency")
         self.spinBox_monitor_fullscan_frequency.setMaximum(1000000)
 
-        self.formLayout_4.setWidget(1, QFormLayout.FieldRole, self.spinBox_monitor_fullscan_frequency)
+        self.formLayout_4.setWidget(1, QFormLayout.ItemRole.FieldRole, self.spinBox_monitor_fullscan_frequency)
 
         self.label_classify_as_big_delete = QLabel(self.groupBox_4)
         self.label_classify_as_big_delete.setObjectName(u"label_classify_as_big_delete")
 
-        self.formLayout_4.setWidget(2, QFormLayout.LabelRole, self.label_classify_as_big_delete)
+        self.formLayout_4.setWidget(2, QFormLayout.ItemRole.LabelRole, self.label_classify_as_big_delete)
 
         self.spinBox_classify_as_big_delete = QSpinBox(self.groupBox_4)
         self.spinBox_classify_as_big_delete.setObjectName(u"spinBox_classify_as_big_delete")
         self.spinBox_classify_as_big_delete.setMaximum(1000000)
 
-        self.formLayout_4.setWidget(2, QFormLayout.FieldRole, self.spinBox_classify_as_big_delete)
+        self.formLayout_4.setWidget(2, QFormLayout.ItemRole.FieldRole, self.spinBox_classify_as_big_delete)
 
         self.label_operation_timeout = QLabel(self.groupBox_4)
         self.label_operation_timeout.setObjectName(u"label_operation_timeout")
 
-        self.formLayout_4.setWidget(3, QFormLayout.LabelRole, self.label_operation_timeout)
+        self.formLayout_4.setWidget(3, QFormLayout.ItemRole.LabelRole, self.label_operation_timeout)
 
         self.spinBox_operation_timeout = QSpinBox(self.groupBox_4)
         self.spinBox_operation_timeout.setObjectName(u"spinBox_operation_timeout")
         self.spinBox_operation_timeout.setMaximum(1000000)
 
-        self.formLayout_4.setWidget(3, QFormLayout.FieldRole, self.spinBox_operation_timeout)
+        self.formLayout_4.setWidget(3, QFormLayout.ItemRole.FieldRole, self.spinBox_operation_timeout)
 
         self.label_connect_timeout = QLabel(self.groupBox_4)
         self.label_connect_timeout.setObjectName(u"label_connect_timeout")
 
-        self.formLayout_4.setWidget(4, QFormLayout.LabelRole, self.label_connect_timeout)
+        self.formLayout_4.setWidget(4, QFormLayout.ItemRole.LabelRole, self.label_connect_timeout)
 
         self.spinBox_connect_timeout = QSpinBox(self.groupBox_4)
         self.spinBox_connect_timeout.setObjectName(u"spinBox_connect_timeout")
 
-        self.formLayout_4.setWidget(4, QFormLayout.FieldRole, self.spinBox_connect_timeout)
+        self.formLayout_4.setWidget(4, QFormLayout.ItemRole.FieldRole, self.spinBox_connect_timeout)
 
         self.label_data_timeout = QLabel(self.groupBox_4)
         self.label_data_timeout.setObjectName(u"label_data_timeout")
 
-        self.formLayout_4.setWidget(5, QFormLayout.LabelRole, self.label_data_timeout)
+        self.formLayout_4.setWidget(5, QFormLayout.ItemRole.LabelRole, self.label_data_timeout)
 
         self.spinBox_data_timeout = QSpinBox(self.groupBox_4)
         self.spinBox_data_timeout.setObjectName(u"spinBox_data_timeout")
 
-        self.formLayout_4.setWidget(5, QFormLayout.FieldRole, self.spinBox_data_timeout)
+        self.formLayout_4.setWidget(5, QFormLayout.ItemRole.FieldRole, self.spinBox_data_timeout)
 
         self.label_ip_protocol_version = QLabel(self.groupBox_4)
         self.label_ip_protocol_version.setObjectName(u"label_ip_protocol_version")
 
-        self.formLayout_4.setWidget(6, QFormLayout.LabelRole, self.label_ip_protocol_version)
+        self.formLayout_4.setWidget(6, QFormLayout.ItemRole.LabelRole, self.label_ip_protocol_version)
 
         self.spinBox_ip_protocol_version = QSpinBox(self.groupBox_4)
         self.spinBox_ip_protocol_version.setObjectName(u"spinBox_ip_protocol_version")
         self.spinBox_ip_protocol_version.setMaximum(2)
 
-        self.formLayout_4.setWidget(6, QFormLayout.FieldRole, self.spinBox_ip_protocol_version)
+        self.formLayout_4.setWidget(6, QFormLayout.ItemRole.FieldRole, self.spinBox_ip_protocol_version)
 
 
         self.horizontalLayout.addLayout(self.formLayout_4)
@@ -259,80 +287,80 @@ class Ui_profile_settings(object):
         self.label_sync_file_permissions = QLabel(self.groupBox_4)
         self.label_sync_file_permissions.setObjectName(u"label_sync_file_permissions")
 
-        self.formLayout_5.setWidget(1, QFormLayout.LabelRole, self.label_sync_file_permissions)
+        self.formLayout_5.setWidget(1, QFormLayout.ItemRole.LabelRole, self.label_sync_file_permissions)
 
         self.spinBox_sync_file_permissions = QSpinBox(self.groupBox_4)
         self.spinBox_sync_file_permissions.setObjectName(u"spinBox_sync_file_permissions")
         self.spinBox_sync_file_permissions.setMaximum(777)
 
-        self.formLayout_5.setWidget(1, QFormLayout.FieldRole, self.spinBox_sync_file_permissions)
+        self.formLayout_5.setWidget(1, QFormLayout.ItemRole.FieldRole, self.spinBox_sync_file_permissions)
 
         self.label_sync_dir_permissions = QLabel(self.groupBox_4)
         self.label_sync_dir_permissions.setObjectName(u"label_sync_dir_permissions")
 
-        self.formLayout_5.setWidget(2, QFormLayout.LabelRole, self.label_sync_dir_permissions)
+        self.formLayout_5.setWidget(2, QFormLayout.ItemRole.LabelRole, self.label_sync_dir_permissions)
 
         self.spinBox_sync_dir_permissions = QSpinBox(self.groupBox_4)
         self.spinBox_sync_dir_permissions.setObjectName(u"spinBox_sync_dir_permissions")
         self.spinBox_sync_dir_permissions.setMaximum(777)
 
-        self.formLayout_5.setWidget(2, QFormLayout.FieldRole, self.spinBox_sync_dir_permissions)
+        self.formLayout_5.setWidget(2, QFormLayout.ItemRole.FieldRole, self.spinBox_sync_dir_permissions)
 
         self.label_user_agent = QLabel(self.groupBox_4)
         self.label_user_agent.setObjectName(u"label_user_agent")
 
-        self.formLayout_5.setWidget(3, QFormLayout.LabelRole, self.label_user_agent)
+        self.formLayout_5.setWidget(3, QFormLayout.ItemRole.LabelRole, self.label_user_agent)
 
         self.lineEdit_user_agent = QLineEdit(self.groupBox_4)
         self.lineEdit_user_agent.setObjectName(u"lineEdit_user_agent")
         self.lineEdit_user_agent.setMaximumSize(QSize(16777215, 16777215))
         self.lineEdit_user_agent.setMaxLength(32767)
 
-        self.formLayout_5.setWidget(3, QFormLayout.FieldRole, self.lineEdit_user_agent)
+        self.formLayout_5.setWidget(3, QFormLayout.ItemRole.FieldRole, self.lineEdit_user_agent)
 
         self.label_azure_ad_endpoint = QLabel(self.groupBox_4)
         self.label_azure_ad_endpoint.setObjectName(u"label_azure_ad_endpoint")
 
-        self.formLayout_5.setWidget(4, QFormLayout.LabelRole, self.label_azure_ad_endpoint)
+        self.formLayout_5.setWidget(4, QFormLayout.ItemRole.LabelRole, self.label_azure_ad_endpoint)
 
         self.lineEdit_azure_ad_endpoint = QLineEdit(self.groupBox_4)
         self.lineEdit_azure_ad_endpoint.setObjectName(u"lineEdit_azure_ad_endpoint")
         self.lineEdit_azure_ad_endpoint.setMaximumSize(QSize(16777215, 16777215))
 
-        self.formLayout_5.setWidget(4, QFormLayout.FieldRole, self.lineEdit_azure_ad_endpoint)
+        self.formLayout_5.setWidget(4, QFormLayout.ItemRole.FieldRole, self.lineEdit_azure_ad_endpoint)
 
         self.label_azure_tenant_id = QLabel(self.groupBox_4)
         self.label_azure_tenant_id.setObjectName(u"label_azure_tenant_id")
 
-        self.formLayout_5.setWidget(5, QFormLayout.LabelRole, self.label_azure_tenant_id)
+        self.formLayout_5.setWidget(5, QFormLayout.ItemRole.LabelRole, self.label_azure_tenant_id)
 
         self.lineEdit_azure_tenant_id = QLineEdit(self.groupBox_4)
         self.lineEdit_azure_tenant_id.setObjectName(u"lineEdit_azure_tenant_id")
         self.lineEdit_azure_tenant_id.setMaximumSize(QSize(16777215, 16777215))
 
-        self.formLayout_5.setWidget(5, QFormLayout.FieldRole, self.lineEdit_azure_tenant_id)
+        self.formLayout_5.setWidget(5, QFormLayout.ItemRole.FieldRole, self.lineEdit_azure_tenant_id)
 
         self.label_drive_id = QLabel(self.groupBox_4)
         self.label_drive_id.setObjectName(u"label_drive_id")
 
-        self.formLayout_5.setWidget(6, QFormLayout.LabelRole, self.label_drive_id)
+        self.formLayout_5.setWidget(6, QFormLayout.ItemRole.LabelRole, self.label_drive_id)
 
         self.lineEdit_drive_id = QLineEdit(self.groupBox_4)
         self.lineEdit_drive_id.setObjectName(u"lineEdit_drive_id")
 
-        self.formLayout_5.setWidget(6, QFormLayout.FieldRole, self.lineEdit_drive_id)
+        self.formLayout_5.setWidget(6, QFormLayout.ItemRole.FieldRole, self.lineEdit_drive_id)
 
         self.label_threads = QLabel(self.groupBox_4)
         self.label_threads.setObjectName(u"label_threads")
 
-        self.formLayout_5.setWidget(0, QFormLayout.LabelRole, self.label_threads)
+        self.formLayout_5.setWidget(0, QFormLayout.ItemRole.LabelRole, self.label_threads)
 
         self.spinBox_threads = QSpinBox(self.groupBox_4)
         self.spinBox_threads.setObjectName(u"spinBox_threads")
         self.spinBox_threads.setMinimum(1)
         self.spinBox_threads.setMaximum(16)
 
-        self.formLayout_5.setWidget(0, QFormLayout.FieldRole, self.spinBox_threads)
+        self.formLayout_5.setWidget(0, QFormLayout.ItemRole.FieldRole, self.spinBox_threads)
 
 
         self.horizontalLayout.addLayout(self.formLayout_5)
@@ -575,61 +603,61 @@ class Ui_profile_settings(object):
         self.label_webhook_public_url = QLabel(self.groupBox_9)
         self.label_webhook_public_url.setObjectName(u"label_webhook_public_url")
 
-        self.formLayout_2.setWidget(1, QFormLayout.LabelRole, self.label_webhook_public_url)
+        self.formLayout_2.setWidget(1, QFormLayout.ItemRole.LabelRole, self.label_webhook_public_url)
 
         self.lineEdit_webhook_public_url = QLineEdit(self.groupBox_9)
         self.lineEdit_webhook_public_url.setObjectName(u"lineEdit_webhook_public_url")
 
-        self.formLayout_2.setWidget(1, QFormLayout.FieldRole, self.lineEdit_webhook_public_url)
+        self.formLayout_2.setWidget(1, QFormLayout.ItemRole.FieldRole, self.lineEdit_webhook_public_url)
 
         self.label_webhook_listening_host = QLabel(self.groupBox_9)
         self.label_webhook_listening_host.setObjectName(u"label_webhook_listening_host")
 
-        self.formLayout_2.setWidget(2, QFormLayout.LabelRole, self.label_webhook_listening_host)
+        self.formLayout_2.setWidget(2, QFormLayout.ItemRole.LabelRole, self.label_webhook_listening_host)
 
         self.lineEdit_webhook_listening_host = QLineEdit(self.groupBox_9)
         self.lineEdit_webhook_listening_host.setObjectName(u"lineEdit_webhook_listening_host")
 
-        self.formLayout_2.setWidget(2, QFormLayout.FieldRole, self.lineEdit_webhook_listening_host)
+        self.formLayout_2.setWidget(2, QFormLayout.ItemRole.FieldRole, self.lineEdit_webhook_listening_host)
 
         self.label_webhook_listening_port = QLabel(self.groupBox_9)
         self.label_webhook_listening_port.setObjectName(u"label_webhook_listening_port")
 
-        self.formLayout_2.setWidget(3, QFormLayout.LabelRole, self.label_webhook_listening_port)
+        self.formLayout_2.setWidget(3, QFormLayout.ItemRole.LabelRole, self.label_webhook_listening_port)
 
         self.spinBox_webhook_listening_port = QSpinBox(self.groupBox_9)
         self.spinBox_webhook_listening_port.setObjectName(u"spinBox_webhook_listening_port")
         self.spinBox_webhook_listening_port.setMinimum(1)
         self.spinBox_webhook_listening_port.setMaximum(65353)
 
-        self.formLayout_2.setWidget(3, QFormLayout.FieldRole, self.spinBox_webhook_listening_port)
+        self.formLayout_2.setWidget(3, QFormLayout.ItemRole.FieldRole, self.spinBox_webhook_listening_port)
 
         self.label_webhook_expiration_interval = QLabel(self.groupBox_9)
         self.label_webhook_expiration_interval.setObjectName(u"label_webhook_expiration_interval")
 
-        self.formLayout_2.setWidget(4, QFormLayout.LabelRole, self.label_webhook_expiration_interval)
+        self.formLayout_2.setWidget(4, QFormLayout.ItemRole.LabelRole, self.label_webhook_expiration_interval)
 
         self.spinBox_webhook_expiration_interval = QSpinBox(self.groupBox_9)
         self.spinBox_webhook_expiration_interval.setObjectName(u"spinBox_webhook_expiration_interval")
         self.spinBox_webhook_expiration_interval.setMaximum(1000000)
 
-        self.formLayout_2.setWidget(4, QFormLayout.FieldRole, self.spinBox_webhook_expiration_interval)
+        self.formLayout_2.setWidget(4, QFormLayout.ItemRole.FieldRole, self.spinBox_webhook_expiration_interval)
 
         self.label_webhook_renewal_interval = QLabel(self.groupBox_9)
         self.label_webhook_renewal_interval.setObjectName(u"label_webhook_renewal_interval")
 
-        self.formLayout_2.setWidget(5, QFormLayout.LabelRole, self.label_webhook_renewal_interval)
+        self.formLayout_2.setWidget(5, QFormLayout.ItemRole.LabelRole, self.label_webhook_renewal_interval)
 
         self.spinBox_webhook_renewal_interval = QSpinBox(self.groupBox_9)
         self.spinBox_webhook_renewal_interval.setObjectName(u"spinBox_webhook_renewal_interval")
         self.spinBox_webhook_renewal_interval.setMaximum(1000000)
 
-        self.formLayout_2.setWidget(5, QFormLayout.FieldRole, self.spinBox_webhook_renewal_interval)
+        self.formLayout_2.setWidget(5, QFormLayout.ItemRole.FieldRole, self.spinBox_webhook_renewal_interval)
 
         self.checkBox_webhook_enabled = QCheckBox(self.groupBox_9)
         self.checkBox_webhook_enabled.setObjectName(u"checkBox_webhook_enabled")
 
-        self.formLayout_2.setWidget(0, QFormLayout.LabelRole, self.checkBox_webhook_enabled)
+        self.formLayout_2.setWidget(0, QFormLayout.ItemRole.LabelRole, self.checkBox_webhook_enabled)
 
 
         self.gridLayout.addWidget(self.groupBox_9, 0, 0, 1, 1)
@@ -697,7 +725,7 @@ class Ui_profile_settings(object):
         self.checkBox_disable_notifications = QCheckBox(self.groupBox_6)
         self.checkBox_disable_notifications.setObjectName(u"checkBox_disable_notifications")
 
-        self.formLayout_3.setWidget(0, QFormLayout.LabelRole, self.checkBox_disable_notifications)
+        self.formLayout_3.setWidget(0, QFormLayout.ItemRole.LabelRole, self.checkBox_disable_notifications)
 
 
         self.verticalLayout_6.addWidget(self.groupBox_6)
@@ -748,6 +776,16 @@ class Ui_profile_settings(object):
         self.checkBox_sync_business_shared_items.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Refer to <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/BusinessSharedFolders.md\"><span style=\" text-decoration: underline; color:#5e81ac;\">Business Shared Folders</span></a> for configuration assistance.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_sync_business_shared_items.setText(QCoreApplication.translate("profile_settings", u"Sync business shared items", None))
+        self.groupBox_recycle_bin.setTitle(QCoreApplication.translate("profile_settings", u"Recycle Bin", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_use_recycle_bin.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>By default, OneDrive client will process online deletions and directly delete the corresponding file or folder directly from your configured 'sync_dir'.</p><p>Enable this option to move deleted files to your Linux user default 'Recycle Bin', so that you can manually delete the files at your own discretion.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_use_recycle_bin.setText(QCoreApplication.translate("profile_settings", u"Use Recycle Bin", None))
+#if QT_CONFIG(tooltip)
+        self.label_recycle_bin_path.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Specify an explicit 'Recycle Bin' directory or keep empty to use the system default recycle bin path.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.label_recycle_bin_path.setText(QCoreApplication.translate("profile_settings", u"Recycle Bin Path", None))
+        self.pushButton_recycle_bin_path_browse.setText(QCoreApplication.translate("profile_settings", u"Browse", None))
         self.groupBox_12.setTitle(QCoreApplication.translate("profile_settings", u"Account actions", None))
 #if QT_CONFIG(tooltip)
         self.checkBox_auto_sync.setToolTip(QCoreApplication.translate("profile_settings", u"Automatically start sync for this profile when OneDriveGUI starts.", None))

@@ -48,4 +48,6 @@ data_timeout = "240"
 display_running_config = "false"
 ip_protocol_version = "1"
 threads = "8"
+use_recycle_bin = "false"
+recycle_bin_path = ""
 
