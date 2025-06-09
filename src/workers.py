@@ -81,7 +81,9 @@ class WorkerThread(QThread):
             "Uploading new file",
             "Uploading modified file",
             "Downloading modified file",
-            "Deleting item",
+            "Deleting item",  # File deleted locally and then removed in the cloud
+            "Deleting local file",  # File deleted in the cloud and then removed locally
+            "Moving this local file",  # File deleted in the cloud and then moved to recycling bin locally
         ]
 
         self.profile_status = {
@@ -193,17 +195,17 @@ class WorkerThread(QThread):
 
             elif any(_ in stdout for _ in self.tasks):
                 # Capture information about file that is being uploaded/downloaded/deleted by OneDrive.
-                file_operation = re.search(r"\b([Uploading|Downloading|Deleting]+)*", stdout).group(1)
+                file_operation = re.search(r"\b([Uploading|Downloading|Deleting|Moving]+)*", stdout).group(1)
 
-                if file_operation == "Deleting":
+                if file_operation in {"Deleting", "Moving"}:
                     self.file_name = re.search(r".*/(.+)$", stdout)
-                    self.file_path = re.search(r"\b[item|OneDrive:]\s(.+)$", stdout)
+                    self.file_path = re.search(r".+\:\s(.+)$", stdout)
 
                 else:
                     self.file_name = re.search(r".*/(.+)\s+\.+", stdout)
                     self.file_path = re.search(r"\b[file:]+\s(.+)\s+\.\.\.", stdout)
 
-                transfer_complete = any(["done" in stdout, "Deleting" in stdout])
+                transfer_complete = any(["done" in stdout, "Deleting" in stdout, "Moving" in stdout])
                 progress = "0"
 
                 transfer_progress_new = {
