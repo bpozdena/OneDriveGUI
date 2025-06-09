@@ -92,8 +92,7 @@ class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
         close_question = QMessageBox.question(
             self,
             "Discard changes?",
-            f"You have unsaved changes in profile(s) <b>{', '.join(self.unsaved_profiles)}</b>."
-            "<br><br> Discard changes and close Profiles window?",
+            f"You have unsaved changes in profile(s) <b>{', '.join(self.unsaved_profiles)}</b>.<br><br> Discard changes and close Profiles window?",
             buttons=QMessageBox.Yes | QMessageBox.No,
             defaultButton=QMessageBox.No,
         )
@@ -181,9 +180,7 @@ class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
 
         old_name = selected_item.text()
 
-        new_name, ok = QInputDialog.getText(
-            self, "Rename Profile", f"Enter new name for profile '{old_name}':", text=old_name
-        )
+        new_name, ok = QInputDialog.getText(self, "Rename Profile", f"Enter new name for profile '{old_name}':", text=old_name)
 
         if ok and new_name:
             new_name = new_name.strip()
@@ -407,11 +404,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         # Rate limit
         self.spinBox_rate_limit.valueChanged.connect(self.set_spin_box_value)
         self.spinBox_rate_limit.valueChanged.connect(self.horizontalSlider_rate_limit.setValue)
-        self.spinBox_rate_limit.valueChanged.connect(
-            lambda: self.label_rate_limit_mbps.setText(
-                str(round(self.spinBox_rate_limit.value() * 8 / 1000 / 1000, 2)) + " Mbit/s"
-            )
-        )
+        self.spinBox_rate_limit.valueChanged.connect(lambda: self.label_rate_limit_mbps.setText(str(round(self.spinBox_rate_limit.value() * 8 / 1000 / 1000, 2)) + " Mbit/s"))
         self.horizontalSlider_rate_limit.valueChanged.connect(self.spinBox_rate_limit.setValue)
 
         # Webhooks tab
@@ -437,6 +430,12 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.pushButton_login.clicked.connect(lambda: main_window.main_window_instance.show_login(self.profile))
         self.pushButton_logout.clicked.connect(self.logout)
         self.checkBox_auto_sync.stateChanged.connect(self.set_check_box_state_profile)
+
+        ## Recycle Bin group box
+        self.checkBox_use_recycle_bin.stateChanged.connect(self.set_check_box_state)
+        self.checkBox_use_recycle_bin.stateChanged.connect(self.validate_checkbox_input)
+        self.lineEdit_recycle_bin_path.textChanged.connect(self.set_recycle_bin_path)
+        self.pushButton_recycle_bin_path_browse.clicked.connect(self.get_recycle_bin_path)
 
     def configure_profile_settings_page(self):
         """Sets all widgets values with values from profile config files"""
@@ -467,26 +466,14 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         # Sync Options tab
         self.checkBox_force_http_11.setChecked(self.get_check_box_state("force_http_11"))
         self.spinBox_monitor_interval.setValue(int(self.temp_profile_config["onedrive"]["monitor_interval"].strip('"')))
-        self.spinBox_monitor_fullscan_frequency.setValue(
-            int(self.temp_profile_config["onedrive"]["monitor_fullscan_frequency"].strip('"'))
-        )
-        self.spinBox_classify_as_big_delete.setValue(
-            int(self.temp_profile_config["onedrive"]["classify_as_big_delete"].strip('"'))
-        )
-        self.spinBox_sync_dir_permissions.setValue(
-            int(self.temp_profile_config["onedrive"]["sync_dir_permissions"].strip('"'))
-        )
-        self.spinBox_sync_file_permissions.setValue(
-            int(self.temp_profile_config["onedrive"]["sync_file_permissions"].strip('"'))
-        )
-        self.spinBox_operation_timeout.setValue(
-            int(self.temp_profile_config["onedrive"]["operation_timeout"].strip('"'))
-        )
+        self.spinBox_monitor_fullscan_frequency.setValue(int(self.temp_profile_config["onedrive"]["monitor_fullscan_frequency"].strip('"')))
+        self.spinBox_classify_as_big_delete.setValue(int(self.temp_profile_config["onedrive"]["classify_as_big_delete"].strip('"')))
+        self.spinBox_sync_dir_permissions.setValue(int(self.temp_profile_config["onedrive"]["sync_dir_permissions"].strip('"')))
+        self.spinBox_sync_file_permissions.setValue(int(self.temp_profile_config["onedrive"]["sync_file_permissions"].strip('"')))
+        self.spinBox_operation_timeout.setValue(int(self.temp_profile_config["onedrive"]["operation_timeout"].strip('"')))
         self.spinBox_connect_timeout.setValue(int(self.temp_profile_config["onedrive"]["connect_timeout"].strip('"')))
         self.spinBox_data_timeout.setValue(int(self.temp_profile_config["onedrive"]["data_timeout"].strip('"')))
-        self.spinBox_ip_protocol_version.setValue(
-            int(self.temp_profile_config["onedrive"]["ip_protocol_version"].strip('"'))
-        )
+        self.spinBox_ip_protocol_version.setValue(int(self.temp_profile_config["onedrive"]["ip_protocol_version"].strip('"')))
         self.spinBox_threads.setValue(int(self.temp_profile_config["onedrive"]["threads"].strip('"')))
         self.checkBox_download_only.setChecked(self.get_check_box_state("download_only"))
         self.checkBox_download_only.setDisabled(self.get_check_box_state("upload_only"))
@@ -515,23 +502,15 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
 
         # Webhooks tab
         self.checkBox_webhook_enabled.setChecked(self.get_check_box_state("webhook_enabled"))
-        self.spinBox_webhook_expiration_interval.setValue(
-            int(self.temp_profile_config["onedrive"]["webhook_expiration_interval"].strip('"'))
-        )
+        self.spinBox_webhook_expiration_interval.setValue(int(self.temp_profile_config["onedrive"]["webhook_expiration_interval"].strip('"')))
         self.spinBox_webhook_expiration_interval.setEnabled(self.checkBox_webhook_enabled.isChecked())
-        self.spinBox_webhook_renewal_interval.setValue(
-            int(self.temp_profile_config["onedrive"]["webhook_renewal_interval"].strip('"'))
-        )
+        self.spinBox_webhook_renewal_interval.setValue(int(self.temp_profile_config["onedrive"]["webhook_renewal_interval"].strip('"')))
         self.spinBox_webhook_renewal_interval.setEnabled(self.checkBox_webhook_enabled.isChecked())
-        self.spinBox_webhook_listening_port.setValue(
-            int(self.temp_profile_config["onedrive"]["webhook_listening_port"].strip('"'))
-        )
+        self.spinBox_webhook_listening_port.setValue(int(self.temp_profile_config["onedrive"]["webhook_listening_port"].strip('"')))
         self.spinBox_webhook_listening_port.setEnabled(self.checkBox_webhook_enabled.isChecked())
         self.lineEdit_webhook_public_url.setText(self.temp_profile_config["onedrive"]["webhook_public_url"].strip('"'))
         self.lineEdit_webhook_public_url.setEnabled(self.checkBox_webhook_enabled.isChecked())
-        self.lineEdit_webhook_listening_host.setText(
-            self.temp_profile_config["onedrive"]["webhook_listening_host"].strip('"')
-        )
+        self.lineEdit_webhook_listening_host.setText(self.temp_profile_config["onedrive"]["webhook_listening_host"].strip('"'))
         self.lineEdit_webhook_listening_host.setEnabled(self.checkBox_webhook_enabled.isChecked())
 
         # Logging tab
@@ -540,9 +519,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.lineEdit_log_dir.setEnabled(self.checkBox_enable_logging.isChecked())
         self.pushButton_log_dir_browse.setEnabled(self.checkBox_enable_logging.isChecked())
         self.checkBox_debug_https.setChecked(self.get_check_box_state("debug_https"))
-        self.spinBox_monitor_log_frequency.setValue(
-            int(self.temp_profile_config["onedrive"]["monitor_log_frequency"].strip('"'))
-        )
+        self.spinBox_monitor_log_frequency.setValue(int(self.temp_profile_config["onedrive"]["monitor_log_frequency"].strip('"')))
         self.spinBox_monitor_log_frequency.setEnabled(self.checkBox_enable_logging.isChecked())
         self.checkBox_disable_notifications.setChecked(self.get_check_box_state("disable_notifications"))
 
@@ -554,6 +531,13 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
 
         # Sync List tab
         self.textEdit_sync_list.setText(self.read_sync_list())
+
+        ## Recycle Bin group box
+        self.checkBox_use_recycle_bin.setChecked(self.get_check_box_state("use_recycle_bin"))
+        self.lineEdit_recycle_bin_path.setText(self.temp_profile_config["onedrive"]["recycle_bin_path"].strip('"'))
+        self.lineEdit_recycle_bin_path.setEnabled(self.checkBox_use_recycle_bin.isChecked())
+        self.label_recycle_bin_path.setEnabled(self.checkBox_use_recycle_bin.isChecked())
+        self.pushButton_recycle_bin_path_browse.setEnabled(self.checkBox_use_recycle_bin.isChecked())
 
     def read_sync_list(self):
         self.sync_list_file = re.search(r"(.+)/.+$", self.config_file).group(1) + "/sync_list"
@@ -615,6 +599,16 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
                 self.lineEdit_webhook_public_url.setEnabled(False)
                 self.lineEdit_webhook_listening_host.setEnabled(False)
 
+        if self.sender().objectName() == "checkBox_use_recycle_bin":
+            if self.checkBox_use_recycle_bin.isChecked():
+                self.lineEdit_recycle_bin_path.setEnabled(True)
+                self.label_recycle_bin_path.setEnabled(True)
+                self.pushButton_recycle_bin_path_browse.setEnabled(True)
+            else:
+                self.lineEdit_recycle_bin_path.setEnabled(False)
+                self.label_recycle_bin_path.setEnabled(False)
+                self.pushButton_recycle_bin_path_browse.setEnabled(False)
+
     def str2bool(self, value):
         return value.lower() in "true"
 
@@ -625,16 +619,12 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         main_window.main_window_instance.profile_status_pages[self.profile].stop_monitor()
         if self.profile in workers:
             workers[self.profile].stop_worker()
-            main_window.main_window_instance.profile_status_pages[self.profile].label_onedrive_status.setText(
-                "OneDrive sync has been stopped"
-            )
+            main_window.main_window_instance.profile_status_pages[self.profile].label_onedrive_status.setText("OneDrive sync has been stopped")
             logging.info(f"OneDrive sync for profile {self.profile} has been stopped.")
         else:
             logging.info(f"OneDrive for profile {self.profile} is not running.")
 
-        main_window.main_window_instance.profile_status_pages[self.profile].label_onedrive_status.setText(
-            "You have been logged out"
-        )
+        main_window.main_window_instance.profile_status_pages[self.profile].label_onedrive_status.setText("You have been logged out")
 
     def get_sync_dir_name(self):
         self.file_dialog = QFileDialog.getExistingDirectory(dir=os.path.expanduser("~/"))
@@ -649,6 +639,13 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         log_dir = self.file_dialog
         logging.info(log_dir)
         self.lineEdit_log_dir.setText(log_dir)
+
+    def get_recycle_bin_path(self):
+        self.file_dialog = QFileDialog.getExistingDirectory(dir=os.path.expanduser("~/"))
+
+        recycle_bin_path = self.file_dialog
+        logging.info(recycle_bin_path)
+        self.lineEdit_recycle_bin_path.setText(recycle_bin_path)
 
     def set_line_edit_value(self, value):
         _property = self.sender().objectName()
@@ -711,15 +708,17 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
 
     def set_rate_limit(self):
         self.temp_profile_config["onedrive"]["rate_limit"] = f'"{self.lineEdit_rate_limit.text()}"'
-        self.label_rate_limit_mbps.setText(
-            str(round(int(self.lineEdit_rate_limit.text()) * 8 / 1000 / 1000, 2)) + " Mbit/s"
-        )
+        self.label_rate_limit_mbps.setText(str(round(int(self.lineEdit_rate_limit.text()) * 8 / 1000 / 1000, 2)) + " Mbit/s")
 
     def set_sync_dir(self):
         self.temp_profile_config["onedrive"]["sync_dir"] = f'"{self.lineEdit_sync_dir.text()}"'
 
     def set_log_dir(self):
         self.temp_profile_config["onedrive"]["log_dir"] = f'"{self.lineEdit_log_dir.text()}"'
+
+    def set_recycle_bin_path(self):
+        self.temp_profile_config["onedrive"]["recycle_bin_path"] = f'"{self.lineEdit_recycle_bin_path.text()}"'
+        logging.info(f"[GUI] [{self.profile}] Recycle bin path set to: {self.temp_profile_config['onedrive']['recycle_bin_path']}")
 
     def add_item_to_qlist(self, source_widget, destination_widget, list):
         if source_widget.text() == "":

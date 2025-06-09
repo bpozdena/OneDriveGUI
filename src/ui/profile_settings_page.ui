@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1019</width>
-    <height>800</height>
+    <width>1344</width>
+    <height>994</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -101,6 +101,48 @@
           </widget>
          </item>
          <item>
+          <widget class="QGroupBox" name="groupBox_recycle_bin">
+           <property name="title">
+            <string>Recycle Bin</string>
+           </property>
+           <property name="checkable">
+            <bool>false</bool>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_12">
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="checkBox_use_recycle_bin">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;By default, OneDrive client will process online deletions and directly delete the corresponding file or folder directly from your configured 'sync_dir'.&lt;/p&gt;&lt;p&gt;Enable this option to move deleted files to your Linux user default 'Recycle Bin', so that you can manually delete the files at your own discretion.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Use Recycle Bin</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLineEdit" name="lineEdit_recycle_bin_path"/>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_recycle_bin_path">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify an explicit 'Recycle Bin' directory or keep empty to use the system default recycle bin path.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Recycle Bin Path</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QPushButton" name="pushButton_recycle_bin_path_browse">
+              <property name="text">
+               <string>Browse</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
           <widget class="QGroupBox" name="groupBox_12">
            <property name="title">
             <string>Account actions</string>
@@ -171,8 +213,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>975</width>
-              <height>657</height>
+              <width>1312</width>
+              <height>812</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_15">
