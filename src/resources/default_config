@@ -50,4 +50,6 @@ ip_protocol_version = "1"
 threads = "8"
 use_recycle_bin = "false"
 recycle_bin_path = ""
-
+force_session_upload = "false"
+delay_inotify_processing = "false"
+inotify_delay = "5"

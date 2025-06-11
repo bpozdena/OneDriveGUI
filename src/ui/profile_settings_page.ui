@@ -50,7 +50,7 @@
         <string/>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="monitored_tab_2">
         <attribute name="title">
@@ -214,7 +214,7 @@
               <x>0</x>
               <y>0</y>
               <width>1312</width>
-              <height>812</height>
+              <height>837</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_15">
@@ -414,6 +414,16 @@ locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seco
                     </property>
                    </widget>
                   </item>
+                  <item row="7" column="1">
+                   <widget class="QSpinBox" name="spinBox_inotify_delay"/>
+                  </item>
+                  <item row="7" column="0">
+                   <widget class="QLabel" name="label">
+                    <property name="text">
+                     <string>Inotify delay</string>
+                    </property>
+                   </widget>
+                  </item>
                  </layout>
                 </item>
                 <item>
@@ -438,6 +448,23 @@ locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seco
                 </item>
                 <item>
                  <layout class="QFormLayout" name="formLayout_5">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_threads">
+                    <property name="text">
+                     <string>Threads</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QSpinBox" name="spinBox_threads">
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>16</number>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="1" column="0">
                    <widget class="QLabel" name="label_sync_file_permissions">
                     <property name="toolTip">
@@ -545,23 +572,6 @@ locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seco
                   <item row="6" column="1">
                    <widget class="QLineEdit" name="lineEdit_drive_id"/>
                   </item>
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_threads">
-                    <property name="text">
-                     <string>Threads</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QSpinBox" name="spinBox_threads">
-                    <property name="minimum">
-                     <number>1</number>
-                    </property>
-                    <property name="maximum">
-                     <number>16</number>
-                    </property>
-                   </widget>
-                  </item>
                  </layout>
                 </item>
                </layout>
@@ -576,25 +586,13 @@ locally will occur every 2 hours (assuming 'monitor_interval' is set to 300 seco
                 <string>Advanced options</string>
                </property>
                <layout class="QGridLayout" name="gridLayout_4">
-                <item row="2" column="1">
-                 <widget class="QCheckBox" name="checkBox_upload_only">
+                <item row="3" column="3">
+                 <widget class="QCheckBox" name="checkBox_force_http_11">
                   <property name="toolTip">
-                   <string>Replicate the locally configured sync_dir state to OneDrive, by only uploading local changes to OneDrive. 
-
-Do not download changes from OneDrive.</string>
+                   <string>Forces the use of HTTP/1.1 instead of the default HTTP/2 .</string>
                   </property>
                   <property name="text">
-                   <string>Upload only</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="1">
-                 <widget class="QCheckBox" name="checkBox_no_remote_delete">
-                  <property name="toolTip">
-                   <string>Do not delete local file 'deletes' from OneDrive when using --upload-only</string>
-                  </property>
-                  <property name="text">
-                   <string>No remote delete</string>
+                   <string>Force HTTP 1.1</string>
                   </property>
                  </widget>
                 </item>
@@ -610,23 +608,13 @@ Do not upload local changes to OneDrive.</string>
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="1">
-                 <widget class="QCheckBox" name="checkBox_local_first">
+                <item row="1" column="3">
+                 <widget class="QCheckBox" name="checkBox_resync">
                   <property name="toolTip">
-                   <string>Synchronize from the local directory source first, before downloading changes from OneDrive.</string>
+                   <string>Forget the last saved state, perform a full sync.</string>
                   </property>
                   <property name="text">
-                   <string>Local first</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="1">
-                 <widget class="QCheckBox" name="checkBox_check_nomount">
-                  <property name="toolTip">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:0px; margin-bottom:16px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:145%;&quot;&gt;&lt;span style=&quot; font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; color:#c9d1d9; background-color:transparent;&quot;&gt;Check for the presence of &lt;/span&gt;&lt;span style=&quot; font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; font-weight:700; color:#c9d1d9; background-color:transparent;&quot;&gt;.nosync&lt;/span&gt;&lt;span style=&quot; font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; color:#c9d1d9; background-color:transparent;&quot;&gt; in the syncdir root. If found, do not perform sync.&lt;/span&gt;&lt;/pre&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                  </property>
-                  <property name="text">
-                   <string>Check for .nomount</string>
+                   <string>Full re-sync</string>
                   </property>
                  </widget>
                 </item>
@@ -640,20 +628,20 @@ Do not upload local changes to OneDrive.</string>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="3">
-                 <widget class="QCheckBox" name="checkBox_resync">
-                  <property name="toolTip">
-                   <string>Forget the last saved state, perform a full sync.</string>
-                  </property>
+                <item row="4" column="2">
+                 <widget class="QCheckBox" name="checkBox_force_session_upload">
                   <property name="text">
-                   <string>Full re-sync</string>
+                   <string>Force Session Upload</string>
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="3">
-                 <widget class="QCheckBox" name="checkBox_bypass_data_preservation">
+                <item row="4" column="1">
+                 <widget class="QCheckBox" name="checkBox_no_remote_delete">
+                  <property name="toolTip">
+                   <string>Do not delete local file 'deletes' from OneDrive when using --upload-only</string>
+                  </property>
                   <property name="text">
-                   <string>Bypass data preservation</string>
+                   <string>No remote delete</string>
                   </property>
                  </widget>
                 </item>
@@ -667,13 +655,13 @@ Do not upload local changes to OneDrive.</string>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="2">
-                 <widget class="QCheckBox" name="checkBox_disable_upload_validation">
+                <item row="0" column="1">
+                 <widget class="QCheckBox" name="checkBox_local_first">
                   <property name="toolTip">
-                   <string>Disable download validation when downloading from OneDrive.</string>
+                   <string>Synchronize from the local directory source first, before downloading changes from OneDrive.</string>
                   </property>
                   <property name="text">
-                   <string>Disable upload validation</string>
+                   <string>Local first</string>
                   </property>
                  </widget>
                 </item>
@@ -687,6 +675,45 @@ Do not upload local changes to OneDrive.</string>
                   </property>
                  </widget>
                 </item>
+                <item row="3" column="1">
+                 <widget class="QCheckBox" name="checkBox_check_nomount">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:0px; margin-bottom:16px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:145%;&quot;&gt;&lt;span style=&quot; font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; color:#c9d1d9; background-color:transparent;&quot;&gt;Check for the presence of &lt;/span&gt;&lt;span style=&quot; font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; font-weight:700; color:#c9d1d9; background-color:transparent;&quot;&gt;.nosync&lt;/span&gt;&lt;span style=&quot; font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; color:#c9d1d9; background-color:transparent;&quot;&gt; in the syncdir root. If found, do not perform sync.&lt;/span&gt;&lt;/pre&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Check for .nomount</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QCheckBox" name="checkBox_upload_only">
+                  <property name="toolTip">
+                   <string>Replicate the locally configured sync_dir state to OneDrive, by only uploading local changes to OneDrive. 
+
+Do not download changes from OneDrive.</string>
+                  </property>
+                  <property name="text">
+                   <string>Upload only</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="2">
+                 <widget class="QCheckBox" name="checkBox_disable_upload_validation">
+                  <property name="toolTip">
+                   <string>Disable download validation when downloading from OneDrive.</string>
+                  </property>
+                  <property name="text">
+                   <string>Disable upload validation</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="3">
+                 <widget class="QCheckBox" name="checkBox_bypass_data_preservation">
+                  <property name="text">
+                   <string>Bypass data preservation</string>
+                  </property>
+                 </widget>
+                </item>
                 <item row="3" column="2">
                  <widget class="QCheckBox" name="checkBox_display_running_config">
                   <property name="text">
@@ -694,13 +721,10 @@ Do not upload local changes to OneDrive.</string>
                   </property>
                  </widget>
                 </item>
-                <item row="3" column="3">
-                 <widget class="QCheckBox" name="checkBox_force_http_11">
-                  <property name="toolTip">
-                   <string>Forces the use of HTTP/1.1 instead of the default HTTP/2 .</string>
-                  </property>
+                <item row="4" column="3">
+                 <widget class="QCheckBox" name="checkBox_delay_inotify_processing">
                   <property name="text">
-                   <string>Force HTTP 1.1</string>
+                   <string>Delay inotify processing</string>
                   </property>
                  </widget>
                 </item>
