@@ -27,7 +27,7 @@ A GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive) with mu
 - Check for other reported [issues/limitations](https://github.com/bpozdena/OneDriveGUI/issues). 
 
 ## Compatibility
-- Minimum supported OneDrive client version: v2.5.0.
+- Minimum supported OneDrive client version: v2.5.6.
 - You will be shown warnings if your OneDrive Client is not up to date.
 
 ## Other Notes
