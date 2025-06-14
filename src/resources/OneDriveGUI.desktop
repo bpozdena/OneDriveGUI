@@ -1,8 +1,9 @@
 [Desktop Entry]
 Name=OneDriveGUI
-StartupNotify=true
-Exec=/usr/bin/python3 /home/bob/host_share/Python/OneDriveGUI/src/OneDriveGUI.py
+Comment=A simple GUI for OneDrive Linux client
+Exec=OneDriveGUI
 Terminal=false
-Path=/home/bob/host_share/Python/OneDriveGUI/src/resources/images
-Icon=/home/bob/host_share/Python/OneDriveGUI/src/resources/images/icons8-clouds-48.png
 Type=Application
+Icon=OneDriveGUI
+Categories=Network;Office
+StartupNotify=true
