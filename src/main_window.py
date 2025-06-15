@@ -30,6 +30,9 @@ import subprocess
 
 
 from wizard import setup_wizard
+# other import, lets see if this helps
+from wizard import SetupWizard
+
 from profile_settings_window import profile_settings_window
 
 from options import (
@@ -257,7 +260,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             logging.info("[GUI] Minimizing main window to taskbar/dock")
 
     def show_setup_wizard(self):
-        # self.setup_wizard = SetupWizard()
+        self.setup_wizard = SetupWizard() #this line was commented out, lets see if uncommenting fix it
         self.setup_wizard.show()
 
     def show_settings_window(self):
