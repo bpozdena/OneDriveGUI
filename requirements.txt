@@ -1,5 +1,6 @@
 PySide6_Essentials==6.2.2.1; python_version <= '3.7'
 requests==2.27.1; python_version <= '3.7'
 
-PySide6_Essentials; python_version >= '3.8'
+PySide6_Essentials==6.6.0; python_version >= '3.8'
 requests; python_version >= '3.8'
+urllib3<2.0
