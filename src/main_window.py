@@ -257,8 +257,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             logging.info("[GUI] Minimizing main window to taskbar/dock")
 
     def show_setup_wizard(self):
-        # self.setup_wizard = SetupWizard()
-        self.setup_wizard.show()
+        setup_wizard.show()
 
     def show_settings_window(self):
         profile_settings_window.show()
