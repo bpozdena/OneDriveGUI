@@ -48,7 +48,7 @@ A GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive) with mu
 |---------------|:--------------------------------------------------------------------------------------------|
 
 ## AUR
-- An AUR package [onedrivegui-git](https://aur.archlinux.org/packages/onedrivegui-git) is available (maintainer: ZhangHua).
+- An AUR package [onedrivegui-git](https://aur.archlinux.org/packages/onedrivegui-git) is available (maintainer: Integral).
 
 ## Running from Source
 
