@@ -18,6 +18,7 @@ from global_config import DIR_PATH
 
 app = QApplication(sys.argv)
 app.setApplicationName("OneDriveGUI")
+app.setDesktopFileName("OneDriveGUI")
 app.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png"))
 
 
