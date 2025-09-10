@@ -7,7 +7,7 @@ from settings.gui_settings import gui_settings
 client_bin_path = gui_settings.get("frameless_window")
 
 
-version = "1.2.1"
+version = "1.2.2"
 client_bin_path = config_client_bin_path()
 client_version = get_installed_client_version(client_bin_path)
 global_config = create_global_config()
