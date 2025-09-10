@@ -293,7 +293,7 @@ class WorkerThread(QThread):
                 self.profile_status["status_message"] = "OneDrive client crashed. Please check logs."
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-            elif "refresh_token" in stdout:
+            elif " refresh_token " in stdout or "'refresh_token'" in stdout:
                 self.profile_status["status_message"] = "Logon details expired. Please re-authenticate."
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
                 self.update_credentials.emit(self.profile_name)
