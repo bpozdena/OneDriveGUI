@@ -88,6 +88,6 @@ class Ui_ExternalLoginWindow(object):
                 None,
             )
         )
-        self.pushButton_login.setText(QCoreApplication.translate("ExternalLoginWindow", "Login", None))
+        self.pushButton_login.setText(QCoreApplication.translate("ExternalLoginWindow", "Save", None))
 
     # retranslateUi
