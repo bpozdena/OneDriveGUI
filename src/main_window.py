@@ -624,6 +624,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if move_scrollbar and (currentScrollValue > 0):
                 scroll.setValue(currentScrollValue + 1)
 
+            # Limit list to 10k items to fix #208.
+            if listWidget.count() > 10_000:
+                listWidget.takeItem(listWidget.count() - 1)
+
     def show_login(self, profile):
         # Show login window with QT WebEngine
         self.window1 = QWidget()
