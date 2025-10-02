@@ -134,7 +134,7 @@ class WorkerThread(QThread):
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
                 self.update_credentials.emit(self.profile_name)
 
-            elif "Sync with Microsoft OneDrive is complete" in stdout or "Total number of local file(s) added or changed" in stdout:
+            elif any(msg in stdout for msg in ["Sync with Microsoft OneDrive is complete", "Total number of local file(s) added or changed", "Scanning the local file system"]):
                 self.profile_status["status_message"] = "OneDrive sync is complete"
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
@@ -173,7 +173,7 @@ class WorkerThread(QThread):
                 self.profile_status["status_message"] = "Initializing the OneDrive API"
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-            elif "Processing" in stdout:
+            elif "Processing:" in stdout or "Number of items to download from Microsoft OneDrive" in stdout:
                 items_left = re.match(r"^Processing\s([0-9]+)\sOneDrive\sitems", stdout)
                 if items_left != None:
                     self.profile_status["status_message"] = f"OneDrive is processing {items_left.group(1)} items..."
