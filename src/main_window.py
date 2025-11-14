@@ -460,6 +460,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if result == QMessageBox.Yes:
             logging.info("Authorize sync: Yes")
             self.profile_status_pages[profile_name].stop_monitor()
+            self.remove_worker(profile_name)
             self.start_onedrive_monitor(profile_name, "--resync --resync-auth")
 
         elif result == QMessageBox.No:
