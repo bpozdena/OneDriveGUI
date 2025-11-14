@@ -482,6 +482,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if big_delete_question == QMessageBox.Yes:
             logging.info("Authorize big delete: Yes")
             self.profile_status_pages[profile_name].stop_monitor()
+            self.remove_worker(profile_name)
             self.start_onedrive_monitor(profile_name, "--force")
             self.profile_status_pages[profile_name].label_onedrive_status.setText("Big delete approved")
 
