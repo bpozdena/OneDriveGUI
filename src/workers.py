@@ -181,7 +181,7 @@ class WorkerThread(QThread):
                     self.profile_status["status_message"] = "OneDrive is processing items..."
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-            elif "--resync is required" in stdout:
+            elif "--resync is required" in stdout or "before using --resync" in stdout:
                 # Ask user for resync authorization and stop the worker.
                 logging.warning(f"[{self.profile_name}] {str(stdout)}  - Asking for resync authorization.")
                 self.trigger_resync.emit(self.profile_name)
