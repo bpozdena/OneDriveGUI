@@ -166,7 +166,7 @@
             <item row="1" column="0">
              <widget class="QCheckBox" name="checkBox_display_manager_integration">
               <property name="toolTip">
-               <string>Enable display manager integration for this profile.</string>
+               <string>Controls whether the client integrates the configured 'sync_dir' with the desktop's file manager (e.g. Nautilus for GNOME, Dolphin for KDE), adding it as a "special place" in the sidebar and setting a custom OneDrive folder icon where supported.</string>
               </property>
               <property name="text">
                <string>Display manager integration</string>
@@ -719,6 +719,26 @@
                  <widget class="QCheckBox" name="checkBox_delay_inotify_processing">
                   <property name="text">
                    <string>Delay inotify processing</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="1">
+                 <widget class="QCheckBox" name="checkBox_disable_websocket_support">
+                  <property name="toolTip">
+                   <string>This option disables the built-in WebSocket support that leverages RFC6455 to communicate with the Microsoft Graph API Service, providing near real-time notifications of online changes.</string>
+                  </property>
+                  <property name="text">
+                   <string>Disable WebSocket support</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="2">
+                 <widget class="QCheckBox" name="checkBox_disable_version_check">
+                  <property name="toolTip">
+                   <string>This option determines whether the client will check the GitHub API for the current application version and grace period of running older application versions</string>
+                  </property>
+                  <property name="text">
+                   <string>Disable version check</string>
                   </property>
                  </widget>
                 </item>
