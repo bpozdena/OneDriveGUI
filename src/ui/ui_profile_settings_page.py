@@ -462,6 +462,16 @@ class Ui_profile_settings(object):
 
         self.gridLayout_4.addWidget(self.checkBox_delay_inotify_processing, 4, 3, 1, 1)
 
+        self.checkBox_disable_websocket_support = QCheckBox(self.groupBox_5)
+        self.checkBox_disable_websocket_support.setObjectName(u"checkBox_disable_websocket_support")
+
+        self.gridLayout_4.addWidget(self.checkBox_disable_websocket_support, 5, 1, 1, 1)
+
+        self.checkBox_disable_version_check = QCheckBox(self.groupBox_5)
+        self.checkBox_disable_version_check.setObjectName(u"checkBox_disable_version_check")
+
+        self.gridLayout_4.addWidget(self.checkBox_disable_version_check, 5, 2, 1, 1)
+
 
         self.verticalLayout_15.addWidget(self.groupBox_5)
 
@@ -817,7 +827,7 @@ class Ui_profile_settings(object):
 #endif // QT_CONFIG(tooltip)
         self.checkBox_auto_sync.setText(QCoreApplication.translate("profile_settings", u"Auto-sync on GUI startup", None))
 #if QT_CONFIG(tooltip)
-        self.checkBox_display_manager_integration.setToolTip(QCoreApplication.translate("profile_settings", u"Enable display manager integration for this profile.", None))
+        self.checkBox_display_manager_integration.setToolTip(QCoreApplication.translate("profile_settings", u"Controls whether the client integrates the configured 'sync_dir' with the desktop's file manager (e.g. Nautilus for GNOME, Dolphin for KDE), adding it as a \"special place\" in the sidebar and setting a custom OneDrive folder icon where supported.", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_display_manager_integration.setText(QCoreApplication.translate("profile_settings", u"Display manager integration", None))
 #if QT_CONFIG(tooltip)
@@ -930,6 +940,14 @@ class Ui_profile_settings(object):
         self.checkBox_bypass_data_preservation.setText(QCoreApplication.translate("profile_settings", u"Bypass data preservation", None))
         self.checkBox_display_running_config.setText(QCoreApplication.translate("profile_settings", u"Display running config", None))
         self.checkBox_delay_inotify_processing.setText(QCoreApplication.translate("profile_settings", u"Delay inotify processing", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_disable_websocket_support.setToolTip(QCoreApplication.translate("profile_settings", u"This option disables the built-in WebSocket support that leverages RFC6455 to communicate with the Microsoft Graph API Service, providing near real-time notifications of online changes.", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_disable_websocket_support.setText(QCoreApplication.translate("profile_settings", u"Disable WebSocket support", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_disable_version_check.setToolTip(QCoreApplication.translate("profile_settings", u"This option determines whether the client will check the GitHub API for the current application version and grace period of running older application versions", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_disable_version_check.setText(QCoreApplication.translate("profile_settings", u"Disable version check", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("profile_settings", u"Sync Options", None))
 #if QT_CONFIG(tooltip)
         self.groupBox.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>This option is used to 'skip' certain files and supports pattern matching.</p><p>Patterns are case insensitive. <span style=\" font-weight:700;\">*</span> and <span style=\" font-weight:700;\">? </span><a href=\"https://technet.microsoft.com/en-us/library/bb490639.aspx\"><span style=\" text-decoration: underline; color:#5e81ac;\">wildcards characters</span></a> are supported. </p><p>Use <span style=\" font-weight:700;\">|</span> to separate multiple patterns.<br/></p><p><span style=\" text-decoration: underline;\">Files can be skipped in the following fashion:</span></p><p>-Specify a wildcard, eg: '<span style=\" font-weight:700;\">*.txt</span>' (skip all txt files)</p><p>-Explicitly specify the filename and it's full path relative to your sync_dir, eg: '<span style=\" font-weight:700;\">path/to/file/filename.ext</span>'</p><p>-Explicitly specify the filename only and skip every instance of this filename, eg: '<span style=\" font-weight:700;\">filename.ext</span>'</p><p><br/></p><p><span "
