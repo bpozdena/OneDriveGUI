@@ -11,3 +11,5 @@ OneDriveGUI.code-workspace
 AppDir/
 appimage-builder-cache/
 *.AppImage
+*.md
+!readme.md
