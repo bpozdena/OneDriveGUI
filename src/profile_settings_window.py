@@ -433,6 +433,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.pushButton_login.clicked.connect(lambda: main_window.main_window_instance.show_login(self.profile))
         self.pushButton_logout.clicked.connect(self.logout)
         self.checkBox_auto_sync.stateChanged.connect(self.set_check_box_state_profile)
+        self.checkBox_display_manager_integration.stateChanged.connect(self.set_check_box_state)
 
         ## Recycle Bin group box
         self.checkBox_use_recycle_bin.stateChanged.connect(self.set_check_box_state)
@@ -534,6 +535,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.config_dir = re.search(r"(.+)/.+$", self.config_file).group(1)
         self.pushButton_login.hide()
         self.checkBox_auto_sync.setChecked(self.get_check_box_state_profile("auto_sync"))
+        self.checkBox_display_manager_integration.setChecked(self.get_check_box_state("display_manager_integration"))
 
         # Sync List tab
         self.textEdit_sync_list.setText(self.read_sync_list())
