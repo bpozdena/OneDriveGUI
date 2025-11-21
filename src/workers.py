@@ -274,8 +274,8 @@ class WorkerThread(QThread):
                 self.profile_status["status_message"] = "Cannot connect to Microsoft OneDrive Service."
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-            elif "onedrive application is already running" in stdout:
-                self.profile_status["status_message"] = "OneDrive is already running outside OneDriveGUI !"
+            elif "application is already running" in stdout:
+                self.profile_status["status_message"] = """OneDrive is already running outside OneDriveGUI!\nPlease stop it first."""
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif "command not found" in stdout:
