@@ -426,6 +426,16 @@ class WorkerThread(QThread):
                     if len(self.failed_files) < 25:
                         self.failed_files.append(failed_entry)
 
+            elif "Unknown key in config file:" in stdout:
+                # Extract the invalid config key
+                match = re.search(r"Unknown key in config file:\s*(.+)$", stdout)
+                if match:
+                    invalid_key = match.group(1).strip()
+                    error_message = f"Configuration error: Unknown key '{invalid_key}'. Please check your config file and remove invalid options."
+                else:
+                    error_message = "Configuration error: Unknown key in config file. Please check your configuration."
+                self._emit_error_status(error_message)
+
             else:
                 # logging.debug(f"No rule matched: {stdout}")
                 pass
