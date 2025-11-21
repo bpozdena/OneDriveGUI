@@ -742,6 +742,16 @@
                   </property>
                  </widget>
                 </item>
+                <item row="5" column="3">
+                 <widget class="QCheckBox" name="checkBox_cleanup_local_files">
+                  <property name="toolTip">
+                   <string>Cleanup local files and folders if they are removed online. This option can only be used with Download only mode.</string>
+                  </property>
+                  <property name="text">
+                   <string>Cleanup local files</string>
+                  </property>
+                 </widget>
+                </item>
                </layout>
               </widget>
              </item>
