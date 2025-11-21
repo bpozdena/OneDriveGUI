@@ -39,7 +39,7 @@ from options import (
     version,
 )
 
-from utils.utils import humanize_file_size, shorten_path
+from utils.utils import humanize_file_size, shorten_path, format_relative_time
 from workers import WorkerThread, MaintenanceWorker, TaskList, workers
 from gui_settings_window import gui_settings_window
 
@@ -131,6 +131,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.profile_status_pages[profile].quit_gui_signal.connect(self.graceful_shutdown)
             self.stackedLayout.addWidget(self.profile_status_pages[profile])
 
+            # Connect scroll events for timestamp updates
+            listWidget = self.profile_status_pages[profile].listWidget
+            scrollbar = listWidget.verticalScrollBar()
+            scrollbar.valueChanged.connect(self.on_list_scrolled)
+
         self.verticalLayout_2.addLayout(self.stackedLayout)
 
         # Ensure all profiles in comboBox are aligned to center
@@ -202,6 +207,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.auto_sync.setSingleShot(True)
         self.auto_sync.timeout.connect(self.autostart_monitor)
         self.auto_sync.start(1000)
+
+        # Timer to refresh relative times for completed transfers
+        self.refresh_relative_times = QTimer()
+        self.refresh_relative_times.setSingleShot(False)
+        self.refresh_relative_times.timeout.connect(self.update_relative_times)
+        self.refresh_relative_times.start(60000)  # Update every 60 seconds
+
+        # Debounce timer for scroll-triggered updates
+        self.scroll_update_timer = QTimer()
+        self.scroll_update_timer.setSingleShot(True)
+        self.scroll_update_timer.timeout.connect(self.update_relative_times)
+        self.scroll_update_timer.setInterval(200)  # 200ms debounce delay
 
     def mousePressEvent(self, event):
         if gui_settings.get("frameless_window") == "True":
@@ -841,20 +858,48 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     if file_operation == "Deleting":
                         item_widget.set_label_1(f"Deleted from {parent_dir}")
                         item_widget.set_label_2(f"")
+                        # Store timestamp and display for deleted files
+                        if "timestamp" in data and data["timestamp"]:
+                            item_widget.set_completion_timestamp(data["timestamp"])
+                            relative_time = format_relative_time(data["timestamp"])
+                            item_widget.set_timestamp(relative_time)
+                        else:
+                            item_widget.set_timestamp("")
 
                     elif file_operation == "Moving":
                         item_widget.set_label_1(f"Trashed from {parent_dir}")
                         item_widget.set_label_2(f"")
+                        # Store timestamp and display for moved files
+                        if "timestamp" in data and data["timestamp"]:
+                            item_widget.set_completion_timestamp(data["timestamp"])
+                            relative_time = format_relative_time(data["timestamp"])
+                            item_widget.set_timestamp(relative_time)
+                        else:
+                            item_widget.set_timestamp("")
 
                     elif transfer_complete and file_operation == "Uploading":
                         shortened_path = shorten_path(relative_path_display, 32)
                         item_widget.set_label_1(f"Uploaded from <a href=file:///{absolute_path}>{shortened_path}</a>")
                         item_widget.set_label_2(f"{file_size_human}")
+                        # Store timestamp and display in separate timestamp label
+                        if "timestamp" in data and data["timestamp"]:
+                            item_widget.set_completion_timestamp(data["timestamp"])
+                            relative_time = format_relative_time(data["timestamp"])
+                            item_widget.set_timestamp(relative_time)
+                        else:
+                            item_widget.set_timestamp("")
 
                     elif transfer_complete and file_operation == "Downloading":
                         shortened_path = shorten_path(relative_path_display, 32)
                         item_widget.set_label_1(f"Downloaded from <a href=file:///{absolute_path}>{shortened_path}</a>")
                         item_widget.set_label_2(f"{file_size_human}")
+                        # Store timestamp and display in separate timestamp label
+                        if "timestamp" in data and data["timestamp"]:
+                            item_widget.set_completion_timestamp(data["timestamp"])
+                            relative_time = format_relative_time(data["timestamp"])
+                            item_widget.set_timestamp(relative_time)
+                        else:
+                            item_widget.set_timestamp("")
 
                     elif file_operation == "Downloading":
                         # Estimate final size of file before download completes
@@ -881,20 +926,48 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if file_operation == "Deleting":
                 myQCustomQWidget.set_label_1(f"Deleted from {parent_dir}")
                 myQCustomQWidget.set_label_2(f"")
+                # Store timestamp and display for deleted files
+                if "timestamp" in data and data["timestamp"]:
+                    myQCustomQWidget.set_completion_timestamp(data["timestamp"])
+                    relative_time = format_relative_time(data["timestamp"])
+                    myQCustomQWidget.set_timestamp(relative_time)
+                else:
+                    myQCustomQWidget.set_timestamp("")
 
             elif file_operation == "Moving":
                 myQCustomQWidget.set_label_1(f"Trashed from {parent_dir}")
                 myQCustomQWidget.set_label_2(f"")
+                # Store timestamp and display for moved files
+                if "timestamp" in data and data["timestamp"]:
+                    myQCustomQWidget.set_completion_timestamp(data["timestamp"])
+                    relative_time = format_relative_time(data["timestamp"])
+                    myQCustomQWidget.set_timestamp(relative_time)
+                else:
+                    myQCustomQWidget.set_timestamp("")
 
             elif transfer_complete and file_operation == "Uploading":
                 shortened_path = shorten_path(relative_path_display, 32)
                 myQCustomQWidget.set_label_1(f"Uploaded from <a href=file:///{absolute_path}>{shortened_path}</a>")
                 myQCustomQWidget.set_label_2(f"{file_size_human}")
+                # Store timestamp and display in separate timestamp label
+                if "timestamp" in data and data["timestamp"]:
+                    myQCustomQWidget.set_completion_timestamp(data["timestamp"])
+                    relative_time = format_relative_time(data["timestamp"])
+                    myQCustomQWidget.set_timestamp(relative_time)
+                else:
+                    myQCustomQWidget.set_timestamp("")
 
             elif transfer_complete and file_operation == "Downloading":
                 shortened_path = shorten_path(relative_path_display, 32)
                 myQCustomQWidget.set_label_1(f"Downloaded from <a href=file:///{absolute_path}>{shortened_path}</a>")
                 myQCustomQWidget.set_label_2(f"{file_size_human}")
+                # Store timestamp and display in separate timestamp label
+                if "timestamp" in data and data["timestamp"]:
+                    myQCustomQWidget.set_completion_timestamp(data["timestamp"])
+                    relative_time = format_relative_time(data["timestamp"])
+                    myQCustomQWidget.set_timestamp(relative_time)
+                else:
+                    myQCustomQWidget.set_timestamp("")
 
             elif file_operation == "Downloading":
                 # Estimate final size of file before download completes
@@ -925,6 +998,54 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # Limit list to 10k items to fix #208.
             if listWidget.count() > 10_000:
                 listWidget.takeItem(listWidget.count() - 1)
+
+    def on_list_scrolled(self, value):
+        """
+        Debounced scroll handler - triggers timestamp update after scrolling stops.
+        Called when scrollbar position changes (user scroll or automatic scroll from new items).
+        """
+        # Restart the debounce timer - only triggers after 200ms of no scrolling
+        self.scroll_update_timer.start()
+
+    def update_relative_times(self):
+        """
+        Update relative time display only for visible items in the viewport.
+        Optimized to update only 10-20 visible items instead of all 10,000 items.
+        Called every 60 seconds by QTimer and when user scrolls the list.
+        """
+        for profile in self.profile_status_pages:
+            listWidget = self.profile_status_pages[profile].listWidget
+
+            # Get the visible viewport area
+            rect = listWidget.viewport().contentsRect()
+            top_index = listWidget.indexAt(rect.topLeft())
+
+            # Skip if no items are visible
+            if not top_index.isValid():
+                continue
+
+            # Get the bottom visible index
+            bottom_index = listWidget.indexAt(rect.bottomLeft())
+
+            # Handle case where bottom index is invalid (last item is visible)
+            if not bottom_index.isValid():
+                bottom_row = listWidget.count() - 1
+            else:
+                bottom_row = bottom_index.row()
+
+            # Only iterate through visible rows (typically 10-20 items instead of 10,000)
+            for row in range(top_index.row(), bottom_row + 1):
+                item = listWidget.item(row)
+                if item is not None:
+                    item_widget = listWidget.itemWidget(item)
+                    if item_widget is not None:
+                        # Get the completion timestamp
+                        timestamp = item_widget.get_completion_timestamp()
+
+                        # If item has a timestamp, update the relative time in the timestamp label
+                        if timestamp is not None:
+                            relative_time = format_relative_time(timestamp)
+                            item_widget.set_timestamp(relative_time)
 
     def show_login(self, profile):
         # Show login window with QT WebEngine

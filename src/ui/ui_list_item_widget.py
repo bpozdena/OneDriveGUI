@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'list_item_widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.2
+## Created by: Qt User Interface Compiler version 6.10.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -35,7 +35,7 @@ class Ui_list_item_widget(object):
         self.toolButton.setMinimumSize(QSize(0, 0))
         self.toolButton.setAutoFillBackground(False)
         icon = QIcon()
-        icon.addFile(u"../resources/images/icons8-clouds-48.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(u"../resources/images/icons8-clouds-48.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.toolButton.setIcon(icon)
         self.toolButton.setIconSize(QSize(30, 40))
 
@@ -43,29 +43,45 @@ class Ui_list_item_widget(object):
 
         self.ls_label_file_name = QLabel(list_item_widget)
         self.ls_label_file_name.setObjectName(u"ls_label_file_name")
-        self.ls_label_file_name.setMaximumSize(QSize(340, 16777215))
+        self.ls_label_file_name.setMaximumSize(QSize(270, 16777215))
         font = QFont()
         font.setPointSize(10)
         font.setBold(True)
         self.ls_label_file_name.setFont(font)
+        self.ls_label_file_name.setTextFormat(Qt.PlainText)
 
-        self.gridLayout.addWidget(self.ls_label_file_name, 0, 1, 1, 2)
+        self.gridLayout.addWidget(self.ls_label_file_name, 0, 1, 1, 1)
+
+        self.ls_label_timestamp = QLabel(list_item_widget)
+        self.ls_label_timestamp.setObjectName(u"ls_label_timestamp")
+        self.ls_label_timestamp.setMinimumSize(QSize(70, 0))
+        self.ls_label_timestamp.setMaximumSize(QSize(70, 16777215))
+        font1 = QFont()
+        font1.setPointSize(8)
+        self.ls_label_timestamp.setFont(font1)
+        self.ls_label_timestamp.setStyleSheet(u"color: rgba(128, 128, 128, 200);")
+        self.ls_label_timestamp.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
+        self.ls_label_timestamp.setTextFormat(Qt.PlainText)
+
+        self.gridLayout.addWidget(self.ls_label_timestamp, 0, 2, 1, 1)
 
         self.ls_label_2 = QLabel(list_item_widget)
         self.ls_label_2.setObjectName(u"ls_label_2")
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.ls_label_2.sizePolicy().hasHeightForWidth())
         self.ls_label_2.setSizePolicy(sizePolicy)
         self.ls_label_2.setMaximumSize(QSize(170, 16777215))
         self.ls_label_2.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.ls_label_2.setTextFormat(Qt.PlainText)
+        self.ls_label_2.setWordWrap(False)
 
         self.gridLayout.addWidget(self.ls_label_2, 2, 2, 2, 1)
 
         self.ls_label_1 = QLabel(list_item_widget)
         self.ls_label_1.setObjectName(u"ls_label_1")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.ls_label_1.sizePolicy().hasHeightForWidth())
@@ -92,6 +108,7 @@ class Ui_list_item_widget(object):
         list_item_widget.setWindowTitle(QCoreApplication.translate("list_item_widget", u"Form", None))
         self.toolButton.setText(QCoreApplication.translate("list_item_widget", u"...", None))
         self.ls_label_file_name.setText(QCoreApplication.translate("list_item_widget", u"FileName", None))
+        self.ls_label_timestamp.setText("")
         self.ls_label_2.setText(QCoreApplication.translate("list_item_widget", u"9960KB of 9100KB", None))
         self.ls_label_1.setText(QCoreApplication.translate("list_item_widget", u"Downloading/Uploading ", None))
     # retranslateUi
