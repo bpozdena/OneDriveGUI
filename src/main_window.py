@@ -74,7 +74,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__()
         self.setupUi(self)
         self.setWindowTitle(f"OneDriveGUI v{version}")
-        self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png"))
+        self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-cloud-80.png"))
 
         if gui_settings.get("frameless_window") == "True":
             self.setWindowFlags(Qt.FramelessWindowHint)
@@ -150,7 +150,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # System Tray
         self.tray = QSystemTrayIcon()
         if self.tray.isSystemTrayAvailable():
-            icon = QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png")
+            # Initial icon will be updated by update_tray_icon() after profiles are loaded
+            icon = QIcon(DIR_PATH + "/resources/images/icons8-cloud-80.png")
             menu = QMenu()
 
             show_action = menu.addAction("Show/Hide")
@@ -165,6 +166,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.tray.setIcon(icon)
             self.tray.setContextMenu(menu)
             self.tray.show()
+            # Initial tooltip - will be updated by update_tray_icon()
             self.tray.setToolTip("OneDriveGUI")
 
         else:
@@ -510,6 +512,162 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     profile_status_page.pushButton_start_stop.clicked.disconnect()
                     profile_status_page.pushButton_start_stop.clicked.connect(profile_status_page.stop_monitor)
 
+        # Update system tray icon based on aggregate status
+        self.update_tray_icon()
+
+    def is_ignorable_error(self, error_text):
+        """
+        Check if an error message should be ignored for tray icon status.
+        Returns True if the error should be ignored.
+        """
+        if not error_text:
+            return True
+
+        # List of error patterns to ignore
+        ignored_patterns = ["inotify_add_watch failed", "The local file system returned an error with the following message"]
+
+        error_lower = error_text.lower()
+        for pattern in ignored_patterns:
+            if pattern.lower() in error_lower:
+                return True
+
+        return False
+
+    def aggregate_tray_status(self):
+        """
+        Aggregate status across all profiles to determine system tray icon state.
+        Returns: tuple (status_state, running_count, total_count, profile_statuses)
+
+        status_state: 'ERROR', 'STOPPED', 'SYNCING', or 'IDLE'
+        Priority: ERROR > STOPPED > SYNCING > IDLE
+        """
+        if not global_config:
+            return ("IDLE", 0, 0, {})
+
+        total_count = len(global_config)
+        running_count = 0
+        profile_statuses = {}
+
+        has_error = False
+        has_stopped = False
+        has_syncing = False
+
+        for profile_name in global_config:
+            # Check if worker is running
+            is_running = profile_name in workers and workers[profile_name].isRunning()
+
+            # Get status message from profile status page
+            if profile_name in self.profile_status_pages:
+                status_msg = self.profile_status_pages[profile_name].label_onedrive_status.text()
+                error_tooltip = self.profile_status_pages[profile_name].label_error_icon.toolTip()
+            else:
+                status_msg = ""
+                error_tooltip = ""
+
+            # Categorize this profile's state
+            if not is_running:
+                profile_state = "STOPPED"
+                has_stopped = True
+            elif (not self.is_ignorable_error(error_tooltip) and not self.is_ignorable_error(status_msg)) and (
+                error_tooltip or "Error:" in status_msg or "error" in status_msg.lower() or "failed" in status_msg.lower() or "crashed" in status_msg.lower()
+            ):
+                profile_state = "ERROR"
+                has_error = True
+                running_count += 1
+            elif "sync in progress" in status_msg.lower() or "processing" in status_msg.lower() or "starting" in status_msg.lower() or "initializing" in status_msg.lower():
+                profile_state = "SYNCING"
+                has_syncing = True
+                running_count += 1
+            elif is_running:
+                profile_state = "IDLE"
+                running_count += 1
+            else:
+                profile_state = "STOPPED"
+                has_stopped = True
+
+            profile_statuses[profile_name] = {"state": profile_state, "status_msg": status_msg if status_msg else "stopped", "is_running": is_running}
+
+        # Determine overall state with priority
+        if has_error:
+            overall_state = "ERROR"
+        elif has_stopped:
+            overall_state = "STOPPED"
+        elif has_syncing:
+            overall_state = "SYNCING"
+        else:
+            overall_state = "IDLE"
+
+        return (overall_state, running_count, total_count, profile_statuses)
+
+    def generate_tray_tooltip(self, overall_state, running_count, total_count, profile_statuses):
+        """
+        Generate detailed tooltip showing status of all profiles.
+        """
+        if not profile_statuses:
+            return "OneDriveGUI - No profiles configured"
+
+        # Summary line
+        if running_count == total_count and overall_state != "ERROR":
+            summary = f"All {total_count} profile(s) running"
+        elif running_count == 0:
+            summary = f"All {total_count} profile(s) stopped"
+        else:
+            summary = f"{running_count} of {total_count} profile(s) running"
+
+        # Add overall state indicator
+        state_indicators = {"ERROR": "Sync error detected", "STOPPED": "Sync stopped", "SYNCING": "Syncing...", "IDLE": "All syncs complete"}
+        summary += f" - {state_indicators.get(overall_state, '')}"
+
+        # Build detailed list
+        lines = [summary, ""]
+        for profile_name, status_info in profile_statuses.items():
+            state = status_info["state"]
+            status_msg = status_info["status_msg"]
+
+            # Add text indicator for each profile
+            if state == "ERROR":
+                indicator = "[ERROR]"
+            elif state == "STOPPED":
+                indicator = "[STOPPED]"
+            elif state == "SYNCING":
+                indicator = "[SYNCING]"
+            else:
+                indicator = "[IDLE]"
+
+            # Shorten status message if too long
+            if len(status_msg) > 50:
+                status_msg = status_msg[:47] + "..."
+
+            lines.append(f"{indicator} {profile_name}: {status_msg}")
+
+        return "\n".join(lines)
+
+    def update_tray_icon(self):
+        """
+        Update system tray icon and tooltip based on current sync status.
+        """
+        if not self.tray:
+            return
+
+        # Get aggregated status
+        overall_state, running_count, total_count, profile_statuses = self.aggregate_tray_status()
+
+        # Select icon based on state
+        icon_map = {
+            "ERROR": DIR_PATH + "/resources/images/icons8-cloud-error-80.png",
+            "STOPPED": DIR_PATH + "/resources/images/icons8-cloud-stop-80.png",
+            "SYNCING": DIR_PATH + "/resources/images/icons8-cloud-sync-80.png",
+            "IDLE": DIR_PATH + "/resources/images/icons8-cloud-done-80.png",
+        }
+
+        icon_path = icon_map.get(overall_state, DIR_PATH + "/resources/images/icons8-cloud-80.png")
+        icon = QIcon(icon_path)
+        self.tray.setIcon(icon)
+
+        # Generate and set tooltip
+        tooltip = self.generate_tray_tooltip(overall_state, running_count, total_count, profile_statuses)
+        self.tray.setToolTip(tooltip)
+
     def autostart_monitor(self):
         # Auto-start sync if compatible version of OneDrive client is installed.
         for profile_name in global_config:
@@ -631,6 +789,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # Clear error icon
             self.profile_status_pages[profile].label_error_icon.clear()
             self.profile_status_pages[profile].label_error_icon.setToolTip("")
+
+        # Update system tray icon when profile status changes
+        self.update_tray_icon()
 
     def event_update_progress(self, data, profile):
         """
@@ -768,7 +929,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def show_login(self, profile):
         # Show login window with QT WebEngine
         self.window1 = QWidget()
-        self.window1.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png"))
+        self.window1.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-cloud-80.png"))
         self.lw = Ui_LoginWindow()
         self.lw.setupUi(self.window1)
         self.window1.show()
@@ -792,7 +953,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def show_external_login(self, profile):
         # Show external login window
         self.window2 = QWidget()
-        self.window2.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png"))
+        self.window2.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-cloud-80.png"))
         self.lw2 = Ui_ExternalLoginWindow()
         self.lw2.setupUi(self.window2)
         self.window2.show()
