@@ -1,6 +1,7 @@
 import os
 import subprocess
 import re
+from datetime import datetime
 
 import logging
 # from logger import logger
@@ -105,3 +106,28 @@ def config_client_bin_path() -> str:
         return "onedrive"
     else:
         return gui_settings.get("client_bin_path")
+
+
+def format_relative_time(timestamp):
+    """
+    Format a datetime timestamp into compact relative time string.
+    Examples: "now", "2m ago", "3h ago", "2d ago"
+    """
+    if timestamp is None:
+        return ""
+
+    now = datetime.now()
+    delta = now - timestamp
+    total_seconds = int(delta.total_seconds())
+
+    if total_seconds < 60:
+        return "now"
+    elif total_seconds < 3600:  # Less than 1 hour
+        minutes = total_seconds // 60
+        return f"{minutes}m ago"
+    elif total_seconds < 86400:  # Less than 1 day
+        hours = total_seconds // 3600
+        return f"{hours}h ago"
+    else:  # 1 day or more
+        days = total_seconds // 86400
+        return f"{days}d ago"

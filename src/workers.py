@@ -1,6 +1,7 @@
-from PySide6.QtCore import QThread, Signal, QFileInfo
+from PySide6.QtCore import QThread, Signal, QFileInfo, Qt
 
 from PySide6.QtWidgets import QWidget, QFileIconProvider
+from PySide6.QtGui import QFontMetrics
 
 
 # Imports for main window.
@@ -10,6 +11,7 @@ from ui.ui_list_item_widget import Ui_list_item_widget
 import re
 import time
 import subprocess
+from datetime import datetime
 
 from global_config import save_global_config
 from options import (
@@ -260,7 +262,7 @@ class WorkerThread(QThread):
                 self.profile_status["status_message"] = "Initializing the OneDrive API"
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-            elif "Processing:" in stdout or "Number of items to download from Microsoft OneDrive" in stdout:
+            elif "Processing:" in stdout or "Number of items to download from Microsoft OneDrive" in stdout or "OneDrive Client requested to create" in stdout:
                 items_left = re.match(r"^Processing\s([0-9]+)\sOneDrive\sitems", stdout)
                 if items_left != None:
                     self.profile_status["status_message"] = f"OneDrive is processing {items_left.group(1)} items..."
@@ -300,6 +302,7 @@ class WorkerThread(QThread):
                     "file_path": "unknown file name" if self.file_path is None else self.file_path.group(1),
                     "progress": progress,
                     "transfer_complete": transfer_complete,
+                    "timestamp": datetime.now() if transfer_complete else None,
                 }
 
                 # Update file transfer list
@@ -333,6 +336,7 @@ class WorkerThread(QThread):
                             "file_path": file_path,
                             "progress": progress,
                             "transfer_complete": transfer_complete,
+                            "timestamp": datetime.now() if transfer_complete else None,
                         }
 
                         logging.info(transfer_progress_new)
@@ -648,6 +652,14 @@ class TaskList(QWidget, Ui_list_item_widget):
         # Set up the user interface from Designer.
         self.setupUi(self)
 
+        # Store completion timestamp for relative time display
+        self.completion_timestamp = None
+
+        # Enable text eliding for ls_label_2 to prevent horizontal overflow
+        self.ls_label_2.setWordWrap(False)
+        self.ls_label_2.setSizePolicy(self.ls_label_2.sizePolicy().horizontalPolicy(), self.ls_label_2.sizePolicy().verticalPolicy())
+        self.ls_label_2_max_width = 170  # Store max width for eliding
+
     def set_icon(self, file_path):
         self.fileInfo = QFileInfo(file_path)
         self.iconProvider = QFileIconProvider()
@@ -656,7 +668,10 @@ class TaskList(QWidget, Ui_list_item_widget):
         self.toolButton.setIcon(self.icon)
 
     def set_file_name(self, file_path):
-        self.ls_label_file_name.setText(file_path)
+        # Use font metrics to elide long filenames
+        font_metrics = QFontMetrics(self.ls_label_file_name.font())
+        elided_text = font_metrics.elidedText(file_path, Qt.ElideMiddle, 270)
+        self.ls_label_file_name.setText(elided_text)
 
     def get_file_name(self):
         return self.ls_label_file_name.text()
@@ -669,13 +684,32 @@ class TaskList(QWidget, Ui_list_item_widget):
         self.ls_label_1.setText(text)
 
     def set_label_2(self, text):
-        self.ls_label_2.setText(text)
+        # Use font metrics to elide text if it exceeds maximum width
+        font_metrics = QFontMetrics(self.ls_label_2.font())
+        elided_text = font_metrics.elidedText(text, Qt.ElideRight, self.ls_label_2_max_width)
+        self.ls_label_2.setText(elided_text)
+
+    def set_timestamp(self, text):
+        """Set the timestamp label text"""
+        self.ls_label_timestamp.setText(text)
+
+    def get_timestamp_text(self):
+        """Get current timestamp label text"""
+        return self.ls_label_timestamp.text()
 
     def hide_progress_bar(self, transfer_status: bool):
         if transfer_status:
             self.ls_progressBar.hide()
         else:
             self.ls_progressBar.show()
+
+    def set_completion_timestamp(self, timestamp):
+        """Store the completion timestamp for this transfer"""
+        self.completion_timestamp = timestamp
+
+    def get_completion_timestamp(self):
+        """Get the completion timestamp for this transfer"""
+        return self.completion_timestamp
 
 
 workers = {}
