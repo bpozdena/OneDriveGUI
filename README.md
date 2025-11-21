@@ -86,3 +86,6 @@ A GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive) with mu
 - The list of managed OneDrive profiles is stored in `~/.config/onedrive-gui/profiles`. You can manually rename your profile or path to the config file there.
 - Newly created OneDrive config files are stored in `~/.config/onedrive/accounts/<profile_name>`.
 - Debug logs are saved in ``. Logging can be changed in the GUI settings.
+
+# Attribution
+- Icons by <a target="_blank" href="https://icons8.com">Icons8</a>

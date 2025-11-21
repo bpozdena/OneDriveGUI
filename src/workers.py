@@ -95,6 +95,11 @@ class WorkerThread(QThread):
         # Track pending error for multi-line error messages
         self.pending_error = None
 
+        # Track failed files for detailed error reporting
+        self.failed_files = []
+        self.failed_files_count = 0
+        self.collecting_failed_files = False  # Flag to indicate we're collecting failed file lines
+
         self.profile_status["status_message"] = "OneDrive sync is starting..."
         self.update_profile_status.emit(self.profile_status, self.profile_name)
 
@@ -159,6 +164,32 @@ class WorkerThread(QThread):
         self.profile_status["error_message"] = full_error_message  # Full error for tooltip
         self.update_profile_status.emit(self.profile_status, self.profile_name)
 
+    def _emit_failed_files_status(self):
+        """Format and emit status for failed file uploads/downloads."""
+        if not self.failed_files and self.failed_files_count == 0:
+            return
+
+        # Use the actual count from the summary line if available, otherwise use list length
+        count = self.failed_files_count if self.failed_files_count > 0 else len(self.failed_files)
+
+        # Status message (truncated for main UI)
+        status_msg = f"Sync completed with {count} failed file(s)"
+
+        # Tooltip message (detailed list)
+        tooltip_lines = [f"Failed items to upload to/from Microsoft OneDrive: {count}"]
+        tooltip_lines.extend(self.failed_files)
+
+        # If there are more failures than we captured, add indicator
+        if count > len(self.failed_files):
+            remaining = count - len(self.failed_files)
+            tooltip_lines.append(f"... and {remaining} more")
+
+        full_tooltip = "\n".join(tooltip_lines)
+
+        self.profile_status["status_message"] = status_msg
+        self.profile_status["error_message"] = full_tooltip
+        self.update_profile_status.emit(self.profile_status, self.profile_name)
+
     def read_stdout(self):
         stdout = self.onedrive_process.stdout.readline().strip()
         if stdout != "":
@@ -170,6 +201,12 @@ class WorkerThread(QThread):
                 self._emit_error_status(self.pending_error)
                 self.pending_error = None
 
+            # Check if we were collecting failed files and this line is not a "Failed to" line
+            if self.collecting_failed_files and "Failed to upload:" not in stdout and "Failed to download:" not in stdout:
+                # We're done collecting, emit the status
+                self._emit_failed_files_status()
+                self.collecting_failed_files = False
+
             if "Calling Function: testNetwork()" in stdout:
                 self.profile_status["status_message"] = "Cannot connect to Microsoft OneDrive Service"
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
@@ -180,7 +217,7 @@ class WorkerThread(QThread):
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
                 self.update_credentials.emit(self.profile_name)
 
-            elif any(msg in stdout for msg in ["Sync with Microsoft OneDrive is complete", "Total number of local file(s) added or changed", "Scanning the local file system"]):
+            elif any(msg in stdout for msg in ["Sync with Microsoft OneDrive is complete", "Total number of local file(s) added or changed"]):
                 self.profile_status["status_message"] = "OneDrive sync is complete"
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
@@ -216,6 +253,10 @@ class WorkerThread(QThread):
                 # save_global_config()
 
             elif "Initializing the OneDrive API" in stdout:
+                # Clear failed files list at start of new sync cycle
+                self.failed_files = []
+                self.failed_files_count = 0
+                self.collecting_failed_files = False
                 self.profile_status["status_message"] = "Initializing the OneDrive API"
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
@@ -364,6 +405,26 @@ class WorkerThread(QThread):
                     error_text = error_parts[1].strip()
                     # Store as pending error to check if next line has "Error Message:"
                     self.pending_error = error_text
+
+            elif "Failed items to upload to/from Microsoft OneDrive:" in stdout:
+                # Extract the count of failed items
+                match = re.search(r"Failed items .+?: (\d+)", stdout)
+                if match:
+                    self.failed_files_count = int(match.group(1))
+                    # Start collecting failed file lines (they come after this summary line)
+                    self.collecting_failed_files = True
+
+            elif "Failed to upload:" in stdout or "Failed to download:" in stdout:
+                # Extract the operation and file path
+                match = re.search(r"Failed to (upload|download): (.+)$", stdout)
+                if match:
+                    operation = match.group(1)
+                    file_path = match.group(2).strip()
+                    failed_entry = f"Failed to {operation}: {file_path}"
+
+                    # Add to list, limiting to 25 entries
+                    if len(self.failed_files) < 25:
+                        self.failed_files.append(failed_entry)
 
             else:
                 # logging.debug(f"No rule matched: {stdout}")
