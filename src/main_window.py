@@ -170,6 +170,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.tray = None
 
+        # Version check results storage
+        self.client_version_status = {
+            "label_text": "",
+            "tooltip_text": "",
+            "min_requirements_met": True,
+        }
+        self.gui_version_status = {
+            "label_text": "",
+            "tooltip_text": "",
+        }
+
         self.refresh_process_status = QTimer()
         self.refresh_process_status.setSingleShot(False)
         self.refresh_process_status.timeout.connect(self.onedrive_process_status)
@@ -179,6 +190,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.check_client_version.setSingleShot(True)
         self.check_client_version.timeout.connect(self.client_version_check)
         self.check_client_version.start(500)
+
+        self.check_gui_version = QTimer()
+        self.check_gui_version.setSingleShot(True)
+        self.check_gui_version.timeout.connect(self.gui_version_check)
+        self.check_gui_version.start(1000)
 
         self.auto_sync = QTimer()
         self.auto_sync.setSingleShot(True)
@@ -271,9 +287,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def client_version_check(self):
         """
         Compare installed version of OneDrive client with the latest version on Github releases.
-        Show workings or prevent sync when installed version is too old.
+        Store results and call display_version_warnings() to show combined warnings.
         """
-        pixmap_warning = QPixmap(DIR_PATH + "/resources/images/warning.png").scaled(20, 20, Qt.KeepAspectRatio)
         s = requests.Session()
         version_label_text = ""
         version_tooltip_text = ""
@@ -332,27 +347,132 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 version_label_text = "OneDrive client is out of date!"
                 version_tooltip_text = f"OneDrive client is out of date! \n Installed: {installed_client_version[0]} \n Latest: {latest_client_version}"
 
-            for profile_name in global_config:
-                self.profile_status_pages[profile_name].label_onedrive_status.setOpenExternalLinks(True)
+            # Store results
+            self.client_version_status["label_text"] = version_label_text
+            self.client_version_status["tooltip_text"] = version_tooltip_text
+            self.client_version_status["min_requirements_met"] = min_requirements_met
 
-                if version_label_text:
-                    self.profile_status_pages[profile_name].label_onedrive_status.setText(version_label_text)
-
-                if not min_requirements_met:
-                    # Disable Start Sync button if OneDrive client is too old (smaller then min_supported_version_num).
-                    self.profile_status_pages[profile_name].pushButton_start.setEnabled(False)
-                    self.profile_status_pages[profile_name].pushButton_start_stop.setEnabled(False)
-                    self.profile_status_pages[profile_name].pushButton_profiles.setEnabled(False)
-                    self.profile_status_pages[profile_name].label_version_check.setToolTip(version_tooltip_text)
-                    self.profile_status_pages[profile_name].label_version_check.setPixmap(pixmap_warning)
-
-                elif latest_client_version not in installed_client_version:
-                    # Display warning in GUI when installed OneDrive client is not up to date.
-                    self.profile_status_pages[profile_name].label_version_check.setToolTip(version_tooltip_text)
-                    self.profile_status_pages[profile_name].label_version_check.setPixmap(pixmap_warning)
+            # Display combined warnings
+            self.display_version_warnings()
 
         except Exception as e:
             logging.error(f"Client version check failed: {e}")
+
+    def gui_version_check(self):
+        """
+        Compare installed version of OneDriveGUI with the latest version on Github releases.
+        Store results and call display_version_warnings() to show combined warnings.
+        """
+        s = requests.Session()
+        version_label_text = ""
+        version_tooltip_text = ""
+
+        def parse_semantic_version(version_string):
+            """Parse semantic version string (e.g., 'v1.2.3' or '1.2.3') into tuple (1, 2, 3)"""
+            try:
+                # Remove 'v' prefix if present
+                clean_version = version_string.strip().lstrip("v")
+                # Split by '.' and convert to integers
+                parts = [int(x) for x in clean_version.split(".")]
+                # Ensure we have at least 3 parts (major, minor, patch)
+                while len(parts) < 3:
+                    parts.append(0)
+                return tuple(parts[:3])  # Return only first 3 parts
+            except Exception as e:
+                logging.error(f"Failed to parse version '{version_string}': {e}")
+                return None
+
+        def get_latest_gui_version():
+            """Fetch latest GUI version from GitHub releases"""
+            latest_url = "https://api.github.com/repos/bpozdena/OneDriveGUI/releases/latest"
+            try:
+                response = s.get(latest_url, timeout=1)
+                latest_gui_version = response.json()["tag_name"]
+                return latest_gui_version
+            except Exception as e:
+                logging.error(f"Failed to fetch latest GUI version: {e}")
+                return None
+
+        try:
+            latest_gui_version = get_latest_gui_version()
+            installed_gui_version = version  # From options.py
+
+            if not latest_gui_version:
+                # Network issue or API error - don't show warning
+                logging.debug("[GUI] Unable to check for latest OneDriveGUI version")
+                return
+
+            # Parse versions for comparison
+            installed_version_tuple = parse_semantic_version(installed_gui_version)
+            latest_version_tuple = parse_semantic_version(latest_gui_version)
+
+            if not installed_version_tuple or not latest_version_tuple:
+                logging.error("[GUI] Failed to parse GUI versions for comparison")
+                return
+
+            logging.debug(f"[GUI] GUI version check: Installed: v{installed_gui_version} | Latest: {latest_gui_version}")
+
+            # Compare versions
+            if installed_version_tuple < latest_version_tuple:
+                version_label_text = "OneDriveGUI is out of date!"
+                version_tooltip_text = f"OneDriveGUI is out of date! \n Installed: v{installed_gui_version} \n Latest: {latest_gui_version}"
+            else:
+                logging.debug("[GUI] OneDriveGUI is up to date")
+
+            # Store results
+            self.gui_version_status["label_text"] = version_label_text
+            self.gui_version_status["tooltip_text"] = version_tooltip_text
+
+            # Display combined warnings
+            self.display_version_warnings()
+
+        except Exception as e:
+            logging.error(f"GUI version check failed: {e}")
+
+    def display_version_warnings(self):
+        """
+        Display combined version warnings for both OneDrive client and GUI.
+        This method combines warnings from both version checks and displays them together.
+        """
+        pixmap_warning = QPixmap(DIR_PATH + "/resources/images/warning.png").scaled(20, 20, Qt.KeepAspectRatio)
+
+        # Combine label texts (use <br> for HTML line break in Qt labels)
+        label_texts = []
+        if self.client_version_status["label_text"]:
+            label_texts.append(self.client_version_status["label_text"])
+        if self.gui_version_status["label_text"]:
+            label_texts.append(self.gui_version_status["label_text"])
+
+        combined_label_text = "<br>".join(label_texts) if label_texts else ""
+
+        # Combine tooltip texts
+        tooltip_parts = []
+        if self.client_version_status["tooltip_text"]:
+            tooltip_parts.append(self.client_version_status["tooltip_text"])
+        if self.gui_version_status["tooltip_text"]:
+            tooltip_parts.append(self.gui_version_status["tooltip_text"])
+
+        combined_tooltip_text = "\n---\n".join(tooltip_parts) if tooltip_parts else ""
+
+        # Display warnings in all profile status pages
+        for profile_name in global_config:
+            page = self.profile_status_pages[profile_name]
+            page.label_onedrive_status.setOpenExternalLinks(True)
+
+            # Set combined label text
+            if combined_label_text:
+                page.label_onedrive_status.setText(combined_label_text)
+
+            # Handle critical client version issues (disable sync)
+            if not self.client_version_status["min_requirements_met"]:
+                page.pushButton_start.setEnabled(False)
+                page.pushButton_start_stop.setEnabled(False)
+                page.pushButton_profiles.setEnabled(False)
+
+            # Set warning icon and tooltip if any warnings exist
+            if combined_tooltip_text:
+                page.label_version_check.setToolTip(combined_tooltip_text)
+                page.label_version_check.setPixmap(pixmap_warning)
 
     def onedrive_process_status(self):
         # Check OneDrive status and start/stop sync button.
