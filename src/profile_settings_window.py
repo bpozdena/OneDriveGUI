@@ -401,6 +401,8 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_force_session_upload.stateChanged.connect(self.set_check_box_state)
         self.checkBox_disable_websocket_support.stateChanged.connect(self.set_check_box_state)
         self.checkBox_disable_version_check.stateChanged.connect(self.set_check_box_state)
+        self.checkBox_cleanup_local_files.stateChanged.connect(self.set_check_box_state)
+        self.checkBox_cleanup_local_files.stateChanged.connect(self.validate_checkbox_input)
         self.lineEdit_user_agent.textChanged.connect(self.set_line_edit_value)
         self.lineEdit_azure_ad_endpoint.textChanged.connect(self.set_line_edit_value)
         self.lineEdit_azure_tenant_id.textChanged.connect(self.set_line_edit_value)
@@ -501,6 +503,8 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_force_session_upload.setChecked(self.get_check_box_state("force_session_upload"))
         self.checkBox_disable_websocket_support.setChecked(self.get_check_box_state("disable_websocket_support"))
         self.checkBox_disable_version_check.setChecked(self.get_check_box_state("disable_version_check"))
+        self.checkBox_cleanup_local_files.setChecked(self.get_check_box_state("cleanup_local_files"))
+        self.checkBox_cleanup_local_files.setEnabled(self.checkBox_download_only.isChecked())
         self.lineEdit_user_agent.setText(self.temp_profile_config["onedrive"]["user_agent"].strip('"'))
         self.lineEdit_azure_ad_endpoint.setText(self.temp_profile_config["onedrive"]["azure_ad_endpoint"].strip('"'))
         self.lineEdit_azure_tenant_id.setText(self.temp_profile_config["onedrive"]["azure_tenant_id"].strip('"'))
@@ -575,8 +579,11 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
             if self.checkBox_download_only.isChecked():
                 self.checkBox_upload_only.setChecked(False)
                 self.checkBox_upload_only.setDisabled(True)
+                self.checkBox_cleanup_local_files.setDisabled(False)
             else:
                 self.checkBox_upload_only.setDisabled(False)
+                self.checkBox_cleanup_local_files.setDisabled(True)
+                self.checkBox_cleanup_local_files.setChecked(False)
 
             if self.checkBox_upload_only.isChecked():
                 self.checkBox_download_only.setChecked(False)
@@ -586,6 +593,11 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
                 self.checkBox_download_only.setDisabled(False)
                 self.checkBox_no_remote_delete.setDisabled(True)
                 self.checkBox_no_remote_delete.setChecked(False)
+
+        if self.sender().objectName() == "checkBox_cleanup_local_files":
+            if self.checkBox_cleanup_local_files.isChecked():
+                if not self.checkBox_download_only.isChecked():
+                    self.checkBox_download_only.setChecked(True)
 
         if self.sender().objectName() == "checkBox_enable_logging":
             if self.checkBox_enable_logging.isChecked():

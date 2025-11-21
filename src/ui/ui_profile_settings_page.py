@@ -472,6 +472,11 @@ class Ui_profile_settings(object):
 
         self.gridLayout_4.addWidget(self.checkBox_disable_version_check, 5, 2, 1, 1)
 
+        self.checkBox_cleanup_local_files = QCheckBox(self.groupBox_5)
+        self.checkBox_cleanup_local_files.setObjectName(u"checkBox_cleanup_local_files")
+
+        self.gridLayout_4.addWidget(self.checkBox_cleanup_local_files, 5, 3, 1, 1)
+
 
         self.verticalLayout_15.addWidget(self.groupBox_5)
 
@@ -948,6 +953,10 @@ class Ui_profile_settings(object):
         self.checkBox_disable_version_check.setToolTip(QCoreApplication.translate("profile_settings", u"This option determines whether the client will check the GitHub API for the current application version and grace period of running older application versions", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_disable_version_check.setText(QCoreApplication.translate("profile_settings", u"Disable version check", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_cleanup_local_files.setToolTip(QCoreApplication.translate("profile_settings", u"Cleanup local files and folders if they are removed online. This option can only be used with Download only mode.", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_cleanup_local_files.setText(QCoreApplication.translate("profile_settings", u"Cleanup local files", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("profile_settings", u"Sync Options", None))
 #if QT_CONFIG(tooltip)
         self.groupBox.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>This option is used to 'skip' certain files and supports pattern matching.</p><p>Patterns are case insensitive. <span style=\" font-weight:700;\">*</span> and <span style=\" font-weight:700;\">? </span><a href=\"https://technet.microsoft.com/en-us/library/bb490639.aspx\"><span style=\" text-decoration: underline; color:#5e81ac;\">wildcards characters</span></a> are supported. </p><p>Use <span style=\" font-weight:700;\">|</span> to separate multiple patterns.<br/></p><p><span style=\" text-decoration: underline;\">Files can be skipped in the following fashion:</span></p><p>-Specify a wildcard, eg: '<span style=\" font-weight:700;\">*.txt</span>' (skip all txt files)</p><p>-Explicitly specify the filename and it's full path relative to your sync_dir, eg: '<span style=\" font-weight:700;\">path/to/file/filename.ext</span>'</p><p>-Explicitly specify the filename only and skip every instance of this filename, eg: '<span style=\" font-weight:700;\">filename.ext</span>'</p><p><br/></p><p><span "
