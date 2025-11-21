@@ -92,6 +92,9 @@ class WorkerThread(QThread):
             "account_type": "",
         }
 
+        # Track pending error for multi-line error messages
+        self.pending_error = None
+
         self.profile_status["status_message"] = "OneDrive sync is starting..."
         self.update_profile_status.emit(self.profile_status, self.profile_name)
 
@@ -119,10 +122,53 @@ class WorkerThread(QThread):
             if time.time() > timeout:
                 break
 
+    def _emit_error_status(self, full_error_message):
+        """Format and emit error message with truncation and line splitting."""
+        # Format for status message: max 50 chars per line, up to 3 lines (150 chars total)
+        max_chars_per_line = 50
+        max_lines = 3
+        max_total_chars = max_chars_per_line * max_lines
+
+        if len(full_error_message) > max_total_chars:
+            # Truncate to 150 chars total
+            display_text = full_error_message[: max_total_chars - 3] + "..."
+        else:
+            display_text = full_error_message
+
+        # Split into lines of max 50 characters
+        lines = []
+        words = display_text.split()
+        current_line = ""
+
+        for word in words:
+            if len(current_line) + len(word) + 1 <= max_chars_per_line:
+                current_line += word + " "
+            else:
+                if current_line:
+                    lines.append(current_line.strip())
+                current_line = word + " "
+                if len(lines) >= max_lines:
+                    break
+
+        if current_line and len(lines) < max_lines:
+            lines.append(current_line.strip())
+
+        truncated_error = "\n".join(lines)
+
+        self.profile_status["status_message"] = f"Error: {truncated_error}"
+        self.profile_status["error_message"] = full_error_message  # Full error for tooltip
+        self.update_profile_status.emit(self.profile_status, self.profile_name)
+
     def read_stdout(self):
         stdout = self.onedrive_process.stdout.readline().strip()
         if stdout != "":
             logging.info(f"[{self.profile_name}] " + stdout)
+
+            # Check if we have a pending error from previous line that wasn't followed by "Error Message:"
+            if self.pending_error and "Error Message:" not in stdout:
+                # Emit the pending error since the next line didn't continue it
+                self._emit_error_status(self.pending_error)
+                self.pending_error = None
 
             if "Calling Function: testNetwork()" in stdout:
                 self.profile_status["status_message"] = "Cannot connect to Microsoft OneDrive Service"
@@ -274,9 +320,9 @@ class WorkerThread(QThread):
                 self.profile_status["status_message"] = "Cannot connect to Microsoft OneDrive Service."
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-            elif "application is already running" in stdout:
-                self.profile_status["status_message"] = """OneDrive is already running outside OneDriveGUI!\nPlease stop it first."""
-                self.update_profile_status.emit(self.profile_status, self.profile_name)
+            # elif "application is already running" in stdout:
+            #     self.profile_status["status_message"] = """OneDrive is already running outside OneDriveGUI!\nPlease stop it first."""
+            #     self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif "command not found" in stdout:
                 logging.error(
@@ -297,6 +343,27 @@ class WorkerThread(QThread):
                 self.profile_status["status_message"] = "Logon details expired. Please re-authenticate."
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
                 self.update_credentials.emit(self.profile_name)
+
+            elif "Error Message:" in stdout:
+                # Check if this is a continuation of a previous ERROR: line
+                if self.pending_error:
+                    error_parts = stdout.split("Error Message:", 1)
+                    if len(error_parts) > 1:
+                        additional_error = error_parts[1].strip()
+                        # Combine with pending error
+                        full_error_message = f"{self.pending_error} {additional_error}"
+                    else:
+                        full_error_message = self.pending_error
+                    self.pending_error = None  # Clear pending error
+                    self._emit_error_status(full_error_message)
+
+            elif "ERROR:" in stdout:
+                # Extract error message after "ERROR:" prefix
+                error_parts = stdout.split("ERROR:", 1)
+                if len(error_parts) > 1:
+                    error_text = error_parts[1].strip()
+                    # Store as pending error to check if next line has "Error Message:"
+                    self.pending_error = error_text
 
             else:
                 # logging.debug(f"No rule matched: {stdout}")

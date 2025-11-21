@@ -400,6 +400,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.start_onedrive_monitor(profile_name)
 
     def start_onedrive_monitor(self, profile_name, options=""):
+        # Clear any previous error messages when starting sync
+        self.profile_status_pages[profile_name].label_error_icon.clear()
+        self.profile_status_pages[profile_name].label_error_icon.setToolTip("")
+
         if profile_name not in workers:
             workers[profile_name] = WorkerThread(profile_name, options)
             workers[profile_name].start()
@@ -496,6 +500,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.profile_status_pages[profile].label_onedrive_status.setText(data["status_message"])
         self.profile_status_pages[profile].label_free_space.setText(data["free_space"])
         self.profile_status_pages[profile].label_account_type.setText(data["account_type"])
+
+        # Handle error message display
+        if "error_message" in data and data["error_message"]:
+            # Show error icon with full error message in tooltip
+            pixmap_warning = QPixmap(DIR_PATH + "/resources/images/warning.png").scaled(20, 20, Qt.KeepAspectRatio)
+            self.profile_status_pages[profile].label_error_icon.setPixmap(pixmap_warning)
+            self.profile_status_pages[profile].label_error_icon.setToolTip(data["error_message"])
+        else:
+            # Clear error icon
+            self.profile_status_pages[profile].label_error_icon.clear()
+            self.profile_status_pages[profile].label_error_icon.setToolTip("")
 
     def event_update_progress(self, data, profile):
         """

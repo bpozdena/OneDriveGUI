@@ -301,6 +301,22 @@ QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}</string>
          </widget>
         </item>
         <item>
+         <widget class="QLabel" name="label_error_icon">
+          <property name="maximumSize">
+           <size>
+            <width>20</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QToolTip { color: white; }</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_2">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>

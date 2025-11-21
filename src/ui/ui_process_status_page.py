@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'process_status_page.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.2
+## Created by: Qt User Interface Compiler version 6.10.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -54,7 +54,7 @@ class Ui_status_page(object):
 
         self.horizontalLayout_3.addWidget(self.pushButton_quit)
 
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer)
 
@@ -130,7 +130,14 @@ class Ui_status_page(object):
 
         self.horizontalLayout_2.addWidget(self.label_version_check)
 
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.label_error_icon = QLabel(self.frame)
+        self.label_error_icon.setObjectName(u"label_error_icon")
+        self.label_error_icon.setMaximumSize(QSize(20, 16777215))
+        self.label_error_icon.setStyleSheet(u"QToolTip { color: white; }")
+
+        self.horizontalLayout_2.addWidget(self.label_error_icon)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
 
@@ -202,7 +209,7 @@ class Ui_status_page(object):
         self.horizontalLayout.setContentsMargins(-1, 6, -1, 6)
         self.pushButton_open_dir = QPushButton(status_page)
         self.pushButton_open_dir.setObjectName(u"pushButton_open_dir")
-        sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton_open_dir.sizePolicy().hasHeightForWidth())
@@ -264,6 +271,7 @@ class Ui_status_page(object):
 #endif // QT_CONFIG(tooltip)
         self.pushButton_stop.setText(QCoreApplication.translate("status_page", u"Stop", None))
         self.label_version_check.setText("")
+        self.label_error_icon.setText("")
 #if QT_CONFIG(tooltip)
         self.label_free_space.setToolTip(QCoreApplication.translate("status_page", u"Free Space", None))
 #endif // QT_CONFIG(tooltip)
