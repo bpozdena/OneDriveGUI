@@ -28,6 +28,9 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
         self.checkBox_start_minimized.setChecked(self.get_check_box_state("start_minimized"))
         self.checkBox_start_minimized.stateChanged.connect(self.set_check_box_state)
 
+        self.checkBox_autostart_enabled.setChecked(self.get_check_box_state("autostart_enabled"))
+        self.checkBox_autostart_enabled.stateChanged.connect(self.handle_autostart_change)
+
         self.lineEdit_client_bin_path.setText(gui_settings.get("client_bin_path"))
         self.lineEdit_client_bin_path.textChanged.connect(self.set_client_bin_path)
         self.pushButton_client_bin_path.clicked.connect(self.get_bin_path)
@@ -62,6 +65,9 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
         self.pushButton_log_file.clicked.connect(self.get_log_dir_name)
 
         self.pushButton_save.clicked.connect(self.save_settings)
+
+        # Sync autostart file with saved setting on startup
+        self.sync_autostart_on_startup()
 
     def get_bin_path(self):
         self.file_dialog = QFileDialog()
@@ -111,8 +117,68 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
             logging.info(f"[GUI][SETTINGS] {property} is unchecked")
             gui_settings.set(property, "False")
 
+    def sync_autostart_on_startup(self):
+        """Sync autostart file with saved setting on app startup."""
+        from utils.autostart import enable_autostart, disable_autostart, is_autostart_enabled
+
+        # Get the saved setting
+        autostart_should_be_enabled = self.get_check_box_state("autostart_enabled")
+        autostart_is_enabled = is_autostart_enabled()
+
+        # If they don't match, sync them
+        if autostart_should_be_enabled and not autostart_is_enabled:
+            logging.info("[GUI][SETTINGS] Autostart is enabled in settings but desktop file is missing - creating it")
+            success = enable_autostart()
+            if not success:
+                logging.error("[GUI][SETTINGS] Failed to create autostart file on startup")
+        elif not autostart_should_be_enabled and autostart_is_enabled:
+            logging.info("[GUI][SETTINGS] Autostart is disabled in settings but desktop file exists - removing it")
+            success = disable_autostart()
+            if not success:
+                logging.error("[GUI][SETTINGS] Failed to remove autostart file on startup")
+        else:
+            logging.info(f"[GUI][SETTINGS] Autostart file is in sync with settings (enabled: {autostart_should_be_enabled})")
+
+    def handle_autostart_change(self):
+        """Handle autostart checkbox state change - only updates settings, doesn't create/delete files."""
+        if self.sender().isChecked():
+            logging.info("[GUI][SETTINGS] Autostart checkbox checked")
+            gui_settings.set("autostart_enabled", "True")
+        else:
+            logging.info("[GUI][SETTINGS] Autostart checkbox unchecked")
+            gui_settings.set("autostart_enabled", "False")
+
     def save_settings(self):
+        """Save all settings and sync autostart file with checkbox state."""
+        from utils.autostart import enable_autostart, disable_autostart
+        from PySide6.QtWidgets import QMessageBox
+
+        # Save all settings first
         gui_settings.save()
+
+        # Now sync the autostart file with the saved setting
+        autostart_should_be_enabled = self.checkBox_autostart_enabled.isChecked()
+
+        if autostart_should_be_enabled:
+            logging.info("[GUI][SETTINGS] Creating autostart file")
+            success = enable_autostart()
+            if not success:
+                logging.error("[GUI][SETTINGS] Failed to create autostart file")
+                QMessageBox.warning(
+                    self,
+                    "Autostart Error",
+                    "Settings saved, but failed to create autostart file. Please check the logs for details.",
+                )
+        else:
+            logging.info("[GUI][SETTINGS] Removing autostart file")
+            success = disable_autostart()
+            if not success:
+                logging.error("[GUI][SETTINGS] Failed to remove autostart file")
+                QMessageBox.warning(
+                    self,
+                    "Autostart Error",
+                    "Settings saved, but failed to remove autostart file. Please check the logs for details.",
+                )
 
 
 gui_settings_window = GuiSettingsWindow()
