@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'gui_settings_windowfuZzTA.ui'
+## Form generated from reading UI file 'gui_settings_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.2
+## Created by: Qt User Interface Compiler version 6.10.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -44,7 +44,12 @@ class Ui_gui_settings_window(object):
         self.checkBox_start_minimized = QCheckBox(self.groupBox)
         self.checkBox_start_minimized.setObjectName(u"checkBox_start_minimized")
 
-        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.checkBox_start_minimized)
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.checkBox_start_minimized)
+
+        self.checkBox_autostart_enabled = QCheckBox(self.groupBox)
+        self.checkBox_autostart_enabled.setObjectName(u"checkBox_autostart_enabled")
+
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.LabelRole, self.checkBox_autostart_enabled)
 
 
         self.verticalLayout_3.addLayout(self.formLayout)
@@ -228,6 +233,7 @@ class Ui_gui_settings_window(object):
         gui_settings_window.setWindowTitle(QCoreApplication.translate("gui_settings_window", u"OneDriveGUI - Settings", None))
         self.groupBox.setTitle(QCoreApplication.translate("gui_settings_window", u"OneDriveGUI behaviour", None))
         self.checkBox_start_minimized.setText(QCoreApplication.translate("gui_settings_window", u"Start OneDriveGUI minimized", None))
+        self.checkBox_autostart_enabled.setText(QCoreApplication.translate("gui_settings_window", u"Start OneDriveGUI automatically on login", None))
         self.groupBox_4.setTitle(QCoreApplication.translate("gui_settings_window", u"OneDrive client options", None))
         self.label_client_bin_path.setText(QCoreApplication.translate("gui_settings_window", u"Path to OneDrive client binary", None))
         self.pushButton_client_bin_path.setText(QCoreApplication.translate("gui_settings_window", u"Browse", None))
