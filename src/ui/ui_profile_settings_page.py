@@ -859,7 +859,7 @@ class Ui_profile_settings(object):
 #if QT_CONFIG(tooltip)
         self.label_classify_as_big_delete.setToolTip(QCoreApplication.translate("profile_settings", u"Number of children in a path that is locally removed which will be classified as a 'big data delete'", None))
 #endif // QT_CONFIG(tooltip)
-        self.label_classify_as_big_delete.setText(QCoreApplication.translate("profile_settings", u"Clasify as big delete", None))
+        self.label_classify_as_big_delete.setText(QCoreApplication.translate("profile_settings", u"Classify as big delete", None))
 #if QT_CONFIG(tooltip)
         self.label_operation_timeout.setToolTip(QCoreApplication.translate("profile_settings", u"Operation Timeout is the maximum amount of time (seconds) a file operation is allowed to take. This includes DNS resolution, connecting, data transfer, etc.", None))
 #endif // QT_CONFIG(tooltip)
