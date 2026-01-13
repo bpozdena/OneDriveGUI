@@ -347,7 +347,7 @@
                      <string>Number of children in a path that is locally removed which will be classified as a 'big data delete'</string>
                     </property>
                     <property name="text">
-                     <string>Clasify as big delete</string>
+                     <string>Classify as big delete</string>
                     </property>
                    </widget>
                   </item>
