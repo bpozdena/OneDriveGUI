@@ -51,10 +51,10 @@ class WorkerThread(QThread):
 
         self.config_file = global_config[profile]["config_file"]
         self.config_dir = re.search(r"(.+)/.+$", self.config_file)
-        logging.debug(f"[GUI] OneDrive config file: {self.config_file}")
-        logging.debug(f"[GUI] OneDrive config dir: {self.config_dir}")
+        logging.info(f"[GUI] OneDrive config file: {self.config_file}")
+        logging.info(f"[GUI] OneDrive config dir: {self.config_dir}")
         self._command = f"exec {client_bin_path} --confdir='{self.config_dir.group(1)}' --monitor -v {options}"
-        logging.debug(f"[GUI] Monitoring command: '{self._command}'")
+        logging.info(f"[GUI] Monitoring command: '{self._command}'")
         self.profile_name = profile
 
     def stop_worker(self):
@@ -102,6 +102,7 @@ class WorkerThread(QThread):
         self.failed_files_count = 0
         self.collecting_failed_files = False  # Flag to indicate we're collecting failed file lines
 
+        self.msg = ""
         self.profile_status["status_message"] = "OneDrive sync is starting..."
         self.update_profile_status.emit(self.profile_status, self.profile_name)
 
@@ -195,7 +196,7 @@ class WorkerThread(QThread):
     def read_stdout(self):
         stdout = self.onedrive_process.stdout.readline().strip()
         if stdout != "":
-            logging.info(f"[{self.profile_name}] " + stdout)
+            logging.debug(f"[{self.profile_name}] " + stdout)
 
             # Check if we have a pending error from previous line that wasn't followed by "Error Message:"
             if self.pending_error and "Error Message:" not in stdout:
@@ -210,21 +211,29 @@ class WorkerThread(QThread):
                 self.collecting_failed_files = False
 
             if "Calling Function: testNetwork()" in stdout:
-                self.profile_status["status_message"] = "Cannot connect to Microsoft OneDrive Service"
+                self.msg = "Testing network connection to Microsoft OneDrive Service..."
+                logging.warning(f"[{self.profile_name}] {self.msg}")
+                self.profile_status["status_message"] = self.msg
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif "authorise this application by" in stdout.lower() or "--reauth and re-authorise this client" in stdout:
                 self.onedrive_process.kill()
-                self.profile_status["status_message"] = "OneDrive login is required"
+                self.msg = "OneDrive login is required."
+                logging.warning(f"[{self.profile_name}] {self.msg}")
+                self.profile_status["status_message"] = self.msg
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
                 self.update_credentials.emit(self.profile_name)
 
             elif any(msg in stdout for msg in ["Sync with Microsoft OneDrive is complete", "Total number of local file(s) added or changed"]):
-                self.profile_status["status_message"] = "OneDrive sync is complete"
+                self.msg = "OneDrive sync is complete."
+                logging.info(f"[{self.profile_name}] {self.msg}")
+                self.profile_status["status_message"] = self.msg
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif "Sync with Microsoft OneDrive has completed, however there are items that failed to sync" in stdout:
-                self.profile_status["status_message"] = "Sync completed with errors. Check the log file."
+                self.msg = "OneDrive sync completed with errors."
+                logging.warning(f"[{self.profile_name}] {self.msg}")
+                self.profile_status["status_message"] = self.msg
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif "Remaining Free Space" in stdout:
@@ -259,27 +268,35 @@ class WorkerThread(QThread):
                 self.failed_files = []
                 self.failed_files_count = 0
                 self.collecting_failed_files = False
-                self.profile_status["status_message"] = "Initializing the OneDrive API"
+                self.msg = "Initializing the OneDrive API"
+                logging.info(f"[{self.profile_name}] {self.msg}")
+                self.profile_status["status_message"] = self.msg
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif "Processing:" in stdout or "Number of items to download from Microsoft OneDrive" in stdout or "OneDrive Client requested to create" in stdout:
                 items_left = re.match(r"^Processing\s([0-9]+)\sOneDrive\sitems", stdout)
                 if items_left != None:
+                    if self.profile_status["status_message"].startswith(f"OneDrive is processing"):
+                        logging.info(f"[{self.profile_name}] OneDrive is processing {items_left.group(1)} items...")
                     self.profile_status["status_message"] = f"OneDrive is processing {items_left.group(1)} items..."
                 else:
+                    if self.profile_status["status_message"] != "OneDrive is processing items...":
+                        logging.info(f"[{self.profile_name}] OneDrive is processing items...")
                     self.profile_status["status_message"] = "OneDrive is processing items..."
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif "--resync is required" in stdout or "before using --resync" in stdout:
                 # Ask user for resync authorization and stop the worker.
-                logging.warning(f"[{self.profile_name}] {str(stdout)}  - Asking for resync authorization.")
+                self.msg = "OneDrive resync authorization is required."
+                logging.warning(f"[{self.profile_name}] {stdout!s} - {self.msg}")
                 self.trigger_resync.emit(self.profile_name)
 
             elif "To delete a large volume of data use" in stdout:
                 # Ask user for big delete authorization and stop the worker.
-                logging.warning(f"[{self.profile_name}] {str(stdout)}  - Asking for big delete authorization.")
+                self.msg = "OneDrive big delete authorization is required."
+                logging.warning(f"[{self.profile_name}] {stdout!s}  - {self.msg}")
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
-                self.profile_status["status_message"] = "Sync stopped due to big delete detected."
+                self.profile_status["status_message"] = self.msg
                 self.trigger_big_delete.emit(self.profile_name)
 
             elif any(_ in stdout for _ in self.tasks):
@@ -306,7 +323,7 @@ class WorkerThread(QThread):
                 }
 
                 # Update file transfer list
-                logging.info(transfer_progress_new)
+                logging.debug(transfer_progress_new)
                 self.update_progress_new.emit(transfer_progress_new, self.profile_name)
 
                 # Update profile status message.
@@ -314,6 +331,8 @@ class WorkerThread(QThread):
                     pass
                     # self.profile_status["status_message"] = "OneDrive sync is complete"
                 else:
+                    if self.profile_status["status_message"] != "OneDrive sync in progress...":
+                        logging.info(f"[{self.profile_name}] OneDrive sync in progress...")
                     self.profile_status["status_message"] = "OneDrive sync in progress..."
 
             elif "% " in stdout:
@@ -339,13 +358,15 @@ class WorkerThread(QThread):
                             "timestamp": datetime.now() if transfer_complete else None,
                         }
 
-                        logging.info(transfer_progress_new)
+                        logging.debug(transfer_progress_new)
                         self.update_progress_new.emit(transfer_progress_new, self.profile_name)
 
                         if transfer_complete:
                             pass
                             # self.profile_status["status_message"] = "OneDrive sync is complete"
                         else:
+                            if self.profile_status["status_message"] != "OneDrive sync in progress...":
+                                logging.info(f"[{self.profile_name}] OneDrive sync in progress...")
                             self.profile_status["status_message"] = "OneDrive sync in progress..."
 
                         self.update_profile_status.emit(self.profile_status, self.profile_name)
@@ -370,22 +391,21 @@ class WorkerThread(QThread):
             #     self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif "command not found" in stdout:
-                logging.error(
-                    """Onedrive does not seem to be installed. Please install it as per instruction at 
-                https://github.com/abraunegg/onedrive/blob/master/docs/install.md """
-                )
+                self.msg = "Onedrive does not seem to be installed. Please install it as per instruction at https://github.com/abraunegg/onedrive/blob/master/docs/install.md"
+                logging.error(f"[{self.profile_name}] {self.msg}")
 
-                self.profile_status["status_message"] = (
-                    'OneDrive Client not found! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/install.md" style="color:#FFFFFF;">install</a> it.'
-                )
+                self.profile_status["status_message"] = self.msg
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif "/dlang/" in stdout:
-                self.profile_status["status_message"] = "OneDrive client crashed. Please check logs."
+                self.msg = "OneDrive client crashed. Please check logs."
+                logging.critical(f"[{self.profile_name}] {self.msg}")
+                self.profile_status["status_message"] = self.msg
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif " refresh_token " in stdout or "'refresh_token'" in stdout:
-                self.profile_status["status_message"] = "Logon details expired. Please re-authenticate."
+                self.msg = "Logon details expired. Please re-authenticate."
+                self.profile_status["status_message"] = self.msg
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
                 self.update_credentials.emit(self.profile_name)
 
@@ -400,6 +420,7 @@ class WorkerThread(QThread):
                     else:
                         full_error_message = self.pending_error
                     self.pending_error = None  # Clear pending error
+                    logging.error(f"[{self.profile_name}] {full_error_message}")
                     self._emit_error_status(full_error_message)
 
             elif "ERROR:" in stdout:
@@ -438,6 +459,7 @@ class WorkerThread(QThread):
                     error_message = f"Configuration error: Unknown key '{invalid_key}'. Please check your config file and remove invalid options."
                 else:
                     error_message = "Configuration error: Unknown key in config file. Please check your configuration."
+                logging.error(f"[{self.profile_name}] {error_message}")
                 self._emit_error_status(error_message)
 
             else:
@@ -465,14 +487,14 @@ class MaintenanceWorker(QThread):
 
         self.config_file = global_config[self.profile]["config_file"]
         self.config_dir = re.search(r"(.+)/.+$", self.config_file).group(1)
-        logging.debug(f"[GUI] OneDrive config file: {self.config_file}")
-        logging.debug(f"[GUI] OneDrive config dir: {self.config_dir}")
+        logging.info(f"[GUI] OneDrive config file: {self.config_file}")
+        logging.info(f"[GUI] OneDrive config dir: {self.config_dir}")
 
         self._command = f"exec {client_bin_path} --confdir='{self.config_dir}' {options}"
-        logging.debug(f"[GUI] Maintenance command: '{self._command}'")
+        logging.info(f"[GUI] Maintenance command: '{self._command}'")
 
     def run(self):
-        logging.debug(f"[GUI] Starting Maintenance Worker")
+        logging.info(f"[GUI] Starting Maintenance Worker")
         self.onedrive_maintainer = subprocess.Popen(
             self._command,
             stdout=subprocess.PIPE,
@@ -483,7 +505,7 @@ class MaintenanceWorker(QThread):
 
         if "--auth-response" in self.options:
             # exec onedrive --confdir="{config_dir}" --auth-response "{response_url}"
-            logging.info(f"[GUI] Trying login...")
+            logging.debug(f"[GUI] Trying login...")
             self.login_response = "success"
 
             while self.onedrive_maintainer.poll() is None:
@@ -585,7 +607,7 @@ class MaintenanceWorker(QThread):
                 pass
             elif "Library Name:" in stdout:
                 library_name = re.match(r"^.+\:\s+(.+)$", stdout).group(1)
-                logging.info(f"[MaintenanceWorker][{self.profile}] Library Name: {library_name}")
+                logging.debug(f"[MaintenanceWorker][{self.profile}] Library Name: {library_name}")
 
                 self.library_ids_dict[library_name] = ""
 
@@ -593,7 +615,7 @@ class MaintenanceWorker(QThread):
                 last_key = list(self.library_ids_dict.keys())[-1]
 
                 library_id = re.match(r"^.+\:\s+(.+)$", stdout).group(1)
-                logging.info(f"[MaintenanceWorker][{self.profile}] Library ID: {library_id}")
+                logging.debug(f"[MaintenanceWorker][{self.profile}] Library ID: {library_id}")
 
                 self.library_ids_dict[last_key] = library_id
 
@@ -614,9 +636,9 @@ class MaintenanceWorker(QThread):
             elif "Shared Folder:" in stdout:
                 folder_name = re.match(r"^.+:\s+(.+)$", stdout).group(1)
                 self.business_folder_list.append(folder_name)
-                logging.info(f"[MaintenanceWorker][{self.profile}] Retrieved Business Shared Folder: {folder_name}")
+                logging.debug(f"[MaintenanceWorker][{self.profile}] Retrieved Business Shared Folder: {folder_name}")
             else:
-                logging.info(f"[MaintenanceWorker][{self.profile}] " + stdout.strip())
+                logging.debug(f"[MaintenanceWorker][{self.profile}] " + stdout.strip())
 
         if self.onedrive_maintainer.stderr:
             stderr = self.onedrive_maintainer.stderr.readline()
@@ -635,9 +657,9 @@ class MaintenanceWorker(QThread):
             elif " * " in stdout:
                 site_name = re.match(r"^\s\*\s(.+)", stdout).group(1)
                 self.sharepoint_site_list.append(site_name)
-                logging.info(f"[MaintenanceWorker][{self.profile}] Retrieved SharePoint Site: {site_name}")
+                logging.debug(f"[MaintenanceWorker][{self.profile}] Retrieved SharePoint Site: {site_name}")
             else:
-                logging.info(f"[MaintenanceWorker][{self.profile}] " + stdout.strip())
+                logging.debug(f"[MaintenanceWorker][{self.profile}] " + stdout.strip())
 
         if self.onedrive_maintainer.stderr:
             stderr = self.onedrive_maintainer.stderr.readline()

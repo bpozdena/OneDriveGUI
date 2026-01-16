@@ -267,7 +267,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             sys.exit()
 
         elif close_question == QMessageBox.No:
-            logging.debug("[GUI] Keeping OneDriveGUI running.")
+            logging.info("[GUI] Keeping OneDriveGUI running.")
 
     def stop_onedrive_monitor(self, profile_name):
         if profile_name in workers:
@@ -283,13 +283,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             if self.tray.isSystemTrayAvailable():
                 self.hide()
-                logging.info("[GUI] Minimizing main window to tray")
+                logging.debug("[GUI] Minimizing main window to tray")
             else:
                 self.setWindowState(Qt.WindowMinimized)
-                logging.info("[GUI] Minimizing main window to taskbar/dock")
+                logging.debug("[GUI] Minimizing main window to taskbar/dock")
         except:
             self.setWindowState(Qt.WindowMinimized)
-            logging.info("[GUI] Minimizing main window to taskbar/dock")
+            logging.debug("[GUI] Minimizing main window to taskbar/dock")
 
     def show_setup_wizard(self):
         setup_wizard.show()
@@ -342,7 +342,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             latest_client_version = get_latest_client_version()
             installed_client_version = get_installed_client_version()
 
-            logging.debug(f"[GUI] Client version check: Installed: {installed_client_version[0]} | Latest: {latest_client_version}")
+            logging.info(f"[GUI] Client version check: Installed: {installed_client_version[0]} | Latest: {latest_client_version}")
 
             if not installed_client_version:
                 version_label_text = "OneDrive client not found!"
@@ -418,7 +418,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             if not latest_gui_version:
                 # Network issue or API error - don't show warning
-                logging.debug("[GUI] Unable to check for latest OneDriveGUI version")
+                logging.warning("[GUI] Unable to check for latest OneDriveGUI version")
                 return
 
             # Parse versions for comparison
@@ -429,14 +429,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 logging.error("[GUI] Failed to parse GUI versions for comparison")
                 return
 
-            logging.debug(f"[GUI] GUI version check: Installed: v{installed_gui_version} | Latest: {latest_gui_version}")
+            logging.info(f"[GUI] GUI version check: Installed: v{installed_gui_version} | Latest: {latest_gui_version}")
 
             # Compare versions
             if installed_version_tuple < latest_version_tuple:
                 version_label_text = "OneDriveGUI is out of date!"
                 version_tooltip_text = f"OneDriveGUI is out of date! \n Installed: v{installed_gui_version} \n Latest: {latest_gui_version}"
             else:
-                logging.debug("[GUI] OneDriveGUI is up to date")
+                logging.info("[GUI] OneDriveGUI is up to date")
 
             # Store results
             self.gui_version_status["label_text"] = version_label_text
@@ -688,8 +688,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def autostart_monitor(self):
         # Auto-start sync if compatible version of OneDrive client is installed.
         for profile_name in global_config:
-            logging.debug(f"[{profile_name}] Compatible client version found: {self.profile_status_pages[profile_name].pushButton_start.isEnabled()}")
-            logging.debug(f"[{profile_name}] Auto-sync enabled for profile: {global_config[profile_name]['auto_sync']}")
+            logging.info(f"[{profile_name}] Compatible client version found: {self.profile_status_pages[profile_name].pushButton_start.isEnabled()}")
+            logging.info(f"[{profile_name}] Auto-sync enabled for profile: {global_config[profile_name]['auto_sync']}")
 
             if self.profile_status_pages[profile_name].pushButton_start.isEnabled() and global_config[profile_name]["auto_sync"] == "True":
                 self.start_onedrive_monitor(profile_name)
@@ -703,7 +703,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             workers[profile_name] = WorkerThread(profile_name, options)
             workers[profile_name].start()
         else:
-            logging.info(f"Worker for profile {profile_name} is already running. Please stop it first.")
+            logging.warning(f"Worker for profile {profile_name} is already running. Please stop it first.")
             logging.info(f"Running workers: {workers}")
 
         if "True" not in gui_settings.get("QWebEngine_login"):
@@ -724,7 +724,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             workers[profile_name].finished.connect(lambda: self.remove_worker(profile_name))
         except KeyError:
-            logging.debug(f"[GUI] The worker for profile {profile_name} is already stopped.")
+            logging.info(f"[GUI] The worker for profile {profile_name} is already stopped.")
 
     def resync_auth_dialog(self, profile_name):
         resync_question = QMessageBox(
@@ -822,7 +822,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         _sync_dir = os.path.expanduser(global_config[profile]["onedrive"]["sync_dir"].strip('"'))
 
-        logging.info(data)
+        logging.debug(data)
         file_path = f"{_sync_dir}" + "/" + data["file_path"]
         absolute_path = QFileInfo(file_path).absolutePath().replace(" ", "%20")
         relative_path_display = os.path.relpath(QFileInfo(file_path).absolutePath(), _sync_dir + os.path.sep)
@@ -849,7 +849,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if file_name == item_file_name and item_incomplete:
                     # If current file is already in the list and progress bar is not complete, update the existing item.
                     # Otherwise skip and create a new item.
-                    logging.info("Updating list item")
+                    logging.debug("Updating list item")
 
                     item_widget.set_progress(int(progress))
                     # item_widget.set_icon(file_path)
@@ -912,11 +912,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
                     self.profile_status_pages[profile].listWidget.setItemWidget(item, item_widget)
                     new_list_item = False
-                    logging.info(f"List item updated for file {item_file_name}")
+                    logging.debug(f"List item updated for file {item_file_name}")
                     break
 
         if new_list_item:
-            logging.info(f"Adding new list item for file {file_name}")
+            logging.debug(f"Adding new list item for file {file_name}")
             myQCustomQWidget = TaskList()
             myQCustomQWidget.set_file_name(file_name)
             myQCustomQWidget.set_progress(int(progress))
@@ -1093,10 +1093,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def enable_login_button(self):
         # Enable 'Save' button only when valid URL with login response code is provided.
         if "nativeclient?code=" in self.lw2.lineEdit_response_url.text():
-            logging.debug(f"[GUI] Valid login response code provided. Enabling Save button.")
+            logging.info(f"[GUI] Valid login response code provided. Enabling Save button.")
             self.lw2.pushButton_login.setEnabled(True)
         else:
-            logging.debug(f"[GUI] Invalid login response code provided. Disabling Save button.")
+            logging.info(f"[GUI] Invalid login response code provided. Disabling Save button.")
             self.lw2.pushButton_login.setEnabled(False)
 
     def get_response_url(self, response_url, profile):
@@ -1209,7 +1209,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         index = self.comboBox.findText(old_name)
         if index >= 0:
             self.comboBox.setItemText(index, new_name)
-            logging.debug(f"[MAIN_WINDOW] Updated comboBox item at index {index} from '{old_name}' to '{new_name}'.")
+            logging.info(f"[MAIN_WINDOW] Updated comboBox item at index {index} from '{old_name}' to '{new_name}'.")
         else:
             logging.warning(f"[MAIN_WINDOW] Profile '{old_name}' not found in comboBox.")
 
@@ -1218,7 +1218,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.profile_status_pages[new_name] = self.profile_status_pages.pop(old_name)
             # Also update the profile_name attribute within the ProfileStatusPage instance
             self.profile_status_pages[new_name].profile_name = new_name
-            logging.debug(f"[MAIN_WINDOW] Updated profile_status_pages key from '{old_name}' to '{new_name}'.")
+            logging.info(f"[MAIN_WINDOW] Updated profile_status_pages key from '{old_name}' to '{new_name}'.")
         else:
             logging.warning(f"[MAIN_WINDOW] Profile '{old_name}' not found in profile_status_pages.")
 
@@ -1227,9 +1227,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             workers[new_name] = workers.pop(old_name)
             # Also update the profile_name attribute within the WorkerThread instance
             workers[new_name].profile_name = new_name
-            logging.debug(f"[MAIN_WINDOW] Updated workers key from '{old_name}' to '{new_name}'.")
+            logging.info(f"[MAIN_WINDOW] Updated workers key from '{old_name}' to '{new_name}'.")
         else:
-            logging.debug(f"[MAIN_WINDOW] No worker found for profile '{old_name}'.")
+            logging.info(f"[MAIN_WINDOW] No worker found for profile '{old_name}'.")
 
         # Force update the UI
         self.comboBox.update()
