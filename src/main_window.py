@@ -679,11 +679,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         icon_path = icon_map.get(overall_state, DIR_PATH + "/resources/images/icons8-cloud-80.png")
         icon = QIcon(icon_path)
-        self.tray.setIcon(icon)
-
-        # Generate and set tooltip
         tooltip = self.generate_tray_tooltip(overall_state, running_count, total_count, profile_statuses)
-        self.tray.setToolTip(tooltip)
+
+        if self.tray.toolTip() != tooltip:
+            logging.debug("Updating tray icon and tooltip")
+            self.tray.setIcon(icon)
+            self.tray.setToolTip(tooltip)
 
     def autostart_monitor(self):
         # Auto-start sync if compatible version of OneDrive client is installed.
@@ -806,9 +807,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # Clear error icon
             self.profile_status_pages[profile].label_error_icon.clear()
             self.profile_status_pages[profile].label_error_icon.setToolTip("")
-
-        # Update system tray icon when profile status changes
-        self.update_tray_icon()
 
     def event_update_progress(self, data, profile):
         """
