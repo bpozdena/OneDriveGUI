@@ -17,6 +17,8 @@ def config_debug_level():
         return logging.WARNING
     elif debug_level == "ERROR":
         return logging.ERROR
+    elif debug_level == "CRITICAL":
+        return logging.CRITICAL
     else:
         return logging.DEBUG
 
