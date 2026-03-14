@@ -7,6 +7,7 @@ Supports both AppImage and source installations.
 
 import os
 import logging
+import shutil
 from pathlib import Path
 
 
@@ -25,19 +26,19 @@ def get_executable_path() -> str:
     Get the absolute path to the executable.
 
     For AppImage installations, returns the path to the AppImage file.
-    For source/system installations, returns 'OneDriveGUI' (assumes it's in PATH).
+    For source/system installations, detects which executable name is available.
 
     Returns:
         str: Executable path or command
     """
     appimage_path = os.getenv("APPIMAGE")
     if appimage_path:
-        # Running in AppImage - use the AppImage path
-        # $APPIMAGE already resolves symlinks
         return appimage_path
     else:
-        # Running from source or system installation
-        # Use command name from PATH (works for AUR and other package managers)
+        for exe_name in ("OneDriveGUI", "onedrivegui"):
+            if shutil.which(exe_name):
+                return exe_name
+
         return "OneDriveGUI"
 
 
