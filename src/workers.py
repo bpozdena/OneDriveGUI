@@ -1,7 +1,7 @@
 from PySide6.QtCore import QThread, Signal, QFileInfo, Qt
 
-from PySide6.QtWidgets import QWidget, QFileIconProvider
-from PySide6.QtGui import QFontMetrics
+from PySide6.QtWidgets import QWidget, QFileIconProvider, QStyle
+from PySide6.QtGui import QFontMetrics, QIcon
 
 
 # Imports for main window.
@@ -688,6 +688,10 @@ class TaskList(QWidget, Ui_list_item_widget):
         self.icon = self.iconProvider.icon(self.fileInfo)
 
         self.toolButton.setIcon(self.icon)
+
+    def set_custom_icon(self, icon):
+        """Set a custom QIcon for the toolButton."""
+        self.toolButton.setIcon(icon)
 
     def set_file_name(self, file_path):
         # Use font metrics to elide long filenames
