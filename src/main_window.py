@@ -842,7 +842,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 item = self.profile_status_pages[profile].listWidget.item(row)
                 item_widget = self.profile_status_pages[profile].listWidget.itemWidget(item)
                 item_file_name = item_widget.get_file_name()
-                item_incomplete = item_widget.ls_progressBar.isVisible()
+                item_incomplete = item_widget.get_timestamp_text() == ""
 
                 if file_name == item_file_name and item_incomplete:
                     # If current file is already in the list and progress bar is not complete, update the existing item.
