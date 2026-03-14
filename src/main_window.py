@@ -723,6 +723,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         workers[profile_name].trigger_big_delete.connect(self.big_delete_auth_dialog)
         workers[profile_name].update_progress_new.connect(self.event_update_progress)
         workers[profile_name].update_profile_status.connect(self.event_update_profile_status)
+        workers[profile_name].clear_warning.connect(self.clear_warning_handler)
         workers[profile_name].started.connect(lambda: logging.info(f"started worker {profile_name}"))
         workers[profile_name].finished.connect(lambda: logging.info(f"finished worker {profile_name}"))
         try:
@@ -810,6 +811,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # Clear error icon
             self.profile_status_pages[profile].label_error_icon.clear()
             self.profile_status_pages[profile].label_error_icon.setToolTip("")
+
+    def clear_warning_handler(self, profile_name):
+        """Clear warning icon and tooltip for a profile when a new sync cycle starts."""
+        self.profile_status_pages[profile_name].label_error_icon.clear()
+        self.profile_status_pages[profile_name].label_error_icon.setToolTip("")
+        # Update tray icon to reflect the cleared warning state
+        self.update_tray_icon()
+        logging.debug(f"[{profile_name}] Cleared warning state before or after new sync cycle")
 
     def event_update_progress(self, data, profile):
         """
