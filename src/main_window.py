@@ -315,7 +315,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         version_label_text = ""
         version_tooltip_text = ""
         min_requirements_met = True
-        min_supported_version = 2500
+        min_supported_version = 2510  # Enforce minimum version of onedrive client to be 2.5.10 to prevent login issues with https://github.com/abraunegg/onedrive/issues/3622
 
         def get_latest_client_version():
             latest_url = "https://api.github.com/repos/abraunegg/onedrive/releases/latest"
