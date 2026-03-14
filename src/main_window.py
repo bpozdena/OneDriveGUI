@@ -1362,7 +1362,8 @@ class ProfileStatusPage(QWidget, Ui_status_page):
 
     def open_sync_dir(self):
         sync_dir = global_config[self.profile_name]["onedrive"]["sync_dir"].strip('"')
-        url = QUrl(os.path.expanduser(sync_dir))
+        sync_dir_path = os.path.expanduser(sync_dir)
+        url = QUrl.fromLocalFile(sync_dir_path)
         QDesktopServices.openUrl(url)
 
     def show_gui_settings_window(self):
