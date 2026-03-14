@@ -44,6 +44,7 @@ class WorkerThread(QThread):
     trigger_resync = Signal(str)
     trigger_big_delete = Signal(str)
     remove_worker = Signal(str)
+    clear_warning = Signal(str)
 
     def __init__(self, profile, options=""):
         super(WorkerThread, self).__init__()
@@ -224,7 +225,17 @@ class WorkerThread(QThread):
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
                 self.update_credentials.emit(self.profile_name)
 
-            elif any(msg in stdout for msg in ["Sync with Microsoft OneDrive is complete", "Total number of local file(s) added or changed"]):
+            elif any(
+                msg in stdout
+                for msg in [
+                    "Sync with Microsoft OneDrive is complete",
+                    "Total number of local file(s) added or changed",
+                    "No changes or items that can be applied were discovered",
+                ]
+            ):
+                # Clear warnings when sync completes without errors
+                self.profile_status.pop("error_message", None)
+                self.clear_warning.emit(self.profile_name)
                 self.msg = "OneDrive sync is complete."
                 logging.info(f"[{self.profile_name}] {self.msg}")
                 self.profile_status["status_message"] = self.msg
@@ -269,6 +280,15 @@ class WorkerThread(QThread):
                 self.failed_files_count = 0
                 self.collecting_failed_files = False
                 self.msg = "Initializing the OneDrive API"
+                logging.info(f"[{self.profile_name}] {self.msg}")
+                self.profile_status["status_message"] = self.msg
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
+
+            elif "Starting a sync with Microsoft OneDrive" in stdout:
+                # Clear warnings when a new sync cycle starts
+                self.profile_status.pop("error_message", None)
+                self.clear_warning.emit(self.profile_name)
+                self.msg = "Starting a sync with Microsoft OneDrive"
                 logging.info(f"[{self.profile_name}] {self.msg}")
                 self.profile_status["status_message"] = self.msg
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
