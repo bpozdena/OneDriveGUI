@@ -9,6 +9,8 @@ from PySide6.QtWidgets import (
     QStackedLayout,
     QMessageBox,
     QStyledItemDelegate,
+    QStyle,
+    QApplication,
 )
 
 
@@ -75,6 +77,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.setWindowTitle(f"OneDriveGUI v{version}")
         self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-cloud-80.png"))
+        self.trash_icon = QApplication.style().standardIcon(QStyle.SP_TrashIcon)
 
         if gui_settings.get("frameless_window") == "True":
             self.setWindowFlags(Qt.FramelessWindowHint)
@@ -850,11 +853,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     logging.debug("Updating list item")
 
                     item_widget.set_progress(int(progress))
-                    # item_widget.set_icon(file_path)
+                    item_widget.set_icon(file_path)
                     item_widget.hide_progress_bar(transfer_complete)
 
                     if file_operation == "Deleting":
                         item_widget.set_label_1(f"Deleted from {parent_dir}")
+                        item_widget.set_custom_icon(self.trash_icon)
                         item_widget.set_label_2(f"")
                         # Store timestamp and display for deleted files
                         if "timestamp" in data and data["timestamp"]:
@@ -923,6 +927,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             if file_operation == "Deleting":
                 myQCustomQWidget.set_label_1(f"Deleted from {parent_dir}")
+                myQCustomQWidget.set_custom_icon(self.trash_icon)
                 myQCustomQWidget.set_label_2(f"")
                 # Store timestamp and display for deleted files
                 if "timestamp" in data and data["timestamp"]:
