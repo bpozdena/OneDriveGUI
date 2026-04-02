@@ -696,6 +696,7 @@ class TaskList(QWidget, Ui_list_item_widget):
 
         # Store completion timestamp for relative time display
         self.completion_timestamp = None
+        self._original_file_name = ""
 
         # Enable text eliding for ls_label_2 to prevent horizontal overflow
         self.ls_label_2.setWordWrap(False)
@@ -714,13 +715,14 @@ class TaskList(QWidget, Ui_list_item_widget):
         self.toolButton.setIcon(icon)
 
     def set_file_name(self, file_path):
+        self._original_file_name = file_path
         # Use font metrics to elide long filenames
         font_metrics = QFontMetrics(self.ls_label_file_name.font())
         elided_text = font_metrics.elidedText(file_path, Qt.ElideMiddle, 270)
         self.ls_label_file_name.setText(elided_text)
 
     def get_file_name(self):
-        return self.ls_label_file_name.text()
+        return self._original_file_name
 
     def set_progress(self, percentage):
         self.ls_progressBar.setValue(percentage)
