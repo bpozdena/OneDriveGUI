@@ -31,10 +31,13 @@ from PySide6.QtWidgets import QApplication, QLabel, QLineEdit, QPushButton, QSiz
 
 
 class Ui_ExternalLoginWindow(object):
-    def setupUi(self, ExternalLoginWindow):
+    def setupUi(self, ExternalLoginWindow, onedriveConfig):
         if not ExternalLoginWindow.objectName():
             ExternalLoginWindow.setObjectName("ExternalLoginWindow")
         ExternalLoginWindow.resize(783, 321)
+
+        self.onedriveConfig = onedriveConfig
+
         self.verticalLayout = QVBoxLayout(ExternalLoginWindow)
         self.verticalLayout.setObjectName("verticalLayout")
         self.layout_external_login = QVBoxLayout()
@@ -81,10 +84,13 @@ class Ui_ExternalLoginWindow(object):
                 None,
             )
         )
+        application_id = self.onedriveConfig.get("application_id", "d50ca740-c83f-4d1b-b616-12c519384f0c").strip('"')
+        azure_tenant_id = self.onedriveConfig.get("azure_tenant_id", "common").strip('"')
+        loginUrl = f"https://login.microsoftonline.com/{azure_tenant_id}/oauth2/v2.0/authorize?client_id={application_id}&amp;scope=Files.ReadWrite%20Files.ReadWrite.all%20Sites.Read.All%20Sites.ReadWrite.All%20offline_access&amp;response_type=code&amp;prompt=login&amp;redirect_uri=https://login.microsoftonline.com/{azure_tenant_id}/oauth2/nativeclient"
         self.label_2.setText(
             QCoreApplication.translate(
                 "ExternalLoginWindow",
-                '<html><head/><body><p>1)Login to OneDrive in your browser by <a href="https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=d50ca740-c83f-4d1b-b616-12c519384f0c&amp;scope=Files.ReadWrite%20Files.ReadWrite.all%20Sites.Read.All%20Sites.ReadWrite.All%20offline_access&amp;response_type=code&amp;prompt=login&amp;redirect_uri=https://login.microsoftonline.com/common/oauth2/nativeclient"><span style=" text-decoration: underline; color:#5e81ac;">clicking this link.</span></a></p><p>2)Copy the response URI from your browser\'s address bar to the below field. </p><p>3)Press Save.</p></body></html>',
+                f'<html><head/><body><p>1)Login to OneDrive in your browser by <a href="{loginUrl}"><span style=" text-decoration: underline; color:#5e81ac;">clicking this link.</span></a></p><p>2)Copy the response URI from your browser\'s address bar to the below field. </p><p>3)Press Save.</p></body></html>',
                 None,
             )
         )
