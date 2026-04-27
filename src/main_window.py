@@ -1073,7 +1073,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         application_id = global_config[profile].get("onedrive", {}).get("application_id", "d50ca740-c83f-4d1b-b616-12c519384f0c").strip('"')
         azure_tenant_id = global_config[profile].get("onedrive", {}).get("azure_tenant_id", "common").strip('"')
-        loginUrl = f"https://login.microsoftonline.com/{azure_tenant_id}/oauth2/v2.0/authorize?client_id={application_id}&scope=Files.ReadWrite%20Files.ReadWrite.All%20Sites.ReadWrite.All%20offline_access&response_type=code&prompt=login&redirect_uri=https://login.microsoftonline.com/{azure_tenant_id}/oauth2/nativeclient"
+        loginUrl = f"https://login.microsoftonline.com/{azure_tenant_id}/oauth2/v2.0/authorize?client_id={application_id}&scope=Files.ReadWrite%20Files.ReadWrite.all%20Sites.Read.All%20Sites.ReadWrite.All%20offline_access&response_type=code&prompt=login&redirect_uri=https://login.microsoftonline.com/{azure_tenant_id}/oauth2/nativeclient"
         self.lw.loginFrame.setUrl(QUrl(loginUrl))
 
         # Wait for user to login and obtain response URL
