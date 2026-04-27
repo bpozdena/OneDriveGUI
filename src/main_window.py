@@ -1059,6 +1059,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             relative_time = format_relative_time(timestamp)
                             item_widget.set_timestamp(relative_time)
 
+    def _build_login_url(self, profile):
+        application_id = global_config[profile]["onedrive"]["application_id"].strip('"') or "d50ca740-c83f-4d1b-b616-12c519384f0c"
+        azure_tenant_id = global_config[profile]["onedrive"]["azure_tenant_id"].strip('"') or "common"
+        self.login_url = (
+            f"https://login.microsoftonline.com/{azure_tenant_id}/oauth2/v2.0/authorize"
+            f"?client_id={application_id}"
+            f"&scope=Files.ReadWrite%20Files.ReadWrite.All%20Sites.ReadWrite.All%20offline_access"
+            f"&response_type=code&prompt=login"
+            f"&redirect_uri=https://login.microsoftonline.com/{azure_tenant_id}/oauth2/nativeclient"
+        )
+        logging.debug(f"[GUI] Built login URL: {self.login_url}")
+
     def show_login(self, profile):
         # Show login window with QT WebEngine
         self.window1 = QWidget()
@@ -1071,14 +1083,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.config_file = global_config[profile]["config_file"].strip('"')
         self.config_dir = re.search(r"(.+)/.+$", self.config_file).group(1)
 
-        # use static URL for now. TODO: use auth files in the future
-        url = (
-            "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=d50ca740-c83f-4d1b-b616"
-            "-12c519384f0c&scope=Files.ReadWrite%20Files.ReadWrite.all%20Sites.Read.All%20Sites.ReadWrite.All"
-            "%20offline_access&response_type=code&prompt=login&redirect_uri=https://login.microsoftonline.com"
-            "/common/oauth2/nativeclient"
-        )
-        self.lw.loginFrame.setUrl(QUrl(url))
+        # Build login URL from profile config
+        self._build_login_url(profile)
+        self.lw.loginFrame.setUrl(QUrl(self.login_url))
 
         # Wait for user to login and obtain response URL
         self.lw.loginFrame.urlChanged.connect(lambda: self.get_response_url(self.lw.loginFrame.url().toString(), profile))
@@ -1094,6 +1101,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.config_file = global_config[profile]["config_file"].strip('"')
         self.config_dir = re.search(r"(.+)/.+$", self.config_file).group(1)
+
+        # Build login URL from profile config and update the label
+        self._build_login_url(profile)
+        self.lw2.label_2.setText(
+            f"<html><head/><body><p>1)Login to OneDrive in your browser by "
+            f'<a href="{self.login_url}"><span style=" text-decoration: underline; color:#5e81ac;">clicking this link.</span></a></p>'
+            f"<p>2)Copy the response URI from your browser's address bar to the below field. </p>"
+            f"<p>3)Press Save.</p></body></html>"
+        )
 
         self.lw2.label_2.setOpenExternalLinks(True)
         self.lw2.pushButton_login.setEnabled(False)
