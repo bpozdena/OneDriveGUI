@@ -1071,10 +1071,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.config_file = global_config[profile]["config_file"].strip('"')
         self.config_dir = re.search(r"(.+)/.+$", self.config_file).group(1)
 
-        application_id = global_config[profile].get("onedrive", {}).get("application_id", "d50ca740-c83f-4d1b-b616-12c519384f0c").strip('"')
-        azure_tenant_id = global_config[profile].get("onedrive", {}).get("azure_tenant_id", "common").strip('"')
-        loginUrl = f"https://login.microsoftonline.com/{azure_tenant_id}/oauth2/v2.0/authorize?client_id={application_id}&scope=Files.ReadWrite%20Files.ReadWrite.all%20Sites.Read.All%20Sites.ReadWrite.All%20offline_access&response_type=code&prompt=login&redirect_uri=https://login.microsoftonline.com/{azure_tenant_id}/oauth2/nativeclient"
-        self.lw.loginFrame.setUrl(QUrl(loginUrl))
+        # use static URL for now. TODO: use auth files in the future
+        url = (
+            "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=d50ca740-c83f-4d1b-b616"
+            "-12c519384f0c&scope=Files.ReadWrite%20Files.ReadWrite.all%20Sites.Read.All%20Sites.ReadWrite.All"
+            "%20offline_access&response_type=code&prompt=login&redirect_uri=https://login.microsoftonline.com"
+            "/common/oauth2/nativeclient"
+        )
+        self.lw.loginFrame.setUrl(QUrl(url))
 
         # Wait for user to login and obtain response URL
         self.lw.loginFrame.urlChanged.connect(lambda: self.get_response_url(self.lw.loginFrame.url().toString(), profile))
@@ -1084,7 +1088,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.window2 = QWidget()
         self.window2.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-cloud-80.png"))
         self.lw2 = Ui_ExternalLoginWindow()
-        self.lw2.setupUi(self.window2, global_config[profile].get("onedrive", {}))
+        self.lw2.setupUi(self.window2)
         self.window2.show()
         self.window2.setWindowTitle(f"OneDrive login for profile {profile}")
 
