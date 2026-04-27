@@ -86,7 +86,7 @@ class Ui_ExternalLoginWindow(object):
         )
         application_id = self.onedriveConfig.get("application_id", "d50ca740-c83f-4d1b-b616-12c519384f0c").strip('"')
         azure_tenant_id = self.onedriveConfig.get("azure_tenant_id", "common").strip('"')
-        loginUrl = f"https://login.microsoftonline.com/{azure_tenant_id}/oauth2/v2.0/authorize?client_id={application_id}&amp;scope=Files.ReadWrite%20Files.ReadWrite.All%20Sites.ReadWrite.All%20offline_access&amp;response_type=code&amp;prompt=login&amp;redirect_uri=https://login.microsoftonline.com/{azure_tenant_id}/oauth2/nativeclient"
+        loginUrl = f"https://login.microsoftonline.com/{azure_tenant_id}/oauth2/v2.0/authorize?client_id={application_id}&amp;scope=Files.ReadWrite%20Files.ReadWrite.all%20Sites.Read.All%20Sites.ReadWrite.All%20offline_access&amp;response_type=code&amp;prompt=login&amp;redirect_uri=https://login.microsoftonline.com/{azure_tenant_id}/oauth2/nativeclient"
         self.label_2.setText(
             QCoreApplication.translate(
                 "ExternalLoginWindow",
