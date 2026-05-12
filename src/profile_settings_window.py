@@ -682,12 +682,10 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.temp_profile_config["onedrive"][f"{property}"] = f'"{value}"'
 
     def set_check_box_state(self):
-        sender = self.sender()
         _property = self.sender().objectName()
-        print("test " + _property)
         try:
             property = re.search(r"checkBox_(.+)", _property).group(1)
-        except:
+        except AttributeError:
             property = re.search(r"groupBox_(.+)", _property).group(1)
 
         if self.sender().isChecked():
