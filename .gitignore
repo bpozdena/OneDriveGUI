@@ -1,6 +1,5 @@
 venv/
 venv2/
-.venv/
 .qt_for_python/
 src/__thrash/
 src/nohup.out
