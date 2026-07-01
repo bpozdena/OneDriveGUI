@@ -321,7 +321,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         version_label_text = ""
         version_tooltip_text = ""
         min_requirements_met = True
-        min_supported_version = 2510  # Enforce minimum version of onedrive client to be 2.5.10 to prevent login issues with https://github.com/abraunegg/onedrive/issues/3622
+        min_supported_version = 20511  # Enforce minimum version of onedrive client to be 2.5.11, required for the in-browser login flow support added in GUI v1.3.2
 
         def get_latest_client_version():
             latest_url = "https://api.github.com/repos/abraunegg/onedrive/releases/latest"
@@ -338,8 +338,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 client_version_check = subprocess.check_output([client_bin_path, "--version"], stderr=subprocess.STDOUT)
                 installed_client_version = re.search(r"(v[0-9.]+)", str(client_version_check)).group(1)
 
-                installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
-                installed_client_version_num = installed_client_version_num if len(str(installed_client_version_num)) > 3 else installed_client_version_num * 10
+                # Zero-pad each component (e.g. "2.5.9" -> "020509") so patch versions
+                # compare correctly regardless of digit count, instead of comparing the
+                # raw concatenated digits (which put "2.5.9" above "2.5.11").
+                version_parts = installed_client_version.replace("v", "").split(".")
+                installed_client_version_num = int("".join(part.zfill(2) for part in version_parts))
 
                 return installed_client_version, installed_client_version_num
 
