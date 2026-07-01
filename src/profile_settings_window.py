@@ -18,6 +18,7 @@ from ui.ui_profile_settings_page import Ui_profile_settings
 import re
 import os
 import copy
+import subprocess
 from configparser import ConfigParser
 
 # Import setup_wizard after importing wizard, keeping it at the bottom to avoid circular imports
@@ -657,9 +658,6 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         return value.lower() in "true"
 
     def logout(self):
-        os.system(f"{client_bin_path} --confdir='{self.config_dir}' --logout")
-        logging.info(f"Profile {self.profile} has been logged out.")
-
         main_window.main_window_instance.profile_status_pages[self.profile].stop_monitor()
         if self.profile in workers:
             workers[self.profile].stop_worker()
@@ -667,6 +665,17 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
             logging.info(f"OneDrive sync for profile {self.profile} has been stopped.")
         else:
             logging.info(f"OneDrive for profile {self.profile} is not running.")
+
+        # Run --logout only after the monitor process has fully stopped, otherwise the
+        # running onedrive process can still hold a lock on the auth/session files and
+        # --logout silently fails to clear the saved credentials.
+        # Use subprocess instead of os.system: inside the AppImage, os.system's /bin/sh
+        # picks up the bundled LD_LIBRARY_PATH and crashes with a readline symbol lookup
+        # error before ever running the command.
+        result = subprocess.run([client_bin_path, f"--confdir={self.config_dir}", "--logout"], capture_output=True, text=True)
+        logging.info(f"Profile {self.profile} has been logged out.")
+        if result.returncode != 0:
+            logging.error(f"[{self.profile}] onedrive --logout failed (exit {result.returncode}): {result.stdout}{result.stderr}")
 
         main_window.main_window_instance.profile_status_pages[self.profile].label_onedrive_status.setText("You have been logged out")
 
