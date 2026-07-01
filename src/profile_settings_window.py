@@ -392,6 +392,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_display_running_config.stateChanged.connect(self.set_check_box_state)
         self.checkBox_check_nomount.stateChanged.connect(self.set_check_box_state)
         self.checkBox_local_first.stateChanged.connect(self.set_check_box_state)
+        self.checkBox_local_first.stateChanged.connect(self.validate_checkbox_input)
         self.checkBox_no_remote_delete.stateChanged.connect(self.set_check_box_state)
         self.checkBox_dry_run.stateChanged.connect(self.set_check_box_state)
         self.checkBox_remove_source_files.stateChanged.connect(self.set_check_box_state)
@@ -403,6 +404,9 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_disable_version_check.stateChanged.connect(self.set_check_box_state)
         self.checkBox_cleanup_local_files.stateChanged.connect(self.set_check_box_state)
         self.checkBox_cleanup_local_files.stateChanged.connect(self.validate_checkbox_input)
+        self.checkBox_mirror_local_state.stateChanged.connect(self.set_check_box_state)
+        self.checkBox_disable_upload_hash_streaming.stateChanged.connect(self.set_check_box_state)
+        self.comboBox_monitor_authoritative_sync.currentTextChanged.connect(self.set_monitor_authoritative_sync)
         self.lineEdit_user_agent.textChanged.connect(self.set_line_edit_value)
         self.lineEdit_azure_ad_endpoint.textChanged.connect(self.set_line_edit_value)
         self.lineEdit_azure_tenant_id.textChanged.connect(self.set_line_edit_value)
@@ -505,6 +509,11 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_disable_version_check.setChecked(self.get_check_box_state("disable_version_check"))
         self.checkBox_cleanup_local_files.setChecked(self.get_check_box_state("cleanup_local_files"))
         self.checkBox_cleanup_local_files.setEnabled(self.checkBox_download_only.isChecked())
+        self.checkBox_mirror_local_state.setChecked(self.get_check_box_state("mirror_local_state"))
+        self.checkBox_mirror_local_state.setEnabled(self.checkBox_local_first.isChecked())
+        self.checkBox_disable_upload_hash_streaming.setChecked(self.get_check_box_state("disable_upload_hash_streaming"))
+        self.comboBox_monitor_authoritative_sync.setCurrentText(self.temp_profile_config["onedrive"]["monitor_authoritative_sync"].strip('"'))
+        self.update_monitor_authoritative_sync_state()
         self.lineEdit_user_agent.setText(self.temp_profile_config["onedrive"]["user_agent"].strip('"'))
         self.lineEdit_azure_ad_endpoint.setText(self.temp_profile_config["onedrive"]["azure_ad_endpoint"].strip('"'))
         self.lineEdit_azure_tenant_id.setText(self.temp_profile_config["onedrive"]["azure_tenant_id"].strip('"'))
@@ -594,10 +603,21 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
                 self.checkBox_no_remote_delete.setDisabled(True)
                 self.checkBox_no_remote_delete.setChecked(False)
 
+            self.update_monitor_authoritative_sync_state()
+
         if self.sender().objectName() == "checkBox_cleanup_local_files":
             if self.checkBox_cleanup_local_files.isChecked():
                 if not self.checkBox_download_only.isChecked():
                     self.checkBox_download_only.setChecked(True)
+
+            self.update_monitor_authoritative_sync_state()
+
+        if self.sender().objectName() == "checkBox_local_first":
+            if self.checkBox_local_first.isChecked():
+                self.checkBox_mirror_local_state.setDisabled(False)
+            else:
+                self.checkBox_mirror_local_state.setDisabled(True)
+                self.checkBox_mirror_local_state.setChecked(False)
 
         if self.sender().objectName() == "checkBox_enable_logging":
             if self.checkBox_enable_logging.isChecked():
@@ -680,6 +700,12 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         _property = self.sender().objectName()
         property = re.search(r"spinBox_(.+)", _property).group(1)
         self.temp_profile_config["onedrive"][f"{property}"] = f'"{value}"'
+
+    def set_monitor_authoritative_sync(self):
+        self.temp_profile_config["onedrive"]["monitor_authoritative_sync"] = f'"{self.comboBox_monitor_authoritative_sync.currentText()}"'
+
+    def update_monitor_authoritative_sync_state(self):
+        self.comboBox_monitor_authoritative_sync.setEnabled(self.checkBox_download_only.isChecked() and self.checkBox_cleanup_local_files.isChecked())
 
     def set_check_box_state(self):
         sender = self.sender()

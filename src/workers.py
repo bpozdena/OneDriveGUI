@@ -45,6 +45,7 @@ class WorkerThread(QThread):
     trigger_big_delete = Signal(str)
     remove_worker = Signal(str)
     clear_warning = Signal(str)
+    browser_login_required = Signal(str)
 
     def __init__(self, profile, options=""):
         super(WorkerThread, self).__init__()
@@ -102,6 +103,9 @@ class WorkerThread(QThread):
         self.failed_files = []
         self.failed_files_count = 0
         self.collecting_failed_files = False  # Flag to indicate we're collecting failed file lines
+
+        # Track whether we're waiting for the user to complete login in their browser
+        self.awaiting_browser_login = False
 
         self.msg = ""
         self.profile_status["status_message"] = "OneDrive sync is starting..."
@@ -224,6 +228,24 @@ class WorkerThread(QThread):
                 self.profile_status["status_message"] = self.msg
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
                 self.update_credentials.emit(self.profile_name)
+
+            elif "Opening the Microsoft authorisation URL in your default browser" in stdout:
+                # New default auth method (client v2.5.11+): the client itself opens the
+                # system browser and runs a local loopback listener for the OAuth response,
+                # so the browser window may open in the background and go unnoticed.
+                self.awaiting_browser_login = True
+                self.msg = "Action required: please complete the OneDrive login\nthat just opened in your web browser."
+                logging.warning(f"[{self.profile_name}] {self.msg}")
+                self.profile_status["status_message"] = self.msg
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
+                self.browser_login_required.emit(self.profile_name)
+
+            elif self.awaiting_browser_login and "The OneDrive API was initialised successfully" in stdout:
+                self.awaiting_browser_login = False
+                self.msg = "OneDrive login successful."
+                logging.info(f"[{self.profile_name}] {self.msg}")
+                self.profile_status["status_message"] = self.msg
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif any(
                 msg in stdout
