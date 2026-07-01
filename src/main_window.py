@@ -64,6 +64,12 @@ except ImportError:
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
+        # Expose this instance as main_window.main_window_instance so other modules
+        # (e.g. profile_settings_window) can reach it without a circular import.
+        import main_window
+
+        main_window.main_window_instance = self
+
         # Access setup_wizard from wizard module to avoid circular imports
         import wizard
 
@@ -721,6 +727,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         workers[profile_name].trigger_resync.connect(self.resync_auth_dialog)
         workers[profile_name].trigger_big_delete.connect(self.big_delete_auth_dialog)
+        workers[profile_name].browser_login_required.connect(self.show_browser_login_notification)
         workers[profile_name].update_progress_new.connect(self.event_update_progress)
         workers[profile_name].update_profile_status.connect(self.event_update_profile_status)
         workers[profile_name].clear_warning.connect(self.clear_warning_handler)
@@ -730,6 +737,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             workers[profile_name].finished.connect(lambda: self.remove_worker(profile_name))
         except KeyError:
             logging.info(f"[GUI] The worker for profile {profile_name} is already stopped.")
+
+    def show_browser_login_notification(self, profile_name):
+        if self.tray:
+            self.tray.showMessage(
+                "OneDriveGUI - Login required",
+                f"Please complete the OneDrive login for '{profile_name}' in the web browser window that just opened.",
+                QSystemTrayIcon.Information,
+                10000,
+            )
 
     def resync_auth_dialog(self, profile_name):
         resync_question = QMessageBox(

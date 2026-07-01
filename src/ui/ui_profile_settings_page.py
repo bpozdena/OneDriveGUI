@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'profile_settings_page.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.0
+## Created by: Qt User Interface Compiler version 6.11.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -15,11 +15,12 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QFormLayout, QGridLayout,
-    QGroupBox, QHBoxLayout, QLabel, QLineEdit,
-    QListWidget, QListWidgetItem, QPushButton, QScrollArea,
-    QSizePolicy, QSlider, QSpacerItem, QSpinBox,
-    QTabWidget, QTextEdit, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFormLayout,
+    QGridLayout, QGroupBox, QHBoxLayout, QLabel,
+    QLineEdit, QListWidget, QListWidgetItem, QPushButton,
+    QScrollArea, QSizePolicy, QSlider, QSpacerItem,
+    QSpinBox, QTabWidget, QTextEdit, QVBoxLayout,
+    QWidget)
 
 class Ui_profile_settings(object):
     def setupUi(self, profile_settings):
@@ -285,6 +286,19 @@ class Ui_profile_settings(object):
 
         self.formLayout_4.setWidget(7, QFormLayout.ItemRole.LabelRole, self.label)
 
+        self.label_monitor_authoritative_sync = QLabel(self.groupBox_4)
+        self.label_monitor_authoritative_sync.setObjectName(u"label_monitor_authoritative_sync")
+
+        self.formLayout_4.setWidget(8, QFormLayout.ItemRole.LabelRole, self.label_monitor_authoritative_sync)
+
+        self.comboBox_monitor_authoritative_sync = QComboBox(self.groupBox_4)
+        self.comboBox_monitor_authoritative_sync.addItem("")
+        self.comboBox_monitor_authoritative_sync.addItem("")
+        self.comboBox_monitor_authoritative_sync.addItem("")
+        self.comboBox_monitor_authoritative_sync.setObjectName(u"comboBox_monitor_authoritative_sync")
+
+        self.formLayout_4.setWidget(8, QFormLayout.ItemRole.FieldRole, self.comboBox_monitor_authoritative_sync)
+
 
         self.horizontalLayout.addLayout(self.formLayout_4)
 
@@ -476,6 +490,16 @@ class Ui_profile_settings(object):
         self.checkBox_cleanup_local_files.setObjectName(u"checkBox_cleanup_local_files")
 
         self.gridLayout_4.addWidget(self.checkBox_cleanup_local_files, 5, 3, 1, 1)
+
+        self.checkBox_mirror_local_state = QCheckBox(self.groupBox_5)
+        self.checkBox_mirror_local_state.setObjectName(u"checkBox_mirror_local_state")
+
+        self.gridLayout_4.addWidget(self.checkBox_mirror_local_state, 6, 1, 1, 1)
+
+        self.checkBox_disable_upload_hash_streaming = QCheckBox(self.groupBox_5)
+        self.checkBox_disable_upload_hash_streaming.setObjectName(u"checkBox_disable_upload_hash_streaming")
+
+        self.gridLayout_4.addWidget(self.checkBox_disable_upload_hash_streaming, 6, 2, 1, 1)
 
 
         self.verticalLayout_15.addWidget(self.groupBox_5)
@@ -871,6 +895,14 @@ class Ui_profile_settings(object):
 #endif // QT_CONFIG(tooltip)
         self.label_ip_protocol_version.setText(QCoreApplication.translate("profile_settings", u"IP Protocol", None))
         self.label.setText(QCoreApplication.translate("profile_settings", u"Inotify delay", None))
+#if QT_CONFIG(tooltip)
+        self.label_monitor_authoritative_sync.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Controls the authoritative cleanup behaviour in monitor mode when using Download only and Cleanup local files.</p><p>'monitor_and_signal' (default) performs authoritative cleanup on every scheduled and signal-triggered sync.<br/>'monitor_interval' performs authoritative cleanup only on scheduled monitor interval syncs.<br/>'monitor_fullscan_frequency' performs authoritative cleanup only when the full-scan frequency cadence is reached.</p><p>Only applicable with --monitor --download-only --cleanup-local-files; ignored otherwise.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.label_monitor_authoritative_sync.setText(QCoreApplication.translate("profile_settings", u"Monitor authoritative sync", None))
+        self.comboBox_monitor_authoritative_sync.setItemText(0, QCoreApplication.translate("profile_settings", u"monitor_and_signal", None))
+        self.comboBox_monitor_authoritative_sync.setItemText(1, QCoreApplication.translate("profile_settings", u"monitor_interval", None))
+        self.comboBox_monitor_authoritative_sync.setItemText(2, QCoreApplication.translate("profile_settings", u"monitor_fullscan_frequency", None))
+
         self.label_threads.setText(QCoreApplication.translate("profile_settings", u"Threads", None))
 #if QT_CONFIG(tooltip)
         self.label_sync_file_permissions.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Utilise the <a href=\"https://chmod-calculator.com/\"><span style=\" text-decoration: underline; color:#5e81ac;\">Unix Permissions Calculator</span></a> to assist in determining the required permissions.</p><p><br/></p><p>Important: Special permission bits (setuid, setgid, sticky bit) are not supported. </p><p>Valid permission values are from <span style=\" font-weight:700;\">000</span> to <span style=\" font-weight:700;\">777</span> only.</p></body></html>", None))
@@ -957,6 +989,14 @@ class Ui_profile_settings(object):
         self.checkBox_cleanup_local_files.setToolTip(QCoreApplication.translate("profile_settings", u"Cleanup local files and folders if they are removed online. This option can only be used with Download only mode.", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_cleanup_local_files.setText(QCoreApplication.translate("profile_settings", u"Cleanup local files", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_mirror_local_state.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>When used with Local first, the local filesystem is treated as the authoritative source of truth and Microsoft OneDrive is reconciled to match the local state.</p><p>Files or directories that exist online but not locally will be removed from Microsoft OneDrive.</p><p>This option requires Local first to be enabled and cannot be used with Upload only.</p><p>Enabling this may permanently remove remote-only files - validate the intended actions with a dry run first.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_mirror_local_state.setText(QCoreApplication.translate("profile_settings", u"Mirror local state", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_disable_upload_hash_streaming.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Controls whether the client uses hash values calculated while streaming file uploads.</p><p>When enabled, the client ignores upload-streamed hash values and always generates upload hashes using the traditional local file hash generation path.</p><p>Intended as a compatibility and diagnostic fail-safe for scenarios where Microsoft OneDrive or SharePoint modifies uploaded file content or metadata after upload.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_disable_upload_hash_streaming.setText(QCoreApplication.translate("profile_settings", u"Disable upload hash streaming", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("profile_settings", u"Sync Options", None))
 #if QT_CONFIG(tooltip)
         self.groupBox.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>This option is used to 'skip' certain files and supports pattern matching.</p><p>Patterns are case insensitive. <span style=\" font-weight:700;\">*</span> and <span style=\" font-weight:700;\">? </span><a href=\"https://technet.microsoft.com/en-us/library/bb490639.aspx\"><span style=\" text-decoration: underline; color:#5e81ac;\">wildcards characters</span></a> are supported. </p><p>Use <span style=\" font-weight:700;\">|</span> to separate multiple patterns.<br/></p><p><span style=\" text-decoration: underline;\">Files can be skipped in the following fashion:</span></p><p>-Specify a wildcard, eg: '<span style=\" font-weight:700;\">*.txt</span>' (skip all txt files)</p><p>-Explicitly specify the filename and it's full path relative to your sync_dir, eg: '<span style=\" font-weight:700;\">path/to/file/filename.ext</span>'</p><p>-Explicitly specify the filename only and skip every instance of this filename, eg: '<span style=\" font-weight:700;\">filename.ext</span>'</p><p><br/></p><p><span "
