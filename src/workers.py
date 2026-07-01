@@ -98,6 +98,7 @@ class WorkerThread(QThread):
 
         # Track pending error for multi-line error messages
         self.pending_error = None
+        self.pending_error_path = None
 
         # Track failed files for detailed error reporting
         self.failed_files = []
@@ -204,10 +205,23 @@ class WorkerThread(QThread):
             logging.debug(f"[{self.profile_name}] " + stdout)
 
             # Check if we have a pending error from previous line that wasn't followed by "Error Message:"
-            if self.pending_error and "Error Message:" not in stdout:
+            # The onedrive client emits multi-line error blocks like:
+            #   ERROR: <summary>
+            #   Calling Function:  <...>
+            #   Path:              <...>
+            #   Error Message:     <...>
+            #   Disk Space (CWD):  <...>
+            # so known continuation lines must not trigger an early flush of the pending error.
+            error_continuation_markers = ("Calling Function:", "Path:", "Disk Space")
+            if (
+                self.pending_error
+                and "Error Message:" not in stdout
+                and not any(marker in stdout for marker in error_continuation_markers)
+            ):
                 # Emit the pending error since the next line didn't continue it
                 self._emit_error_status(self.pending_error)
                 self.pending_error = None
+                self.pending_error_path = None
 
             # Check if we were collecting failed files and this line is not a "Failed to" line
             if self.collecting_failed_files and "Failed to upload:" not in stdout and "Failed to download:" not in stdout:
@@ -457,13 +471,25 @@ class WorkerThread(QThread):
                     error_parts = stdout.split("Error Message:", 1)
                     if len(error_parts) > 1:
                         additional_error = error_parts[1].strip()
-                        # Combine with pending error
-                        full_error_message = f"{self.pending_error} {additional_error}"
+                        # Combine with pending error, including the affected path if we captured one
+                        if self.pending_error_path:
+                            full_error_message = f"{self.pending_error} Path: {self.pending_error_path} - {additional_error}"
+                        else:
+                            full_error_message = f"{self.pending_error} {additional_error}"
                     else:
                         full_error_message = self.pending_error
                     self.pending_error = None  # Clear pending error
+                    self.pending_error_path = None
                     logging.error(f"[{self.profile_name}] {full_error_message}")
                     self._emit_error_status(full_error_message)
+
+            elif self.pending_error and "Path:" in stdout:
+                # Capture the affected file/folder path from a multi-line ERROR block
+                path_parts = stdout.split("Path:", 1)
+                if len(path_parts) > 1:
+                    path_value = path_parts[1].strip()
+                    if path_value and path_value != "(not available)":
+                        self.pending_error_path = path_value
 
             elif "ERROR:" in stdout:
                 # Extract error message after "ERROR:" prefix
@@ -472,6 +498,7 @@ class WorkerThread(QThread):
                     error_text = error_parts[1].strip()
                     # Store as pending error to check if next line has "Error Message:"
                     self.pending_error = error_text
+                    self.pending_error_path = None
 
             elif "Failed items to upload to/from Microsoft OneDrive:" in stdout:
                 # Extract the count of failed items
