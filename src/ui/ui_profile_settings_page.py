@@ -1027,7 +1027,7 @@ class Ui_profile_settings(object):
         self.checkBox_skip_dotfiles.setText(QCoreApplication.translate("profile_settings", u"Skip dotfiles (hidden files)", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("profile_settings", u"Excluded files", None))
         self.groupBox_11.setTitle(QCoreApplication.translate("profile_settings", u"Sync List", None))
-        self.label_sync_list.setText(QCoreApplication.translate("profile_settings", u"Selective sync allows you to sync only specific files and directories. <br> See <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/usage.md#performing-a-selective-sync-via-sync_list-file\">official documentation </a> for more details.", None))
+        self.label_sync_list.setText(QCoreApplication.translate("profile_settings", u"Selective sync allows you to sync only specific files and directories. <br> See <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/usage.md#performing-a-selective-synchronisation-via-sync_list-file\">official documentation </a> for more details.", None))
 #if QT_CONFIG(tooltip)
         self.checkBox_sync_root_files.setToolTip(QCoreApplication.translate("profile_settings", u"Sync all files in Sync Directory root when using Sync List.", None))
 #endif // QT_CONFIG(tooltip)
