@@ -2,7 +2,12 @@
 
 # Docker-based AppImage builder for OneDriveGUI
 # Allows building AppImages on non-Debian systems (e.g. Arch Linux)
-# using an Ubuntu Noble container with appimage-builder.
+# using an Ubuntu Jammy container with appimage-builder.
+#
+# Must stay on Jammy (22.04), not Noble (24.04): Noble's glibc package uses a
+# merged-/usr layout that appimage-builder v1.1.0's glibc-compatibility runtime
+# does not handle, breaking the AppImage on hosts with an older glibc than the
+# build machine (APPRUN_ERROR / linker SIGSEGV). See AppImageBuilder.yml.
 
 set -e
 
@@ -17,14 +22,14 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-# Build the AppImage inside an Ubuntu Noble container
+# Build the AppImage inside an Ubuntu Jammy container
 docker run \
     --cap-add SYS_ADMIN \
     --device /dev/fuse \
     --security-opt apparmor:unconfined \
     --rm \
     -v "$SCRIPT_DIR:/OneDriveGUI" \
-    ubuntu:noble \
+    ubuntu:jammy \
     bash -c '
 set -e
 echo "Installing dependencies..."
