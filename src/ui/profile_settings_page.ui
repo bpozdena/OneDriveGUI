@@ -987,7 +987,7 @@
             <item>
              <widget class="QLabel" name="label_sync_list">
               <property name="text">
-               <string>Selective sync allows you to sync only specific files and directories. &lt;br&gt; See &lt;a href=&quot;https://github.com/abraunegg/onedrive/blob/master/docs/usage.md#performing-a-selective-sync-via-sync_list-file&quot;&gt;official documentation &lt;/a&gt; for more details.</string>
+               <string>Selective sync allows you to sync only specific files and directories. &lt;br&gt; See &lt;a href=&quot;https://github.com/abraunegg/onedrive/blob/master/docs/usage.md#performing-a-selective-synchronisation-via-sync_list-file&quot;&gt;official documentation &lt;/a&gt; for more details.</string>
               </property>
              </widget>
             </item>

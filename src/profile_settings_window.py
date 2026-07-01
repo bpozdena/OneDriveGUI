@@ -268,6 +268,9 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.label_profile_name.setText(self.profile)
         self.tabWidget.setCurrentIndex(0)
 
+        # Make the "official documentation" link on the Selective Sync tab clickable.
+        self.label_sync_list.setOpenExternalLinks(True)
+
         # Configures widget values
         self.configure_profile_settings_page()
 
