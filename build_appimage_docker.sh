@@ -34,7 +34,15 @@ docker run \
 set -e
 echo "Installing dependencies..."
 apt update
-apt install -y wget python3 python3-pip fuse gtk-update-icon-cache
+apt install -y \
+	fuse \
+	gtk-update-icon-cache \
+	python3 \
+	python3-pip \
+	python3-venv \
+	wget
+
+pip install build setuptools
 
 echo "Installing appimage-builder..."
 wget -q -O /tmp/appimage-builder.AppImage https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage
