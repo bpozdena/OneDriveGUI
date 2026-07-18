@@ -66,13 +66,13 @@ A GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive) with mu
 1) Start OneDrive GUI:
     ```sh
     cd src/
-    python3 OneDriveGUI.py
+    python3 -m onedrive_gui
     ```
 
     Optionally, you can detach the GUI from the terminal by using the command below:
     ```sh
     cd src/
-    nohup python3 OneDriveGUI.py > /dev/null 2>&1 &
+    nohup python3 -m onedrive_gui > /dev/null 2>&1 &
     ```
 
 # Usage
