@@ -6,14 +6,14 @@ script:
   - cp src AppDir/usr -r
   - cp src/resources/images/OneDriveGUI.png AppDir/usr/share/icons/hicolor/48x48
   - python3 -m pip install --ignore-installed --prefix=/usr --no-cache-dir --root=AppDir -r ./requirements.txt
-  - rm -rf AppDir/usr/local/lib/python3.12/dist-packages/PySide6/Qt/qml/
-  - rm -rf AppDir/usr/local/lib/python3.12/dist-packages/PySide6/examples/
-  - rm -rf AppDir/usr/local/lib/python3.12/dist-packages/PySide6/Qt/resources/
-  - rm -rf AppDir/usr/local/lib/python3.12/dist-packages/PySide6/Qt/translations/qtwebengine_locales/
-  - rm -f AppDir/usr/local/lib/python3.12/dist-packages/PySide6/{assistant,designer,linguist,lrelease,lupdate}
-  - rm -f AppDir/usr/local/lib/python3.12/dist-packages/PySide6/{Qt3D*,QtBluetooth*,QtCharts*,QtConcurrent*,QtDataVisualization*,QtDBus*,QtDesigner*,QtHelp*,QtMultimedia*,QtNetwork*,QtOpenGL*,QtPositioning*,QtPrintSupport*,QtQml*,QtQuick*,QtRemoteObjects*,QtScxml*,QtSensors*,QtSerialPort*,QtSql*,QtStateMachine*,QtSvg*,QtTest*,QtWeb*,QtXml*}
+  - rm -rf AppDir/usr/local/lib/python3.10/dist-packages/PySide6/Qt/qml/
+  - rm -rf AppDir/usr/local/lib/python3.10/dist-packages/PySide6/examples/
+  - rm -rf AppDir/usr/local/lib/python3.10/dist-packages/PySide6/Qt/resources/
+  - rm -rf AppDir/usr/local/lib/python3.10/dist-packages/PySide6/Qt/translations/qtwebengine_locales/
+  - rm -f AppDir/usr/local/lib/python3.10/dist-packages/PySide6/{assistant,designer,linguist,lrelease,lupdate}
+  - rm -f AppDir/usr/local/lib/python3.10/dist-packages/PySide6/{Qt3D*,QtBluetooth*,QtCharts*,QtConcurrent*,QtDataVisualization*,QtDBus*,QtDesigner*,QtHelp*,QtMultimedia*,QtNetwork*,QtOpenGL*,QtPositioning*,QtPrintSupport*,QtQml*,QtQuick*,QtRemoteObjects*,QtScxml*,QtSensors*,QtSerialPort*,QtSql*,QtStateMachine*,QtSvg*,QtTest*,QtWeb*,QtXml*}
   - shopt -s extglob
-  - rm -rf AppDir/usr/local/lib/python3.12/dist-packages/PySide6/Qt/lib/!(libQt6OpenGL*|libQt6XcbQpa*|libQt6Wayland*|libQt6Egl*|libicudata*|libicuuc*|libicui18n*|libQt6DBus*|libQt6Network*|libQt6Qml*|libQt6Core*|libQt6Gui*|libQt6Widgets*|libQt6Svg*|libQt6UiTools*)
+  - rm -rf AppDir/usr/local/lib/python3.10/dist-packages/PySide6/Qt/lib/!(libQt6OpenGL*|libQt6XcbQpa*|libQt6Wayland*|libQt6Egl*|libicudata*|libicuuc*|libicui18n*|libQt6DBus*|libQt6Network*|libQt6Qml*|libQt6Core*|libQt6Gui*|libQt6Widgets*|libQt6Svg*|libQt6UiTools*)
 
 
 AppDir:
@@ -23,15 +23,24 @@ AppDir:
     id: io.github.bpozdena.OneDriveGUI
     name: OneDriveGUI
     icon: OneDriveGUI
-    version: 1.2.0
-    exec: usr/bin/python3
+    version: 1.3.2
+    exec: usr/bin/python3.10
     exec_args: "$APPDIR/usr/src/OneDriveGUI.py $@"
 
   apt:
     arch: amd64
     sources:
-      - sourceline: 'deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ focal main restricted universe multiverse'
+      # Built against Jammy (22.04) rather than Noble (24.04) on purpose: Noble's glibc
+      # package ships a merged-/usr layout (loader under usr/lib64/), which
+      # appimage-builder v1.1.0's glibc-compatibility runtime does not account for
+      # (it hardcodes the pre-merged /lib64 path). That mismatch makes the AppImage
+      # fail with "APPRUN_ERROR: No such file or directory" (or a linker SIGSEGV) on
+      # any host with an older glibc than the build machine. Jammy still uses the
+      # classic layout, so the compatibility runtime works correctly.
+      - sourceline: 'deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse'
         key_url: 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3b4fe6acc0b21f32'
+      - sourceline: 'deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse'
+        key_url: 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920d1991bc93c'
 
     include:
       - python3
@@ -46,7 +55,7 @@ AppDir:
   runtime:
     env:
       PYTHONHOME: '${APPDIR}/usr'
-      PYTHONPATH: '${APPDIR}/usr/local/lib/python3.12/dist-packages/'
+      PYTHONPATH: '${APPDIR}/usr/local/lib/python3.10/dist-packages/'
 
 AppImage:
 #  update-information: gh-releases-zsync
