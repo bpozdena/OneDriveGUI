@@ -422,6 +422,35 @@
                     </property>
                    </widget>
                   </item>
+                  <item row="8" column="0">
+                   <widget class="QLabel" name="label_monitor_authoritative_sync">
+                    <property name="toolTip">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Controls the authoritative cleanup behaviour in monitor mode when using Download only and Cleanup local files.&lt;/p&gt;&lt;p&gt;'monitor_and_signal' (default) performs authoritative cleanup on every scheduled and signal-triggered sync.&lt;br/&gt;'monitor_interval' performs authoritative cleanup only on scheduled monitor interval syncs.&lt;br/&gt;'monitor_fullscan_frequency' performs authoritative cleanup only when the full-scan frequency cadence is reached.&lt;/p&gt;&lt;p&gt;Only applicable with --monitor --download-only --cleanup-local-files; ignored otherwise.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="text">
+                     <string>Monitor authoritative sync</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="8" column="1">
+                   <widget class="QComboBox" name="comboBox_monitor_authoritative_sync">
+                    <item>
+                     <property name="text">
+                      <string>monitor_and_signal</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>monitor_interval</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>monitor_fullscan_frequency</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
                  </layout>
                 </item>
                 <item>
@@ -752,6 +781,26 @@
                   </property>
                  </widget>
                 </item>
+                <item row="6" column="1">
+                 <widget class="QCheckBox" name="checkBox_mirror_local_state">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When used with Local first, the local filesystem is treated as the authoritative source of truth and Microsoft OneDrive is reconciled to match the local state.&lt;/p&gt;&lt;p&gt;Files or directories that exist online but not locally will be removed from Microsoft OneDrive.&lt;/p&gt;&lt;p&gt;This option requires Local first to be enabled and cannot be used with Upload only.&lt;/p&gt;&lt;p&gt;Enabling this may permanently remove remote-only files - validate the intended actions with a dry run first.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Mirror local state</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="2">
+                 <widget class="QCheckBox" name="checkBox_disable_upload_hash_streaming">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Controls whether the client uses hash values calculated while streaming file uploads.&lt;/p&gt;&lt;p&gt;When enabled, the client ignores upload-streamed hash values and always generates upload hashes using the traditional local file hash generation path.&lt;/p&gt;&lt;p&gt;Intended as a compatibility and diagnostic fail-safe for scenarios where Microsoft OneDrive or SharePoint modifies uploaded file content or metadata after upload.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Disable upload hash streaming</string>
+                  </property>
+                 </widget>
+                </item>
                </layout>
               </widget>
              </item>
@@ -938,7 +987,7 @@
             <item>
              <widget class="QLabel" name="label_sync_list">
               <property name="text">
-               <string>Selective sync allows you to sync only specific files and directories. &lt;br&gt; See &lt;a href=&quot;https://github.com/abraunegg/onedrive/blob/master/docs/usage.md#performing-a-selective-sync-via-sync_list-file&quot;&gt;official documentation &lt;/a&gt; for more details.</string>
+               <string>Selective sync allows you to sync only specific files and directories. &lt;br&gt; See &lt;a href=&quot;https://github.com/abraunegg/onedrive/blob/master/docs/usage.md#performing-a-selective-synchronisation-via-sync_list-file&quot;&gt;official documentation &lt;/a&gt; for more details.</string>
               </property>
              </widget>
             </item>

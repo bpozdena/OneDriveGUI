@@ -2,6 +2,7 @@ import logging
 import os
 import copy
 import re
+import shutil
 
 # from logger import logger
 from configparser import ConfigParser
@@ -134,7 +135,8 @@ def save_global_config(global_config):
                         od_config.remove_option(section, option)
 
         # Backup last config
-        os.system(f"cp {od_config_file} {od_config_file}_backup")
+        if os.path.exists(od_config_file):
+            shutil.copy2(od_config_file, f"{od_config_file}_backup")
 
         # Save OD config changes.
         directory = re.search(r"(.+)/.+$", od_config_file).group(1)
