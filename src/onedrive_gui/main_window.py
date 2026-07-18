@@ -15,12 +15,12 @@ from PySide6.QtWidgets import (
 
 
 # Imports for main window.
-from ui.ui_mainwindow import Ui_MainWindow
-from ui.ui_process_status_page import Ui_status_page
+from .ui.ui_mainwindow import Ui_MainWindow
+from .ui.ui_process_status_page import Ui_status_page
 
 
 # Import for login windows.
-from ui.ui_external_login import Ui_ExternalLoginWindow
+from .ui.ui_external_login import Ui_ExternalLoginWindow
 
 
 import re
@@ -31,27 +31,27 @@ import requests
 import subprocess
 
 
-from wizard import setup_wizard
-from profile_settings_window import profile_settings_window
+from .wizard import setup_wizard
+from .profile_settings_window import profile_settings_window
 
-from options import (
+from .options import (
     global_config,
     client_bin_path,
     gui_settings,
     version,
 )
 
-from utils.utils import humanize_file_size, shorten_path, format_relative_time
-from workers import WorkerThread, MaintenanceWorker, TaskList, workers
-from gui_settings_window import gui_settings_window
+from .utils.utils import humanize_file_size, shorten_path, format_relative_time
+from .workers import WorkerThread, MaintenanceWorker, TaskList, workers
+from .gui_settings_window import gui_settings_window
 
 import logging
 
 # from logger import logger
-from global_config import DIR_PATH, PROFILES_FILE
+from .global_config import DIR_PATH, PROFILES_FILE
 
 try:
-    from ui.ui_login import Ui_LoginWindow
+    from .ui.ui_login import Ui_LoginWindow
 except ImportError:
     logging.warning("Failed to import ui_login. This is expected if you are running AppImage version.")
 
@@ -66,12 +66,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         # Expose this instance as main_window.main_window_instance so other modules
         # (e.g. profile_settings_window) can reach it without a circular import.
-        import main_window
+        from . import main_window
 
         main_window.main_window_instance = self
 
         # Access setup_wizard from wizard module to avoid circular imports
-        import wizard
+        from . import wizard
 
         wizard.setup_wizard.show_main_window_signal.connect(self.show)
         wizard.setup_wizard.add_profile_signal.connect(self.add_profile)

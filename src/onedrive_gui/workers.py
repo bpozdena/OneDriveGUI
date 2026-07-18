@@ -5,7 +5,7 @@ from PySide6.QtGui import QFontMetrics, QIcon
 
 
 # Imports for main window.
-from ui.ui_list_item_widget import Ui_list_item_widget
+from .ui.ui_list_item_widget import Ui_list_item_widget
 
 
 import re
@@ -13,8 +13,8 @@ import time
 import subprocess
 from datetime import datetime
 
-from global_config import save_global_config
-from options import (
+from .global_config import save_global_config
+from .options import (
     # main_window,
     global_config,
     temp_global_config,
@@ -24,13 +24,13 @@ from options import (
     version,
 )
 
-from utils.utils import humanize_file_size, shorten_path
+from .utils.utils import humanize_file_size, shorten_path
 
 
 import logging
 
 # from logger import logger
-from global_config import DIR_PATH, PROFILES_FILE
+from .global_config import DIR_PATH, PROFILES_FILE
 
 
 class WorkerThread(QThread):

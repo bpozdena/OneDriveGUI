@@ -22,8 +22,8 @@ import requests
 import subprocess
 from configparser import ConfigParser
 
-from global_config import save_global_config, read_config
-from options import (
+from .global_config import save_global_config, read_config
+from .options import (
     global_config,
     temp_global_config,
     client_bin_path,
@@ -31,9 +31,9 @@ from options import (
     version,
 )
 
-from workers import MaintenanceWorker
+from .workers import MaintenanceWorker
 import logging
-from global_config import DIR_PATH, PROFILES_FILE
+from .global_config import DIR_PATH, PROFILES_FILE
 
 
 class SetupWizard(QWizard):
