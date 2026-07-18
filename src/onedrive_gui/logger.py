@@ -3,7 +3,7 @@ import sys
 import re
 import logging
 import logging.handlers as handlers
-from settings.gui_settings import gui_settings
+from .settings.gui_settings import gui_settings
 
 
 def config_debug_level():
