@@ -10,10 +10,10 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
 
-from logger import logger
+from .logger import logger
 
 
-from global_config import DIR_PATH
+from .global_config import DIR_PATH
 
 
 app = QApplication(sys.argv)
@@ -22,9 +22,9 @@ app.setDesktopFileName("OneDriveGUI")
 app.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-cloud-80.png"))
 
 
-from options import gui_settings, global_config, version
-from global_config import save_global_config
-from main_window import MainWindow
+from .options import gui_settings, global_config, version
+from .global_config import save_global_config
+from .main_window import MainWindow
 
 
 def main_window_start_state():

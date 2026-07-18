@@ -12,8 +12,8 @@ from PySide6.QtWidgets import (
 )
 
 # Imports for Profiles windows.
-from ui.ui_profile_settings_window import Ui_profile_settings_window
-from ui.ui_profile_settings_page import Ui_profile_settings
+from .ui.ui_profile_settings_window import Ui_profile_settings_window
+from .ui.ui_profile_settings_page import Ui_profile_settings
 
 import re
 import os
@@ -22,20 +22,20 @@ import subprocess
 from configparser import ConfigParser
 
 # Import setup_wizard after importing wizard, keeping it at the bottom to avoid circular imports
-import wizard
-from global_config import save_global_config
+from . import wizard
+from .global_config import save_global_config
 
 # Import main_window (lazy import to avoid circular references)
-import main_window
-from options import client_bin_path, global_config
-from options import temp_global_config
+from . import main_window
+from .options import client_bin_path, global_config
+from .options import temp_global_config
 
-from workers import workers
+from .workers import workers
 
 import logging
 
 # from logger import logger
-from global_config import DIR_PATH, PROFILES_FILE
+from .global_config import DIR_PATH, PROFILES_FILE
 
 
 class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
