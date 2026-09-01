@@ -248,7 +248,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             pass
         elif reason == QSystemTrayIcon.Trigger:
             logging.debug("[GUI] Left clicked on tray icon")
-            self.hide() if self.isVisible() else self.show()
+            if not self.isVisible():
+                self.show()
+            elif self.isActiveWindow():
+                self.hide()
+            else:
+                self.activateWindow()
+                self.raise_()
         elif reason == QSystemTrayIcon.MiddleClick:
             pass
         else:
