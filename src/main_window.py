@@ -48,7 +48,7 @@ from gui_settings_window import gui_settings_window
 import logging
 
 # from logger import logger
-from global_config import DIR_PATH, PROFILES_FILE
+from global_config import DIR_PATH, PROFILES_FILE, save_global_config
 
 try:
     from ui.ui_login import Ui_LoginWindow
@@ -130,6 +130,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         )
         self.stackedLayout = QStackedLayout()
+
+        # Account types already persisted in the profiles file. Used to detect
+        # when a type reported during sync still needs to be saved to disk.
+        self.saved_account_types = {profile: global_config[profile]["account_type"] for profile in global_config}
 
         self.profile_status_pages = {}
         for profile in global_config:
@@ -819,6 +823,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.profile_status_pages[profile].label_onedrive_status.setText(data["status_message"])
         self.profile_status_pages[profile].label_free_space.setText(data["free_space"])
         self.profile_status_pages[profile].label_account_type.setText(data["account_type"])
+
+        # Persist the account type reported by the client so it survives a
+        # restart; the worker only updates the in-memory config. Saving here
+        # keeps config writes on the main thread.
+        if data["account_type"] and data["account_type"] != self.saved_account_types.get(profile):
+            self.saved_account_types[profile] = data["account_type"]
+            save_global_config(global_config)
+            logging.info(f"[{profile}] Saved account type: {data['account_type']}")
 
         # Handle error message display
         if "error_message" in data and data["error_message"]:
