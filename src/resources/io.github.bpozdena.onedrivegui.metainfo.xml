@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.bpozdena.onedrivegui</id>
+  
+  <name>OneDriveGUI</name>
+  <summary>A simple GUI for Linux OneDrive Client, with multi-account support.</summary>
+  
+  <metadata_license>MIT</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  
+  <description>
+    <p>
+      A simple GUI for Linux OneDrive Client, with multi-account support.
+    </p>
+  </description>
+  
+  <launchable type="desktop-id">OneDriveGUI.desktop</launchable>
+</component>
