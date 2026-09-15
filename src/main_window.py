@@ -1,4 +1,4 @@
-from PySide6.QtCore import QTimer, QUrl, QFileInfo, Qt, Signal, Slot, QTimer
+from PySide6.QtCore import QTimer, QUrl, QFileInfo, Qt, Signal, Slot
 from PySide6.QtGui import QIcon, QPixmap, QDesktopServices
 from PySide6.QtWidgets import (
     QWidget,
