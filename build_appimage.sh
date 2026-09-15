@@ -28,22 +28,7 @@ update_yaml() {
   fi
 }
 
-# Step 3: Update the indented version line in pyproject.toml
-update_pyproject() {
-  PYPROJECT_TOML_FILE="pyproject.toml"
-  
-  if [ -f "$PYPROJECT_TOML_FILE" ]; then
-    echo "Updating version in $PYPROJECT_TOML_FILE..."
-    # Use sed to match the indented version line and update it
-    sed -i "s/^\(version =\).*/\1 \"$VERSION\"/" "$PYPROJECT_TOML_FILE"
-    echo "Version updated to $VERSION in the indented version line of $PYPROJECT_TOML_FILE"
-  else
-    echo "$PYPROJECT_TOML_FILE not found."
-    exit 1
-  fi
-}
-
-# Step 4: Build the AppImage using appimage-builder
+# Step 3: Build the AppImage using appimage-builder
 build_appimage() {
   if ! command -v appimage-builder &> /dev/null; then
     echo "appimage-builder could not be found. Please install it first."
@@ -64,5 +49,4 @@ build_appimage() {
 # Main script execution
 get_version
 update_yaml
-update_pyproject
 build_appimage

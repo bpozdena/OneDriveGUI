@@ -1,10 +1,14 @@
 [project]
 name = "onedrive-gui"
-version = "1.3.2"
+dynamic = ["version"]
 description = "A simple GUI for Linux OneDrive Client, with multi-account support."
 readme = "README.md"
 requires-python = ">=3.8"
 license-files = ["LICENSE"]
+dependencies = [
+    "PySide6_Essentials",
+    "requests",
+]
 
 [project.scripts]
 onedrive-gui = "onedrive_gui.OneDriveGUI:main"
@@ -12,3 +16,7 @@ onedrive-gui = "onedrive_gui.OneDriveGUI:main"
 [build-system]
 requires = ["setuptools >= 61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+# Single source of truth for the version is src/onedrive_gui/options.py
+version = { attr = "onedrive_gui.options.version" }

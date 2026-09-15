@@ -14,3 +14,7 @@ appimage-build/
 *.AppImage
 *.md
 !readme.md
+# Python packaging
+build/
+dist/
+*.egg-info/
