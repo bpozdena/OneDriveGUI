@@ -3,19 +3,19 @@ from PySide6.QtWidgets import QWidget, QFileDialog
 
 
 # Imports for GUI settings window
-from ui.ui_gui_settings_window import Ui_gui_settings_window
+from .ui.ui_gui_settings_window import Ui_gui_settings_window
 
 
 import re
 import os
 
-from settings.gui_settings import gui_settings
+from .settings.gui_settings import gui_settings
 
 
 import logging
 
 # from logger import logger
-from global_config import DIR_PATH, PROFILES_FILE
+from .global_config import DIR_PATH, PROFILES_FILE
 
 
 class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
@@ -119,7 +119,7 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
 
     def sync_autostart_on_startup(self):
         """Sync autostart file with saved setting on app startup."""
-        from utils.autostart import enable_autostart, disable_autostart, is_autostart_enabled
+        from .utils.autostart import enable_autostart, disable_autostart, is_autostart_enabled
 
         # Get the saved setting
         autostart_should_be_enabled = self.get_check_box_state("autostart_enabled")
@@ -150,7 +150,7 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
 
     def save_settings(self):
         """Save all settings and sync autostart file with checkbox state."""
-        from utils.autostart import enable_autostart, disable_autostart
+        from .utils.autostart import enable_autostart, disable_autostart
         from PySide6.QtWidgets import QMessageBox
 
         # Save all settings first

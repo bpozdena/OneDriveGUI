@@ -1,8 +1,8 @@
 import copy
-from utils.utils import get_installed_client_version, config_client_bin_path
-from global_config import create_global_config
+from .utils.utils import get_installed_client_version, config_client_bin_path
+from .global_config import create_global_config
 
-from settings.gui_settings import gui_settings
+from .settings.gui_settings import gui_settings
 
 client_bin_path = gui_settings.get("frameless_window")
 

@@ -50,6 +50,21 @@ A GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive) with mu
 ## AUR
 - An AUR package [onedrivegui-git](https://aur.archlinux.org/packages/onedrivegui-git) is available (maintainer: Integral).
 
+## Python Package
+
+Use setuptools and build to build the package:
+
+```
+python3 -m pip install setuptools build
+python3 -m build
+```
+
+That produces a wheel package in the directory `dist/` than can be installed:
+
+```
+python3 -m pip install dist/onedrive_gui-1.3.2-py3-none-any.whl
+```
+
 ## Running from Source
 
 1) Ensure Python3 and [pip](https://pip.pypa.io/en/stable/installation/) are installed on your system. 
@@ -66,13 +81,13 @@ A GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive) with mu
 1) Start OneDrive GUI:
     ```sh
     cd src/
-    python3 OneDriveGUI.py
+    python3 -m onedrive_gui
     ```
 
     Optionally, you can detach the GUI from the terminal by using the command below:
     ```sh
     cd src/
-    nohup python3 OneDriveGUI.py > /dev/null 2>&1 &
+    nohup python3 -m onedrive_gui > /dev/null 2>&1 &
     ```
 
 # Usage
