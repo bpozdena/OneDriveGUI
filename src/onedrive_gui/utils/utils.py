@@ -6,7 +6,7 @@ from datetime import datetime
 import logging
 # from logger import logger
 
-from settings.gui_settings import gui_settings
+from ..settings.gui_settings import gui_settings
 
 
 def humanize_file_size(num, suffix="B"):

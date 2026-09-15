@@ -10,10 +10,10 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
 
-from logger import logger
+from .logger import logger
 
 
-from global_config import DIR_PATH
+from .global_config import DIR_PATH
 
 
 app = QApplication(sys.argv)
@@ -22,15 +22,20 @@ app.setDesktopFileName("OneDriveGUI")
 app.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-cloud-80.png"))
 
 
-from options import gui_settings, global_config, version
-from global_config import save_global_config
-from main_window import MainWindow
+from .options import gui_settings, global_config, version
+from .global_config import save_global_config
+from .main_window import MainWindow
 
+workers = {}
 
-def main_window_start_state():
-    # Determine if OneDriveGUI should start maximized, minimized to tray or minimized to taskbar/dock.
-    # This should help ensure the GUI does not just disappear on Gnome without system tray extension.
+def main():
+    logging.info(f"Starting OneDriveGUI v{version}")
 
+    if len(global_config) > 0:
+        save_global_config(global_config)
+
+    main_window = MainWindow()
+    
     if gui_settings.get("start_minimized") == "True" or len(global_config) == 0:
         try:
             if main_window.tray.isSystemTrayAvailable():
@@ -45,16 +50,5 @@ def main_window_start_state():
         logging.info("[GUI] Starting OneDriveGUI maximized")
 
 
-workers = {}
-
-
-if __name__ == "__main__":
-    logging.info(f"Starting OneDriveGUI v{version}")
-
-    if len(global_config) > 0:
-        save_global_config(global_config)
-
-    main_window = MainWindow()
-    main_window_start_state()
-
     app.exec()
+
