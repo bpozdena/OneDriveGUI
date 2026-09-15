@@ -328,12 +328,6 @@ class wizardPage_create_shared_library(QWizardPage):
         self.pushButton_create_profile.setText("Create Profile")
         self.pushButton_create_profile.setDisabled(True)
 
-        for profile in global_config:
-            if global_config[profile]["account_type"] == "Business":
-                self.comboBox_profile_list.addItem(profile)
-                self.comboBox_profile_list.setPlaceholderText("")
-                self.pushButton_get_sites.setDisabled(False)
-
         layout = QGridLayout()
         layout.addWidget(self.label_1, 0, 0)
         layout.addWidget(self.comboBox_profile_list, 0, 1)
@@ -349,6 +343,20 @@ class wizardPage_create_shared_library(QWizardPage):
         layout.addWidget(self.pushButton_create_profile, 5, 1)
 
         self.setLayout(layout)
+
+    def initializePage(self):
+        # Rebuild the profile list on every page entry. Account types are only
+        # discovered while a sync is running, so the set of known Business
+        # profiles can change at any point after the wizard was created.
+        self.comboBox_profile_list.clear()
+
+        for profile in global_config:
+            if global_config[profile]["account_type"] == "Business":
+                self.comboBox_profile_list.addItem(profile)
+
+        business_account_found = self.comboBox_profile_list.count() > 0
+        self.comboBox_profile_list.setPlaceholderText("" if business_account_found else "No Business accounts detected.")
+        self.pushButton_get_sites.setDisabled(not business_account_found)
 
     def isComplete(self):
         if self.pushButton_create_profile.text() == "Done":
