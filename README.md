@@ -59,10 +59,10 @@ python3 -m pip install setuptools build
 python3 -m build
 ```
 
-That produces a wheel package in the directory `dist/` than can be installed:
+That produces a wheel package in the directory `dist/` that can be installed (this also provides an `onedrive-gui` command):
 
 ```
-python3 -m pip install dist/onedrive_gui-1.3.2-py3-none-any.whl
+python3 -m pip install dist/onedrive_gui-*.whl
 ```
 
 ## Running from Source

@@ -29,7 +29,8 @@ def get_executable_path() -> str:
     For AppImage installations, returns the path to the AppImage file.
     For frozen (PyInstaller) builds, returns the path to the binary.
     For system installations, returns the absolute path of the installed executable.
-    For source installations, returns the current interpreter plus the main script.
+    For pip installations, returns the absolute path of the console script.
+    For source installations, returns the current interpreter running the package module.
 
     Returns:
         str: Exec command with absolute, quoted paths
@@ -41,15 +42,18 @@ def get_executable_path() -> str:
     if getattr(sys, "frozen", False):
         return f'"{sys.executable}"'
 
-    for exe_name in ("OneDriveGUI", "onedrivegui"):
+    for exe_name in ("OneDriveGUI", "onedrivegui", "onedrive-gui"):
         exe_path = shutil.which(exe_name)
         if exe_path:
             return f'"{exe_path}"'
 
     # Running from source, so no executable exists on PATH. A bare command name
     # here would produce a desktop entry that silently fails at login.
-    main_script = Path(sys.argv[0]).resolve()
-    return f'"{sys.executable}" "{main_script}"'
+    # The package uses relative imports, so it must be started with "-m onedrive_gui"
+    # rather than by script path, and the directory containing the package must be
+    # importable regardless of the working directory the session manager uses.
+    package_parent = Path(__file__).resolve().parents[2]
+    return f'env PYTHONPATH="{package_parent}" "{sys.executable}" -m onedrive_gui'
 
 
 def get_autostart_file_path() -> Path:
