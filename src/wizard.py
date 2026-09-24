@@ -489,7 +489,7 @@ class wizardPage_create_shared_library(QWizardPage):
         new_profile = {
             profile_name: {
                 "config_file": config_path,
-                "auto_sync": False,
+                "auto_sync": True,
                 "account_type": "",
                 "free_space": "",
             }
@@ -664,7 +664,7 @@ class wizardPage_create(QWizardPage):
         new_profile = {
             profile_name: {
                 "config_file": config_path,
-                "auto_sync": False,
+                "auto_sync": True,
                 "account_type": "",
                 "free_space": "",
             }
@@ -845,7 +845,7 @@ class wizardPage_import(QWizardPage):
         new_profile = {
             profile_name: {
                 "config_file": config_path,
-                "auto_sync": False,
+                "auto_sync": True,
                 "account_type": "",
                 "free_space": "",
             }
