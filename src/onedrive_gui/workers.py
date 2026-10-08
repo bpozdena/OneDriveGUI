@@ -46,6 +46,8 @@ class WorkerThread(QThread):
     remove_worker = Signal(str)
     clear_warning = Signal(str)
     browser_login_required = Signal(str)
+    finalize_stalled_tasks = Signal(str)
+    notify_failed_sync = Signal(str, int)
 
     def __init__(self, profile, options=""):
         super(WorkerThread, self).__init__()
@@ -100,6 +102,15 @@ class WorkerThread(QThread):
         self.pending_error = None
         self.pending_error_path = None
 
+        # Track per-file error messages so the GUI can show why each file failed
+        self.file_errors = {}
+        self.last_unattributed_error = None
+        self.last_error_time = 0.0
+
+        # Signature of the last notified failure list, to avoid repeating
+        # identical tray notifications on every sync cycle
+        self._last_notified_failures = None
+
         # Track failed files for detailed error reporting
         self.failed_files = []
         self.failed_files_count = 0
@@ -137,39 +148,24 @@ class WorkerThread(QThread):
                 break
 
     def _emit_error_status(self, full_error_message):
-        """Format and emit error message with truncation and line splitting."""
-        # Format for status message: max 50 chars per line, up to 3 lines (150 chars total)
-        max_chars_per_line = 50
-        max_lines = 3
-        max_total_chars = max_chars_per_line * max_lines
+        """Emit a short, categorized status message. The full error message is kept
+        for the warning icon tooltip, and per-file details are shown when hovering
+        the failed files in the file operation list."""
+        lower = full_error_message.lower()
 
-        if len(full_error_message) > max_total_chars:
-            # Truncate to 150 chars total
-            display_text = full_error_message[: max_total_chars - 3] + "..."
+        if "name is too long" in lower:
+            short_error = "File or folder name too long"
+        elif "case-insensitive match" in lower:
+            short_error = "File name conflicts with an existing file on OneDrive"
+        elif "permission denied" in lower:
+            short_error = "File cannot be read (permission denied)"
+        elif "no space left" in lower or "insufficient space" in lower:
+            short_error = "Not enough disk space"
         else:
-            display_text = full_error_message
+            # Unknown error: keep the beginning of the message on a single line
+            short_error = full_error_message if len(full_error_message) <= 90 else full_error_message[:87] + "..."
 
-        # Split into lines of max 50 characters
-        lines = []
-        words = display_text.split()
-        current_line = ""
-
-        for word in words:
-            if len(current_line) + len(word) + 1 <= max_chars_per_line:
-                current_line += word + " "
-            else:
-                if current_line:
-                    lines.append(current_line.strip())
-                current_line = word + " "
-                if len(lines) >= max_lines:
-                    break
-
-        if current_line and len(lines) < max_lines:
-            lines.append(current_line.strip())
-
-        truncated_error = "\n".join(lines)
-
-        self.profile_status["status_message"] = f"Error: {truncated_error}"
+        self.profile_status["status_message"] = f"Error: {short_error}"
         self.profile_status["error_message"] = full_error_message  # Full error for tooltip
         self.update_profile_status.emit(self.profile_status, self.profile_name)
 
@@ -198,6 +194,13 @@ class WorkerThread(QThread):
         self.profile_status["status_message"] = status_msg
         self.profile_status["error_message"] = full_tooltip
         self.update_profile_status.emit(self.profile_status, self.profile_name)
+
+        # Raise a tray notification so the user learns about the failures even
+        # when the GUI window is minimized - but only when the set of failing
+        # files changed, so persistent failures do not spam on every cycle.
+        if full_tooltip != self._last_notified_failures:
+            self._last_notified_failures = full_tooltip
+            self.notify_failed_sync.emit(self.profile_name, count)
 
     def read_stdout(self):
         stdout = self.onedrive_process.stdout.readline().strip()
@@ -269,19 +272,31 @@ class WorkerThread(QThread):
                     "No changes or items that can be applied were discovered",
                 ]
             ):
-                # Clear warnings when sync completes without errors
-                self.profile_status.pop("error_message", None)
-                self.clear_warning.emit(self.profile_name)
-                self.msg = "OneDrive sync is complete."
-                logging.info(f"[{self.profile_name}] {self.msg}")
-                self.profile_status["status_message"] = self.msg
-                self.update_profile_status.emit(self.profile_status, self.profile_name)
+                if self.failed_files or self.failed_files_count:
+                    # This sync cycle had files that failed to sync - keep the
+                    # "completed with errors" state (status message, warning icon
+                    # and tray) until a cycle completes without any failures, so
+                    # the user stays aware of the background failures.
+                    count = self.failed_files_count if self.failed_files_count > 0 else len(self.failed_files)
+                    logging.warning(f"[{self.profile_name}] Sync finished with {count} failed item(s) - keeping error state")
+                else:
+                    # Clear warnings when sync completes without errors
+                    self.profile_status.pop("error_message", None)
+                    self.clear_warning.emit(self.profile_name)
+                    self.msg = "OneDrive sync is complete."
+                    logging.info(f"[{self.profile_name}] {self.msg}")
+                    self.profile_status["status_message"] = self.msg
+                    self.update_profile_status.emit(self.profile_status, self.profile_name)
+                # Finalize any transfers that never reported completion during the cycle.
+                self.finalize_stalled_tasks.emit(self.profile_name)
 
             elif "Sync with Microsoft OneDrive has completed, however there are items that failed to sync" in stdout:
                 self.msg = "OneDrive sync completed with errors."
                 logging.warning(f"[{self.profile_name}] {self.msg}")
                 self.profile_status["status_message"] = self.msg
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
+                # Finalize any transfers that never reported completion during the cycle.
+                self.finalize_stalled_tasks.emit(self.profile_name)
 
             elif "Remaining Free Space" in stdout:
                 try:
@@ -315,19 +330,33 @@ class WorkerThread(QThread):
                 self.failed_files = []
                 self.failed_files_count = 0
                 self.collecting_failed_files = False
+                self.file_errors = {}
+                self.last_unattributed_error = None
+                self._last_notified_failures = None
                 self.msg = "Initializing the OneDrive API"
                 logging.info(f"[{self.profile_name}] {self.msg}")
                 self.profile_status["status_message"] = self.msg
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif "Starting a sync with Microsoft OneDrive" in stdout:
-                # Clear warnings when a new sync cycle starts
-                self.profile_status.pop("error_message", None)
-                self.clear_warning.emit(self.profile_name)
+                # A new sync cycle starts. Reset the failed-files list of the
+                # previous cycle, but keep its warning (if any) visible until
+                # this cycle completes, so the user stays informed that files
+                # failed to sync.
+                previous_cycle_had_failures = bool(self.failed_files or self.failed_files_count)
+                self.failed_files = []
+                self.failed_files_count = 0
+                self.collecting_failed_files = False
+                if not previous_cycle_had_failures:
+                    self.profile_status.pop("error_message", None)
+                    self.clear_warning.emit(self.profile_name)
                 self.msg = "Starting a sync with Microsoft OneDrive"
                 logging.info(f"[{self.profile_name}] {self.msg}")
                 self.profile_status["status_message"] = self.msg
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
+                # Finalize transfers left over from a previous cycle that never
+                # reported completion (e.g. the client was killed mid-sync).
+                self.finalize_stalled_tasks.emit(self.profile_name)
 
             elif "Processing:" in stdout or "Number of items to download from Microsoft OneDrive" in stdout or "OneDrive Client requested to create" in stdout:
                 items_left = re.match(r"^Processing\s([0-9]+)\sOneDrive\sitems", stdout)
@@ -368,6 +397,7 @@ class WorkerThread(QThread):
                     self.file_path = re.search(r"\b[file:]+\s(.+)\s+\.\.\.", stdout)
 
                 transfer_complete = any(["done" in stdout, "Deleting" in stdout, "Moving" in stdout])
+                transfer_failed = "failed!" in stdout
                 progress = "0"
 
                 transfer_progress_new = {
@@ -375,8 +405,21 @@ class WorkerThread(QThread):
                     "file_path": "unknown file name" if self.file_path is None else self.file_path.group(1),
                     "progress": progress,
                     "transfer_complete": transfer_complete,
+                    "transfer_failed": transfer_failed,
                     "timestamp": datetime.now() if transfer_complete else None,
                 }
+
+                if transfer_failed:
+                    # Attach the reason why this file failed, if we know it.
+                    error_message = self.file_errors.get(transfer_progress_new["file_path"])
+                    if error_message is None and self.last_unattributed_error and (time.time() - self.last_error_time) < 10:
+                        # API error blocks (e.g. HTTP 400) carry no path - they are
+                        # printed just before the client retries the same file and
+                        # reports the failed transfer, so attribute them here.
+                        error_message = self.last_unattributed_error
+                        self.last_unattributed_error = None
+                        self.file_errors[transfer_progress_new["file_path"]] = error_message
+                    transfer_progress_new["error_message"] = error_message
 
                 # Update file transfer list
                 logging.debug(transfer_progress_new)
@@ -478,10 +521,28 @@ class WorkerThread(QThread):
                             full_error_message = f"{self.pending_error} {additional_error}"
                     else:
                         full_error_message = self.pending_error
+                    # Remember the error for the file it refers to (local file system
+                    # error blocks include a "Path:" line), or as the most recent
+                    # error to be attributed to the next transfer that fails.
+                    if self.pending_error_path:
+                        self.file_errors[self.pending_error_path] = full_error_message
+                    self.last_unattributed_error = full_error_message
+                    self.last_error_time = time.time()
                     self.pending_error = None  # Clear pending error
                     self.pending_error_path = None
                     logging.error(f"[{self.profile_name}] {full_error_message}")
                     self._emit_error_status(full_error_message)
+
+            elif "Error Reason:" in stdout:
+                # API error blocks print the human-readable reason on the line after
+                # "Error Message:" - append it to the last error so the per-file
+                # tooltip explains the actual cause (e.g. file name too long), and
+                # re-emit the status so it can be categorized into a short message.
+                if self.last_unattributed_error and "Error Reason" not in self.last_unattributed_error:
+                    reason = stdout.split("Error Reason:", 1)[1].strip()
+                    self.last_unattributed_error = f"{self.last_unattributed_error} - {reason}"
+                    self.last_error_time = time.time()
+                    self._emit_error_status(self.last_unattributed_error)
 
             elif self.pending_error and "Path:" in stdout:
                 # Capture the affected file/folder path from a multi-line ERROR block
@@ -499,6 +560,14 @@ class WorkerThread(QThread):
                     # Store as pending error to check if next line has "Error Message:"
                     self.pending_error = error_text
                     self.pending_error_path = None
+
+            elif stdout.startswith("Skipping uploading this"):
+                # Examples:
+                #   Skipping uploading this new file due to 'case-insensitive match': ./file
+                #   Skipping uploading this file as it cannot be read (file permissions or file corruption): ./file
+                match = re.match(r"Skipping uploading this (?:new )?file (.*?): (.+)$", stdout)
+                if match:
+                    self.file_errors[match.group(2).strip()] = f"Skipped uploading {match.group(1)}"
 
             elif "Failed items to upload to/from Microsoft OneDrive:" in stdout:
                 # Extract the count of failed items
@@ -519,6 +588,21 @@ class WorkerThread(QThread):
                     # Add to list, limiting to 25 entries
                     if len(self.failed_files) < 25:
                         self.failed_files.append(failed_entry)
+
+                    # Mark the matching entry in the file operation list as failed,
+                    # or create one for files that failed before a transfer was shown
+                    # (e.g. skipped due to permission errors or name conflicts).
+                    transfer_progress_new = {
+                        "file_operation": "Uploading" if operation == "upload" else "Downloading",
+                        "file_path": file_path,
+                        "progress": "0",
+                        "transfer_complete": False,
+                        "transfer_failed": True,
+                        "error_message": self.file_errors.get(file_path),
+                        "timestamp": None,
+                    }
+                    logging.debug(transfer_progress_new)
+                    self.update_progress_new.emit(transfer_progress_new, self.profile_name)
 
             elif "Unknown key in config file:" in stdout:
                 # Extract the invalid config key
@@ -746,6 +830,8 @@ class TaskList(QWidget, Ui_list_item_widget):
         # Store completion timestamp for relative time display
         self.completion_timestamp = None
         self._original_file_name = ""
+        self._file_path = ""
+        self.transfer_state = "Uploading"
 
         # Enable text eliding for ls_label_2 to prevent horizontal overflow
         self.ls_label_2.setWordWrap(False)
@@ -773,6 +859,41 @@ class TaskList(QWidget, Ui_list_item_widget):
     def get_file_name(self):
         return self._original_file_name
 
+    def set_file_path(self, file_path):
+        """Store the absolute path of the file this row refers to, so rows for
+        identically-named files in different folders can be told apart."""
+        self._file_path = file_path
+
+    def get_file_path(self):
+        return self._file_path
+
+    def set_state(self, state):
+        """Set transfer state: 'Uploading', 'Downloading', 'Complete' or 'Failed'."""
+        self.transfer_state = state
+
+    def get_state(self):
+        return self.transfer_state
+
+    def clone(self):
+        """Create a new widget displaying the same row.
+
+        Needed when moving a row within the list: Qt deletes a row's widget when
+        the row is taken out of a QListWidget, so a moved row must be given a
+        fresh widget instead of reusing the old one."""
+        new_widget = TaskList()
+        new_widget.set_file_name(self._original_file_name)
+        new_widget.set_file_path(self._file_path)
+        new_widget.set_state(self.transfer_state)
+        new_widget.set_progress(self.ls_progressBar.value())
+        new_widget.set_custom_icon(self.toolButton.icon())
+        new_widget.set_label_1(self.ls_label_1.text())
+        new_widget.set_label_2(self.ls_label_2.text())
+        new_widget.set_completion_timestamp(self.completion_timestamp)
+        new_widget.set_timestamp(self.ls_label_timestamp.text())
+        new_widget.set_tooltip(self.toolTip())
+        new_widget.hide_progress_bar(self.ls_progressBar.isHidden())
+        return new_widget
+
     def set_progress(self, percentage):
         self.ls_progressBar.setValue(percentage)
 
@@ -785,6 +906,11 @@ class TaskList(QWidget, Ui_list_item_widget):
         font_metrics = QFontMetrics(self.ls_label_2.font())
         elided_text = font_metrics.elidedText(text, Qt.ElideRight, self.ls_label_2_max_width)
         self.ls_label_2.setText(elided_text)
+
+    def set_tooltip(self, text):
+        """Show text on hover anywhere on the row, e.g. the full path of a failed
+        file and the error message explaining why it failed."""
+        self.setToolTip(text)
 
     def set_timestamp(self, text):
         """Set the timestamp label text"""

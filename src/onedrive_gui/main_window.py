@@ -84,6 +84,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowTitle(f"OneDriveGUI v{version}")
         self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-cloud-80.png"))
         self.trash_icon = QApplication.style().standardIcon(QStyle.SP_TrashIcon)
+        self.fail_icon = QApplication.style().standardIcon(QStyle.SP_MessageBoxWarning)
 
         if gui_settings.get("frameless_window") == "True":
             self.setWindowFlags(Qt.FramelessWindowHint)
@@ -744,6 +745,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         workers[profile_name].update_progress_new.connect(self.event_update_progress)
         workers[profile_name].update_profile_status.connect(self.event_update_profile_status)
         workers[profile_name].clear_warning.connect(self.clear_warning_handler)
+        workers[profile_name].finalize_stalled_tasks.connect(self.event_finalize_stalled_tasks)
+        workers[profile_name].notify_failed_sync.connect(self.show_failed_sync_notification)
         workers[profile_name].started.connect(lambda: logging.info(f"started worker {profile_name}"))
         workers[profile_name].finished.connect(lambda: logging.info(f"finished worker {profile_name}"))
         try:
@@ -757,6 +760,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 "OneDriveGUI - Login required",
                 f"Please complete the OneDrive login for '{profile_name}' in the web browser window that just opened.",
                 QSystemTrayIcon.Information,
+                10000,
+            )
+
+    def show_failed_sync_notification(self, profile_name, count):
+        """Show a tray balloon when files fail to sync, so the user is informed
+        even when the GUI window is minimized."""
+        if self.tray:
+            self.tray.showMessage(
+                "OneDriveGUI - Sync completed with errors",
+                f"'{profile_name}': {count} file(s) failed to sync.\nHover the failed entries in the file operation list for details.",
+                QSystemTrayIcon.Warning,
                 10000,
             )
 
@@ -864,7 +878,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "file_operation": file_operation.group(1),
             "file_path": file_path.group(1),
             "progress": progress.group(1),
-            "transfer_complete": transfer_complete
+            "transfer_complete": transfer_complete,
+            "transfer_failed": transfer_failed
         }
         """
         _sync_dir = os.path.expanduser(global_config[profile]["onedrive"]["sync_dir"].strip('"'))
@@ -873,7 +888,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         file_path = f"{_sync_dir}" + "/" + data["file_path"]
         absolute_path = QFileInfo(file_path).absolutePath().replace(" ", "%20")
         relative_path_display = os.path.relpath(QFileInfo(file_path).absolutePath(), _sync_dir + os.path.sep)
-        parent_dir = re.search(r".+/([^/]+)/.+$", file_path).group(1)
+        parent_dir_match = re.search(r".+/([^/]+)/.+$", file_path)
+        parent_dir = parent_dir_match.group(1) if parent_dir_match else ""
         file_size = QFileInfo(file_path + ".partial").size() if QFileInfo(file_path).size() == 0 else QFileInfo(file_path).size()
         file_size_human = humanize_file_size(file_size)
         file_name = QFileInfo(file_path).fileName()
@@ -882,94 +898,142 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         progress_data_human = humanize_file_size(progress_data)
         file_operation = data["file_operation"]
         transfer_complete = data["transfer_complete"]
+        transfer_failed = data.get("transfer_failed", False)
         move_scrollbar = True
         new_list_item = True
 
+        if transfer_failed:
+            item_state = "Failed"
+        elif transfer_complete or file_operation in ("Deleting", "Moving"):
+            item_state = "Complete"
+        else:
+            item_state = file_operation
+
+        # Find an existing row for the same file to update. Matching is done on the
+        # full path (not just the file name) so that identically-named files in
+        # different folders each keep their own row. If the file is already in the
+        # list and its progress bar is not complete, update the existing item;
+        # otherwise skip and create a new item.
+        item = None
         for row in range(50):
             # Check last 50 entries to see if the file is already in the list.
-            if self.profile_status_pages[profile].listWidget.item(row) != None:
-                item = self.profile_status_pages[profile].listWidget.item(row)
-                item_widget = self.profile_status_pages[profile].listWidget.itemWidget(item)
-                item_file_name = item_widget.get_file_name()
-                item_incomplete = item_widget.get_timestamp_text() == ""
+            candidate = self.profile_status_pages[profile].listWidget.item(row)
+            if candidate is None:
+                continue
+            candidate_widget = self.profile_status_pages[profile].listWidget.itemWidget(candidate)
+            if candidate_widget.get_file_path() == file_path and candidate_widget.get_timestamp_text() == "":
+                item = candidate
+                break
 
-                if file_name == item_file_name and item_incomplete:
-                    # If current file is already in the list and progress bar is not complete, update the existing item.
-                    # Otherwise skip and create a new item.
-                    logging.debug("Updating list item")
+        if item is not None:
+            item_widget = self.profile_status_pages[profile].listWidget.itemWidget(item)
+            item_file_name = item_widget.get_file_name()
+            previous_state = item_widget.get_state()
+            logging.debug("Updating list item")
 
-                    item_widget.set_progress(int(progress))
-                    item_widget.set_icon(file_path)
-                    item_widget.hide_progress_bar(transfer_complete)
+            item_widget.set_file_path(file_path)
+            item_widget.set_state(item_state)
+            item_widget.set_progress(int(progress))
+            item_widget.set_icon(file_path)
+            item_widget.hide_progress_bar(transfer_complete or transfer_failed)
 
-                    if file_operation == "Deleting":
-                        item_widget.set_label_1(f"Deleted from {parent_dir}")
-                        item_widget.set_custom_icon(self.trash_icon)
-                        item_widget.set_label_2(f"")
-                        # Store timestamp and display for deleted files
-                        if "timestamp" in data and data["timestamp"]:
-                            item_widget.set_completion_timestamp(data["timestamp"])
-                            relative_time = format_relative_time(data["timestamp"])
-                            item_widget.set_timestamp(relative_time)
-                        else:
-                            item_widget.set_timestamp("")
+            if file_operation == "Deleting":
+                item_widget.set_label_1(f"Deleted from {parent_dir}")
+                item_widget.set_custom_icon(self.trash_icon)
+                item_widget.set_label_2(f"")
+                # Store timestamp and display for deleted files
+                if "timestamp" in data and data["timestamp"]:
+                    item_widget.set_completion_timestamp(data["timestamp"])
+                    relative_time = format_relative_time(data["timestamp"])
+                    item_widget.set_timestamp(relative_time)
+                else:
+                    item_widget.set_timestamp("")
 
-                    elif file_operation == "Moving":
-                        item_widget.set_label_1(f"Trashed from {parent_dir}")
-                        item_widget.set_label_2(f"")
-                        # Store timestamp and display for moved files
-                        if "timestamp" in data and data["timestamp"]:
-                            item_widget.set_completion_timestamp(data["timestamp"])
-                            relative_time = format_relative_time(data["timestamp"])
-                            item_widget.set_timestamp(relative_time)
-                        else:
-                            item_widget.set_timestamp("")
+            elif file_operation == "Moving":
+                item_widget.set_label_1(f"Trashed from {parent_dir}")
+                item_widget.set_label_2(f"")
+                # Store timestamp and display for moved files
+                if "timestamp" in data and data["timestamp"]:
+                    item_widget.set_completion_timestamp(data["timestamp"])
+                    relative_time = format_relative_time(data["timestamp"])
+                    item_widget.set_timestamp(relative_time)
+                else:
+                    item_widget.set_timestamp("")
 
-                    elif transfer_complete and file_operation == "Uploading":
-                        shortened_path = shorten_path(relative_path_display, 32)
-                        item_widget.set_label_1(f"Uploaded from <a href=file:///{absolute_path}>{shortened_path}</a>")
-                        item_widget.set_label_2(f"{file_size_human}")
-                        # Store timestamp and display in separate timestamp label
-                        if "timestamp" in data and data["timestamp"]:
-                            item_widget.set_completion_timestamp(data["timestamp"])
-                            relative_time = format_relative_time(data["timestamp"])
-                            item_widget.set_timestamp(relative_time)
-                        else:
-                            item_widget.set_timestamp("")
+            elif transfer_failed:
+                # The transfer failed - mark the item as failed instead of
+                # leaving it in a perpetual "uploading" state. The path links
+                # to the file's folder so the user can quickly locate and fix
+                # the file; hovering shows the full path. The timestamp
+                # is deliberately left empty so repeated attempts of the
+                # same file update this row rather than adding duplicates,
+                # and a later successful upload flips it back to "Uploaded".
+                failed_operation = "Upload" if file_operation == "Uploading" else "Download"
+                shortened_path = shorten_path(relative_path_display, 32)
+                item_widget.set_label_1(f"{failed_operation} failed - <a href=file:///{absolute_path}>{shortened_path}</a>")
+                item_widget.set_label_2(f"")
+                item_widget.set_custom_icon(self.fail_icon)
+                item_widget.set_timestamp("")
+                item_widget.set_tooltip(self._failed_file_tooltip(file_path, data.get("error_message")))
 
-                    elif transfer_complete and file_operation == "Downloading":
-                        shortened_path = shorten_path(relative_path_display, 32)
-                        item_widget.set_label_1(f"Downloaded from <a href=file:///{absolute_path}>{shortened_path}</a>")
-                        item_widget.set_label_2(f"{file_size_human}")
-                        # Store timestamp and display in separate timestamp label
-                        if "timestamp" in data and data["timestamp"]:
-                            item_widget.set_completion_timestamp(data["timestamp"])
-                            relative_time = format_relative_time(data["timestamp"])
-                            item_widget.set_timestamp(relative_time)
-                        else:
-                            item_widget.set_timestamp("")
+            elif transfer_complete and file_operation == "Uploading":
+                shortened_path = shorten_path(relative_path_display, 32)
+                item_widget.set_label_1(f"Uploaded from <a href=file:///{absolute_path}>{shortened_path}</a>")
+                item_widget.set_label_2(f"{file_size_human}")
+                # Store timestamp and display in separate timestamp label
+                if "timestamp" in data and data["timestamp"]:
+                    item_widget.set_completion_timestamp(data["timestamp"])
+                    relative_time = format_relative_time(data["timestamp"])
+                    item_widget.set_timestamp(relative_time)
+                else:
+                    item_widget.set_timestamp("")
 
-                    elif file_operation == "Downloading":
-                        # Estimate final size of file before download completes
-                        # Adding 5% to progress as the OD client report status 5% behind.
-                        item_widget.set_label_1(file_operation)
-                        item_widget.set_label_2(f"{humanize_file_size(file_size)} of ~{humanize_file_size(int(file_size) / (int(progress) + 5) * 100)}")
-                    else:
-                        item_widget.set_label_1(file_operation)
-                        item_widget.set_label_2(f"{progress_data_human} of {file_size_human}")
+            elif transfer_complete and file_operation == "Downloading":
+                shortened_path = shorten_path(relative_path_display, 32)
+                item_widget.set_label_1(f"Downloaded from <a href=file:///{absolute_path}>{shortened_path}</a>")
+                item_widget.set_label_2(f"{file_size_human}")
+                # Store timestamp and display in separate timestamp label
+                if "timestamp" in data and data["timestamp"]:
+                    item_widget.set_completion_timestamp(data["timestamp"])
+                    relative_time = format_relative_time(data["timestamp"])
+                    item_widget.set_timestamp(relative_time)
+                else:
+                    item_widget.set_timestamp("")
 
-                    self.profile_status_pages[profile].listWidget.setItemWidget(item, item_widget)
-                    new_list_item = False
-                    logging.debug(f"List item updated for file {item_file_name}")
-                    break
+            elif file_operation == "Downloading":
+                # Estimate final size of file before download completes
+                # Adding 5% to progress as the OD client report status 5% behind.
+                item_widget.set_label_1(file_operation)
+                item_widget.set_label_2(f"{humanize_file_size(file_size)} of ~{humanize_file_size(int(file_size) / (int(progress) + 5) * 100)}")
+            else:
+                item_widget.set_label_1(file_operation)
+                item_widget.set_label_2(f"{progress_data_human} of {file_size_human}")
+
+            listWidget = self.profile_status_pages[profile].listWidget
+            if transfer_failed and listWidget.row(item) != 0:
+                # Move the failed entry to the top of the list so it stays
+                # visible and does not scroll away below synced files.
+                self._move_list_item(listWidget, item, 0)
+            elif previous_state == "Failed" and item_state != "Failed":
+                # A previously failed entry completed (e.g. the user fixed the
+                # file) - move it below the block of failed entries pinned at
+                # the top, so the remaining failures stay visible.
+                target_row = self._first_row_below_failed_block(listWidget, exclude_item=item)
+                self._move_list_item(listWidget, item, target_row)
+            else:
+                listWidget.setItemWidget(item, item_widget)
+            new_list_item = False
+            logging.debug(f"List item updated for file {item_file_name}")
 
         if new_list_item:
             logging.debug(f"Adding new list item for file {file_name}")
             myQCustomQWidget = TaskList()
             myQCustomQWidget.set_file_name(file_name)
+            myQCustomQWidget.set_file_path(file_path)
+            myQCustomQWidget.set_state(item_state)
             myQCustomQWidget.set_progress(int(progress))
             myQCustomQWidget.set_icon(file_path)
-            myQCustomQWidget.hide_progress_bar(transfer_complete)
+            myQCustomQWidget.hide_progress_bar(transfer_complete or transfer_failed)
 
             if file_operation == "Deleting":
                 myQCustomQWidget.set_label_1(f"Deleted from {parent_dir}")
@@ -993,6 +1057,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     myQCustomQWidget.set_timestamp(relative_time)
                 else:
                     myQCustomQWidget.set_timestamp("")
+
+            elif transfer_failed:
+                # The transfer failed before an item existed - create it in the failed
+                # state so the failure is visible in the file operation list.
+                failed_operation = "Upload" if file_operation == "Uploading" else "Download"
+                shortened_path = shorten_path(relative_path_display, 32)
+                myQCustomQWidget.set_label_1(f"{failed_operation} failed - <a href=file:///{absolute_path}>{shortened_path}</a>")
+                myQCustomQWidget.set_label_2(f"")
+                myQCustomQWidget.set_custom_icon(self.fail_icon)
+                myQCustomQWidget.set_tooltip(self._failed_file_tooltip(file_path, data.get("error_message")))
 
             elif transfer_complete and file_operation == "Uploading":
                 shortened_path = shorten_path(relative_path_display, 32)
@@ -1033,9 +1107,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # Set size hint
             myQListWidgetItem.setSizeHint(myQCustomQWidget.sizeHint())
 
-            # Add QListWidgetItem into QListWidget
+            # Add QListWidgetItem into QListWidget. Failed transfers are pinned
+            # at the top so they stay visible; all other entries are inserted
+            # below the block of failed entries.
             listWidget = self.profile_status_pages[profile].listWidget
-            listWidget.insertItem(0, myQListWidgetItem)
+            insert_row = 0 if transfer_failed else self._first_row_below_failed_block(listWidget)
+            listWidget.insertItem(insert_row, myQListWidgetItem)
             listWidget.setItemWidget(myQListWidgetItem, myQCustomQWidget)
 
             # If the list is not scrolled all the way to the top, increment the scroll value so that the list stays in the same spot when new items are added.
@@ -1047,6 +1124,104 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # Limit list to 10k items to fix #208.
             if listWidget.count() > 10_000:
                 listWidget.takeItem(listWidget.count() - 1)
+
+    @staticmethod
+    def _failed_file_tooltip(file_path, error_message):
+        """Build hover text for a failed transfer: full file path and, when known,
+        the error message explaining why the file failed to sync."""
+        tooltip = QFileInfo(file_path).absoluteFilePath()
+        if error_message:
+            # Keep the tooltip readable even for very long API error messages.
+            error_message = error_message.strip()
+            if len(error_message) > 500:
+                error_message = error_message[:500] + "..."
+            tooltip += f"\n\nError: {error_message}"
+        return tooltip
+
+    @staticmethod
+    def _move_list_item(list_widget, item, target_row):
+        """
+        Move an item to the given row within the list. Qt deletes a row's widget
+        when the row is taken out of a QListWidget, so the widget is cloned
+        before the move and the row gets the fresh clone - reusing the old
+        widget would leave a dangling pointer in the view and crash on repaint.
+        """
+        item_widget = list_widget.itemWidget(item)
+        if item_widget is None:
+            return
+        new_widget = item_widget.clone()
+        row = list_widget.row(item)
+        list_widget.takeItem(row)
+        if row < target_row:
+            target_row -= 1
+        target_row = max(0, min(target_row, list_widget.count()))
+        list_widget.insertItem(target_row, item)
+        list_widget.setItemWidget(item, new_widget)
+
+    @staticmethod
+    def _first_row_below_failed_block(list_widget, exclude_item=None):
+        """
+        Index of the first row below the block of failed entries pinned at the
+        top of the list. `exclude_item` is skipped when scanning (used when the
+        row being relocated is itself non-failed and sits inside the block).
+        """
+        for row in range(list_widget.count()):
+            item = list_widget.item(row)
+            if exclude_item is not None and item == exclude_item:
+                continue
+            row_widget = list_widget.itemWidget(item)
+            if row_widget is None or row_widget.get_state() != "Failed":
+                return row
+        return list_widget.count()
+
+    def event_finalize_stalled_tasks(self, profile):
+        """
+        Mark file transfers that never reported completion during a sync cycle as
+        failed, so they do not stay in a perpetual 'uploading' state in the list.
+        Called at sync cycle boundaries (start and end of each cycle).
+        """
+        if profile not in self.profile_status_pages:
+            return
+
+        try:
+            _sync_dir = os.path.expanduser(global_config[profile]["onedrive"]["sync_dir"].strip('"'))
+        except KeyError:
+            return
+
+        list_widget = self.profile_status_pages[profile].listWidget
+
+        # Collect stalled rows first - moving items to the top below would
+        # shift the row indices while iterating.
+        stalled_items = []
+        for row in range(list_widget.count()):
+            item = list_widget.item(row)
+            item_widget = list_widget.itemWidget(item)
+            if item_widget is not None and item_widget.get_state() in ("Uploading", "Downloading"):
+                stalled_items.append((item, item_widget))
+
+        for item, item_widget in stalled_items:
+            full_path = item_widget.get_file_path()
+            parent_dir = QFileInfo(full_path).absolutePath()
+            relative_path_display = os.path.relpath(parent_dir, _sync_dir + os.path.sep)
+            failed_operation = "Download" if item_widget.get_state() == "Downloading" else "Upload"
+            shortened_path = shorten_path(relative_path_display, 32)
+
+            item_widget.set_state("Failed")
+            item_widget.hide_progress_bar(True)
+            item_widget.set_label_1(f"{failed_operation} failed - <a href=file:///{parent_dir.replace(' ', '%20')}>{shortened_path}</a>")
+            item_widget.set_label_2("")
+            item_widget.set_custom_icon(self.fail_icon)
+            item_widget.set_timestamp("")
+            sweep_reason = "Transfer did not complete during the sync cycle (no specific error was reported)."
+            item_widget.set_tooltip(self._failed_file_tooltip(full_path, sweep_reason))
+            # Move the failed entry to the top of the list so it stays visible.
+            if list_widget.row(item) != 0:
+                self._move_list_item(list_widget, item, 0)
+            else:
+                list_widget.setItemWidget(item, item_widget)
+
+        if stalled_items:
+            logging.info(f"[{profile}] Marked {len(stalled_items)} stalled transfer(s) as failed")
 
     def on_list_scrolled(self, value):
         """
