@@ -600,9 +600,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if profile_name in self.profile_status_pages:
                 status_msg = self.profile_status_pages[profile_name].label_onedrive_status.text()
                 error_tooltip = self.profile_status_pages[profile_name].label_error_icon.toolTip()
+                # Label holds the live value while sync runs, or the last known
+                # value restored from global_config on startup.
+                free_space = self.profile_status_pages[profile_name].label_free_space.text()
             else:
                 status_msg = ""
                 error_tooltip = ""
+                free_space = ""
 
             # Categorize this profile's state
             if not is_running:
@@ -625,7 +629,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 profile_state = "STOPPED"
                 has_stopped = True
 
-            profile_statuses[profile_name] = {"state": profile_state, "status_msg": status_msg if status_msg else "stopped", "is_running": is_running}
+            profile_statuses[profile_name] = {"state": profile_state, "status_msg": status_msg if status_msg else "stopped", "is_running": is_running, "free_space": free_space}
 
         # Determine overall state with priority
         if has_error:
@@ -642,43 +646,36 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def generate_tray_tooltip(self, overall_state, running_count, total_count, profile_statuses):
         """
         Generate detailed tooltip showing status of all profiles.
+
+        The tooltip window is rendered by the desktop environment at a fixed
+        narrow width - the application cannot make it wider - and long profile
+        names (e.g. email addresses) already use most of that width. Each value
+        therefore gets its own short indented line under the profile name, so
+        the free space (#309) and status never wrap away from their meaning.
+        Profiles are separated by blank lines so multi-profile listings stay
+        scannable.
         """
         if not profile_statuses:
             return "OneDriveGUI - No profiles configured"
 
-        # Summary line
-        if running_count == total_count and overall_state != "ERROR":
-            summary = f"All {total_count} profile(s) running"
-        elif running_count == 0:
-            summary = f"All {total_count} profile(s) stopped"
-        else:
-            summary = f"{running_count} of {total_count} profile(s) running"
-
-        # Add overall state indicator
+        state_tags = {"ERROR": "[ERROR]", "STOPPED": "[STOPPED]", "SYNCING": "[SYNCING]", "IDLE": "[IDLE]"}
         state_indicators = {"ERROR": "Sync error detected", "STOPPED": "Sync stopped", "SYNCING": "Syncing...", "IDLE": "All syncs complete"}
-        summary += f" - {state_indicators.get(overall_state, '')}"
+        lines = [f"{running_count}/{total_count} profile(s) running - {state_indicators.get(overall_state, '')}"]
 
-        # Build detailed list
-        lines = [summary, ""]
         for profile_name, status_info in profile_statuses.items():
-            state = status_info["state"]
+            # Each profile is its own block, separated by a blank line
+            lines.append("")
+            lines.append(f"{profile_name} {state_tags.get(status_info['state'], '[IDLE]')}")
+
+            free_space = status_info.get("free_space", "")
+            if free_space and free_space != "Not Available":
+                lines.append(f"  Free: {free_space}")
+
             status_msg = status_info["status_msg"]
-
-            # Add text indicator for each profile
-            if state == "ERROR":
-                indicator = "[ERROR]"
-            elif state == "STOPPED":
-                indicator = "[STOPPED]"
-            elif state == "SYNCING":
-                indicator = "[SYNCING]"
-            else:
-                indicator = "[IDLE]"
-
-            # Shorten status message if too long
-            if len(status_msg) > 50:
-                status_msg = status_msg[:47] + "..."
-
-            lines.append(f"{indicator} {profile_name}: {status_msg}")
+            if status_msg and status_msg != "stopped":
+                if len(status_msg) > 40:
+                    status_msg = status_msg[:37] + "..."
+                lines.append(f"  {status_msg}")
 
         return "\n".join(lines)
 
