@@ -148,8 +148,12 @@ class WorkerThread(QThread):
             "Uploading modified file",
             "Downloading modified file",
             "Deleting item",  # File deleted locally and then removed in the cloud
+            "Deleting online file from",  # File deleted locally and then removed in the cloud (client v2.5.11+)
+            "Deleting online folder from",  # Folder deleted locally and then removed in the cloud (client v2.5.11+)
             "Deleting local file",  # File deleted in the cloud and then removed locally
+            "Deleting local directory",  # Folder deleted in the cloud and then removed locally
             "Moving this local file",  # File deleted in the cloud and then moved to recycling bin locally
+            "Moving this local directory",  # Folder deleted in the cloud and then moved to recycling bin locally
         ]
 
         self.profile_status = {
