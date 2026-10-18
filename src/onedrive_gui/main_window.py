@@ -41,7 +41,7 @@ from .options import (
     version,
 )
 
-from .utils.utils import humanize_file_size, shorten_path, format_relative_time
+from .utils.utils import humanize_file_size, shorten_path, format_relative_time, version_number, MIN_CLIENT_VERSION
 from .workers import WorkerThread, MaintenanceWorker, TaskList, workers, parse_status_timestamp
 from .gui_settings_window import gui_settings_window
 
@@ -345,7 +345,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         version_label_text = ""
         version_tooltip_text = ""
         min_requirements_met = True
-        min_supported_version = 20511  # Enforce minimum version of onedrive client to be 2.5.11, required for the in-browser login flow support added in GUI v1.3.2
+        min_supported_version = MIN_CLIENT_VERSION  # 2.5.11, required for the in-browser login flow support added in GUI v1.3.2
 
         def get_latest_client_version():
             latest_url = "https://api.github.com/repos/abraunegg/onedrive/releases/latest"
@@ -362,11 +362,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 client_version_check = subprocess.check_output([client_bin_path, "--version"], stderr=subprocess.STDOUT)
                 installed_client_version = re.search(r"(v[0-9.]+)", str(client_version_check)).group(1)
 
-                # Zero-pad each component (e.g. "2.5.9" -> "020509") so patch versions
-                # compare correctly regardless of digit count, instead of comparing the
-                # raw concatenated digits (which put "2.5.9" above "2.5.11").
-                version_parts = installed_client_version.replace("v", "").split(".")
-                installed_client_version_num = int("".join(part.zfill(2) for part in version_parts))
+                installed_client_version_num = version_number(installed_client_version)
 
                 return installed_client_version, installed_client_version_num
 
@@ -398,7 +394,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 )
                 min_requirements_met = False
 
-            elif latest_client_version not in installed_client_version[0]:
+            elif installed_client_version[1] < version_number(latest_client_version):
+                # Only warn when the installed client is older than the latest release;
+                # a newer build (e.g. a pre-release from 'master') is not out of date.
                 version_label_text = "OneDrive client is out of date!"
                 version_tooltip_text = f"OneDrive client is out of date! \n Installed: {installed_client_version[0]} \n Latest: {latest_client_version}"
 
