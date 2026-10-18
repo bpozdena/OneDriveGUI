@@ -168,6 +168,8 @@ class WorkerThread(QThread):
             short_error = "File cannot be read (permission denied)"
         elif "no space left" in lower or "insufficient space" in lower:
             short_error = "Not enough disk space"
+        elif "sync_business_shared_folders" in lower:
+            short_error = "Unsupported option 'sync_business_shared_folders' in client config"
         else:
             # Unknown error: keep the beginning of the message on a single line
             short_error = full_error_message if len(full_error_message) <= 90 else full_error_message[:87] + "..."
@@ -482,11 +484,14 @@ class WorkerThread(QThread):
                         # Example: "Downloading file ./200MB.zip ... done"
                         pass
 
-            elif "sync_business_shared_folders" in stdout:
-                self.profile_status["status_message"] = (
-                    'Business Shared Folder <a href="https://github.com/abraunegg/onedrive/blob/master/docs/business-shared-items.md"> has been deprecated</a>.'
+            elif "The option 'sync_business_shared_folders' has been deprecated" in stdout:
+                # The client refuses to start while this removed option is in its config.
+                # OneDriveGUI drops it when profiles are loaded, so this only happens when
+                # the config file was edited by hand while the GUI was running (#287).
+                self._emit_error_status(
+                    "Configuration error: the option 'sync_business_shared_folders' is no longer supported. "
+                    "Remove it from the client config file, or restart OneDriveGUI to remove it automatically."
                 )
-                self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif "Network Connection Issue" in stdout:
                 self.profile_status["status_message"] = "Cannot connect to Microsoft OneDrive Service."
