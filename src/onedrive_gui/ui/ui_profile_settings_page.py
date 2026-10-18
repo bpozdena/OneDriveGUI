@@ -252,6 +252,7 @@ class Ui_profile_settings(object):
 
         self.spinBox_connect_timeout = QSpinBox(self.groupBox_4)
         self.spinBox_connect_timeout.setObjectName(u"spinBox_connect_timeout")
+        self.spinBox_connect_timeout.setMaximum(3600)
 
         self.formLayout_4.setWidget(4, QFormLayout.ItemRole.FieldRole, self.spinBox_connect_timeout)
 
@@ -262,6 +263,7 @@ class Ui_profile_settings(object):
 
         self.spinBox_data_timeout = QSpinBox(self.groupBox_4)
         self.spinBox_data_timeout.setObjectName(u"spinBox_data_timeout")
+        self.spinBox_data_timeout.setMaximum(3600)
 
         self.formLayout_4.setWidget(5, QFormLayout.ItemRole.FieldRole, self.spinBox_data_timeout)
 
