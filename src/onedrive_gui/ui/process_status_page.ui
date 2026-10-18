@@ -171,6 +171,9 @@ QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}</string>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
@@ -313,6 +316,31 @@ QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}</string>
           </property>
           <property name="text">
            <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_show_errors">
+          <property name="styleSheet">
+           <string notr="true">QToolTip { color: white; }
+QPushButton {
+	color: rgb(255, 255, 255);
+	font-weight: bold;
+}
+QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}
+QPushButton:checked {background-color: rgba(0, 0, 0, 0.2)}</string>
+          </property>
+          <property name="toolTip">
+           <string>Failed file transfers - click to show or hide them in the list</string>
+          </property>
+          <property name="text">
+           <string>0 failed</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
           </property>
          </widget>
         </item>

@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'process_status_page.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.0
+## Created by: Qt User Interface Compiler version 6.11.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -79,6 +79,7 @@ class Ui_status_page(object):
         self.label_onedrive_status.setFont(font)
         self.label_onedrive_status.setStyleSheet(u"color: rgb(255, 255, 255);")
         self.label_onedrive_status.setAlignment(Qt.AlignCenter)
+        self.label_onedrive_status.setWordWrap(True)
 
         self.verticalLayout_2.addWidget(self.label_onedrive_status)
 
@@ -136,6 +137,20 @@ class Ui_status_page(object):
         self.label_error_icon.setStyleSheet(u"QToolTip { color: white; }")
 
         self.horizontalLayout_2.addWidget(self.label_error_icon)
+
+        self.pushButton_show_errors = QPushButton(self.frame)
+        self.pushButton_show_errors.setObjectName(u"pushButton_show_errors")
+        self.pushButton_show_errors.setStyleSheet(u"QToolTip { color: white; }\n"
+"QPushButton {\n"
+"	color: rgb(255, 255, 255);\n"
+"	font-weight: bold;\n"
+"}\n"
+"QPushButton:pressed {background-color: rgba(0, 0, 0, 0.1)}\n"
+"QPushButton:checked {background-color: rgba(0, 0, 0, 0.2)}")
+        self.pushButton_show_errors.setCheckable(True)
+        self.pushButton_show_errors.setFlat(True)
+
+        self.horizontalLayout_2.addWidget(self.pushButton_show_errors)
 
         self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
@@ -272,6 +287,10 @@ class Ui_status_page(object):
         self.pushButton_stop.setText(QCoreApplication.translate("status_page", u"Stop", None))
         self.label_version_check.setText("")
         self.label_error_icon.setText("")
+#if QT_CONFIG(tooltip)
+        self.pushButton_show_errors.setToolTip(QCoreApplication.translate("status_page", u"Failed file transfers - click to show or hide them in the list", None))
+#endif // QT_CONFIG(tooltip)
+        self.pushButton_show_errors.setText(QCoreApplication.translate("status_page", u"0 failed", None))
 #if QT_CONFIG(tooltip)
         self.label_free_space.setToolTip(QCoreApplication.translate("status_page", u"Free Space", None))
 #endif // QT_CONFIG(tooltip)
