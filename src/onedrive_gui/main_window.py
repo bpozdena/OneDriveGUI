@@ -206,6 +206,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "tooltip_text": "",
         }
 
+        # Stop the clients and their worker threads before the application is torn
+        # down; destroying a QThread that is still running aborts the process.
+        QApplication.instance().aboutToQuit.connect(self.stop_all_workers)
+
         self.refresh_process_status = QTimer()
         self.refresh_process_status.setSingleShot(False)
         self.refresh_process_status.timeout.connect(self.onedrive_process_status)
@@ -288,18 +292,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         if close_question == QMessageBox.Yes:
             logging.info("Quitting OneDriveGUI")
-            workers_to_stop = []
-
-            for worker in workers:
-                workers_to_stop.append(worker)
-
-            for worker in workers_to_stop:
-                workers[worker].stop_worker()
-
-            sys.exit()
+            self.stop_all_workers()
+            QApplication.instance().quit()
 
         elif close_question == QMessageBox.No:
             logging.info("[GUI] Keeping OneDriveGUI running.")
+
+    def stop_all_workers(self):
+        for profile_name in list(workers):
+            workers[profile_name].stop_worker()
 
     def stop_onedrive_monitor(self, profile_name):
         if profile_name in workers:
