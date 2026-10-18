@@ -6,16 +6,21 @@
 A GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive) with multi-account support.
 ![image](https://github.com/user-attachments/assets/00769399-1a65-4648-8705-7dee81ee4f52)
 
-## Feature Highlights  
+## Feature Highlights
 - Management and configuration of multiple OneDrive accounts.
 - Asynchronous real-time monitoring of multiple OneDrive accounts.
 - Setup wizard for easy OneDrive profile creation and import.
 - Auto-sync on GUI startup.
-- Support for GUI-based login process.
+- Login via the system browser (handled by the OneDrive client) or by pasting the response URL manually.
 - System tray (if supported by your desktop environment).
 - Start minimized to tray/dock.
+- Remembers window size and position between sessions.
 - Input validation to prevent configuration of incompatible OneDrive client options.
 - Progress monitoring of multiple simultaneous file transfers.
+- Failed transfers are grouped behind a `N failed` toggle, with the reason shown on hover.
+- Files skipped because of an invalid name or failing transfers to the local Recycle Bin are reported as failed.
+- Overall sync state from the client's `monitor-status.json` on OneDrive client v2.5.12+ (with v2.5.11 the state is derived from the client output).
+- OneDrive clients are stopped gracefully when OneDriveGUI exits or the session logs out (configurable); a client already running outside the GUI can be taken over on startup.
 - Import and management of SharePoint Shared Libraries.
 - Tooltips with brief explanations of various OneDrive Client configuration options.
 - Prompt for re-sync authorization to prevent unexpected data loss.
@@ -23,8 +28,9 @@ A GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive) with mu
 ## Known Limitations
 - No window shadows for Wayland sessions.
 - No window icon when using AppImage on Wayland sessions.
-- AppImage still requires the use of an external browser for authentication.
-- Check for other reported [issues/limitations](https://github.com/bpozdena/OneDriveGUI/issues). 
+- AppImage: the built-in QWebEngine login window is unavailable; login uses the system browser instead.
+- On Wayland, the compositor decides the window position; only the window size is guaranteed to be restored.
+- Check for other reported [issues/limitations](https://github.com/bpozdena/OneDriveGUI/issues).
 
 ## Compatibility
 - Minimum supported OneDrive client version: **v2.5.11** (required for the client-based browser login flow).
@@ -99,9 +105,10 @@ python3 -m pip install dist/onedrive_gui-*.whl
 # Additional Notes
 - When importing a OneDrive config file, all comments will be removed.
 - If multi-line options `skip_file` and `skip_dir` are used, they will be consolidated into a single line.
+- Options removed from the OneDrive client (`sync_business_shared_folders`, `min_notify_changes`, `force_http_2`) are dropped from the config on the first start after upgrading. The client then detects the config change and asks for a one-time `--resync`.
 - The list of managed OneDrive profiles is stored in `~/.config/onedrive-gui/profiles`. You can manually rename your profile or path to the config file there.
 - Newly created OneDrive config files are stored in `~/.config/onedrive/accounts/<profile_name>`.
-- Debug logs are saved in ``. Logging can be changed in the GUI settings.
+- Logs are written to the file configured in the GUI settings (default `/tmp/onedrive-gui/onedrive-gui.log`) and rotate based on the configured interval and maximum file size.
 
 # Attribution
 - Icons by <a target="_blank" href="https://icons8.com">Icons8</a>
