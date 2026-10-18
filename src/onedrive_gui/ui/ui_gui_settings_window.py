@@ -205,6 +205,23 @@ class Ui_gui_settings_window(object):
 
         self.horizontalLayout_2.addWidget(self.spinBox_log_backup_count)
 
+        self.horizontalLayout_log_max_size = QHBoxLayout()
+        self.horizontalLayout_log_max_size.setObjectName(u"horizontalLayout_log_max_size")
+        self.label_log_max_file_size = QLabel(self.groupBox_2)
+        self.label_log_max_file_size.setObjectName(u"label_log_max_file_size")
+
+        self.horizontalLayout_log_max_size.addWidget(self.label_log_max_file_size)
+
+        self.spinBox_log_max_file_size = QSpinBox(self.groupBox_2)
+        self.spinBox_log_max_file_size.setObjectName(u"spinBox_log_max_file_size")
+        self.spinBox_log_max_file_size.setMinimum(1)
+        self.spinBox_log_max_file_size.setMaximum(2048)
+
+        self.horizontalLayout_log_max_size.addWidget(self.spinBox_log_max_file_size)
+
+
+        self.horizontalLayout_2.addLayout(self.horizontalLayout_log_max_size)
+
         self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
@@ -273,6 +290,10 @@ class Ui_gui_settings_window(object):
         self.pushButton_log_file.setText(QCoreApplication.translate("gui_settings_window", u"Browse", None))
         self.label_log_rotation_interval.setText(QCoreApplication.translate("gui_settings_window", u"Log rotation (hours): ", None))
         self.label_log_backup_count.setText(QCoreApplication.translate("gui_settings_window", u"Log backup count:     ", None))
+#if QT_CONFIG(tooltip)
+        self.label_log_max_file_size.setToolTip(QCoreApplication.translate("gui_settings_window", u"The current log file is rotated once it reaches this size, even if the rotation interval has not elapsed yet. This bounds how much disk space the logs can use between rotations.", None))
+#endif // QT_CONFIG(tooltip)
+        self.label_log_max_file_size.setText(QCoreApplication.translate("gui_settings_window", u"Max log file size (MB): ", None))
         self.pushButton_save.setText(QCoreApplication.translate("gui_settings_window", u"Save", None))
     # retranslateUi
 

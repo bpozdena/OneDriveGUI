@@ -62,6 +62,9 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
         self.spinBox_log_backup_count.setValue(int(gui_settings.get("log_backup_count")))
         self.spinBox_log_backup_count.valueChanged.connect(self.set_spin_box_value)
 
+        self.spinBox_log_max_file_size.setValue(int(gui_settings.get("log_max_file_size")))
+        self.spinBox_log_max_file_size.valueChanged.connect(self.set_spin_box_value)
+
         self.comboBox_debug_level.setCurrentText(gui_settings.get("debug_level").upper())
         self.comboBox_debug_level.activated.connect(self.set_debug_level)
 
