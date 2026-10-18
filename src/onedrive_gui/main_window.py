@@ -692,7 +692,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return True
 
         # List of error patterns to ignore
-        ignored_patterns = ["inotify_add_watch failed", "The local file system returned an error with the following message"]
+        ignored_patterns = ["inotify_add_watch failed", "The local file system returned an error with the following message", "Local file system error:"]
 
         error_lower = error_text.lower()
         for pattern in ignored_patterns:
