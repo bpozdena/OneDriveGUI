@@ -206,6 +206,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "tooltip_text": "",
         }
 
+        # The GUI often starts before the network is up (autostart on login), so the
+        # GitHub lookups are retried a few times before giving up.
+        self.version_check_retry_interval = 60000
+        self.version_check_max_attempts = 10
+        self.client_version_check_attempts = 0
+        self.gui_version_check_attempts = 0
+
         # Stop the clients and their worker threads before the application is torn
         # down; destroying a QThread that is still running aborts the process.
         QApplication.instance().aboutToQuit.connect(self.stop_all_workers)
@@ -350,7 +357,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         def get_latest_client_version():
             latest_url = "https://api.github.com/repos/abraunegg/onedrive/releases/latest"
             try:
-                latest_client_version = s.get(latest_url, timeout=1).json()["tag_name"]
+                latest_client_version = s.get(latest_url, timeout=3).json()["tag_name"]
                 return latest_client_version
 
             except Exception as e:
@@ -382,8 +389,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 min_requirements_met = False
 
             elif not latest_client_version:
-                version_label_text = "Unable to check for latest OneDrive client version!"
-                version_tooltip_text = "Unable to check for latest OneDrive client version!"
+                self.client_version_check_attempts += 1
+                if self.client_version_check_attempts < self.version_check_max_attempts:
+                    logging.warning(f"[GUI] Unable to check for latest OneDrive client version, retrying (attempt {self.client_version_check_attempts})")
+                    self.check_client_version.start(self.version_check_retry_interval)
+                else:
+                    version_label_text = "Unable to check for latest OneDrive client version!"
+                    version_tooltip_text = "Unable to check for latest OneDrive client version!"
 
             elif installed_client_version[1] < min_supported_version:
                 version_label_text = (
@@ -439,7 +451,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             """Fetch latest GUI version from GitHub releases"""
             latest_url = "https://api.github.com/repos/bpozdena/OneDriveGUI/releases/latest"
             try:
-                response = s.get(latest_url, timeout=1)
+                response = s.get(latest_url, timeout=3)
                 latest_gui_version = response.json()["tag_name"]
                 return latest_gui_version
             except Exception as e:
@@ -451,8 +463,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             installed_gui_version = version  # From options.py
 
             if not latest_gui_version:
-                # Network issue or API error - don't show warning
-                logging.warning("[GUI] Unable to check for latest OneDriveGUI version")
+                # Network issue or API error, do not show a warning, retry later
+                self.gui_version_check_attempts += 1
+                if self.gui_version_check_attempts < self.version_check_max_attempts:
+                    self.check_gui_version.start(self.version_check_retry_interval)
+                logging.warning(f"[GUI] Unable to check for latest OneDriveGUI version (attempt {self.gui_version_check_attempts})")
                 return
 
             # Parse versions for comparison
