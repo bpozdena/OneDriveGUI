@@ -14,7 +14,10 @@ script:
   - shopt -s extglob
   - rm -rf AppDir/usr/local/lib/python3.10/dist-packages/PySide6/Qt/lib/!(libQt6OpenGL*|libQt6XcbQpa*|libQt6Wayland*|libQt6Egl*|libicudata*|libicuuc*|libicui18n*|libQt6DBus*|libQt6Network*|libQt6Qml*|libQt6Core*|libQt6Gui*|libQt6Widgets*|libQt6Svg*|libQt6UiTools*)
   - python3 -m build
-  - find dist -type f -name '*.whl' -exec python3 -m pip install --ignore-installed --prefix=/usr --no-cache-dir --root=AppDir {} \;
+  # --no-deps: dependencies were installed from requirements.txt above and pruned
+  # since; pip resolves them against the build container, not the AppDir, so
+  # without this flag it reinstalls PySide6_Essentials and undoes the pruning.
+  - find dist -type f -name '*.whl' -exec python3 -m pip install --ignore-installed --no-deps --prefix=/usr --no-cache-dir --root=AppDir {} \;
 
 
 AppDir:
