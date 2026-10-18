@@ -83,14 +83,30 @@ def shorten_path(path, limit):
     return path
 
 
+# Minimum supported OneDrive client version, required for the in-browser login
+# flow (client v2.5.11+). See version_number() for the encoding.
+MIN_CLIENT_VERSION = 20511
+
+
+def version_number(version: str) -> int:
+    """
+    Comparable number for a client version string such as 'v2.5.12' or
+    'onedrive v2.5.12-master-2bf2f9f': each component is zero-padded to two
+    digits (2.5.12 -> 20512), so 2.5.9 < 2.5.11 < 2.6.0. Returns 0 when no
+    version can be found.
+    """
+    match = re.search(r"v?(\d+)\.(\d+)(?:\.(\d+))?", version or "")
+    if not match:
+        return 0
+    return int("".join((part or "0").zfill(2) for part in match.groups()))
+
+
 def get_installed_client_version(client_bin_path: str) -> int:
+    """Installed client version as a version_number(), or 0 if the client is not found."""
     try:
-        # Checks installed client version. Later used to remove unsupported options from account config if needed.
-        # TODO: Restructure and perform this in different function.
         client_version_check = subprocess.check_output([client_bin_path, "--version"], stderr=subprocess.STDOUT)
-        installed_client_version = re.search(r".\s(v[0-9.]+)", str(client_version_check)).group(1)
-        installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
-    except:
+        installed_client_version_num = version_number(client_version_check.decode(errors="replace"))
+    except Exception:
         logging.error(f"[GUI] Onedrive client not found!")
         installed_client_version_num = 0
 

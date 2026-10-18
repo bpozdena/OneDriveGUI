@@ -32,6 +32,7 @@ from .options import (
 )
 
 from .workers import MaintenanceWorker
+from .utils.utils import version_number, MIN_CLIENT_VERSION
 import logging
 from .global_config import DIR_PATH, PROFILES_FILE
 
@@ -170,9 +171,8 @@ class wizardPage_version_check(QWizardPage):
         try:
             client_version_check = subprocess.check_output([client_bin_path, "--version"], stderr=subprocess.STDOUT)
             installed_client_version = re.search(r"(v[0-9.]+)", str(client_version_check)).group(1)
-            installed_client_version_num = int(installed_client_version.replace("v", "").replace(".", ""))
-            installed_client_version_num = installed_client_version_num if len(str(installed_client_version_num)) > 3 else installed_client_version_num * 10
-            min_supported_version_num = 2500
+            installed_client_version_num = version_number(installed_client_version)
+            min_supported_version_num = MIN_CLIENT_VERSION
 
             if installed_client_version_num < min_supported_version_num:
                 logging.info(f"Unsupported OneDrive {installed_client_version} detected.")

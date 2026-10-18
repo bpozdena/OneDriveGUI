@@ -560,7 +560,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
 
         # Options added in client v2.5.12. Older clients refuse to start with
         # unknown keys in their config, so they can only be changed on v2.5.12+.
-        if client_version < 2512:
+        if client_version < 20512:
             for check_box in (self.checkBox_disable_time_check, self.checkBox_monitor_status, self.checkBox_notify_monitor_start):
                 check_box.setEnabled(False)
                 check_box.setToolTip(check_box.toolTip() + "\n\nRequires OneDrive client v2.5.12 or newer.")
@@ -673,7 +673,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
 
         if self.sender().objectName() == "checkBox_disable_notifications":
             # The monitor-start notification is only sent while notifications are enabled.
-            self.checkBox_notify_monitor_start.setEnabled(not self.checkBox_disable_notifications.isChecked() and client_version >= 2512)
+            self.checkBox_notify_monitor_start.setEnabled(not self.checkBox_disable_notifications.isChecked() and client_version >= 20512)
 
     def str2bool(self, value):
         return value.lower() in "true"
