@@ -10,9 +10,10 @@ from .ui.ui_list_item_widget import Ui_list_item_widget
 
 import os
 import re
+import json
 import time
 import subprocess
-from datetime import datetime
+from datetime import datetime, timezone
 
 from .global_config import save_global_config
 from .options import (
@@ -36,6 +37,47 @@ from .global_config import DIR_PATH, PROFILES_FILE
 # Exit codes the client uses when a --resync is required: 78 (EX_CONFIG) since
 # client v2.5.12, 126 in earlier versions.
 EXIT_RESYNC_REQUIRED = (78, 126)
+
+
+MONITOR_STATUS_FILE = "monitor-status.json"
+MONITOR_STATUS_SCHEMA_VERSION = 1
+
+
+def read_monitor_status(config_dir, pid):
+    """
+    Read the machine-readable runtime status the client (v2.5.12+) publishes in
+    its configuration directory while running in --monitor mode.
+
+    Returns the parsed document, or None when it is missing, unreadable, of an
+    unknown schema version, or owned by a different process. The file is removed
+    on a clean shutdown but can be left behind after a crash or SIGKILL, so the
+    pid must match the client process this worker started.
+    """
+    try:
+        with open(os.path.join(config_dir, MONITOR_STATUS_FILE), "r", encoding="utf-8") as status_file:
+            status = json.load(status_file)
+    except (OSError, ValueError):
+        return None
+
+    if not isinstance(status, dict) or status.get("schema_version") != MONITOR_STATUS_SCHEMA_VERSION or status.get("pid") != pid:
+        return None
+    return status
+
+
+def parse_status_timestamp(value):
+    """
+    Convert a monitor status UTC timestamp (e.g. '2026-10-01T21:43:26.9855399Z')
+    to a local, naive datetime. Returns None for empty or malformed values.
+    Fractional seconds are trimmed by hand because the client emits 7 digits,
+    which datetime.fromisoformat() does not accept before Python 3.11.
+    """
+    match = re.match(r"^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d+))?Z$", value or "")
+    if not match:
+        return None
+    timestamp = datetime.strptime(match.group(1), "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc)
+    if match.group(2):
+        timestamp = timestamp.replace(microsecond=int(match.group(2)[:6].ljust(6, "0")))
+    return timestamp.astimezone().replace(tzinfo=None)
 
 
 def _path_key(path):
@@ -71,6 +113,13 @@ class WorkerThread(QThread):
         self._command = f"exec {client_bin_path} --confdir='{self.config_dir.group(1)}' --monitor -v {options}"
         logging.info(f"[GUI] Monitoring command: '{self._command}'")
         self.profile_name = profile
+
+    def monitor_status(self):
+        """Current monitor-status.json document of this worker's client, or None."""
+        process = getattr(self, "onedrive_process", None)
+        if process is None or process.poll() is not None:
+            return None
+        return read_monitor_status(self.config_dir.group(1), process.pid)
 
     def stop_worker(self):
         logging.info(f"[{self.profile_name}] Waiting for worker to finish...")

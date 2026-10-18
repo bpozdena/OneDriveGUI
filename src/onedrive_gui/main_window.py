@@ -42,7 +42,7 @@ from .options import (
 )
 
 from .utils.utils import humanize_file_size, shorten_path, format_relative_time
-from .workers import WorkerThread, MaintenanceWorker, TaskList, workers
+from .workers import WorkerThread, MaintenanceWorker, TaskList, workers, parse_status_timestamp
 from .gui_settings_window import gui_settings_window
 
 import logging
@@ -221,6 +221,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.auto_sync.setSingleShot(True)
         self.auto_sync.timeout.connect(self.autostart_monitor)
         self.auto_sync.start(1000)
+
+        # Poll the machine-readable runtime status published by client v2.5.12+
+        # (monitor-status.json). Older clients do not publish it, in which case
+        # the status keeps being derived from the client output alone.
+        self.refresh_monitor_status = QTimer()
+        self.refresh_monitor_status.setSingleShot(False)
+        self.refresh_monitor_status.timeout.connect(self.update_monitor_status)
+        self.refresh_monitor_status.start(2000)
 
         # Timer to refresh relative times for completed transfers
         self.refresh_relative_times = QTimer()
@@ -555,6 +563,122 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Update system tray icon based on aggregate status
         self.update_tray_icon()
 
+    def update_monitor_status(self):
+        """
+        Apply the client's monitor-status.json to each running profile. The file
+        is the authoritative source for the high-level state (syncing, idle,
+        degraded, reachability, system time); per-file activity still comes from
+        the client output. The status label is only rewritten when the
+        high-level state changes, so detailed output messages are not overwritten
+        on every poll.
+        """
+        for profile_name, page in self.profile_status_pages.items():
+            worker = workers.get(profile_name)
+            status = worker.monitor_status() if worker is not None and worker.isRunning() else None
+            page.monitor_status = status
+
+            if status is None:
+                if page.monitor_status_key is not None:
+                    page.monitor_status_key = None
+                    page.label_onedrive_status.setToolTip("")
+                continue
+
+            process = status.get("process", {})
+            sync = status.get("sync", {})
+            last_cycle = sync.get("last_cycle", {})
+            conditions = status.get("conditions", {})
+
+            page.label_onedrive_status.setToolTip(self._monitor_status_tooltip(status))
+
+            key = (
+                process.get("state"),
+                last_cycle.get("result"),
+                conditions.get("onedrive_reachability"),
+                conditions.get("system_time"),
+                process.get("monitor_loop"),
+            )
+            if key == page.monitor_status_key:
+                continue
+            page.monitor_status_key = key
+
+            message = self._monitor_status_message(status)
+            if message:
+                logging.info(f"[{profile_name}] Monitor status: {message}")
+                page.label_onedrive_status.setText(message)
+
+    @staticmethod
+    def _monitor_status_message(status):
+        """Status label text for a monitor status document, or None to keep the
+        message derived from the client output (e.g. per-file progress)."""
+        process = status.get("process", {})
+        sync = status.get("sync", {})
+        last_cycle = sync.get("last_cycle", {})
+        conditions = status.get("conditions", {})
+        state = process.get("state")
+        result = last_cycle.get("result")
+
+        if conditions.get("system_time") == "TIME_DRIFT_BLOCKING":
+            return "Sync paused: the system clock differs from Microsoft service time.\nPlease correct the system time."
+        if conditions.get("onedrive_reachability") == "unreachable":
+            return "Cannot connect to Microsoft OneDrive Service.\nThe client will retry automatically."
+        if state == "idle":
+            last_sync = parse_status_timestamp(sync.get("last_successful_sync_at"))
+            if last_sync is not None:
+                return f"OneDrive sync is complete (last sync {last_sync.strftime('%H:%M')})."
+            return "OneDrive sync is complete."
+        if state == "degraded":
+            if result == "partial_failure":
+                failures = sum(int(last_cycle.get(k) or 0) for k in ("upload_failures", "download_failures", "recycle_bin_failures"))
+                return f"Sync completed with {failures} failed item(s)"
+            if result == "service_unreachable":
+                return "Cannot connect to Microsoft OneDrive Service.\nThe client will retry automatically."
+            if result == "time_unsafe":
+                return "Sync paused: the system clock differs from Microsoft service time.\nPlease correct the system time."
+            if result == "interrupted":
+                return "The last sync was interrupted."
+        return None
+
+    @staticmethod
+    def _monitor_status_tooltip(status):
+        """Hover text for the status label summarising the monitor status document."""
+        process = status.get("process", {})
+        sync = status.get("sync", {})
+        last_cycle = sync.get("last_cycle", {})
+        conditions = status.get("conditions", {})
+
+        def local_time(value):
+            timestamp = parse_status_timestamp(value)
+            return timestamp.strftime("%Y-%m-%d %H:%M:%S") if timestamp else "never"
+
+        lines = [
+            f"Client state: {process.get('state', 'unknown')} (monitor loop {process.get('monitor_loop', 0)})",
+            f"Last successful sync: {local_time(sync.get('last_successful_sync_at'))}",
+            f"Successful sync cycles: {sync.get('successful_cycle_count', 0)}",
+            f"Last cycle result: {str(last_cycle.get('result', 'never_run')).replace('_', ' ')}",
+        ]
+        failures = {k: int(last_cycle.get(f"{k}_failures") or 0) for k in ("upload", "download", "recycle_bin")}
+        if any(failures.values()):
+            lines.append("Failed: " + ", ".join(f"{count} {kind.replace('_', ' ')}" for kind, count in failures.items() if count))
+        lines.append(f"Microsoft OneDrive: {conditions.get('onedrive_reachability', 'unknown')}")
+        lines.append(f"System time: {conditions.get('system_time', 'unknown')}")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _monitor_tray_state(page):
+        """Tray state derived from the monitor status document, or None when not available."""
+        status = getattr(page, "monitor_status", None)
+        if not status:
+            return None
+        state = status.get("process", {}).get("state")
+        conditions = status.get("conditions", {})
+        if state == "degraded" or conditions.get("onedrive_reachability") == "unreachable" or conditions.get("system_time") == "TIME_DRIFT_BLOCKING":
+            return "ERROR"
+        if state in ("starting", "syncing"):
+            return "SYNCING"
+        if state == "idle":
+            return "IDLE"
+        return None
+
     def is_ignorable_error(self, error_text):
         """
         Check if an error message should be ignored for tray icon status.
@@ -608,17 +732,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 error_tooltip = ""
                 free_space = ""
 
+            # High-level state from monitor-status.json (client v2.5.12+), if available
+            monitor_state = self._monitor_tray_state(self.profile_status_pages[profile_name]) if profile_name in self.profile_status_pages else None
+
             # Categorize this profile's state
             if not is_running:
                 profile_state = "STOPPED"
                 has_stopped = True
-            elif (not self.is_ignorable_error(error_tooltip) and not self.is_ignorable_error(status_msg)) and (
-                error_tooltip or "Error:" in status_msg or "error" in status_msg.lower() or "failed" in status_msg.lower() or "crashed" in status_msg.lower()
+            elif monitor_state == "ERROR" or (
+                (not self.is_ignorable_error(error_tooltip) and not self.is_ignorable_error(status_msg))
+                and (error_tooltip or "Error:" in status_msg or "error" in status_msg.lower() or "failed" in status_msg.lower() or "crashed" in status_msg.lower())
             ):
                 profile_state = "ERROR"
                 has_error = True
                 running_count += 1
-            elif "sync in progress" in status_msg.lower() or "processing" in status_msg.lower() or "starting" in status_msg.lower() or "initializing" in status_msg.lower():
+            elif monitor_state == "SYNCING" or (
+                monitor_state is None
+                and ("sync in progress" in status_msg.lower() or "processing" in status_msg.lower() or "starting" in status_msg.lower() or "initializing" in status_msg.lower())
+            ):
                 profile_state = "SYNCING"
                 has_syncing = True
                 running_count += 1
@@ -1614,6 +1745,11 @@ class ProfileStatusPage(QWidget, Ui_status_page):
         # rows are hidden until the user toggles the failed-files button.
         self.open_rows = {}
         self.show_failed_entries = False
+
+        # Last monitor-status.json document of the running client (v2.5.12+) and
+        # the high-level state it was last applied for.
+        self.monitor_status = None
+        self.monitor_status_key = None
         self.pushButton_show_errors.hide()
         self.pushButton_show_errors.toggled.connect(self.toggle_failed_entries)
 
