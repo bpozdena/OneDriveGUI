@@ -27,7 +27,8 @@ A GUI for [Linux OneDrive Client](https://github.com/abraunegg/onedrive) with mu
 - Check for other reported [issues/limitations](https://github.com/bpozdena/OneDriveGUI/issues). 
 
 ## Compatibility
-- Minimum supported OneDrive client version: v2.5.11.
+- Minimum supported OneDrive client version: **v2.5.11** (required for the client-based browser login flow).
+- OneDrive client **v2.5.12 or newer is recommended**: the GUI then shows the overall sync state from the client's `monitor-status.json`, supports the new client options (`disable_time_check`, `monitor_status`, `notify_monitor_start`), and reports Recycle Bin move failures and system clock drift. With v2.5.11 everything except these additions works the same.
 - You will be shown warnings if your OneDrive Client is not up to date.
 
 ## Other Notes
