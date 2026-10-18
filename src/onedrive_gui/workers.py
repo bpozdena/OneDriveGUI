@@ -33,6 +33,10 @@ import logging
 # from logger import logger
 from .global_config import DIR_PATH, PROFILES_FILE
 
+# Exit codes the client uses when a --resync is required: 78 (EX_CONFIG) since
+# client v2.5.12, 126 in earlier versions.
+EXIT_RESYNC_REQUIRED = (78, 126)
+
 
 def _path_key(path):
     """Key for per-file lookups. The client prints the same file both with and
@@ -126,6 +130,10 @@ class WorkerThread(QThread):
         # Track whether we're waiting for the user to complete login in their browser
         self.awaiting_browser_login = False
 
+        # Set once the resync authorization dialog has been requested, so the exit
+        # code check below does not ask a second time.
+        self.resync_requested = False
+
         self.msg = ""
         self.profile_status["status_message"] = "OneDrive sync is starting..."
         self.update_profile_status.emit(self.profile_status, self.profile_name)
@@ -153,6 +161,15 @@ class WorkerThread(QThread):
 
             if time.time() > timeout:
                 break
+
+        # The resync message is matched in the output, but the exit code is the
+        # authoritative signal in case the wording changes.
+        returncode = self.onedrive_process.returncode
+        logging.info(f"[{self.profile_name}] OneDrive client exited with code {returncode}")
+        if returncode in EXIT_RESYNC_REQUIRED and not self.resync_requested:
+            logging.warning(f"[{self.profile_name}] Exit code {returncode} - OneDrive resync authorization is required.")
+            self.resync_requested = True
+            self.trigger_resync.emit(self.profile_name)
 
     def _emit_error_status(self, full_error_message):
         """Emit a short, categorized status message. The full error message is kept
@@ -383,7 +400,9 @@ class WorkerThread(QThread):
                 # Ask user for resync authorization and stop the worker.
                 self.msg = "OneDrive resync authorization is required."
                 logging.warning(f"[{self.profile_name}] {stdout!s} - {self.msg}")
-                self.trigger_resync.emit(self.profile_name)
+                if not self.resync_requested:
+                    self.resync_requested = True
+                    self.trigger_resync.emit(self.profile_name)
 
             elif "To delete a large volume of data use" in stdout:
                 # Ask user for big delete authorization and stop the worker.
