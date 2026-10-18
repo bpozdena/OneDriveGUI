@@ -62,6 +62,10 @@ except ImportError:
             window.hide()
 
 
+# Label of a failed file operation in the file operation list.
+FAILED_OPERATION_LABELS = {"Uploading": "Upload", "Downloading": "Download", "Moving": "Move to Recycle Bin"}
+
+
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         # Expose this instance as main_window.main_window_instance so other modules
@@ -1066,7 +1070,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             item_widget.set_icon(file_path)
             item_widget.hide_progress_bar(transfer_complete or transfer_failed)
 
-            if file_operation == "Deleting":
+            if file_operation == "Deleting" and not transfer_failed:
                 item_widget.set_label_1(f"Deleted from {parent_dir}")
                 item_widget.set_custom_icon(self.trash_icon)
                 item_widget.set_label_2(f"")
@@ -1078,7 +1082,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 else:
                     item_widget.set_timestamp("")
 
-            elif file_operation == "Moving":
+            elif file_operation == "Moving" and not transfer_failed:
                 item_widget.set_label_1(f"Trashed from {parent_dir}")
                 item_widget.set_label_2(f"")
                 # Store timestamp and display for moved files
@@ -1097,7 +1101,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 # is deliberately left empty so repeated attempts of the
                 # same file update this row rather than adding duplicates,
                 # and a later successful upload flips it back to "Uploaded".
-                failed_operation = "Upload" if file_operation == "Uploading" else "Download"
+                failed_operation = FAILED_OPERATION_LABELS.get(file_operation, "Download")
                 shortened_path = shorten_path(relative_path_display, 32)
                 item_widget.set_label_1(f"{failed_operation} failed - <a href=file:///{absolute_path}>{shortened_path}</a>")
                 item_widget.set_label_2(f"")
@@ -1181,7 +1185,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             myQCustomQWidget.set_icon(file_path)
             myQCustomQWidget.hide_progress_bar(transfer_complete or transfer_failed)
 
-            if file_operation == "Deleting":
+            if file_operation == "Deleting" and not transfer_failed:
                 myQCustomQWidget.set_label_1(f"Deleted from {parent_dir}")
                 myQCustomQWidget.set_custom_icon(self.trash_icon)
                 myQCustomQWidget.set_label_2(f"")
@@ -1193,7 +1197,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 else:
                     myQCustomQWidget.set_timestamp("")
 
-            elif file_operation == "Moving":
+            elif file_operation == "Moving" and not transfer_failed:
                 myQCustomQWidget.set_label_1(f"Trashed from {parent_dir}")
                 myQCustomQWidget.set_label_2(f"")
                 # Store timestamp and display for moved files
@@ -1207,7 +1211,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             elif transfer_failed:
                 # The transfer failed before an item existed - create it in the failed
                 # state so the failure is visible in the file operation list.
-                failed_operation = "Upload" if file_operation == "Uploading" else "Download"
+                failed_operation = FAILED_OPERATION_LABELS.get(file_operation, "Download")
                 shortened_path = shorten_path(relative_path_display, 32)
                 myQCustomQWidget.set_label_1(f"{failed_operation} failed - <a href=file:///{absolute_path}>{shortened_path}</a>")
                 myQCustomQWidget.set_label_2(f"")
