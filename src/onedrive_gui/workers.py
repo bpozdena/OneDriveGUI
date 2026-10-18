@@ -715,6 +715,29 @@ class WorkerThread(QThread):
                     self.pending_error = error_text
                     self.pending_error_path = None
 
+            elif stdout.startswith("Skipping ") and " - invalid name (" in stdout:
+                # Examples:
+                #   Skipping item - invalid name (Microsoft Naming Convention): ./dir/bad:name.txt
+                #   Skipping item - invalid name (Contains an invalid whitespace character): ./file
+                # The client never uploads these items and does not count them as failed,
+                # so without this they would be silently missing online.
+                match = re.match(r"Skipping .+? - invalid name \((.+?)\): (.+)$", stdout)
+                if match:
+                    reason, file_path = match.group(1), match.group(2).strip()
+                    error_message = f"Not synced - the name is not valid on OneDrive ({reason}). Rename the item to sync it."
+                    self.file_errors[_path_key(file_path)] = error_message
+                    transfer_progress_new = {
+                        "file_operation": "Uploading",
+                        "file_path": file_path,
+                        "progress": "0",
+                        "transfer_complete": False,
+                        "transfer_failed": True,
+                        "error_message": error_message,
+                        "timestamp": None,
+                    }
+                    logging.warning(f"[{self.profile_name}] {stdout}")
+                    self.update_progress_new.emit(transfer_progress_new, self.profile_name)
+
             elif stdout.startswith("Skipping uploading this"):
                 # Examples:
                 #   Skipping uploading this new file due to 'case-insensitive match': ./file
