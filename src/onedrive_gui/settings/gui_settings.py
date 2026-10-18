@@ -17,6 +17,7 @@ class GuiSettings:
             "debug_level": "DEBUG",
             "client_bin_path": "onedrive",
             "QWebEngine_login": "False",
+            "stop_clients_on_exit": "True",
             "autostart_enabled": "False",
         }
     }

@@ -31,6 +31,9 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
         self.checkBox_autostart_enabled.setChecked(self.get_check_box_state("autostart_enabled"))
         self.checkBox_autostart_enabled.stateChanged.connect(self.handle_autostart_change)
 
+        self.checkBox_stop_clients_on_exit.setChecked(self.get_check_box_state("stop_clients_on_exit"))
+        self.checkBox_stop_clients_on_exit.stateChanged.connect(self.set_check_box_state)
+
         self.lineEdit_client_bin_path.setText(gui_settings.get("client_bin_path"))
         self.lineEdit_client_bin_path.textChanged.connect(self.set_client_bin_path)
         self.pushButton_client_bin_path.clicked.connect(self.get_bin_path)

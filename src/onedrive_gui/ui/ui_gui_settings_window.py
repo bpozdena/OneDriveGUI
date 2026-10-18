@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'gui_settings_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.0
+## Created by: Qt User Interface Compiler version 6.11.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -41,6 +41,11 @@ class Ui_gui_settings_window(object):
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.formLayout = QFormLayout()
         self.formLayout.setObjectName(u"formLayout")
+        self.checkBox_stop_clients_on_exit = QCheckBox(self.groupBox)
+        self.checkBox_stop_clients_on_exit.setObjectName(u"checkBox_stop_clients_on_exit")
+
+        self.formLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.checkBox_stop_clients_on_exit)
+
         self.checkBox_start_minimized = QCheckBox(self.groupBox)
         self.checkBox_start_minimized.setObjectName(u"checkBox_start_minimized")
 
@@ -232,6 +237,10 @@ class Ui_gui_settings_window(object):
     def retranslateUi(self, gui_settings_window):
         gui_settings_window.setWindowTitle(QCoreApplication.translate("gui_settings_window", u"OneDriveGUI - Settings", None))
         self.groupBox.setTitle(QCoreApplication.translate("gui_settings_window", u"OneDriveGUI behaviour", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_stop_clients_on_exit.setToolTip(QCoreApplication.translate("gui_settings_window", u"Stop the OneDrive client of every profile when OneDriveGUI exits or the session logs out. The client finishes in-flight transfers before it exits.<br/>When disabled, the clients keep running in the background; OneDriveGUI offers to reconnect to them on the next start.", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_stop_clients_on_exit.setText(QCoreApplication.translate("gui_settings_window", u"Stop OneDrive clients when OneDriveGUI exits", None))
         self.checkBox_start_minimized.setText(QCoreApplication.translate("gui_settings_window", u"Start OneDriveGUI minimized", None))
         self.checkBox_autostart_enabled.setText(QCoreApplication.translate("gui_settings_window", u"Start OneDriveGUI automatically on login", None))
         self.groupBox_4.setTitle(QCoreApplication.translate("gui_settings_window", u"OneDrive client options", None))
