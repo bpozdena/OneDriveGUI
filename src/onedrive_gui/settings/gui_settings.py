@@ -18,6 +18,8 @@ class GuiSettings:
             "client_bin_path": "onedrive",
             "QWebEngine_login": "False",
             "stop_clients_on_exit": "True",
+            "remember_window_geometry": "True",
+            "window_geometry": "",
             "autostart_enabled": "False",
         }
     }

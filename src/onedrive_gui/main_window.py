@@ -1,4 +1,4 @@
-from PySide6.QtCore import QTimer, QUrl, QFileInfo, Qt, Signal, Slot
+from PySide6.QtCore import QTimer, QUrl, QFileInfo, Qt, Signal, Slot, QByteArray
 from PySide6.QtGui import QIcon, QPixmap, QDesktopServices
 from PySide6.QtWidgets import (
     QWidget,
@@ -220,6 +220,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Whether the clients are stopped (or left running in the background) is
         # controlled by the 'stop_clients_on_exit' setting.
         QApplication.instance().aboutToQuit.connect(self.stop_all_workers)
+        QApplication.instance().aboutToQuit.connect(self.save_window_geometry)
+
+        # Restore the window size and position from the previous session.
+        stored_geometry = gui_settings.get("window_geometry")
+        if gui_settings.get("remember_window_geometry") != "False" and stored_geometry:
+            self.restoreGeometry(QByteArray.fromBase64(stored_geometry.encode()))
 
         # End-of-session signals: the desktop environment sends SIGTERM/SIGHUP to
         # the session processes on logout. The Python handler only schedules the
@@ -315,6 +321,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         elif close_question == QMessageBox.No:
             logging.info("[GUI] Keeping OneDriveGUI running.")
 
+    def save_window_geometry(self):
+        """Persist the window size and position for the next session."""
+        if gui_settings.get("remember_window_geometry") != "False" and not self.isMinimized():
+            gui_settings.set("window_geometry", bytes(self.saveGeometry().toBase64()).decode())
+            gui_settings.save()
+
     def stop_all_workers(self, force=False):
         """
         Stop every running worker and its OneDrive client.
@@ -346,6 +358,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def closeEvent(self, event):
         # Minimize main window to system tray if it is available. Otherwise minimize to taskbar.
+        self.save_window_geometry()
         event.ignore()
         try:
             if self.tray.isSystemTrayAvailable():
@@ -1782,6 +1795,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.show()
 
     def hide_main_window(self):
+        self.save_window_geometry()
         self.hide()
 
 
