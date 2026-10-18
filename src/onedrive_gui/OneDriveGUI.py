@@ -20,6 +20,10 @@ app = QApplication(sys.argv)
 app.setApplicationName("OneDriveGUI")
 app.setDesktopFileName("OneDriveGUI")
 app.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-cloud-80.png"))
+# OneDriveGUI lives in the system tray: closing a dialog while the main window is
+# hidden (e.g. the resync prompt with start_minimized) must not quit the app and
+# destroy the still-running worker threads (#297). Quitting is explicit.
+app.setQuitOnLastWindowClosed(False)
 
 
 from .options import gui_settings, global_config, version
