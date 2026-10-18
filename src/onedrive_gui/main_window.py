@@ -882,7 +882,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         _sync_dir = os.path.expanduser(global_config[profile]["onedrive"]["sync_dir"].strip('"'))
 
         logging.debug(data)
-        file_path = f"{_sync_dir}" + "/" + data["file_path"]
+        # Normalise the path: the client prints the same file both with and without
+        # a leading './' depending on the message, and every message about one file
+        # must resolve to the same row.
+        file_path = os.path.normpath(os.path.join(_sync_dir, data["file_path"]))
         absolute_path = QFileInfo(file_path).absolutePath().replace(" ", "%20")
         relative_path_display = os.path.relpath(QFileInfo(file_path).absolutePath(), _sync_dir + os.path.sep)
         parent_dir_match = re.search(r".+/([^/]+)/.+$", file_path)
