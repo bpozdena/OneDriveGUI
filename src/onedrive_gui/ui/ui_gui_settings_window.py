@@ -46,6 +46,11 @@ class Ui_gui_settings_window(object):
 
         self.formLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.checkBox_stop_clients_on_exit)
 
+        self.checkBox_remember_window_geometry = QCheckBox(self.groupBox)
+        self.checkBox_remember_window_geometry.setObjectName(u"checkBox_remember_window_geometry")
+
+        self.formLayout.setWidget(3, QFormLayout.ItemRole.LabelRole, self.checkBox_remember_window_geometry)
+
         self.checkBox_start_minimized = QCheckBox(self.groupBox)
         self.checkBox_start_minimized.setObjectName(u"checkBox_start_minimized")
 
@@ -241,6 +246,10 @@ class Ui_gui_settings_window(object):
         self.checkBox_stop_clients_on_exit.setToolTip(QCoreApplication.translate("gui_settings_window", u"Stop the OneDrive client of every profile when OneDriveGUI exits or the session logs out. The client finishes in-flight transfers before it exits.<br/>When disabled, the clients keep running in the background; OneDriveGUI offers to reconnect to them on the next start.", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_stop_clients_on_exit.setText(QCoreApplication.translate("gui_settings_window", u"Stop OneDrive clients when OneDriveGUI exits", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_remember_window_geometry.setToolTip(QCoreApplication.translate("gui_settings_window", u"Restore the size and position of the OneDriveGUI window from the previous session.<br/>Note: on Wayland, the position is controlled by the compositor and may not be restored exactly.", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_remember_window_geometry.setText(QCoreApplication.translate("gui_settings_window", u"Remember window size and position", None))
         self.checkBox_start_minimized.setText(QCoreApplication.translate("gui_settings_window", u"Start OneDriveGUI minimized", None))
         self.checkBox_autostart_enabled.setText(QCoreApplication.translate("gui_settings_window", u"Start OneDriveGUI automatically on login", None))
         self.groupBox_4.setTitle(QCoreApplication.translate("gui_settings_window", u"OneDrive client options", None))

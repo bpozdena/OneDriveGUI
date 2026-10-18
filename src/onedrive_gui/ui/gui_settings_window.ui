@@ -47,6 +47,16 @@
               </property>
              </widget>
             </item>
+            <item row="3" column="0">
+             <widget class="QCheckBox" name="checkBox_remember_window_geometry">
+              <property name="toolTip">
+               <string>Restore the size and position of the OneDriveGUI window from the previous session.&lt;br/&gt;Note: on Wayland, the position is controlled by the compositor and may not be restored exactly.</string>
+              </property>
+              <property name="text">
+               <string>Remember window size and position</string>
+              </property>
+             </widget>
+            </item>
 
             <item row="0" column="0">
              <widget class="QCheckBox" name="checkBox_start_minimized">
