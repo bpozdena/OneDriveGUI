@@ -45,6 +45,10 @@ AppDir:
 
     include:
       - python3
+      # libglib2.0-0 provides libgthread-2.0.so.0, which Qt needs but some
+      # minimal distributions (e.g. openSUSE Leap 16) do not have installed
+      # system-wide (#283). An AppImage must bundle all of its dependencies.
+      - libglib2.0-0
       - libxcb-icccm4
       - libxcb-image0
       - libxcb-keysyms1
