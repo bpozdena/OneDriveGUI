@@ -13,6 +13,7 @@ class GuiSettings:
             "save_debug": "True",
             "log_rotation_interval": "24",
             "log_backup_count": "3",
+            "log_max_file_size": "20",
             "log_file": "/tmp/onedrive-gui/onedrive-gui.log",
             "debug_level": "DEBUG",
             "client_bin_path": "onedrive",
