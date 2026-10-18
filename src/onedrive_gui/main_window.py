@@ -766,7 +766,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.tray:
             self.tray.showMessage(
                 "OneDriveGUI - Sync completed with errors",
-                f"'{profile_name}': {count} file(s) failed to sync.\nHover the failed entries in the file operation list for details.",
+                f"'{profile_name}': {count} file(s) failed to sync.\nUse the failed-files button on the account page to show them in the list.",
                 QSystemTrayIcon.Warning,
                 10000,
             )
@@ -906,21 +906,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             item_state = file_operation
 
-        # Find an existing row for the same file to update. Matching is done on the
-        # full path (not just the file name) so that identically-named files in
-        # different folders each keep their own row. If the file is already in the
-        # list and its progress bar is not complete, update the existing item;
-        # otherwise skip and create a new item.
+        # Find an existing open row (no completion timestamp yet: in-progress or
+        # failed) for the same file. Open rows are tracked in a per-profile map
+        # keyed by full path, so a file that keeps failing across sync cycles
+        # updates its row in place instead of adding a duplicate on every cycle.
+        page = self.profile_status_pages[profile]
         item = None
-        for row in range(50):
-            # Check last 50 entries to see if the file is already in the list.
-            candidate = self.profile_status_pages[profile].listWidget.item(row)
-            if candidate is None:
-                continue
-            candidate_widget = self.profile_status_pages[profile].listWidget.itemWidget(candidate)
-            if candidate_widget.get_file_path() == file_path and candidate_widget.get_timestamp_text() == "":
+        candidate = page.open_rows.get(file_path)
+        if candidate is not None:
+            if page.listWidget.row(candidate) == -1:
+                # The row was trimmed off the end of the list - drop the stale reference.
+                page.open_rows.pop(file_path, None)
+            else:
                 item = candidate
-                break
 
         if item is not None:
             item_widget = self.profile_status_pages[profile].listWidget.itemWidget(item)
@@ -1006,20 +1004,37 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 item_widget.set_label_1(file_operation)
                 item_widget.set_label_2(f"{progress_data_human} of {file_size_human}")
 
-            listWidget = self.profile_status_pages[profile].listWidget
-            if transfer_failed and listWidget.row(item) != 0:
-                # Move the failed entry to the top of the list so it stays
-                # visible and does not scroll away below synced files.
-                self._move_list_item(listWidget, item, 0)
+            listWidget = page.listWidget
+            # Keep the open-row map up to date. Read the timestamp before any
+            # move below - _move_list_item replaces the row's widget, after
+            # which the old widget must not be touched.
+            if item_widget.get_timestamp_text() == "":
+                page.open_rows[file_path] = item
+            else:
+                page.open_rows.pop(file_path, None)
+
+            if transfer_failed:
+                # Keep failed entries pinned at the top of the list. The row is
+                # hidden unless the user toggled the failed-files button in the
+                # header, so a large number of failures does not flood the list.
+                if previous_state != "Failed" and listWidget.row(item) != 0:
+                    self._move_list_item(listWidget, item, 0)
+                else:
+                    listWidget.setItemWidget(item, item_widget)
+                listWidget.setRowHidden(listWidget.row(item), not page.show_failed_entries)
             elif previous_state == "Failed" and item_state != "Failed":
                 # A previously failed entry completed (e.g. the user fixed the
-                # file) - move it below the block of failed entries pinned at
-                # the top, so the remaining failures stay visible.
+                # file) - make the row visible again and move it below the block
+                # of failed entries pinned at the top, so the remaining failures
+                # stay together.
                 target_row = self._first_row_below_failed_block(listWidget, exclude_item=item)
                 self._move_list_item(listWidget, item, target_row)
+                listWidget.setRowHidden(listWidget.row(item), False)
             else:
                 listWidget.setItemWidget(item, item_widget)
             new_list_item = False
+            if transfer_failed or previous_state == "Failed":
+                page.update_show_errors_button()
             logging.debug(f"List item updated for file {item_file_name}")
 
         if new_list_item:
@@ -1107,15 +1122,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # Add QListWidgetItem into QListWidget. Failed transfers are pinned
             # at the top so they stay visible; all other entries are inserted
             # below the block of failed entries.
-            listWidget = self.profile_status_pages[profile].listWidget
+            listWidget = page.listWidget
             insert_row = 0 if transfer_failed else self._first_row_below_failed_block(listWidget)
             listWidget.insertItem(insert_row, myQListWidgetItem)
             listWidget.setItemWidget(myQListWidgetItem, myQCustomQWidget)
 
+            # Track open rows (no completion timestamp yet) so later updates of
+            # the same file find this row regardless of how far down the list
+            # it moves.
+            if myQCustomQWidget.get_timestamp_text() == "":
+                page.open_rows[file_path] = myQListWidgetItem
+
+            if transfer_failed:
+                # Hide the new failed entry unless the user chose to show failures.
+                listWidget.setRowHidden(insert_row, not page.show_failed_entries)
+                page.update_show_errors_button()
+
             # If the list is not scrolled all the way to the top, increment the scroll value so that the list stays in the same spot when new items are added.
+            # Hidden rows do not occupy space in the view, so they must not trigger the compensation.
             scroll = listWidget.verticalScrollBar()
             currentScrollValue = scroll.value()
-            if move_scrollbar and (currentScrollValue > 0):
+            if move_scrollbar and (currentScrollValue > 0) and not (transfer_failed and not page.show_failed_entries):
                 scroll.setValue(currentScrollValue + 1)
 
             # Limit list to 10k items to fix #208.
@@ -1185,18 +1212,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         except KeyError:
             return
 
-        list_widget = self.profile_status_pages[profile].listWidget
+        page = self.profile_status_pages[profile]
+        list_widget = page.listWidget
 
-        # Collect stalled rows first - moving items to the top below would
-        # shift the row indices while iterating.
+        # Collect stalled rows first - they are moved to the top below, which
+        # shifts row indices. Only open rows (no completion timestamp yet) can
+        # still be in a transfer state.
         stalled_items = []
-        for row in range(list_widget.count()):
-            item = list_widget.item(row)
+        for file_path, item in list(page.open_rows.items()):
             item_widget = list_widget.itemWidget(item)
-            if item_widget is not None and item_widget.get_state() in ("Uploading", "Downloading"):
-                stalled_items.append((item, item_widget))
+            if item_widget is None or list_widget.row(item) == -1:
+                # The row was trimmed off the end of the list - drop the stale reference.
+                page.open_rows.pop(file_path, None)
+                continue
+            if item_widget.get_state() in ("Uploading", "Downloading"):
+                stalled_items.append(item)
 
-        for item, item_widget in stalled_items:
+        for item in stalled_items:
+            item_widget = list_widget.itemWidget(item)
             full_path = item_widget.get_file_path()
             parent_dir = QFileInfo(full_path).absolutePath()
             relative_path_display = os.path.relpath(parent_dir, _sync_dir + os.path.sep)
@@ -1211,14 +1244,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             item_widget.set_timestamp("")
             sweep_reason = "Transfer did not complete during the sync cycle (no specific error was reported)."
             item_widget.set_tooltip(self._failed_file_tooltip(full_path, sweep_reason))
-            # Move the failed entry to the top of the list so it stays visible.
-            if list_widget.row(item) != 0:
-                self._move_list_item(list_widget, item, 0)
-            else:
-                list_widget.setItemWidget(item, item_widget)
 
         if stalled_items:
+            # Move the failed entries to the top of the list as one batch. Qt
+            # deletes a row's widget when the row is taken out of a QListWidget,
+            # so each row gets a fresh clone of its widget on reinsertion (see
+            # _move_list_item).
+            moved = [(item, list_widget.itemWidget(item).clone()) for item in stalled_items]
+            for item, _ in moved:
+                list_widget.takeItem(list_widget.row(item))
+            for item, widget in reversed(moved):
+                list_widget.insertItem(0, item)
+                list_widget.setItemWidget(item, widget)
+                # Failed entries stay hidden unless the user chose to show them.
+                list_widget.setRowHidden(0, not page.show_failed_entries)
             logging.info(f"[{profile}] Marked {len(stalled_items)} stalled transfer(s) as failed")
+
+        page.update_show_errors_button()
 
     def on_list_scrolled(self, value):
         """
@@ -1563,6 +1605,15 @@ class ProfileStatusPage(QWidget, Ui_status_page):
         self.label_free_space_icon.setPixmap(self.storage_icon)
         self.label_free_space_icon.hide()
 
+        # Failed file transfers: open rows (no completion timestamp yet) are
+        # tracked by full path so a file that keeps failing across sync cycles
+        # updates its row instead of getting a duplicate on every cycle. Failed
+        # rows are hidden until the user toggles the failed-files button.
+        self.open_rows = {}
+        self.show_failed_entries = False
+        self.pushButton_show_errors.hide()
+        self.pushButton_show_errors.toggled.connect(self.toggle_failed_entries)
+
         # Open Sync Dir
         self.pushButton_open_dir.setText("")
         self.pushButton_open_dir.setIcon(self.folder_icon)
@@ -1593,6 +1644,30 @@ class ProfileStatusPage(QWidget, Ui_status_page):
             # self.label_free_space_icon.hide()
         else:
             self.label_free_space.setText(global_config[self.profile_name]["free_space"])
+
+    def failed_rows(self):
+        """List items currently in the 'Failed' state (one row per failed file)."""
+        failed = []
+        for item in self.open_rows.values():
+            if self.listWidget.row(item) == -1:
+                continue  # Row was trimmed off the end of the list
+            item_widget = self.listWidget.itemWidget(item)
+            if item_widget is not None and item_widget.get_state() == "Failed":
+                failed.append(item)
+        return failed
+
+    def toggle_failed_entries(self, show):
+        """Show or hide the failed entries pinned at the top of the file operation list."""
+        self.show_failed_entries = show
+        for item in self.failed_rows():
+            self.listWidget.setRowHidden(self.listWidget.row(item), not show)
+
+    def update_show_errors_button(self):
+        """Refresh the failed-files toggle in the header: text with the current
+        number of failed entries, hidden while there are none."""
+        failed_count = len(self.failed_rows())
+        self.pushButton_show_errors.setText(f"{failed_count} failed")
+        self.pushButton_show_errors.setVisible(failed_count > 0)
 
     def open_sync_dir(self):
         sync_dir = global_config[self.profile_name]["onedrive"]["sync_dir"].strip('"')
