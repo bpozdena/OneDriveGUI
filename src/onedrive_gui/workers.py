@@ -11,6 +11,7 @@ from .ui.ui_list_item_widget import Ui_list_item_widget
 import os
 import re
 import json
+import signal
 import time
 import subprocess
 from datetime import datetime, timezone
@@ -121,10 +122,32 @@ class WorkerThread(QThread):
             return None
         return read_monitor_status(self.config_dir.group(1), process.pid)
 
-    def stop_worker(self):
-        logging.info(f"[{self.profile_name}] Waiting for worker to finish...")
-        while self.onedrive_process.poll() is None:
-            self.onedrive_process.kill()
+    def stop_worker(self, grace_period=10):
+        """
+        Ask the OneDrive client to shut down and wait for this thread to finish.
+
+        On SIGINT the client completes in-flight transfers, checkpoints its
+        database, removes monitor-status.json and exits, so it is signalled first
+        and only killed when it does not exit within `grace_period` seconds.
+        Blocks the caller (main thread) for at most the grace period.
+        """
+        process = getattr(self, "onedrive_process", None)
+        if process is not None and process.poll() is None:
+            logging.info(f"[{self.profile_name}] Asking the OneDrive client to shut down (SIGINT)")
+            try:
+                process.send_signal(signal.SIGINT)
+            except ProcessLookupError:
+                pass
+
+            try:
+                process.wait(timeout=grace_period)
+            except subprocess.TimeoutExpired:
+                logging.warning(f"[{self.profile_name}] Client did not exit within {grace_period}s - killing it")
+                process.kill()
+                try:
+                    process.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    pass
 
         logging.info(f"[{self.profile_name}] Quitting thread")
         self.quit()
