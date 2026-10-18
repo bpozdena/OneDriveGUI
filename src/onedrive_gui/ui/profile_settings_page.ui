@@ -655,6 +655,9 @@
                 </item>
                 <item row="4" column="2">
                  <widget class="QCheckBox" name="checkBox_force_session_upload">
+                  <property name="toolTip">
+                   <string>Force the client to use a 'session' upload, which includes the local timestamp of the file when it is uploaded.</string>
+                  </property>
                   <property name="text">
                    <string>Force Session Upload</string>
                   </property>
@@ -663,7 +666,7 @@
                 <item row="4" column="1">
                  <widget class="QCheckBox" name="checkBox_no_remote_delete">
                   <property name="toolTip">
-                   <string>Do not delete local file 'deletes' from OneDrive when using --upload-only</string>
+                   <string>When used with Upload only, local file and folder deletions are not replicated to Microsoft OneDrive.</string>
                   </property>
                   <property name="text">
                    <string>No remote delete</string>
@@ -723,7 +726,7 @@
                 <item row="1" column="2">
                  <widget class="QCheckBox" name="checkBox_disable_upload_validation">
                   <property name="toolTip">
-                   <string>Disable download validation when downloading from OneDrive.</string>
+                   <string>Skip the integrity validation the client performs on files uploaded to Microsoft OneDrive. Enable this if the online service modifies your files after the upload (typically SharePoint), which breaks the integrity check.</string>
                   </property>
                   <property name="text">
                    <string>Disable upload validation</string>
@@ -732,6 +735,9 @@
                 </item>
                 <item row="2" column="3">
                  <widget class="QCheckBox" name="checkBox_bypass_data_preservation">
+                  <property name="toolTip">
+                   <string>Disable 'safeBackup' data preservation when unique local file content would otherwise be displaced during conflict resolution or reconciliation. When enabled, local content can be overwritten or removed without a recoverable 'safeBackup' copy. Use with extreme care - this can lead to data loss.</string>
+                  </property>
                   <property name="text">
                    <string>Bypass data preservation</string>
                   </property>
@@ -746,6 +752,9 @@
                 </item>
                 <item row="4" column="3">
                  <widget class="QCheckBox" name="checkBox_delay_inotify_processing">
+                  <property name="toolTip">
+                   <string>Delay processing of 'inotify' events. Only enable this to reduce the impact of editors like Obsidian, which constantly write changes to disk in an atomic fashion. You must also enable 'Force Session Upload'.</string>
+                  </property>
                   <property name="text">
                    <string>Delay inotify processing</string>
                   </property>
