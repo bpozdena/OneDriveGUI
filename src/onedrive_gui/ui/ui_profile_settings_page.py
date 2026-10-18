@@ -511,6 +511,16 @@ class Ui_profile_settings(object):
 
         self.gridLayout_4.addWidget(self.checkBox_monitor_status, 7, 1, 1, 1)
 
+        self.checkBox_use_device_auth = QCheckBox(self.groupBox_5)
+        self.checkBox_use_device_auth.setObjectName(u"checkBox_use_device_auth")
+
+        self.gridLayout_4.addWidget(self.checkBox_use_device_auth, 7, 2, 1, 1)
+
+        self.checkBox_permanent_delete = QCheckBox(self.groupBox_5)
+        self.checkBox_permanent_delete.setObjectName(u"checkBox_permanent_delete")
+
+        self.gridLayout_4.addWidget(self.checkBox_permanent_delete, 7, 3, 1, 1)
+
 
         self.verticalLayout_15.addWidget(self.groupBox_5)
 
@@ -634,6 +644,22 @@ class Ui_profile_settings(object):
         self.checkBox_skip_dotfiles.setObjectName(u"checkBox_skip_dotfiles")
 
         self.gridLayout_2.addWidget(self.checkBox_skip_dotfiles, 1, 0, 1, 1)
+
+        self.horizontalLayout_skip_size = QHBoxLayout()
+        self.horizontalLayout_skip_size.setObjectName(u"horizontalLayout_skip_size")
+        self.label_skip_size = QLabel(self.groupBox_3)
+        self.label_skip_size.setObjectName(u"label_skip_size")
+
+        self.horizontalLayout_skip_size.addWidget(self.label_skip_size)
+
+        self.spinBox_skip_size = QSpinBox(self.groupBox_3)
+        self.spinBox_skip_size.setObjectName(u"spinBox_skip_size")
+        self.spinBox_skip_size.setMaximum(1048576)
+
+        self.horizontalLayout_skip_size.addWidget(self.spinBox_skip_size)
+
+
+        self.gridLayout_2.addLayout(self.horizontalLayout_skip_size, 2, 0, 1, 1)
 
 
         self.verticalLayout_7.addWidget(self.groupBox_3)
@@ -1029,6 +1055,14 @@ class Ui_profile_settings(object):
         self.checkBox_monitor_status.setToolTip(QCoreApplication.translate("profile_settings", u"Publish the machine-readable runtime status file 'monitor-status.json' in the configuration directory while monitoring. OneDriveGUI uses it to show the overall sync state; when disabled, the state is derived from the client output only. (client v2.5.12+)", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_monitor_status.setText(QCoreApplication.translate("profile_settings", u"Publish monitor status file", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_use_device_auth.setToolTip(QCoreApplication.translate("profile_settings", u"Sign in with a code shown by the client (Microsoft OAuth2 Device Authorisation Flow), instead of the browser-based flow. Ideal for headless systems and remote sessions.<br/>Only supported for Work/School (Entra ID) accounts - not for personal accounts (e.g. @outlook.com).", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_use_device_auth.setText(QCoreApplication.translate("profile_settings", u"Use device authentication", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_permanent_delete.setToolTip(QCoreApplication.translate("profile_settings", u"Permanently delete items online when they are removed locally, instead of moving them to the OneDrive Recycle Bin. Permanently deleted items cannot be restored - <b>online data loss may occur</b>.", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_permanent_delete.setText(QCoreApplication.translate("profile_settings", u"Permanent delete", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("profile_settings", u"Sync Options", None))
 #if QT_CONFIG(tooltip)
         self.groupBox.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>This option is used to 'skip' certain files and supports pattern matching.</p><p>Patterns are case insensitive. <span style=\" font-weight:700;\">*</span> and <span style=\" font-weight:700;\">? </span><a href=\"https://technet.microsoft.com/en-us/library/bb490639.aspx\"><span style=\" text-decoration: underline; color:#5e81ac;\">wildcards characters</span></a> are supported. </p><p>Use <span style=\" font-weight:700;\">|</span> to separate multiple patterns.<br/></p><p><span style=\" text-decoration: underline;\">Files can be skipped in the following fashion:</span></p><p>-Specify a wildcard, eg: '<span style=\" font-weight:700;\">*.txt</span>' (skip all txt files)</p><p>-Explicitly specify the filename and it's full path relative to your sync_dir, eg: '<span style=\" font-weight:700;\">path/to/file/filename.ext</span>'</p><p>-Explicitly specify the filename only and skip every instance of this filename, eg: '<span style=\" font-weight:700;\">filename.ext</span>'</p><p><br/></p><p><span "
@@ -1057,6 +1091,13 @@ class Ui_profile_settings(object):
         self.checkBox_skip_dotfiles.setToolTip(QCoreApplication.translate("profile_settings", u"Skip dot files and folders from syncing", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_skip_dotfiles.setText(QCoreApplication.translate("profile_settings", u"Skip dotfiles (hidden files)", None))
+#if QT_CONFIG(tooltip)
+        self.label_skip_size.setToolTip(QCoreApplication.translate("profile_settings", u"Do not sync files larger than this size, in MB. 0 syncs all files regardless of size. Changing this option requires a resync.", None))
+#endif // QT_CONFIG(tooltip)
+        self.label_skip_size.setText(QCoreApplication.translate("profile_settings", u"Skip files larger than (MB)", None))
+#if QT_CONFIG(tooltip)
+        self.spinBox_skip_size.setToolTip(QCoreApplication.translate("profile_settings", u"Do not sync files larger than this size, in MB. 0 syncs all files regardless of size. Changing this option requires a resync.", None))
+#endif // QT_CONFIG(tooltip)
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("profile_settings", u"Excluded files", None))
         self.groupBox_11.setTitle(QCoreApplication.translate("profile_settings", u"Sync List", None))
         self.label_sync_list.setText(QCoreApplication.translate("profile_settings", u"Selective sync allows you to sync only specific files and directories. <br> See <a href=\"https://github.com/abraunegg/onedrive/blob/master/docs/usage.md#performing-a-selective-synchronisation-via-sync_list-file\">official documentation </a> for more details.", None))

@@ -830,6 +830,26 @@
                   </property>
                  </widget>
                 </item>
+<item row="7" column="2">
+                <widget class="QCheckBox" name="checkBox_use_device_auth">
+                 <property name="toolTip">
+                  <string>Sign in with a code shown by the client (Microsoft OAuth2 Device Authorisation Flow), instead of the browser-based flow. Ideal for headless systems and remote sessions.&lt;br/&gt;Only supported for Work/School (Entra ID) accounts - not for personal accounts (e.g. @outlook.com).</string>
+                 </property>
+                 <property name="text">
+                  <string>Use device authentication</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="3">
+                <widget class="QCheckBox" name="checkBox_permanent_delete">
+                 <property name="toolTip">
+                  <string>Permanently delete items online when they are removed locally, instead of moving them to the OneDrive Recycle Bin. Permanently deleted items cannot be restored - &lt;b&gt;online data loss may occur&lt;/b&gt;.</string>
+                 </property>
+                 <property name="text">
+                  <string>Permanent delete</string>
+                 </property>
+                </widget>
+               </item>
                </layout>
               </widget>
              </item>
@@ -996,6 +1016,30 @@
                <string>Skip dotfiles (hidden files)</string>
               </property>
              </widget>
+            </item>
+<item row="2" column="0">
+             <layout class="QHBoxLayout" name="horizontalLayout_skip_size">
+              <item>
+               <widget class="QLabel" name="label_skip_size">
+                <property name="toolTip">
+                 <string>Do not sync files larger than this size, in MB. 0 syncs all files regardless of size. Changing this option requires a resync.</string>
+                </property>
+                <property name="text">
+                 <string>Skip files larger than (MB)</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="spinBox_skip_size">
+                <property name="toolTip">
+                 <string>Do not sync files larger than this size, in MB. 0 syncs all files regardless of size. Changing this option requires a resync.</string>
+                </property>
+                <property name="maximum">
+                 <number>1048576</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
            </layout>
           </widget>
