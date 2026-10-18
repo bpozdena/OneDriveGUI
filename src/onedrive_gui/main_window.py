@@ -25,6 +25,7 @@ from .ui.ui_external_login import Ui_ExternalLoginWindow
 
 import re
 import os
+import signal
 import sys
 
 import requests
@@ -215,7 +216,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # Stop the clients and their worker threads before the application is torn
         # down; destroying a QThread that is still running aborts the process.
+        # Whether the clients are stopped (or left running in the background) is
+        # controlled by the 'stop_clients_on_exit' setting.
         QApplication.instance().aboutToQuit.connect(self.stop_all_workers)
+
+        # End-of-session signals: the desktop environment sends SIGTERM/SIGHUP to
+        # the session processes on logout. The Python handler only schedules the
+        # shutdown; the actual work happens in the event loop.
+        for termination_signal in (signal.SIGTERM, signal.SIGHUP):
+            signal.signal(termination_signal, lambda *_: QTimer.singleShot(0, self.shutdown_from_signal))
 
         self.refresh_process_status = QTimer()
         self.refresh_process_status.setSingleShot(False)
@@ -299,15 +308,32 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         if close_question == QMessageBox.Yes:
             logging.info("Quitting OneDriveGUI")
-            self.stop_all_workers()
+            self.stop_all_workers(force=True)
             QApplication.instance().quit()
 
         elif close_question == QMessageBox.No:
             logging.info("[GUI] Keeping OneDriveGUI running.")
 
-    def stop_all_workers(self):
+    def stop_all_workers(self, force=False):
+        """
+        Stop every running worker and its OneDrive client.
+
+        Unless `force` is set, the 'stop_clients_on_exit' setting decides whether
+        the clients are stopped or left running in the background for the next
+        OneDriveGUI start to reconnect to.
+        """
+        if not force and gui_settings.get("stop_clients_on_exit") == "False":
+            logging.info("[GUI] Leaving the OneDrive clients running (stop on exit disabled)")
+            return
+
         for profile_name in list(workers):
             workers[profile_name].stop_worker()
+
+    def shutdown_from_signal(self):
+        """Shut down without asking: the session is ending (SIGTERM/SIGHUP)."""
+        logging.info("[GUI] Termination signal received - shutting down")
+        self.stop_all_workers()
+        QApplication.instance().quit()
 
     def stop_onedrive_monitor(self, profile_name):
         if profile_name in workers:

@@ -37,6 +37,17 @@
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
            <layout class="QFormLayout" name="formLayout">
+            <item row="2" column="0">
+             <widget class="QCheckBox" name="checkBox_stop_clients_on_exit">
+              <property name="toolTip">
+               <string>Stop the OneDrive client of every profile when OneDriveGUI exits or the session logs out. The client finishes in-flight transfers before it exits.&lt;br/&gt;When disabled, the clients keep running in the background; OneDriveGUI offers to reconnect to them on the next start.</string>
+              </property>
+              <property name="text">
+               <string>Stop OneDrive clients when OneDriveGUI exits</string>
+              </property>
+             </widget>
+            </item>
+
             <item row="0" column="0">
              <widget class="QCheckBox" name="checkBox_start_minimized">
               <property name="text">
