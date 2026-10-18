@@ -27,7 +27,7 @@ from .global_config import save_global_config
 
 # Import main_window (lazy import to avoid circular references)
 from . import main_window
-from .options import client_bin_path, global_config
+from .options import client_bin_path, client_version, global_config
 from .options import temp_global_config
 
 from .workers import workers
@@ -410,6 +410,8 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_cleanup_local_files.stateChanged.connect(self.validate_checkbox_input)
         self.checkBox_mirror_local_state.stateChanged.connect(self.set_check_box_state)
         self.checkBox_disable_upload_hash_streaming.stateChanged.connect(self.set_check_box_state)
+        self.checkBox_disable_time_check.stateChanged.connect(self.set_check_box_state)
+        self.checkBox_monitor_status.stateChanged.connect(self.set_check_box_state)
         self.comboBox_monitor_authoritative_sync.currentTextChanged.connect(self.set_monitor_authoritative_sync)
         self.lineEdit_user_agent.textChanged.connect(self.set_line_edit_value)
         self.lineEdit_azure_ad_endpoint.textChanged.connect(self.set_line_edit_value)
@@ -440,6 +442,7 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.spinBox_monitor_log_frequency.valueChanged.connect(self.set_spin_box_value)
         self.checkBox_disable_notifications.stateChanged.connect(self.set_check_box_state)
         self.checkBox_disable_notifications.stateChanged.connect(self.validate_checkbox_input)
+        self.checkBox_notify_monitor_start.stateChanged.connect(self.set_check_box_state)
 
         # Account tab
         self.pushButton_login.clicked.connect(lambda: main_window.main_window_instance.show_login(self.profile))
@@ -516,6 +519,8 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.checkBox_mirror_local_state.setChecked(self.get_check_box_state("mirror_local_state"))
         self.checkBox_mirror_local_state.setEnabled(self.checkBox_local_first.isChecked())
         self.checkBox_disable_upload_hash_streaming.setChecked(self.get_check_box_state("disable_upload_hash_streaming"))
+        self.checkBox_disable_time_check.setChecked(self.get_check_box_state("disable_time_check"))
+        self.checkBox_monitor_status.setChecked(self.get_check_box_state("monitor_status"))
         self.comboBox_monitor_authoritative_sync.setCurrentText(self.temp_profile_config["onedrive"]["monitor_authoritative_sync"].strip('"'))
         self.update_monitor_authoritative_sync_state()
         self.lineEdit_user_agent.setText(self.temp_profile_config["onedrive"]["user_agent"].strip('"'))
@@ -550,6 +555,15 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
         self.spinBox_monitor_log_frequency.setValue(int(self.temp_profile_config["onedrive"]["monitor_log_frequency"].strip('"')))
         self.spinBox_monitor_log_frequency.setEnabled(self.checkBox_enable_logging.isChecked())
         self.checkBox_disable_notifications.setChecked(self.get_check_box_state("disable_notifications"))
+        self.checkBox_notify_monitor_start.setChecked(self.get_check_box_state("notify_monitor_start"))
+        self.checkBox_notify_monitor_start.setEnabled(not self.checkBox_disable_notifications.isChecked())
+
+        # Options added in client v2.5.12. Older clients refuse to start with
+        # unknown keys in their config, so they can only be changed on v2.5.12+.
+        if client_version < 2512:
+            for check_box in (self.checkBox_disable_time_check, self.checkBox_monitor_status, self.checkBox_notify_monitor_start):
+                check_box.setEnabled(False)
+                check_box.setToolTip(check_box.toolTip() + "\n\nRequires OneDrive client v2.5.12 or newer.")
 
         # Account tab
         self.config_file = global_config[self.profile]["config_file"].strip('"')
@@ -656,6 +670,10 @@ class ProfileSettingsPage(QWidget, Ui_profile_settings):
                 self.lineEdit_recycle_bin_path.setEnabled(False)
                 self.label_recycle_bin_path.setEnabled(False)
                 self.pushButton_recycle_bin_path_browse.setEnabled(False)
+
+        if self.sender().objectName() == "checkBox_disable_notifications":
+            # The monitor-start notification is only sent while notifications are enabled.
+            self.checkBox_notify_monitor_start.setEnabled(not self.checkBox_disable_notifications.isChecked() and client_version >= 2512)
 
     def str2bool(self, value):
         return value.lower() in "true"

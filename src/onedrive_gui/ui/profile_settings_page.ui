@@ -801,6 +801,26 @@
                   </property>
                  </widget>
                 </item>
+                <item row="6" column="3">
+                 <widget class="QCheckBox" name="checkBox_disable_time_check">
+                  <property name="toolTip">
+                   <string>Do not validate the local system clock against Microsoft service time. CAUTION: this bypasses a synchronisation correctness safeguard - if the system clock is significantly wrong, timestamp-related reconciliation may be unreliable. (client v2.5.12+)</string>
+                  </property>
+                  <property name="text">
+                   <string>Disable time check</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="1">
+                 <widget class="QCheckBox" name="checkBox_monitor_status">
+                  <property name="toolTip">
+                   <string>Publish the machine-readable runtime status file 'monitor-status.json' in the configuration directory while monitoring. OneDriveGUI uses it to show the overall sync state; when disabled, the state is derived from the client output only. (client v2.5.12+)</string>
+                  </property>
+                  <property name="text">
+                   <string>Publish monitor status file</string>
+                  </property>
+                 </widget>
+                </item>
                </layout>
               </widget>
              </item>
@@ -1204,6 +1224,16 @@
               </property>
               <property name="text">
                <string>Disable notifications</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QCheckBox" name="checkBox_notify_monitor_start">
+              <property name="toolTip">
+               <string>Send a desktop notification summarising the local and remote monitoring mechanisms when monitor mode becomes active. Has no effect while notifications are disabled. (client v2.5.12+)</string>
+              </property>
+              <property name="text">
+               <string>Notify when monitoring starts</string>
               </property>
              </widget>
             </item>
