@@ -13,6 +13,10 @@ script:
   - rm -f AppDir/usr/local/lib/python3.10/dist-packages/PySide6/{Qt3D*,QtBluetooth*,QtCharts*,QtConcurrent*,QtDataVisualization*,QtDBus*,QtDesigner*,QtHelp*,QtMultimedia*,QtNetwork*,QtOpenGL*,QtPositioning*,QtPrintSupport*,QtQml*,QtQuick*,QtRemoteObjects*,QtScxml*,QtSensors*,QtSerialPort*,QtSql*,QtStateMachine*,QtSvg*,QtTest*,QtWeb*,QtXml*}
   - shopt -s extglob
   - rm -rf AppDir/usr/local/lib/python3.10/dist-packages/PySide6/Qt/lib/!(libQt6OpenGL*|libQt6XcbQpa*|libQt6Wayland*|libQt6Egl*|libicudata*|libicuuc*|libicui18n*|libQt6DBus*|libQt6Network*|libQt6Qml*|libQt6Core*|libQt6Gui*|libQt6Widgets*|libQt6Svg*|libQt6UiTools*)
+  # Remove packaging output from previous builds: the wheel install below picks
+  # up every *.whl in dist/, so a stale older wheel would overwrite the freshly
+  # built package in the AppDir (e.g. an old version number in options.py).
+  - rm -rf build dist src/onedrive_gui.egg-info
   - python3 -m build
   # --no-deps: dependencies were installed from requirements.txt above and pruned
   # since; pip resolves them against the build container, not the AppDir, so
