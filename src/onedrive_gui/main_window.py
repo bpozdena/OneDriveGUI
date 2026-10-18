@@ -39,6 +39,7 @@ from .profile_settings_window import profile_settings_window
 from .options import (
     global_config,
     client_bin_path,
+    client_version,
     gui_settings,
     version,
 )
@@ -1614,10 +1615,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Build login URL from profile config and update the label
         self._build_login_url(profile)
         self.lw2.label_2.setText(
-            f"<html><head/><body><p>1)Login to OneDrive in your browser by "
+            f"<html><head/><body><p>Preferred: press <b>Sign in with web browser</b> above - "
+            f"the OneDrive client opens your browser and completes the login by itself.</p>"
+            f"<p>--- or manually ---</p>"
+            f"<p>1)Login to OneDrive in your browser by "
             f'<a href="{self.login_url}"><span style=" text-decoration: underline; color:#5e81ac;">clicking this link.</span></a></p>'
-            f"<p>2)Copy the response URI from your browser's address bar to the below field. </p>"
-            f"<p>3)Press Save.</p></body></html>"
+            f"<p>2)If the browser ends up on a 'This page is no longer available' page, copy the address of the <i>previous</i> "
+            f"page from the browser history (Ctrl+Shift+H or F12 &#8594; Network with persisted logs helps). </p>"
+            f"<p>3)Paste the response URI from your browser's address bar to the below field. </p>"
+            f"<p>4)Press Save.</p></body></html>"
         )
 
         self.lw2.label_2.setOpenExternalLinks(True)
@@ -1626,6 +1632,31 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lw2.lineEdit_response_url.textChanged.connect(self.enable_login_button)
 
         self.lw2.pushButton_login.clicked.connect(lambda: self.get_response_url(self.lw2.lineEdit_response_url.text(), profile))
+
+        # The client's own login flow (v2.5.11+) opens the default browser and
+        # receives the response on a local loopback listener - no URL copying, and
+        # no "wrongplace" redirect page as with the manual nativeclient redirect.
+        if client_version >= MIN_CLIENT_VERSION:
+            self.lw2.pushButton_browser_login.clicked.connect(lambda: self.browser_login(profile, self.window2))
+        else:
+            self.lw2.pushButton_browser_login.hide()
+
+    def browser_login(self, profile, login_window=None):
+        """
+        Restart the profile's client with --reauth so it opens the default web
+        browser and completes the login with its local loopback listener
+        (client v2.5.11+). No response URL has to be copied manually.
+        """
+        logging.info(f"[{profile}] Logging in via the system browser (client --reauth)")
+        if login_window is not None:
+            login_window.close()
+
+        if profile in workers:
+            # Stop the remains of the worker that reported the login requirement.
+            workers[profile].stop_worker()
+            self.remove_worker(profile)
+
+        self.start_onedrive_monitor(profile, "--reauth")
 
     def enable_login_button(self):
         # Enable 'Save' button only when valid URL with login response code is provided.

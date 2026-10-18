@@ -47,6 +47,16 @@
                         </spacer>
                     </item>
                     <item>
+                        <widget class="QPushButton" name="pushButton_browser_login">
+                            <property name="toolTip">
+                             <string>The OneDrive client opens your default web browser and completes the login automatically - no need to copy anything.</string>
+                            </property>
+                            <property name="text">
+                             <string>Sign in with web browser</string>
+                            </property>
+                        </widget>
+                    </item>
+                    <item>
                         <widget class="QLabel" name="label_2">
                             <property name="styleSheet">
                                 <string notr="true" />
