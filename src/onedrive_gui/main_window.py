@@ -27,6 +27,7 @@ import re
 import os
 import signal
 import sys
+import time
 
 import requests
 import subprocess
@@ -890,12 +891,78 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if self.profile_status_pages[profile_name].pushButton_start.isEnabled() and global_config[profile_name]["auto_sync"] == "True":
                 self.start_onedrive_monitor(profile_name)
 
+    @staticmethod
+    def find_running_client(profile_name):
+        """
+        PID of an OneDrive client process running with this profile's
+        configuration directory, or None. Such a process is typically left
+        behind by a previous OneDriveGUI run or started outside the GUI; the
+        client refuses to start a second instance for the same configuration.
+        """
+        config_file = global_config[profile_name]["config_file"].strip('"')
+        config_dir = os.path.expanduser(re.search(r"(.+)/.+$", config_file).group(1))
+
+        for proc_entry in os.listdir("/proc"):
+            if not proc_entry.isdigit():
+                continue
+            try:
+                with open(f"/proc/{proc_entry}/cmdline", "rb") as cmdline_file:
+                    cmdline = cmdline_file.read()
+            except OSError:
+                continue
+            if b"onedrive" in cmdline and os.fsencode(config_dir) in cmdline:
+                return int(proc_entry)
+        return None
+
+    def take_over_running_client(self, profile_name):
+        """
+        A client for this profile is already running outside OneDriveGUI. Ask the
+        user whether to stop it so the GUI can monitor the profile, and if
+        agreed, stop it gracefully and wait for it to exit.
+        Returns True when the caller can start monitoring.
+        """
+        orphan_pid = self.find_running_client(profile_name)
+        if orphan_pid is None:
+            return True
+
+        answer = QMessageBox.question(
+            self,
+            f"OneDrive client already running for profile {profile_name}",
+            f"An OneDrive client for profile <b>{profile_name}</b> is already running outside OneDriveGUI (PID {orphan_pid}).<br><br>"
+            "It was probably left behind by a previous OneDriveGUI session. Only one client can use this profile.<br><br>"
+            "Stop it and start monitoring it in OneDriveGUI?",
+            buttons=QMessageBox.Yes | QMessageBox.No,
+            defaultButton=QMessageBox.Yes,
+        )
+        if answer != QMessageBox.Yes:
+            logging.info(f"[{profile_name}] Keeping the external OneDrive client (PID {orphan_pid}); not starting the monitor")
+            return False
+
+        logging.info(f"[{profile_name}] Stopping external OneDrive client (PID {orphan_pid})")
+        self.profile_status_pages[profile_name].label_onedrive_status.setText("Stopping external OneDrive client...")
+        try:
+            os.kill(orphan_pid, signal.SIGINT)
+            for _ in range(50):  # Wait up to 10 s for a graceful shutdown
+                try:
+                    os.kill(orphan_pid, 0)
+                except ProcessLookupError:
+                    break
+                time.sleep(0.2)
+            else:
+                logging.warning(f"[{profile_name}] External client did not exit within 10s - killing it")
+                os.kill(orphan_pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass  # Exited on its own in the meantime
+        return True
+
     def start_onedrive_monitor(self, profile_name, options=""):
         # Clear any previous error messages when starting sync
         self.profile_status_pages[profile_name].label_error_icon.clear()
         self.profile_status_pages[profile_name].label_error_icon.setToolTip("")
 
         if profile_name not in workers:
+            if not self.take_over_running_client(profile_name):
+                return
             workers[profile_name] = WorkerThread(profile_name, options)
             workers[profile_name].start()
         else:
