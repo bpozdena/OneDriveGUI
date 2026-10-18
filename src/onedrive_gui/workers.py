@@ -243,6 +243,9 @@ class WorkerThread(QThread):
             short_error = "Not enough disk space"
         elif "sync_business_shared_folders" in lower:
             short_error = "Unsupported option 'sync_business_shared_folders' in client config"
+        elif lower.startswith("local file system error:"):
+            short_error = full_error_message.split(". If this is", 1)[0]
+            short_error = short_error if len(short_error) <= 90 else short_error[:87] + "..."
         else:
             # Unknown error: keep the beginning of the message on a single line
             short_error = full_error_message if len(full_error_message) <= 90 else full_error_message[:87] + "..."
@@ -603,7 +606,18 @@ class WorkerThread(QThread):
                     if len(error_parts) > 1:
                         additional_error = error_parts[1].strip()
                         # Combine with pending error, including the affected path if we captured one
-                        if self.pending_error_path:
+                        if "local file system returned an error" in self.pending_error.lower():
+                            # The summary line carries no information of its own; the
+                            # error message already names the affected path.
+                            full_error_message = f"Local file system error: {additional_error}"
+                            if self.pending_error_path and self.pending_error_path not in additional_error:
+                                full_error_message += f" (path: {self.pending_error_path})"
+                            if "no such file or directory" in additional_error.lower():
+                                full_error_message += (
+                                    ". If this is a broken symbolic link, remove it or enable 'Skip symlinks' "
+                                    "in the profile's Excluded files settings."
+                                )
+                        elif self.pending_error_path:
                             full_error_message = f"{self.pending_error} Path: {self.pending_error_path} - {additional_error}"
                         else:
                             full_error_message = f"{self.pending_error} {additional_error}"
