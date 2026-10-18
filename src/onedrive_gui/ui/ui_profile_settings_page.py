@@ -501,6 +501,16 @@ class Ui_profile_settings(object):
 
         self.gridLayout_4.addWidget(self.checkBox_disable_upload_hash_streaming, 6, 2, 1, 1)
 
+        self.checkBox_disable_time_check = QCheckBox(self.groupBox_5)
+        self.checkBox_disable_time_check.setObjectName(u"checkBox_disable_time_check")
+
+        self.gridLayout_4.addWidget(self.checkBox_disable_time_check, 6, 3, 1, 1)
+
+        self.checkBox_monitor_status = QCheckBox(self.groupBox_5)
+        self.checkBox_monitor_status.setObjectName(u"checkBox_monitor_status")
+
+        self.gridLayout_4.addWidget(self.checkBox_monitor_status, 7, 1, 1, 1)
+
 
         self.verticalLayout_15.addWidget(self.groupBox_5)
 
@@ -791,6 +801,11 @@ class Ui_profile_settings(object):
 
         self.formLayout_3.setWidget(0, QFormLayout.ItemRole.LabelRole, self.checkBox_disable_notifications)
 
+        self.checkBox_notify_monitor_start = QCheckBox(self.groupBox_6)
+        self.checkBox_notify_monitor_start.setObjectName(u"checkBox_notify_monitor_start")
+
+        self.formLayout_3.setWidget(1, QFormLayout.ItemRole.LabelRole, self.checkBox_notify_monitor_start)
+
 
         self.verticalLayout_6.addWidget(self.groupBox_6)
 
@@ -997,6 +1012,14 @@ class Ui_profile_settings(object):
         self.checkBox_disable_upload_hash_streaming.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>Controls whether the client uses hash values calculated while streaming file uploads.</p><p>When enabled, the client ignores upload-streamed hash values and always generates upload hashes using the traditional local file hash generation path.</p><p>Intended as a compatibility and diagnostic fail-safe for scenarios where Microsoft OneDrive or SharePoint modifies uploaded file content or metadata after upload.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_disable_upload_hash_streaming.setText(QCoreApplication.translate("profile_settings", u"Disable upload hash streaming", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_disable_time_check.setToolTip(QCoreApplication.translate("profile_settings", u"Do not validate the local system clock against Microsoft service time. CAUTION: this bypasses a synchronisation correctness safeguard - if the system clock is significantly wrong, timestamp-related reconciliation may be unreliable. (client v2.5.12+)", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_disable_time_check.setText(QCoreApplication.translate("profile_settings", u"Disable time check", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_monitor_status.setToolTip(QCoreApplication.translate("profile_settings", u"Publish the machine-readable runtime status file 'monitor-status.json' in the configuration directory while monitoring. OneDriveGUI uses it to show the overall sync state; when disabled, the state is derived from the client output only. (client v2.5.12+)", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_monitor_status.setText(QCoreApplication.translate("profile_settings", u"Publish monitor status file", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("profile_settings", u"Sync Options", None))
 #if QT_CONFIG(tooltip)
         self.groupBox.setToolTip(QCoreApplication.translate("profile_settings", u"<html><head/><body><p>This option is used to 'skip' certain files and supports pattern matching.</p><p>Patterns are case insensitive. <span style=\" font-weight:700;\">*</span> and <span style=\" font-weight:700;\">? </span><a href=\"https://technet.microsoft.com/en-us/library/bb490639.aspx\"><span style=\" text-decoration: underline; color:#5e81ac;\">wildcards characters</span></a> are supported. </p><p>Use <span style=\" font-weight:700;\">|</span> to separate multiple patterns.<br/></p><p><span style=\" text-decoration: underline;\">Files can be skipped in the following fashion:</span></p><p>-Specify a wildcard, eg: '<span style=\" font-weight:700;\">*.txt</span>' (skip all txt files)</p><p>-Explicitly specify the filename and it's full path relative to your sync_dir, eg: '<span style=\" font-weight:700;\">path/to/file/filename.ext</span>'</p><p>-Explicitly specify the filename only and skip every instance of this filename, eg: '<span style=\" font-weight:700;\">filename.ext</span>'</p><p><br/></p><p><span "
@@ -1073,6 +1096,10 @@ class Ui_profile_settings(object):
         self.checkBox_disable_notifications.setToolTip(QCoreApplication.translate("profile_settings", u"Do not use desktop notifications in monitor mode.", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_disable_notifications.setText(QCoreApplication.translate("profile_settings", u"Disable notifications", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_notify_monitor_start.setToolTip(QCoreApplication.translate("profile_settings", u"Send a desktop notification summarising the local and remote monitoring mechanisms when monitor mode becomes active. Has no effect while notifications are disabled. (client v2.5.12+)", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_notify_monitor_start.setText(QCoreApplication.translate("profile_settings", u"Notify when monitoring starts", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_logging), QCoreApplication.translate("profile_settings", u"Logging", None))
         self.pushButton_discard.setText(QCoreApplication.translate("profile_settings", u"Discard changes", None))
         self.pushButton_save.setText(QCoreApplication.translate("profile_settings", u"Save", None))
