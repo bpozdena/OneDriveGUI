@@ -8,6 +8,7 @@ from PySide6.QtGui import QFontMetrics, QIcon
 from .ui.ui_list_item_widget import Ui_list_item_widget
 
 
+import os
 import re
 import time
 import subprocess
@@ -31,6 +32,12 @@ import logging
 
 # from logger import logger
 from .global_config import DIR_PATH, PROFILES_FILE
+
+
+def _path_key(path):
+    """Key for per-file lookups. The client prints the same file both with and
+    without a leading './' depending on the message."""
+    return os.path.normpath(path)
 
 
 class WorkerThread(QThread):
@@ -411,14 +418,14 @@ class WorkerThread(QThread):
 
                 if transfer_failed:
                     # Attach the reason why this file failed, if we know it.
-                    error_message = self.file_errors.get(transfer_progress_new["file_path"])
+                    error_message = self.file_errors.get(_path_key(transfer_progress_new["file_path"]))
                     if error_message is None and self.last_unattributed_error and (time.time() - self.last_error_time) < 10:
                         # API error blocks (e.g. HTTP 400) carry no path - they are
                         # printed just before the client retries the same file and
                         # reports the failed transfer, so attribute them here.
                         error_message = self.last_unattributed_error
                         self.last_unattributed_error = None
-                        self.file_errors[transfer_progress_new["file_path"]] = error_message
+                        self.file_errors[_path_key(transfer_progress_new["file_path"])] = error_message
                     transfer_progress_new["error_message"] = error_message
 
                 # Update file transfer list
@@ -525,7 +532,7 @@ class WorkerThread(QThread):
                     # error blocks include a "Path:" line), or as the most recent
                     # error to be attributed to the next transfer that fails.
                     if self.pending_error_path:
-                        self.file_errors[self.pending_error_path] = full_error_message
+                        self.file_errors[_path_key(self.pending_error_path)] = full_error_message
                     self.last_unattributed_error = full_error_message
                     self.last_error_time = time.time()
                     self.pending_error = None  # Clear pending error
@@ -567,7 +574,7 @@ class WorkerThread(QThread):
                 #   Skipping uploading this file as it cannot be read (file permissions or file corruption): ./file
                 match = re.match(r"Skipping uploading this (?:new )?file (.*?): (.+)$", stdout)
                 if match:
-                    self.file_errors[match.group(2).strip()] = f"Skipped uploading {match.group(1)}"
+                    self.file_errors[_path_key(match.group(2).strip())] = f"Skipped uploading {match.group(1)}"
 
             elif "Failed items to upload to/from Microsoft OneDrive:" in stdout:
                 # Extract the count of failed items
@@ -598,7 +605,7 @@ class WorkerThread(QThread):
                         "progress": "0",
                         "transfer_complete": False,
                         "transfer_failed": True,
-                        "error_message": self.file_errors.get(file_path),
+                        "error_message": self.file_errors.get(_path_key(file_path)),
                         "timestamp": None,
                     }
                     logging.debug(transfer_progress_new)
