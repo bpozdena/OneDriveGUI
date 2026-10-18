@@ -418,19 +418,6 @@ class WorkerThread(QThread):
                 temp_global_config[self.profile_name]["account_type"] = self.account_type.capitalize()
                 # save_global_config()
 
-            elif "Initializing the OneDrive API" in stdout:
-                # Clear failed files list at start of new sync cycle
-                self.failed_files = []
-                self.failed_files_count = 0
-                self.collecting_failed_files = False
-                self.file_errors = {}
-                self.last_unattributed_error = None
-                self._last_notified_failures = None
-                self.msg = "Initializing the OneDrive API"
-                logging.info(f"[{self.profile_name}] {self.msg}")
-                self.profile_status["status_message"] = self.msg
-                self.update_profile_status.emit(self.profile_status, self.profile_name)
-
             elif "Starting a sync with Microsoft OneDrive" in stdout:
                 # A new sync cycle starts. Reset the failed-files list of the
                 # previous cycle, but keep its warning (if any) visible until
@@ -440,6 +427,9 @@ class WorkerThread(QThread):
                 self.failed_files = []
                 self.failed_files_count = 0
                 self.collecting_failed_files = False
+                # Per-file error messages only explain failures of the current cycle.
+                self.file_errors = {}
+                self.last_unattributed_error = None
                 if not previous_cycle_had_failures:
                     self.profile_status.pop("error_message", None)
                     self.clear_warning.emit(self.profile_name)
