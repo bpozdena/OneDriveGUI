@@ -260,7 +260,7 @@ class WorkerThread(QThread):
         status_msg = f"Sync completed with {count} failed file(s)"
 
         # Tooltip message (detailed list)
-        tooltip_lines = [f"Failed items to upload to/from Microsoft OneDrive: {count}"]
+        tooltip_lines = [f"Failed items to sync with Microsoft OneDrive: {count}"]
         tooltip_lines.extend(self.failed_files)
 
         # If there are more failures than we captured, add indicator
@@ -274,11 +274,20 @@ class WorkerThread(QThread):
         self.profile_status["error_message"] = full_tooltip
         self.update_profile_status.emit(self.profile_status, self.profile_name)
 
-        # Raise a tray notification so the user learns about the failures even
-        # when the GUI window is minimized - but only when the set of failing
-        # files changed, so persistent failures do not spam on every cycle.
-        if full_tooltip != self._last_notified_failures:
-            self._last_notified_failures = full_tooltip
+    def _notify_failed_files(self):
+        """
+        Raise a tray notification at the end of a sync cycle with failures, so the
+        user learns about them even when the GUI window is minimized - but only
+        when the set of failing files changed, so persistent failures do not spam
+        on every cycle. Called once per cycle, after all failure summaries
+        (uploads, downloads, ...) have been collected.
+        """
+        if not self.failed_files and self.failed_files_count == 0:
+            return
+        count = self.failed_files_count if self.failed_files_count > 0 else len(self.failed_files)
+        signature = (count, tuple(self.failed_files))
+        if signature != self._last_notified_failures:
+            self._last_notified_failures = signature
             self.notify_failed_sync.emit(self.profile_name, count)
 
     def read_stdout(self):
@@ -358,6 +367,7 @@ class WorkerThread(QThread):
                     # the user stays aware of the background failures.
                     count = self.failed_files_count if self.failed_files_count > 0 else len(self.failed_files)
                     logging.warning(f"[{self.profile_name}] Sync finished with {count} failed item(s) - keeping error state")
+                    self._notify_failed_files()
                 else:
                     # Clear warnings when sync completes without errors
                     self.profile_status.pop("error_message", None)
@@ -374,6 +384,7 @@ class WorkerThread(QThread):
                 logging.warning(f"[{self.profile_name}] {self.msg}")
                 self.profile_status["status_message"] = self.msg
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
+                self._notify_failed_files()
                 # Finalize any transfers that never reported completion during the cycle.
                 self.finalize_stalled_tasks.emit(self.profile_name)
 
@@ -653,11 +664,12 @@ class WorkerThread(QThread):
                 if match:
                     self.file_errors[_path_key(match.group(2).strip())] = f"Skipped uploading {match.group(1)}"
 
-            elif "Failed items to upload to/from Microsoft OneDrive:" in stdout:
-                # Extract the count of failed items
+            elif re.match(r"Failed items to (upload|download) to/from Microsoft OneDrive:", stdout):
+                # Extract the count of failed items. Upload and download failures are
+                # summarised on separate lines, so the counts add up.
                 match = re.search(r"Failed items .+?: (\d+)", stdout)
                 if match:
-                    self.failed_files_count = int(match.group(1))
+                    self.failed_files_count += int(match.group(1))
                     # Start collecting failed file lines (they come after this summary line)
                     self.collecting_failed_files = True
 
