@@ -315,7 +315,7 @@ class WorkerThread(QThread):
                 self.pending_error_path = None
 
             # Check if we were collecting failed files and this line is not a "Failed to" line
-            if self.collecting_failed_files and "Failed to upload:" not in stdout and "Failed to download:" not in stdout:
+            if self.collecting_failed_files and not any(m in stdout for m in ("Failed to upload:", "Failed to download:", "Failed to move to the configured Recycle Bin:")):
                 # We're done collecting, emit the status
                 self._emit_failed_files_status()
                 self.collecting_failed_files = False
@@ -647,6 +647,16 @@ class WorkerThread(QThread):
                     if path_value and path_value != "(not available)":
                         self.pending_error_path = path_value
 
+            elif "to the configured Recycle Bin failed for " in stdout:
+                # Client v2.5.12+: 'ERROR: Move of local file to the configured Recycle Bin
+                # failed for <path>: <reason>' - single line, no 'Path:' continuation.
+                error_text = stdout.split("ERROR:", 1)[-1].strip()
+                match = re.search(r"failed for (.+?): ([^:]+)$", error_text)
+                if match:
+                    self.file_errors[_path_key(match.group(1).strip())] = error_text
+                logging.error(f"[{self.profile_name}] {error_text}")
+                self._emit_error_status(error_text)
+
             elif "ERROR:" in stdout:
                 # Extract error message after "ERROR:" prefix
                 error_parts = stdout.split("ERROR:", 1)
@@ -672,6 +682,30 @@ class WorkerThread(QThread):
                     self.failed_files_count += int(match.group(1))
                     # Start collecting failed file lines (they come after this summary line)
                     self.collecting_failed_files = True
+
+            elif stdout.startswith("Failed local items to move to the configured Recycle Bin:"):
+                # Client v2.5.12+: online deletions that could not be moved to the
+                # local Recycle Bin are summarised after the transfer failures.
+                match = re.search(r": (\d+)$", stdout)
+                if match:
+                    self.failed_files_count += int(match.group(1))
+                    self.collecting_failed_files = True
+
+            elif stdout.startswith("Failed to move to the configured Recycle Bin:"):
+                file_path = stdout.split(":", 1)[1].strip()
+                if len(self.failed_files) < 25:
+                    self.failed_files.append(f"Failed to move to Recycle Bin: {file_path}")
+                transfer_progress_new = {
+                    "file_operation": "Moving",
+                    "file_path": file_path,
+                    "progress": "0",
+                    "transfer_complete": False,
+                    "transfer_failed": True,
+                    "error_message": self.file_errors.get(_path_key(file_path)),
+                    "timestamp": None,
+                }
+                logging.debug(transfer_progress_new)
+                self.update_progress_new.emit(transfer_progress_new, self.profile_name)
 
             elif "Failed to upload:" in stdout or "Failed to download:" in stdout:
                 # Extract the operation and file path
