@@ -383,7 +383,11 @@
                    </widget>
                   </item>
                   <item row="4" column="1">
-                   <widget class="QSpinBox" name="spinBox_connect_timeout"/>
+                   <widget class="QSpinBox" name="spinBox_connect_timeout">
+                    <property name="maximum">
+                     <number>3600</number>
+                    </property>
+                   </widget>
                   </item>
                   <item row="5" column="0">
                    <widget class="QLabel" name="label_data_timeout">
@@ -393,7 +397,11 @@
                    </widget>
                   </item>
                   <item row="5" column="1">
-                   <widget class="QSpinBox" name="spinBox_data_timeout"/>
+                   <widget class="QSpinBox" name="spinBox_data_timeout">
+                    <property name="maximum">
+                     <number>3600</number>
+                    </property>
+                   </widget>
                   </item>
                   <item row="6" column="0">
                    <widget class="QLabel" name="label_ip_protocol_version">
