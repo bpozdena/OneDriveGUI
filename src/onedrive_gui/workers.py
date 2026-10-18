@@ -684,6 +684,14 @@ class WorkerThread(QThread):
                 self.profile_status["status_message"] = "The system clock is back in sync. OneDrive sync will resume."
                 self.update_profile_status.emit(self.profile_status, self.profile_name)
 
+            elif "Unable to configure WebSocket support" in stdout:
+                # Not an error: the client keeps polling for online changes on the
+                # monitor interval and retries WebSocket while monitoring.
+                logging.warning(f"[{self.profile_name}] {stdout}")
+
+            elif "Enabled WebSocket support" in stdout or "Retrying WebSocket notification URL acquisition" in stdout:
+                logging.info(f"[{self.profile_name}] {stdout}")
+
             elif "to the configured Recycle Bin failed for " in stdout:
                 # Client v2.5.12+: 'ERROR: Move of local file to the configured Recycle Bin
                 # failed for <path>: <reason>' - single line, no 'Path:' continuation.
