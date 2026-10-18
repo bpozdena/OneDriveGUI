@@ -183,6 +183,9 @@ class WorkerThread(QThread):
         # Track whether we're waiting for the user to complete login in their browser
         self.awaiting_browser_login = False
 
+        # Explanation of an active system clock drift warning or suspension (client v2.5.12+)
+        self.clock_message = None
+
         # Set once the resync authorization dialog has been requested, so the exit
         # code check below does not ask a second time.
         self.resync_requested = False
@@ -646,6 +649,40 @@ class WorkerThread(QThread):
                     path_value = path_parts[1].strip()
                     if path_value and path_value != "(not available)":
                         self.pending_error_path = path_value
+
+            elif "OneDrive synchronisation suspended because unsafe local system clock drift" in stdout:
+                # Client v2.5.12+ validates the system clock against Microsoft service
+                # time and suspends timestamp-sensitive sync while the drift is unsafe.
+                self.clock_message = (
+                    "OneDrive synchronisation is suspended because the local system clock differs too much from Microsoft service time. "
+                    "Sync resumes automatically once the system time is corrected (check that time synchronisation, e.g. NTP, is enabled)."
+                )
+                logging.error(f"[{self.profile_name}] {stdout}")
+                self.profile_status["status_message"] = "Sync suspended: the system clock is out of sync.\nPlease correct the system time."
+                self.profile_status["error_message"] = self.clock_message
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
+
+            elif "local system clock drift detected" in stdout.lower():
+                # Warning level: sync continues, but the user should fix the clock.
+                self.clock_message = f"{stdout.split('WARNING:', 1)[-1].strip()}. Accurate system time is important for reliable synchronisation and authentication."
+                logging.warning(f"[{self.profile_name}] {stdout}")
+                self.profile_status["error_message"] = self.clock_message
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
+
+            elif self.clock_message and stdout.startswith("Observed clock difference:"):
+                # Detail line following a clock drift warning or suspension.
+                self.clock_message = f"{self.clock_message}\n{stdout}"
+                self.profile_status["error_message"] = self.clock_message
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
+
+            elif "NOTICE: System clock" in stdout or "NOTICE: Local system clock drift has returned" in stdout:
+                # The clock is back within the acceptable range - sync resumes.
+                logging.info(f"[{self.profile_name}] {stdout}")
+                self.clock_message = None
+                self.profile_status.pop("error_message", None)
+                self.clear_warning.emit(self.profile_name)
+                self.profile_status["status_message"] = "The system clock is back in sync. OneDrive sync will resume."
+                self.update_profile_status.emit(self.profile_status, self.profile_name)
 
             elif "to the configured Recycle Bin failed for " in stdout:
                 # Client v2.5.12+: 'ERROR: Move of local file to the configured Recycle Bin
