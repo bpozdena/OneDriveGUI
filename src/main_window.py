@@ -1,4 +1,4 @@
-from PySide6.QtCore import QTimer, QUrl, QFileInfo, Qt, Signal, Slot
+from PySide6.QtCore import QTimer, QUrl, QFileInfo, Qt, Signal, Slot, SLOT
 from PySide6.QtGui import QIcon, QPixmap, QDesktopServices
 from PySide6.QtWidgets import (
     QWidget,
@@ -233,6 +233,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.scroll_update_timer.timeout.connect(self.update_relative_times)
         self.scroll_update_timer.setInterval(200)  # 200ms debounce delay
 
+        # Restart running syncs when the system wakes from sleep. The onedrive client keeps
+        # its network state from before the suspend and can stay stuck on DNS errors until restarted.
+        try:
+            from PySide6.QtDBus import QDBusConnection
+
+            QDBusConnection.systemBus().connect(
+                "org.freedesktop.login1", "/org/freedesktop/login1", "org.freedesktop.login1.Manager", "PrepareForSleep", self, SLOT("prepare_for_sleep(bool)")
+            )
+        except Exception as e:
+            logging.warning(f"[GUI] Not monitoring sleep and resume events: {e}")
+
     def mousePressEvent(self, event):
         if gui_settings.get("frameless_window") == "True":
             self.dragPos = event.globalPosition().toPoint()
@@ -287,6 +298,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         elif close_question == QMessageBox.No:
             logging.info("[GUI] Keeping OneDriveGUI running.")
+
+    @Slot(bool)
+    def prepare_for_sleep(self, sleeping):
+        if sleeping:
+            return
+
+        for profile_name in list(workers):
+            logging.info(f"[{profile_name}] System resumed from sleep, restarting OneDrive sync")
+            self.restart_onedrive_monitor(profile_name)
+
+    def restart_onedrive_monitor(self, profile_name):
+        self.stop_onedrive_monitor(profile_name)
+        self.profile_status_pages[profile_name].label_onedrive_status.setText("Restarting OneDrive sync...")
+
+        def start_again():
+            # Skip if the user already started the sync or removed the profile in the meantime.
+            if profile_name in global_config and profile_name not in workers:
+                self.start_onedrive_monitor(profile_name)
+
+        # Give the network a moment to come back. The client retries on its own if it is still down.
+        QTimer.singleShot(5000, start_again)
 
     def stop_onedrive_monitor(self, profile_name):
         if profile_name in workers:
