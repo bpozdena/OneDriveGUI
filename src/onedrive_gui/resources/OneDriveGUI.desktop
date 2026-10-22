@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=OneDriveGUI
 Comment=A simple GUI for OneDrive Linux client
-Exec=OneDriveGUI
+Exec=onedrive-gui
 Terminal=false
 Type=Application
 Icon=OneDriveGUI
