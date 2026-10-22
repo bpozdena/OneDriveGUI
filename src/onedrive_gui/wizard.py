@@ -1,4 +1,4 @@
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QVBoxLayout,
@@ -12,6 +12,8 @@ from PySide6.QtWidgets import (
     QGridLayout,
     QFileDialog,
     QComboBox,
+    QCompleter,
+    QMessageBox,
 )
 
 import re
@@ -97,6 +99,11 @@ class SetupWizard(QWizard):
             selection_page.checkBox_create.setEnabled(True)
             selection_page.checkBox_import.setEnabled(True)
             selection_page.checkBox_sharepoint_library.setEnabled(True)
+
+        # Reset the SharePoint Shared Library page
+        library_page = self.page(6)
+        if hasattr(library_page, "pushButton_get_sites"):
+            library_page.reset_page()
 
     def on_page_change(self):
         if self.currentId() == 2:
@@ -282,6 +289,7 @@ class wizardPage_create_import(QWizardPage):
 class wizardPage_create_shared_library(QWizardPage):
     def __init__(self, parent=None):
         self.library_dict = {}
+        self._site_names = set()
 
         super(wizardPage_create_shared_library, self).__init__(parent)
         self.setTitle("Add SharePoint Shared Library")
@@ -314,6 +322,7 @@ class wizardPage_create_shared_library(QWizardPage):
 
         self.comboBox_sharepoint_site_list = QComboBox()
         self.comboBox_sharepoint_site_list.setDisabled(True)
+        self._make_filterable(self.comboBox_sharepoint_site_list)
 
         self.pushButton_get_libraries = QPushButton()
         self.pushButton_get_libraries.setText("Get Shared Libraries")
@@ -322,6 +331,7 @@ class wizardPage_create_shared_library(QWizardPage):
 
         self.comboBox_sharepoint_library_list = QComboBox()
         self.comboBox_sharepoint_library_list.setDisabled(True)
+        self._make_filterable(self.comboBox_sharepoint_library_list)
 
         self.pushButton_create_profile = QPushButton()
         self.pushButton_create_profile.clicked.connect(self.create_library_profile)
@@ -344,6 +354,21 @@ class wizardPage_create_shared_library(QWizardPage):
 
         self.setLayout(layout)
 
+    @staticmethod
+    def _make_filterable(comboBox):
+        """
+        Makes a combo box with a potentially very long item list (SharePoint
+        sites/libraries) filterable: typing part of a name narrows the
+        completion popup to matching items, case-insensitively.
+        """
+        comboBox.setEditable(True)
+        comboBox.setInsertPolicy(QComboBox.NoInsert)
+        completer = QCompleter(comboBox)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        completer.setFilterMode(Qt.MatchContains)
+        comboBox.setCompleter(completer)
+        completer.setModel(comboBox.model())
+
     def initializePage(self):
         # Rebuild the profile list on every page entry. Account types are only
         # discovered while a sync is running, so the set of known Business
@@ -357,6 +382,28 @@ class wizardPage_create_shared_library(QWizardPage):
         business_account_found = self.comboBox_profile_list.count() > 0
         self.comboBox_profile_list.setPlaceholderText("" if business_account_found else "No Business accounts detected.")
         self.pushButton_get_sites.setDisabled(not business_account_found)
+
+    def reset_page(self):
+        """Restore initial widget state so the page can be reused for another
+        Shared Library when the wizard is opened again."""
+        self.library_dict = {}
+        self._site_names = set()
+
+        self.comboBox_profile_list.setDisabled(False)
+        self.comboBox_sharepoint_site_list.clear()
+        self.comboBox_sharepoint_site_list.setDisabled(True)
+        self.comboBox_sharepoint_site_list.setPlaceholderText("")
+        self.pushButton_get_sites.setText("Get SharePoint Sites")
+        self.pushButton_get_sites.setDisabled(True)
+
+        self.comboBox_sharepoint_library_list.clear()
+        self.comboBox_sharepoint_library_list.setDisabled(True)
+        self.comboBox_sharepoint_library_list.setPlaceholderText("")
+        self.pushButton_get_libraries.setText("Get Shared Libraries")
+        self.pushButton_get_libraries.setDisabled(True)
+
+        self.pushButton_create_profile.setText("Create Profile")
+        self.pushButton_create_profile.setDisabled(True)
 
     def isComplete(self):
         if self.pushButton_create_profile.text() == "Done":
@@ -401,8 +448,11 @@ class wizardPage_create_shared_library(QWizardPage):
             self.pushButton_get_sites.setText("Get SharePoint Sites")
 
         else:
-            self.comboBox_sharepoint_site_list.setPlaceholderText("")
+            self._site_names = set(sharepoint_site_list)
+
+            self.comboBox_sharepoint_site_list.setPlaceholderText("Type to filter, or click arrow for full list")
             self.comboBox_sharepoint_site_list.addItems(sorted(sharepoint_site_list, key=str.casefold))
+            self.comboBox_sharepoint_site_list.setCurrentIndex(-1)
             self.comboBox_sharepoint_site_list.setDisabled(False)
 
             self.comboBox_profile_list.setDisabled(True)
@@ -421,18 +471,29 @@ class wizardPage_create_shared_library(QWizardPage):
         Once libraries are obtained, the worker emits dict {'Documents': 'b!SeGaP5QU4UWy...', 'test': 'b!SeGaP5QU4UWySy...'}
         """
         profile_name = self.comboBox_profile_list.currentText()
-        library_name = self.comboBox_sharepoint_site_list.currentText()
-        options = f"--get-sharepoint-drive-id '{library_name}'"
+        site_name = self.comboBox_sharepoint_site_list.currentText()
+
+        if site_name not in self._site_names:
+            QMessageBox.warning(
+                self,
+                "Invalid SharePoint Site",
+                "Please select a SharePoint Site from the list (type into the field to filter it) before obtaining Shared Libraries.",
+            )
+            return
+
+        options = f"--get-sharepoint-drive-id '{site_name}'"
 
         self.pushButton_get_libraries.setText("Please wait...")
         self.pushButton_get_libraries.setDisabled(True)
         self.comboBox_sharepoint_site_list.setDisabled(True)
 
-        logging.info(f"[GUI] Starting maintenance worker to obtain SharePoint Library Drive ID for library {library_name} from profile {profile_name}.")
+        logging.info(f"[GUI] Starting maintenance worker to obtain SharePoint Library Drive ID for site {site_name} from profile {profile_name}.")
 
+        # Create and configure the worker before connecting signals and starting it,
+        # so a fast reply cannot be emitted before the slot is connected.
         self.obtain_library_drive_ids = MaintenanceWorker(profile_name, options)
-        self.obtain_library_drive_ids.start()
         self.obtain_library_drive_ids.update_library_list.connect(self.populate_comboBox_sharepoint_library_list)
+        self.obtain_library_drive_ids.start()
 
     def populate_comboBox_sharepoint_library_list(self, library_dict):
         """
@@ -448,12 +509,14 @@ class wizardPage_create_shared_library(QWizardPage):
 
             self.pushButton_get_libraries.setDisabled(False)
             self.pushButton_get_libraries.setText("Get Shared Libraries")
+            self.comboBox_sharepoint_site_list.setDisabled(False)
 
         else:
             self.list_of_libraries = sorted(library_dict.keys(), key=str.casefold)
 
-            self.comboBox_sharepoint_library_list.setPlaceholderText("")
+            self.comboBox_sharepoint_library_list.setPlaceholderText("Type to filter, or click arrow for full list")
             self.comboBox_sharepoint_library_list.addItems(self.list_of_libraries)
+            self.comboBox_sharepoint_library_list.setCurrentIndex(-1)
             self.comboBox_sharepoint_library_list.setDisabled(False)
 
             self.pushButton_get_libraries.setDisabled(True)
@@ -475,6 +538,15 @@ class wizardPage_create_shared_library(QWizardPage):
         logging.info(f"[GUI] Available Libraries:  {self.library_dict}")
         _site_name = self.comboBox_sharepoint_site_list.currentText()
         _library_name = self.comboBox_sharepoint_library_list.currentText()
+
+        if _site_name not in self._site_names or _library_name not in self.library_dict:
+            QMessageBox.warning(
+                self,
+                "Invalid selection",
+                "Please select a SharePoint Site and a Shared Library from the lists (type into the fields to filter them) before creating the profile.",
+            )
+            return
+
         _library_id = self.library_dict[_library_name]
         profile_name = f"SharePoint_{_site_name.replace(' ', '_')}_{_library_name.replace(' ', '_')}"
 

@@ -871,178 +871,124 @@ class MaintenanceWorker(QThread):
         self._command = f"exec {client_bin_path} --confdir='{self.config_dir}' {options}"
         logging.info(f"[GUI] Maintenance command: '{self._command}'")
 
+        # Enumerating every SharePoint site of a tenant can take minutes on large
+        # tenants (thousands of sites); all other maintenance calls are quick API
+        # round-trips.
+        if "--get-sharepoint-drive-id 'non-existent-library'" in options:
+            self.command_timeout = 300
+        else:
+            self.command_timeout = 120
+
     def run(self):
         logging.info(f"[GUI] Starting Maintenance Worker")
+
+        # The client output is read through a single merged pipe with a timeout.
+        # Reading two separate pipes line-by-line deadlocks when one pipe fills
+        # its OS buffer while no line arrives on the other: the client blocks on
+        # write() to a full stdout pipe (site lists exceed the ~64 KiB pipe
+        # buffer on large tenants) while this thread blocks on readline() of the
+        # silent stderr pipe (#292). communicate() drains both from one pipe and
+        # enforces the timeout from Python, not from a blocked syscall.
         self.onedrive_maintainer = subprocess.Popen(
             self._command,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             shell=True,
             universal_newlines=True,
         )
 
+        try:
+            output, _ = self.onedrive_maintainer.communicate(timeout=self.command_timeout)
+        except subprocess.TimeoutExpired:
+            logging.error(f"[MaintenanceWorker][{self.profile}] '{self.options}' did not finish within {self.command_timeout}s - killing the client")
+            self.onedrive_maintainer.kill()
+            # Returns the partial output produced before the kill, so lines
+            # already printed (e.g. a login request) are still parsed below.
+            output, _ = self.onedrive_maintainer.communicate()
+
         if "--auth-response" in self.options:
             # exec onedrive --confdir="{config_dir}" --auth-response "{response_url}"
             logging.debug(f"[GUI] Trying login...")
-            self.login_response = "success"
+            login_response = "success"
 
-            while self.onedrive_maintainer.poll() is None:
-                self.perform_login()
+            for line in output.splitlines():
+                line = line.strip()
+                if line == "":
+                    continue
+                if "error reason" in line.lower():
+                    login_response = line
+                    logging.error(f"[MaintenanceWorker][{self.profile}] {line}")
 
-            timeout = time.time() + 1
-            while True:
-                # This helps monitor stdout for extra second after onedrive process stops. I could not find a smarter way.
-                self.perform_login()
-                if time.time() > timeout:
-                    break
-
-            logging.info(f"[GUI] - Login response: {self.login_response}")
-            self.update_login_response.emit({"profile_name": self.profile, "response": self.login_response})
+            logging.info(f"[GUI] - Login response: {login_response}")
+            self.update_login_response.emit({"profile_name": self.profile, "response": login_response})
 
         elif "--get-sharepoint-drive-id 'non-existent-library'" in self.options:
             # Trying to obtain Sharepoint Site list by searching a non-existent library name.
             logging.info(f"[GUI] Trying to get list of SharePoint Sites...")
-            self.sharepoint_site_list = []
+            sharepoint_site_list = []
 
-            while self.onedrive_maintainer.poll() is None:
-                self.read_sharepoint_sites()
+            for line in output.splitlines():
+                if line.strip() == "":
+                    continue
+                site_match = re.match(r"^\s*\*\s+(.+)$", line)
+                if site_match:
+                    site_name = site_match.group(1).strip()
+                    sharepoint_site_list.append(site_name)
+                    logging.debug(f"[MaintenanceWorker][{self.profile}] Retrieved SharePoint Site: {site_name}")
+                elif "authorise this application" in line.lower() or "--reauth and re-authorise this client" in line:
+                    logging.error(
+                        f"[MaintenanceWorker][{self.profile}] Cannot fetch SharePoint Sites - a OneDrive login is required for profile '{self.profile}'."
+                    )
+                else:
+                    logging.debug(f"[MaintenanceWorker][{self.profile}] " + line.strip())
 
-            timeout = time.time() + 1
-            while True:
-                # This helps monitor stdout for extra second after onedrive process stops. I could not find a smarter way.
-                self.read_sharepoint_sites()
-                if time.time() > timeout:
-                    break
-
-            logging.info(f"[GUI] - Number of retrieved Shared libraries: {len(self.sharepoint_site_list)}")
-            self.update_sharepoint_site_list.emit(self.sharepoint_site_list)
+            logging.info(f"[GUI] - Number of retrieved SharePoint Sites: {len(sharepoint_site_list)}")
+            self.update_sharepoint_site_list.emit(sharepoint_site_list)
 
         elif "--get-sharepoint-drive-id '" in self.options:
-            self.library_ids_dict = {}
-
             # Obtain Drive ID of a specific Shared Library.
             logging.info(f"[GUI] Trying to get Drive ID of shared library...")
+            library_ids_dict = {}
 
-            while self.onedrive_maintainer.poll() is None:
-                self.read_library_drive_ids()
+            for line in output.splitlines():
+                if line.strip() == "":
+                    continue
 
-            timeout = time.time() + 5
-            while True:
-                # This helps monitor stdout for extra second after onedrive process stops. I could not find a smarter way.
-                self.read_library_drive_ids()
-                if time.time() > timeout:
-                    break
+                name_match = re.match(r"^.*Library Name:\s*(.+)$", line)
+                drive_id_match = re.match(r"^.*drive_id:\s*(.+)$", line)
 
-            self.update_library_list.emit(self.library_ids_dict)
+                if name_match:
+                    library_name = name_match.group(1).strip()
+                    logging.debug(f"[MaintenanceWorker][{self.profile}] Library Name: {library_name}")
+                    library_ids_dict[library_name] = ""
+
+                elif drive_id_match and library_ids_dict:
+                    # Assign to the most recently announced library name.
+                    library_id = drive_id_match.group(1).strip()
+                    last_key = next(reversed(library_ids_dict))
+                    logging.debug(f"[MaintenanceWorker][{self.profile}] Library ID: {library_id}")
+                    library_ids_dict[last_key] = library_id
+
+                else:
+                    logging.debug(f"[MaintenanceWorker][{self.profile}] " + line.strip())
+
+            self.update_library_list.emit(library_ids_dict)
 
         elif "--list-shared-items" in self.options:
-            self.business_folder_list = []
+            business_folder_list = []
 
-            while self.onedrive_maintainer.poll() is None:
-                self.read_shared_business_folders()
+            for line in output.splitlines():
+                if line.strip() == "":
+                    continue
+                folder_match = re.match(r"^.*Shared Folder:\s*(.+)$", line)
+                if folder_match:
+                    folder_name = folder_match.group(1).strip()
+                    business_folder_list.append(folder_name)
+                    logging.debug(f"[MaintenanceWorker][{self.profile}] Retrieved Business Shared Folder: {folder_name}")
+                else:
+                    logging.debug(f"[MaintenanceWorker][{self.profile}] " + line.strip())
 
-            timeout = time.time() + 1
-            while True:
-                # This helps monitor stdout for extra second after onedrive process stops. I could not find a smarter way.
-                self.read_shared_business_folders()
-                if time.time() > timeout:
-                    break
-
-            self.update_business_folder_list.emit(self.business_folder_list)
-
-    def perform_login(self):
-        """
-        Performs OneDrive Login based on provided --auth-response url .
-        Validates if login was successful.
-        """
-        if self.onedrive_maintainer.stdout:
-            stdout = self.onedrive_maintainer.stdout.readline().strip()
-
-            if stdout == "":
-                pass
-            elif "error reason" in stdout.lower():
-                self.login_response = stdout
-                logging.error(stdout)
-
-            if self.onedrive_maintainer.stderr:
-                stderr = self.onedrive_maintainer.stderr.readline().strip()
-                if stderr != "":
-                    logging.error("@ERROR " + stderr)
-
-                if "error reason" in stderr.lower():
-                    self.login_response = stderr
-                    logging.error(stderr)
-
-    def read_library_drive_ids(self):
-        """
-        Reads returned Drive IDs of SharePoint Shared Libraries and emits them to GUI wizard.
-        """
-
-        if self.onedrive_maintainer.stdout:
-            stdout = self.onedrive_maintainer.stdout.readline()
-
-            if stdout.strip() == "":
-                pass
-            elif "Library Name:" in stdout:
-                library_name = re.match(r"^.+\:\s+(.+)$", stdout).group(1)
-                logging.debug(f"[MaintenanceWorker][{self.profile}] Library Name: {library_name}")
-
-                self.library_ids_dict[library_name] = ""
-
-            elif "drive_id:" in stdout:
-                last_key = list(self.library_ids_dict.keys())[-1]
-
-                library_id = re.match(r"^.+\:\s+(.+)$", stdout).group(1)
-                logging.debug(f"[MaintenanceWorker][{self.profile}] Library ID: {library_id}")
-
-                self.library_ids_dict[last_key] = library_id
-
-            if self.onedrive_maintainer.stderr:
-                stderr = self.onedrive_maintainer.stderr.readline()
-                if stderr != "":
-                    logging.error("@ERROR " + stderr)
-
-    def read_shared_business_folders(self):
-        """
-        Reads list of returned Shared Business Folders and emits them to GUI.
-        """
-        if self.onedrive_maintainer.stdout:
-            stdout = self.onedrive_maintainer.stdout.readline()
-
-            if stdout.strip() == "":
-                pass
-            elif "Shared Folder:" in stdout:
-                folder_name = re.match(r"^.+:\s+(.+)$", stdout).group(1)
-                self.business_folder_list.append(folder_name)
-                logging.debug(f"[MaintenanceWorker][{self.profile}] Retrieved Business Shared Folder: {folder_name}")
-            else:
-                logging.debug(f"[MaintenanceWorker][{self.profile}] " + stdout.strip())
-
-        if self.onedrive_maintainer.stderr:
-            stderr = self.onedrive_maintainer.stderr.readline()
-            if stderr != "":
-                logging.error("@ERROR " + stderr)
-
-    def read_sharepoint_sites(self):
-        """
-        Reads list of returned SharePoint Sites and emits them to GUI wizard.
-        """
-        if self.onedrive_maintainer.stdout:
-            stdout = self.onedrive_maintainer.stdout.readline()
-
-            if stdout.strip() == "":
-                pass
-            elif " * " in stdout:
-                site_name = re.match(r"^\s\*\s(.+)", stdout).group(1)
-                self.sharepoint_site_list.append(site_name)
-                logging.debug(f"[MaintenanceWorker][{self.profile}] Retrieved SharePoint Site: {site_name}")
-            else:
-                logging.debug(f"[MaintenanceWorker][{self.profile}] " + stdout.strip())
-
-        if self.onedrive_maintainer.stderr:
-            stderr = self.onedrive_maintainer.stderr.readline()
-            if stderr != "":
-                logging.error("@ERROR " + stderr)
+            self.update_business_folder_list.emit(business_folder_list)
 
 
 class TaskList(QWidget, Ui_list_item_widget):
