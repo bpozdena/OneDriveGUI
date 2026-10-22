@@ -1674,8 +1674,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             options = f'--reauth --auth-response "{response_url}"'
             self.login = MaintenanceWorker(profile, options)
-            self.login.start()
+            # Connect before starting, so a fast reply cannot be emitted before
+            # the slot is connected.
             self.login.update_login_response.connect(self.login_failed_dialog)
+            self.login.start()
         else:
             pass
 
