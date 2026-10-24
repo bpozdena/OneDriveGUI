@@ -1,0 +1,37 @@
+name: Attribution
+
+# Blocks commits that attribute authorship to AI tools (Co-authored-by /
+# Generated-with / session trailers). GitHub renders those trailers as
+# co-authors and counts them in the Contributors graph.
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - v2.4.0
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check commit messages for AI attribution trailers
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.after }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            RANGE="$PR_BASE..$PR_HEAD"
+          elif [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            RANGE="HEAD~50..HEAD"
+          else
+            RANGE="$BEFORE..$AFTER"
+          fi
+          sh scripts/check_attribution.sh "$RANGE"
