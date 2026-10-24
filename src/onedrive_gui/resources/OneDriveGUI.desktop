@@ -7,3 +7,4 @@ Type=Application
 Icon=OneDriveGUI
 Categories=Network;Office
 StartupNotify=true
+StartupWMClass=OneDriveGUI

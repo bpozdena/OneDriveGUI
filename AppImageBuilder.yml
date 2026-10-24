@@ -2,8 +2,11 @@ version: 1
 script:
   - rm -rf AppDir  | true
   - mkdir -p AppDir/usr
-  - mkdir -p AppDir/usr/share/icons/hicolor/48x48
-  - cp src/onedrive_gui/resources/images/OneDriveGUI.png AppDir/usr/share/icons/hicolor/48x48
+  # Full hicolor set (16x16 .. 256x256) under .../apps/, which is where icon
+  # themes (and AppImageLauncher's integration) look for app icons; a bare
+  # size directory without apps/ is ignored by GNOME (#315).
+  - mkdir -p AppDir/usr/share/icons
+  - cp -r src/onedrive_gui/resources/images/hicolor AppDir/usr/share/icons/
   - python3 -m pip install --ignore-installed --prefix=/usr --no-cache-dir --root=AppDir -r ./requirements.txt
   - rm -rf AppDir/usr/local/lib/python3.10/dist-packages/PySide6/Qt/qml/
   - rm -rf AppDir/usr/local/lib/python3.10/dist-packages/PySide6/examples/
@@ -68,6 +71,16 @@ AppDir:
     env:
       PYTHONHOME: '${APPDIR}/usr'
       PYTHONPATH: '${APPDIR}/usr/local/lib/python3.10/dist-packages/'
+
+  # appimage-builder 1.1.0 generates the desktop entry (during the setup phase)
+  # without StartupWMClass, so GNOME/Wayland cannot match the running window
+  # (app id "OneDriveGUI", from QApplication::setDesktopFileName) to the launcher
+  # entry and shows a generic icon in the dock. The generator has no recipe knob
+  # for it, so append it to the generated file. This must run after the setup
+  # phase: before_bundle runs too early, after_runtime runs right after the
+  # desktop entry is written (#315).
+  after_runtime:
+    - sed -i '/^\[Desktop Entry\]/a StartupWMClass=OneDriveGUI' AppDir/io.github.bpozdena.OneDriveGUI.desktop
 
 AppImage:
 #  update-information: gh-releases-zsync
