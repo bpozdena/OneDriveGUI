@@ -2,7 +2,7 @@
 
 # Step 1: Function to extract version from OneDriveGUI.py without importing
 get_version() {
-  FILE_PATH="src/options.py"
+  FILE_PATH="src/onedrive_gui/options.py"
   VERSION=$(grep -Po '^version\s*=\s*"\K[^\"]+' "$FILE_PATH")
   
   if [ -z "$VERSION" ]; then

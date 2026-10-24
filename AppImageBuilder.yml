@@ -2,9 +2,11 @@ version: 1
 script:
   - rm -rf AppDir  | true
   - mkdir -p AppDir/usr
-  - mkdir -p AppDir/usr/share/icons/hicolor/48x48
-  - cp src AppDir/usr -r
-  - cp src/resources/images/OneDriveGUI.png AppDir/usr/share/icons/hicolor/48x48
+  # Full hicolor set (16x16 .. 256x256) under .../apps/, which is where icon
+  # themes (and AppImageLauncher's integration) look for app icons; a bare
+  # size directory without apps/ is ignored by GNOME (#315).
+  - mkdir -p AppDir/usr/share/icons
+  - cp -r src/onedrive_gui/resources/images/hicolor AppDir/usr/share/icons/
   - python3 -m pip install --ignore-installed --prefix=/usr --no-cache-dir --root=AppDir -r ./requirements.txt
   - rm -rf AppDir/usr/local/lib/python3.10/dist-packages/PySide6/Qt/qml/
   - rm -rf AppDir/usr/local/lib/python3.10/dist-packages/PySide6/examples/
@@ -14,6 +16,15 @@ script:
   - rm -f AppDir/usr/local/lib/python3.10/dist-packages/PySide6/{Qt3D*,QtBluetooth*,QtCharts*,QtConcurrent*,QtDataVisualization*,QtDBus*,QtDesigner*,QtHelp*,QtMultimedia*,QtNetwork*,QtOpenGL*,QtPositioning*,QtPrintSupport*,QtQml*,QtQuick*,QtRemoteObjects*,QtScxml*,QtSensors*,QtSerialPort*,QtSql*,QtStateMachine*,QtSvg*,QtTest*,QtWeb*,QtXml*}
   - shopt -s extglob
   - rm -rf AppDir/usr/local/lib/python3.10/dist-packages/PySide6/Qt/lib/!(libQt6OpenGL*|libQt6XcbQpa*|libQt6Wayland*|libQt6Egl*|libicudata*|libicuuc*|libicui18n*|libQt6DBus*|libQt6Network*|libQt6Qml*|libQt6Core*|libQt6Gui*|libQt6Widgets*|libQt6Svg*|libQt6UiTools*)
+  # Remove packaging output from previous builds: the wheel install below picks
+  # up every *.whl in dist/, so a stale older wheel would overwrite the freshly
+  # built package in the AppDir (e.g. an old version number in options.py).
+  - rm -rf build dist src/onedrive_gui.egg-info
+  - python3 -m build
+  # --no-deps: dependencies were installed from requirements.txt above and pruned
+  # since; pip resolves them against the build container, not the AppDir, so
+  # without this flag it reinstalls PySide6_Essentials and undoes the pruning.
+  - find dist -type f -name '*.whl' -exec python3 -m pip install --ignore-installed --no-deps --prefix=/usr --no-cache-dir --root=AppDir {} \;
 
 
 AppDir:
@@ -23,9 +34,9 @@ AppDir:
     id: io.github.bpozdena.OneDriveGUI
     name: OneDriveGUI
     icon: OneDriveGUI
-    version: 1.3.2
+    version: 2.4.0
     exec: usr/bin/python3.10
-    exec_args: "$APPDIR/usr/src/OneDriveGUI.py $@"
+    exec_args: "-m onedrive_gui $@"
 
   apt:
     arch: amd64
@@ -44,6 +55,10 @@ AppDir:
 
     include:
       - python3
+      # libglib2.0-0 provides libgthread-2.0.so.0, which Qt needs but some
+      # minimal distributions (e.g. openSUSE Leap 16) do not have installed
+      # system-wide (#283). An AppImage must bundle all of its dependencies.
+      - libglib2.0-0
       - libxcb-icccm4
       - libxcb-image0
       - libxcb-keysyms1
@@ -56,6 +71,16 @@ AppDir:
     env:
       PYTHONHOME: '${APPDIR}/usr'
       PYTHONPATH: '${APPDIR}/usr/local/lib/python3.10/dist-packages/'
+
+  # appimage-builder 1.1.0 generates the desktop entry (during the setup phase)
+  # without StartupWMClass, so GNOME/Wayland cannot match the running window
+  # (app id "OneDriveGUI", from QApplication::setDesktopFileName) to the launcher
+  # entry and shows a generic icon in the dock. The generator has no recipe knob
+  # for it, so append it to the generated file. This must run after the setup
+  # phase: before_bundle runs too early, after_runtime runs right after the
+  # desktop entry is written (#315).
+  after_runtime:
+    - sed -i '/^\[Desktop Entry\]/a StartupWMClass=OneDriveGUI' AppDir/io.github.bpozdena.OneDriveGUI.desktop
 
 AppImage:
 #  update-information: gh-releases-zsync

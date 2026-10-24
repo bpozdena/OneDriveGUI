@@ -1,0 +1,2010 @@
+from PySide6.QtCore import QTimer, QUrl, QFileInfo, Qt, Signal, Slot, QByteArray
+from PySide6.QtGui import QIcon, QPixmap, QDesktopServices
+from PySide6.QtWidgets import (
+    QWidget,
+    QMainWindow,
+    QMenu,
+    QSystemTrayIcon,
+    QListWidgetItem,
+    QStackedLayout,
+    QMessageBox,
+    QStyledItemDelegate,
+    QStyle,
+    QApplication,
+)
+
+
+# Imports for main window.
+from .ui.ui_mainwindow import Ui_MainWindow
+from .ui.ui_process_status_page import Ui_status_page
+
+
+# Import for login windows.
+from .ui.ui_external_login import Ui_ExternalLoginWindow
+
+
+import re
+import os
+import signal
+import sys
+import time
+
+import requests
+import subprocess
+
+
+from .wizard import setup_wizard
+from .profile_settings_window import profile_settings_window
+
+from .options import (
+    global_config,
+    client_bin_path,
+    client_version,
+    gui_settings,
+    version,
+)
+
+from .utils.utils import humanize_file_size, shorten_path, format_relative_time, version_number, MIN_CLIENT_VERSION
+from .workers import WorkerThread, MaintenanceWorker, TaskList, workers, parse_status_timestamp
+from .gui_settings_window import gui_settings_window
+
+import logging
+
+# from logger import logger
+from .global_config import DIR_PATH, PROFILES_FILE, save_global_config
+
+try:
+    from .ui.ui_login import Ui_LoginWindow
+except ImportError:
+    logging.warning("Failed to import ui_login. This is expected if you are running AppImage version.")
+
+    # Define a dummy class to avoid errors when this UI component isn't available
+    class Ui_LoginWindow:
+        def setupUi(self, window):
+            logging.error("LoginWindow UI is not available in this environment")
+            window.hide()
+
+
+# Label of a failed file operation in the file operation list.
+FAILED_OPERATION_LABELS = {"Uploading": "Upload", "Downloading": "Download", "Moving": "Move to Recycle Bin"}
+
+
+class MainWindow(QMainWindow, Ui_MainWindow):
+    def __init__(self):
+        # Expose this instance as main_window.main_window_instance so other modules
+        # (e.g. profile_settings_window) can reach it without a circular import.
+        from . import main_window
+
+        main_window.main_window_instance = self
+
+        # Access setup_wizard from wizard module to avoid circular imports
+        from . import wizard
+
+        wizard.setup_wizard.show_main_window_signal.connect(self.show)
+        wizard.setup_wizard.add_profile_signal.connect(self.add_profile)
+
+        profile_settings_window.remove_profile_signal.connect(self.remove_profile)
+        profile_settings_window.rename_profile_signal.connect(self.rename_profile_in_main_window)
+
+        super(MainWindow, self).__init__()
+        self.setupUi(self)
+        self.setWindowTitle(f"OneDriveGUI v{version}")
+        self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-cloud-80.png"))
+        self.trash_icon = QApplication.style().standardIcon(QStyle.SP_TrashIcon)
+        self.fail_icon = QApplication.style().standardIcon(QStyle.SP_MessageBoxWarning)
+
+        if gui_settings.get("frameless_window") == "True":
+            self.setWindowFlags(Qt.FramelessWindowHint)
+
+        if len(global_config) == 0:
+            self.show_setup_wizard()
+
+        self.pushButton_new_profile.hide()
+        self.menubar.hide()
+
+        self.comboBox.activated.connect(self.switch_account_status_page)
+        self.comboBox.setStyleSheet(
+            f"""
+        QComboBox {{
+            border : 0px black;
+            border-radius : 0px;
+            background-color: rgb(0, 120, 212);
+            color: rgb(255, 255, 255);
+        }}
+
+        QComboBox::drop-down {{
+            border : 0px black;
+            background-color: rgb(0, 120, 212);
+            text-transform: uppercase;
+            color: rgb(255, 255, 255);
+        }}
+
+        QComboBox QAbstractItemView::item {{ 
+            min-height: 20px;
+            background-color: rgb(0, 120, 212);
+            text-transform: uppercase;
+            color: rgb(255, 255, 255);
+        }}
+
+        QComboBox::down-arrow {{
+            image: url({DIR_PATH}/resources/images/user-account.png);
+            width: 20px;
+            height: 20px;
+        }}
+
+        background-color: rgb(0, 120, 212);
+        color: rgb(255, 255, 255);
+        
+        """
+        )
+        self.stackedLayout = QStackedLayout()
+
+        # Account types already persisted in the profiles file. Used to detect
+        # when a type reported during sync still needs to be saved to disk.
+        self.saved_account_types = {profile: global_config[profile]["account_type"] for profile in global_config}
+
+        self.profile_status_pages = {}
+        for profile in global_config:
+            self.comboBox.addItem(profile)
+            self.profile_status_pages[profile] = ProfileStatusPage(profile)
+            self.profile_status_pages[profile].start_sync_signal.connect(self.start_onedrive_monitor)
+            self.profile_status_pages[profile].stop_sync_signal.connect(self.stop_onedrive_monitor)
+            self.profile_status_pages[profile].quit_gui_signal.connect(self.graceful_shutdown)
+            self.stackedLayout.addWidget(self.profile_status_pages[profile])
+
+            # Connect scroll events for timestamp updates
+            listWidget = self.profile_status_pages[profile].listWidget
+            scrollbar = listWidget.verticalScrollBar()
+            scrollbar.valueChanged.connect(self.on_list_scrolled)
+
+        self.verticalLayout_2.addLayout(self.stackedLayout)
+
+        # Ensure all profiles in comboBox are aligned to center
+        delegate = AlignDelegate(self.comboBox)
+        self.comboBox.setItemDelegate(delegate)
+
+        # Making comboBox editable, which allows for center alignment.
+        self.comboBox.setEditable(True)
+        line_edit = self.comboBox.lineEdit()
+        line_edit.setAlignment(Qt.AlignRight)
+        line_edit.setReadOnly(True)
+
+        # Hide comboBox if only one profile exists
+        if len(self.profile_status_pages) < 2:
+            self.comboBox.hide()
+
+        # System Tray
+        self.tray = QSystemTrayIcon()
+        if self.tray.isSystemTrayAvailable():
+            # Initial icon will be updated by update_tray_icon() after profiles are loaded
+            icon = QIcon(DIR_PATH + "/resources/images/icons8-cloud-80.png")
+            menu = QMenu()
+
+            show_action = menu.addAction("Show/Hide")
+            show_action.triggered.connect(lambda: self.hide() if self.isVisible() else self.show())
+            setting_action = menu.addAction("Settings")
+            setting_action.triggered.connect(self.show_settings_window)
+            quit_action = menu.addAction("Quit")
+            quit_action.triggered.connect(lambda: self.graceful_shutdown())
+
+            self.tray.activated.connect(self.tray_icon_clicked)
+
+            self.tray.setIcon(icon)
+            self.tray.setContextMenu(menu)
+            self.tray.show()
+            # Initial tooltip - will be updated by update_tray_icon()
+            self.tray.setToolTip("OneDriveGUI")
+
+        else:
+            self.tray = None
+
+        # Version check results storage
+        self.client_version_status = {
+            "label_text": "",
+            "tooltip_text": "",
+            "min_requirements_met": True,
+        }
+        self.gui_version_status = {
+            "label_text": "",
+            "tooltip_text": "",
+        }
+
+        # The GUI often starts before the network is up (autostart on login), so the
+        # GitHub lookups are retried a few times before giving up.
+        self.version_check_retry_interval = 60000
+        self.version_check_max_attempts = 10
+        self.client_version_check_attempts = 0
+        self.gui_version_check_attempts = 0
+
+        # Stop the clients and their worker threads before the application is torn
+        # down; destroying a QThread that is still running aborts the process.
+        # Whether the clients are stopped (or left running in the background) is
+        # controlled by the 'stop_clients_on_exit' setting.
+        QApplication.instance().aboutToQuit.connect(self.stop_all_workers)
+        QApplication.instance().aboutToQuit.connect(self.save_window_geometry)
+
+        # Restore the window size and position from the previous session.
+        stored_geometry = gui_settings.get("window_geometry")
+        if gui_settings.get("remember_window_geometry") != "False" and stored_geometry:
+            self.restoreGeometry(QByteArray.fromBase64(stored_geometry.encode()))
+
+        # End-of-session signals: the desktop environment sends SIGTERM/SIGHUP to
+        # the session processes on logout. The Python handler only schedules the
+        # shutdown; the actual work happens in the event loop.
+        for termination_signal in (signal.SIGTERM, signal.SIGHUP):
+            signal.signal(termination_signal, lambda *_: QTimer.singleShot(0, self.shutdown_from_signal))
+
+        self.refresh_process_status = QTimer()
+        self.refresh_process_status.setSingleShot(False)
+        self.refresh_process_status.timeout.connect(self.onedrive_process_status)
+        self.refresh_process_status.start(500)
+
+        self.check_client_version = QTimer()
+        self.check_client_version.setSingleShot(True)
+        self.check_client_version.timeout.connect(self.client_version_check)
+        self.check_client_version.start(500)
+
+        self.check_gui_version = QTimer()
+        self.check_gui_version.setSingleShot(True)
+        self.check_gui_version.timeout.connect(self.gui_version_check)
+        self.check_gui_version.start(1000)
+
+        self.auto_sync = QTimer()
+        self.auto_sync.setSingleShot(True)
+        self.auto_sync.timeout.connect(self.autostart_monitor)
+        self.auto_sync.start(1000)
+
+        # Poll the machine-readable runtime status published by client v2.5.12+
+        # (monitor-status.json). Older clients do not publish it, in which case
+        # the status keeps being derived from the client output alone.
+        self.refresh_monitor_status = QTimer()
+        self.refresh_monitor_status.setSingleShot(False)
+        self.refresh_monitor_status.timeout.connect(self.update_monitor_status)
+        self.refresh_monitor_status.start(2000)
+
+        # Timer to refresh relative times for completed transfers
+        self.refresh_relative_times = QTimer()
+        self.refresh_relative_times.setSingleShot(False)
+        self.refresh_relative_times.timeout.connect(self.update_relative_times)
+        self.refresh_relative_times.start(60000)  # Update every 60 seconds
+
+        # Debounce timer for scroll-triggered updates
+        self.scroll_update_timer = QTimer()
+        self.scroll_update_timer.setSingleShot(True)
+        self.scroll_update_timer.timeout.connect(self.update_relative_times)
+        self.scroll_update_timer.setInterval(200)  # 200ms debounce delay
+
+    def mousePressEvent(self, event):
+        if gui_settings.get("frameless_window") == "True":
+            self.dragPos = event.globalPosition().toPoint()
+
+    def mouseMoveEvent(self, event):
+        if gui_settings.get("frameless_window") == "True":
+            self.move(self.pos() + event.globalPosition().toPoint() - self.dragPos)
+            self.dragPos = event.globalPosition().toPoint()
+            event.accept()
+
+    def tray_icon_clicked(self, reason):
+        if reason == QSystemTrayIcon.Unknown:
+            pass
+        elif reason == QSystemTrayIcon.Context:
+            logging.debug("[GUI] Right clicked on tray icon")
+        elif reason == QSystemTrayIcon.DoubleClick:
+            pass
+        elif reason == QSystemTrayIcon.Trigger:
+            logging.debug("[GUI] Left clicked on tray icon")
+            if not self.isVisible():
+                self.show()
+            elif self.isActiveWindow():
+                self.hide()
+            else:
+                self.activateWindow()
+                self.raise_()
+        elif reason == QSystemTrayIcon.MiddleClick:
+            pass
+        else:
+            pass
+
+    def graceful_shutdown(self):
+        close_question = QMessageBox.question(
+            self,
+            "Quit OneDriveGUI ?",
+            f"Would you like to stop all sync operations and quit OneDriveGUI ?",
+            buttons=QMessageBox.Yes | QMessageBox.No,
+            defaultButton=QMessageBox.No,
+        )
+
+        if close_question == QMessageBox.Yes:
+            logging.info("Quitting OneDriveGUI")
+            self.stop_all_workers(force=True)
+            QApplication.instance().quit()
+
+        elif close_question == QMessageBox.No:
+            logging.info("[GUI] Keeping OneDriveGUI running.")
+
+    def save_window_geometry(self):
+        """Persist the window size and position for the next session."""
+        if gui_settings.get("remember_window_geometry") != "False" and not self.isMinimized():
+            gui_settings.set("window_geometry", bytes(self.saveGeometry().toBase64()).decode())
+            gui_settings.save()
+
+    def stop_all_workers(self, force=False):
+        """
+        Stop every running worker and its OneDrive client.
+
+        Unless `force` is set, the 'stop_clients_on_exit' setting decides whether
+        the clients are stopped or left running in the background for the next
+        OneDriveGUI start to reconnect to.
+        """
+        if not force and gui_settings.get("stop_clients_on_exit") == "False":
+            logging.info("[GUI] Leaving the OneDrive clients running (stop on exit disabled)")
+            return
+
+        for profile_name in list(workers):
+            workers[profile_name].stop_worker()
+
+    def shutdown_from_signal(self):
+        """Shut down without asking: the session is ending (SIGTERM/SIGHUP)."""
+        logging.info("[GUI] Termination signal received - shutting down")
+        self.stop_all_workers()
+        QApplication.instance().quit()
+
+    def stop_onedrive_monitor(self, profile_name):
+        if profile_name in workers:
+            workers[profile_name].stop_worker()
+            self.profile_status_pages[profile_name].label_onedrive_status.setText("OneDrive sync has been stopped")
+            logging.info(f"OneDrive sync for profile {profile_name} has been stopped.")
+        else:
+            logging.info(f"OneDrive for profile {profile_name} is not running.")
+
+    def closeEvent(self, event):
+        # Minimize main window to system tray if it is available. Otherwise minimize to taskbar.
+        self.save_window_geometry()
+        event.ignore()
+        try:
+            if self.tray.isSystemTrayAvailable():
+                self.hide()
+                logging.debug("[GUI] Minimizing main window to tray")
+            else:
+                self.setWindowState(Qt.WindowMinimized)
+                logging.debug("[GUI] Minimizing main window to taskbar/dock")
+        except:
+            self.setWindowState(Qt.WindowMinimized)
+            logging.debug("[GUI] Minimizing main window to taskbar/dock")
+
+    def show_setup_wizard(self):
+        setup_wizard.show()
+
+    def show_settings_window(self):
+        profile_settings_window.show()
+
+        # Start checking for unsaved changes.
+        profile_settings_window.start_unsaved_changes_timer()
+
+    def switch_account_status_page(self):
+        self.stackedLayout.setCurrentIndex(self.comboBox.currentIndex())
+
+    def client_version_check(self):
+        """
+        Compare installed version of OneDrive client with the latest version on Github releases.
+        Store results and call display_version_warnings() to show combined warnings.
+        """
+        s = requests.Session()
+        version_label_text = ""
+        version_tooltip_text = ""
+        min_requirements_met = True
+        min_supported_version = MIN_CLIENT_VERSION  # 2.5.11, required for the in-browser login flow support added in GUI v1.3.2
+
+        def get_latest_client_version():
+            latest_url = "https://api.github.com/repos/abraunegg/onedrive/releases/latest"
+            try:
+                latest_client_version = s.get(latest_url, timeout=3).json()["tag_name"]
+                return latest_client_version
+
+            except Exception as e:
+                logging.error(e)
+                return None
+
+        def get_installed_client_version():
+            try:
+                client_version_check = subprocess.check_output([client_bin_path, "--version"], stderr=subprocess.STDOUT)
+                installed_client_version = re.search(r"(v[0-9.]+)", str(client_version_check)).group(1)
+
+                installed_client_version_num = version_number(installed_client_version)
+
+                return installed_client_version, installed_client_version_num
+
+            except Exception as e:
+                logging.error(e)
+                return None
+
+        try:
+            latest_client_version = get_latest_client_version()
+            installed_client_version = get_installed_client_version()
+
+            logging.info(f"[GUI] Client version check: Installed: {installed_client_version[0]} | Latest: {latest_client_version}")
+
+            if not installed_client_version:
+                version_label_text = "OneDrive client not found!"
+                version_tooltip_text = "OneDrive client not found!"
+                min_requirements_met = False
+
+            elif not latest_client_version:
+                self.client_version_check_attempts += 1
+                if self.client_version_check_attempts < self.version_check_max_attempts:
+                    logging.warning(f"[GUI] Unable to check for latest OneDrive client version, retrying (attempt {self.client_version_check_attempts})")
+                    self.check_client_version.start(self.version_check_retry_interval)
+                else:
+                    version_label_text = "Unable to check for latest OneDrive client version!"
+                    version_tooltip_text = "Unable to check for latest OneDrive client version!"
+
+            elif installed_client_version[1] < min_supported_version:
+                version_label_text = (
+                    'Unsupported OneDrive client! Please <a href="https://github.com/abraunegg/onedrive/blob/master/docs/install.md" style="color:#FFFFFF;">upgrade</a> it.'
+                )
+                version_tooltip_text = (
+                    f"Your OneDrive Client version not supported! Please upgrade it. \n Installed: {installed_client_version[0]} \n Latest: {latest_client_version}"
+                )
+                min_requirements_met = False
+
+            elif installed_client_version[1] < version_number(latest_client_version):
+                # Only warn when the installed client is older than the latest release;
+                # a newer build (e.g. a pre-release from 'master') is not out of date.
+                version_label_text = "OneDrive client is out of date!"
+                version_tooltip_text = f"OneDrive client is out of date! \n Installed: {installed_client_version[0]} \n Latest: {latest_client_version}"
+
+            # Store results
+            self.client_version_status["label_text"] = version_label_text
+            self.client_version_status["tooltip_text"] = version_tooltip_text
+            self.client_version_status["min_requirements_met"] = min_requirements_met
+
+            # Display combined warnings
+            self.display_version_warnings()
+
+        except Exception as e:
+            logging.error(f"Client version check failed: {e}")
+
+    def gui_version_check(self):
+        """
+        Compare installed version of OneDriveGUI with the latest version on Github releases.
+        Store results and call display_version_warnings() to show combined warnings.
+        """
+        s = requests.Session()
+        version_label_text = ""
+        version_tooltip_text = ""
+
+        def parse_semantic_version(version_string):
+            """Parse semantic version string (e.g., 'v1.2.3' or '1.2.3') into tuple (1, 2, 3)"""
+            try:
+                # Remove 'v' prefix if present
+                clean_version = version_string.strip().lstrip("v")
+                # Split by '.' and convert to integers
+                parts = [int(x) for x in clean_version.split(".")]
+                # Ensure we have at least 3 parts (major, minor, patch)
+                while len(parts) < 3:
+                    parts.append(0)
+                return tuple(parts[:3])  # Return only first 3 parts
+            except Exception as e:
+                logging.error(f"Failed to parse version '{version_string}': {e}")
+                return None
+
+        def get_latest_gui_version():
+            """Fetch latest GUI version from GitHub releases"""
+            latest_url = "https://api.github.com/repos/bpozdena/OneDriveGUI/releases/latest"
+            try:
+                response = s.get(latest_url, timeout=3)
+                latest_gui_version = response.json()["tag_name"]
+                return latest_gui_version
+            except Exception as e:
+                logging.error(f"Failed to fetch latest GUI version: {e}")
+                return None
+
+        try:
+            latest_gui_version = get_latest_gui_version()
+            installed_gui_version = version  # From options.py
+
+            if not latest_gui_version:
+                # Network issue or API error, do not show a warning, retry later
+                self.gui_version_check_attempts += 1
+                if self.gui_version_check_attempts < self.version_check_max_attempts:
+                    self.check_gui_version.start(self.version_check_retry_interval)
+                logging.warning(f"[GUI] Unable to check for latest OneDriveGUI version (attempt {self.gui_version_check_attempts})")
+                return
+
+            # Parse versions for comparison
+            installed_version_tuple = parse_semantic_version(installed_gui_version)
+            latest_version_tuple = parse_semantic_version(latest_gui_version)
+
+            if not installed_version_tuple or not latest_version_tuple:
+                logging.error("[GUI] Failed to parse GUI versions for comparison")
+                return
+
+            logging.info(f"[GUI] GUI version check: Installed: v{installed_gui_version} | Latest: {latest_gui_version}")
+
+            # Compare versions
+            if installed_version_tuple < latest_version_tuple:
+                version_label_text = "OneDriveGUI is out of date!"
+                version_tooltip_text = f"OneDriveGUI is out of date! \n Installed: v{installed_gui_version} \n Latest: {latest_gui_version}"
+            else:
+                logging.info("[GUI] OneDriveGUI is up to date")
+
+            # Store results
+            self.gui_version_status["label_text"] = version_label_text
+            self.gui_version_status["tooltip_text"] = version_tooltip_text
+
+            # Display combined warnings
+            self.display_version_warnings()
+
+        except Exception as e:
+            logging.error(f"GUI version check failed: {e}")
+
+    def display_version_warnings(self):
+        """
+        Display combined version warnings for both OneDrive client and GUI.
+        This method combines warnings from both version checks and displays them together.
+        """
+        pixmap_warning = QPixmap(DIR_PATH + "/resources/images/warning.png").scaled(20, 20, Qt.KeepAspectRatio)
+
+        # Combine label texts (use <br> for HTML line break in Qt labels)
+        label_texts = []
+        if self.client_version_status["label_text"]:
+            label_texts.append(self.client_version_status["label_text"])
+        if self.gui_version_status["label_text"]:
+            label_texts.append(self.gui_version_status["label_text"])
+
+        combined_label_text = "<br>".join(label_texts) if label_texts else ""
+
+        # Combine tooltip texts
+        tooltip_parts = []
+        if self.client_version_status["tooltip_text"]:
+            tooltip_parts.append(self.client_version_status["tooltip_text"])
+        if self.gui_version_status["tooltip_text"]:
+            tooltip_parts.append(self.gui_version_status["tooltip_text"])
+
+        combined_tooltip_text = "\n---\n".join(tooltip_parts) if tooltip_parts else ""
+
+        # Display warnings in all profile status pages
+        for profile_name in global_config:
+            page = self.profile_status_pages[profile_name]
+            page.label_onedrive_status.setOpenExternalLinks(True)
+
+            # Set combined label text
+            if combined_label_text:
+                page.label_onedrive_status.setText(combined_label_text)
+
+            # Handle critical client version issues (disable sync)
+            if not self.client_version_status["min_requirements_met"]:
+                page.pushButton_start.setEnabled(False)
+                page.pushButton_start_stop.setEnabled(False)
+                page.pushButton_profiles.setEnabled(False)
+
+            # Set warning icon and tooltip if any warnings exist
+            if combined_tooltip_text:
+                page.label_version_check.setToolTip(combined_tooltip_text)
+                page.label_version_check.setPixmap(pixmap_warning)
+
+    def onedrive_process_status(self):
+        # Check OneDrive status and start/stop sync button.
+        pixmap_running = QPixmap(DIR_PATH + "/resources/images/icons8-green-circle-48.png").scaled(24, 24, Qt.KeepAspectRatio)
+        pixmap_stopped = QPixmap(DIR_PATH + "/resources/images/icons8-red-circle-48.png").scaled(24, 24, Qt.KeepAspectRatio)
+
+        for profile_name in global_config:
+            # Check if profile exists in profile_status_pages, if not add it
+            if profile_name not in self.profile_status_pages:
+                logging.info(f"Profile {profile_name} found in global_config but not in UI, adding it now")
+                self.add_profile(profile_name)
+
+            profile_status_page = self.profile_status_pages[profile_name]
+
+            if profile_name not in workers:
+                profile_status_page.label_status.setText("stopped")
+                profile_status_page.label_status.setToolTip("Sync is stopped")
+                profile_status_page.label_status.setPixmap(pixmap_stopped)
+
+                # Show Play icon when sync is stopped.
+                profile_status_page.pushButton_start_stop.setIcon(profile_status_page.start_icon)
+                profile_status_page.pushButton_start_stop.setToolTip("Start Sync")
+                profile_status_page.pushButton_start_stop.clicked.disconnect()
+                profile_status_page.pushButton_start_stop.clicked.connect(profile_status_page.start_monitor)
+
+            else:
+                if workers[profile_name].isRunning():
+                    profile_status_page.label_status.setText("running")
+                    profile_status_page.label_status.setToolTip("Sync is running")
+                    profile_status_page.label_status.setPixmap(pixmap_running)
+
+                    # Show Stop icon when sync is running.
+                    profile_status_page.pushButton_start_stop.setIcon(profile_status_page.stop_icon)
+                    profile_status_page.pushButton_start_stop.setToolTip("Stop Sync")
+                    profile_status_page.pushButton_start_stop.clicked.disconnect()
+                    profile_status_page.pushButton_start_stop.clicked.connect(profile_status_page.stop_monitor)
+
+        # Update system tray icon based on aggregate status
+        self.update_tray_icon()
+
+    def update_monitor_status(self):
+        """
+        Apply the client's monitor-status.json to each running profile. The file
+        is the authoritative source for the high-level state (syncing, idle,
+        degraded, reachability, system time); per-file activity still comes from
+        the client output. The status label is only rewritten when the
+        high-level state changes, so detailed output messages are not overwritten
+        on every poll.
+        """
+        for profile_name, page in self.profile_status_pages.items():
+            worker = workers.get(profile_name)
+            status = worker.monitor_status() if worker is not None and worker.isRunning() else None
+            page.monitor_status = status
+
+            if status is None:
+                if page.monitor_status_key is not None:
+                    page.monitor_status_key = None
+                    page.label_onedrive_status.setToolTip("")
+                continue
+
+            process = status.get("process", {})
+            sync = status.get("sync", {})
+            last_cycle = sync.get("last_cycle", {})
+            conditions = status.get("conditions", {})
+
+            page.label_onedrive_status.setToolTip(self._monitor_status_tooltip(status))
+
+            key = (
+                process.get("state"),
+                last_cycle.get("result"),
+                conditions.get("onedrive_reachability"),
+                conditions.get("system_time"),
+                process.get("monitor_loop"),
+            )
+            if key == page.monitor_status_key:
+                continue
+            page.monitor_status_key = key
+
+            message = self._monitor_status_message(status)
+            if message:
+                logging.info(f"[{profile_name}] Monitor status: {message}")
+                page.label_onedrive_status.setText(message)
+
+    @staticmethod
+    def _monitor_status_message(status):
+        """Status label text for a monitor status document, or None to keep the
+        message derived from the client output (e.g. per-file progress)."""
+        process = status.get("process", {})
+        sync = status.get("sync", {})
+        last_cycle = sync.get("last_cycle", {})
+        conditions = status.get("conditions", {})
+        state = process.get("state")
+        result = last_cycle.get("result")
+
+        if conditions.get("system_time") == "TIME_DRIFT_BLOCKING":
+            return "Sync paused: the system clock differs from Microsoft service time.\nPlease correct the system time."
+        if conditions.get("onedrive_reachability") == "unreachable":
+            return "Cannot connect to Microsoft OneDrive Service.\nThe client will retry automatically."
+        if state == "idle":
+            last_sync = parse_status_timestamp(sync.get("last_successful_sync_at"))
+            if last_sync is not None:
+                return f"OneDrive sync is complete (last sync {last_sync.strftime('%H:%M')})."
+            return "OneDrive sync is complete."
+        if state == "degraded":
+            if result == "partial_failure":
+                failures = sum(int(last_cycle.get(k) or 0) for k in ("upload_failures", "download_failures", "recycle_bin_failures"))
+                return f"Sync completed with {failures} failed item(s)"
+            if result == "service_unreachable":
+                return "Cannot connect to Microsoft OneDrive Service.\nThe client will retry automatically."
+            if result == "time_unsafe":
+                return "Sync paused: the system clock differs from Microsoft service time.\nPlease correct the system time."
+            if result == "interrupted":
+                return "The last sync was interrupted."
+        return None
+
+    @staticmethod
+    def _monitor_status_tooltip(status):
+        """Hover text for the status label summarising the monitor status document."""
+        process = status.get("process", {})
+        sync = status.get("sync", {})
+        last_cycle = sync.get("last_cycle", {})
+        conditions = status.get("conditions", {})
+
+        def local_time(value):
+            timestamp = parse_status_timestamp(value)
+            return timestamp.strftime("%Y-%m-%d %H:%M:%S") if timestamp else "never"
+
+        lines = [
+            f"Client state: {process.get('state', 'unknown')} (monitor loop {process.get('monitor_loop', 0)})",
+            f"Last successful sync: {local_time(sync.get('last_successful_sync_at'))}",
+            f"Successful sync cycles: {sync.get('successful_cycle_count', 0)}",
+            f"Last cycle result: {str(last_cycle.get('result', 'never_run')).replace('_', ' ')}",
+        ]
+        failures = {k: int(last_cycle.get(f"{k}_failures") or 0) for k in ("upload", "download", "recycle_bin")}
+        if any(failures.values()):
+            lines.append("Failed: " + ", ".join(f"{count} {kind.replace('_', ' ')}" for kind, count in failures.items() if count))
+        lines.append(f"Microsoft OneDrive: {conditions.get('onedrive_reachability', 'unknown')}")
+        lines.append(f"System time: {conditions.get('system_time', 'unknown')}")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _monitor_tray_state(page):
+        """Tray state derived from the monitor status document, or None when not available."""
+        status = getattr(page, "monitor_status", None)
+        if not status:
+            return None
+        state = status.get("process", {}).get("state")
+        conditions = status.get("conditions", {})
+        if state == "degraded" or conditions.get("onedrive_reachability") == "unreachable" or conditions.get("system_time") == "TIME_DRIFT_BLOCKING":
+            return "ERROR"
+        if state in ("starting", "syncing"):
+            return "SYNCING"
+        if state == "idle":
+            return "IDLE"
+        return None
+
+    def is_ignorable_error(self, error_text):
+        """
+        Check if an error message should be ignored for tray icon status.
+        Returns True if the error should be ignored.
+        """
+        if not error_text:
+            return True
+
+        # List of error patterns to ignore
+        ignored_patterns = ["inotify_add_watch failed", "The local file system returned an error with the following message", "Local file system error:"]
+
+        error_lower = error_text.lower()
+        for pattern in ignored_patterns:
+            if pattern.lower() in error_lower:
+                return True
+
+        return False
+
+    def aggregate_tray_status(self):
+        """
+        Aggregate status across all profiles to determine system tray icon state.
+        Returns: tuple (status_state, running_count, total_count, profile_statuses)
+
+        status_state: 'ERROR', 'STOPPED', 'SYNCING', or 'IDLE'
+        Priority: ERROR > STOPPED > SYNCING > IDLE
+        """
+        if not global_config:
+            return ("IDLE", 0, 0, {})
+
+        total_count = len(global_config)
+        running_count = 0
+        profile_statuses = {}
+
+        has_error = False
+        has_stopped = False
+        has_syncing = False
+
+        for profile_name in global_config:
+            # Check if worker is running
+            is_running = profile_name in workers and workers[profile_name].isRunning()
+
+            # Get status message from profile status page
+            if profile_name in self.profile_status_pages:
+                status_msg = self.profile_status_pages[profile_name].label_onedrive_status.text()
+                error_tooltip = self.profile_status_pages[profile_name].label_error_icon.toolTip()
+                # Label holds the live value while sync runs, or the last known
+                # value restored from global_config on startup.
+                free_space = self.profile_status_pages[profile_name].label_free_space.text()
+            else:
+                status_msg = ""
+                error_tooltip = ""
+                free_space = ""
+
+            # High-level state from monitor-status.json (client v2.5.12+), if available
+            monitor_state = self._monitor_tray_state(self.profile_status_pages[profile_name]) if profile_name in self.profile_status_pages else None
+
+            # Categorize this profile's state
+            if not is_running:
+                profile_state = "STOPPED"
+                has_stopped = True
+            elif monitor_state == "ERROR" or (
+                (not self.is_ignorable_error(error_tooltip) and not self.is_ignorable_error(status_msg))
+                and (error_tooltip or "Error:" in status_msg or "error" in status_msg.lower() or "failed" in status_msg.lower() or "crashed" in status_msg.lower())
+            ):
+                profile_state = "ERROR"
+                has_error = True
+                running_count += 1
+            elif monitor_state == "SYNCING" or (
+                monitor_state is None
+                and ("sync in progress" in status_msg.lower() or "processing" in status_msg.lower() or "starting" in status_msg.lower() or "initializing" in status_msg.lower())
+            ):
+                profile_state = "SYNCING"
+                has_syncing = True
+                running_count += 1
+            elif is_running:
+                profile_state = "IDLE"
+                running_count += 1
+            else:
+                profile_state = "STOPPED"
+                has_stopped = True
+
+            profile_statuses[profile_name] = {"state": profile_state, "status_msg": status_msg if status_msg else "stopped", "is_running": is_running, "free_space": free_space}
+
+        # Determine overall state with priority
+        if has_error:
+            overall_state = "ERROR"
+        elif has_stopped:
+            overall_state = "STOPPED"
+        elif has_syncing:
+            overall_state = "SYNCING"
+        else:
+            overall_state = "IDLE"
+
+        return (overall_state, running_count, total_count, profile_statuses)
+
+    def generate_tray_tooltip(self, overall_state, running_count, total_count, profile_statuses):
+        """
+        Generate detailed tooltip showing status of all profiles.
+
+        The tooltip window is rendered by the desktop environment at a fixed
+        narrow width - the application cannot make it wider - and long profile
+        names (e.g. email addresses) already use most of that width. Each value
+        therefore gets its own short indented line under the profile name, so
+        the free space (#309) and status never wrap away from their meaning.
+        Profiles are separated by blank lines so multi-profile listings stay
+        scannable.
+        """
+        if not profile_statuses:
+            return "OneDriveGUI - No profiles configured"
+
+        state_tags = {"ERROR": "[ERROR]", "STOPPED": "[STOPPED]", "SYNCING": "[SYNCING]", "IDLE": "[IDLE]"}
+        state_indicators = {"ERROR": "Sync error detected", "STOPPED": "Sync stopped", "SYNCING": "Syncing...", "IDLE": "All syncs complete"}
+        lines = [f"{running_count}/{total_count} profile(s) running - {state_indicators.get(overall_state, '')}"]
+
+        for profile_name, status_info in profile_statuses.items():
+            # Each profile is its own block, separated by a blank line
+            lines.append("")
+            lines.append(f"{profile_name} {state_tags.get(status_info['state'], '[IDLE]')}")
+
+            free_space = status_info.get("free_space", "")
+            if free_space and free_space != "Not Available":
+                lines.append(f"  Free: {free_space}")
+
+            status_msg = status_info["status_msg"]
+            if status_msg and status_msg != "stopped":
+                if len(status_msg) > 40:
+                    status_msg = status_msg[:37] + "..."
+                lines.append(f"  {status_msg}")
+
+        return "\n".join(lines)
+
+    def update_tray_icon(self):
+        """
+        Update system tray icon and tooltip based on current sync status.
+        """
+        if not self.tray:
+            return
+
+        # Get aggregated status
+        overall_state, running_count, total_count, profile_statuses = self.aggregate_tray_status()
+
+        # Select icon based on state
+        icon_map = {
+            "ERROR": DIR_PATH + "/resources/images/icons8-cloud-error-80.png",
+            "STOPPED": DIR_PATH + "/resources/images/icons8-cloud-stop-80.png",
+            "SYNCING": DIR_PATH + "/resources/images/icons8-cloud-sync-80.png",
+            "IDLE": DIR_PATH + "/resources/images/icons8-cloud-done-80.png",
+        }
+
+        icon_path = icon_map.get(overall_state, DIR_PATH + "/resources/images/icons8-cloud-80.png")
+        icon = QIcon(icon_path)
+        tooltip = self.generate_tray_tooltip(overall_state, running_count, total_count, profile_statuses)
+
+        if self.tray.toolTip() != tooltip:
+            logging.debug("Updating tray icon and tooltip")
+            self.tray.setIcon(icon)
+            self.tray.setToolTip(tooltip)
+
+    def autostart_monitor(self):
+        # Auto-start sync if compatible version of OneDrive client is installed.
+        for profile_name in global_config:
+            logging.info(f"[{profile_name}] Compatible client version found: {self.profile_status_pages[profile_name].pushButton_start.isEnabled()}")
+            logging.info(f"[{profile_name}] Auto-sync enabled for profile: {global_config[profile_name]['auto_sync']}")
+
+            if self.profile_status_pages[profile_name].pushButton_start.isEnabled() and global_config[profile_name]["auto_sync"] == "True":
+                self.start_onedrive_monitor(profile_name)
+
+    @staticmethod
+    def find_running_client(profile_name):
+        """
+        PID of an OneDrive client process running with this profile's
+        configuration directory, or None. Such a process is typically left
+        behind by a previous OneDriveGUI run or started outside the GUI; the
+        client refuses to start a second instance for the same configuration.
+
+        Only the current user's `onedrive` processes count, and their
+        configuration directory must be this profile's: the one given with
+        --confdir, or the client's default ~/.config/onedrive without it.
+        """
+        config_file = global_config[profile_name]["config_file"].strip('"')
+        config_dir = os.path.realpath(os.path.expanduser(re.search(r"(.+)/.+$", config_file).group(1)))
+        uid = os.getuid()
+
+        for proc_entry in os.listdir("/proc"):
+            if not proc_entry.isdigit():
+                continue
+            try:
+                if os.stat(f"/proc/{proc_entry}").st_uid != uid:
+                    continue
+                with open(f"/proc/{proc_entry}/cmdline", "rb") as cmdline_file:
+                    args = [os.fsdecode(arg) for arg in cmdline_file.read().split(b"\0") if arg]
+            except OSError:
+                continue
+            if not args or os.path.basename(args[0]) != "onedrive":
+                continue
+
+            client_config_dir = "~/.config/onedrive"
+            for index, arg in enumerate(args[1:], start=1):
+                if arg.startswith("--confdir="):
+                    client_config_dir = arg.split("=", 1)[1]
+                elif arg == "--confdir" and index + 1 < len(args):
+                    client_config_dir = args[index + 1]
+
+            if os.path.realpath(os.path.expanduser(client_config_dir)) == config_dir:
+                return int(proc_entry)
+        return None
+
+    def take_over_running_client(self, profile_name):
+        """
+        A client for this profile is already running outside OneDriveGUI. Ask the
+        user whether to stop it so the GUI can monitor the profile, and if
+        agreed, stop it gracefully and wait for it to exit.
+        Returns True when the caller can start monitoring.
+        """
+        orphan_pid = self.find_running_client(profile_name)
+        if orphan_pid is None:
+            return True
+
+        answer = QMessageBox.question(
+            self,
+            f"OneDrive client already running for profile {profile_name}",
+            f"An OneDrive client for profile <b>{profile_name}</b> is already running outside OneDriveGUI (PID {orphan_pid}).<br><br>"
+            "It was probably left behind by a previous OneDriveGUI session. Only one client can use this profile.<br><br>"
+            "Stop it and start monitoring it in OneDriveGUI?",
+            buttons=QMessageBox.Yes | QMessageBox.No,
+            defaultButton=QMessageBox.Yes,
+        )
+        if answer != QMessageBox.Yes:
+            logging.info(f"[{profile_name}] Keeping the external OneDrive client (PID {orphan_pid}); not starting the monitor")
+            return False
+
+        logging.info(f"[{profile_name}] Stopping external OneDrive client (PID {orphan_pid})")
+        self.profile_status_pages[profile_name].label_onedrive_status.setText("Stopping external OneDrive client...")
+        try:
+            os.kill(orphan_pid, signal.SIGINT)
+            for _ in range(50):  # Wait up to 10 s for a graceful shutdown
+                try:
+                    os.kill(orphan_pid, 0)
+                except ProcessLookupError:
+                    break
+                time.sleep(0.2)
+            else:
+                logging.warning(f"[{profile_name}] External client did not exit within 10s - killing it")
+                os.kill(orphan_pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass  # Exited on its own in the meantime
+        return True
+
+    def start_onedrive_monitor(self, profile_name, options=""):
+        # Clear any previous error messages when starting sync
+        self.profile_status_pages[profile_name].label_error_icon.clear()
+        self.profile_status_pages[profile_name].label_error_icon.setToolTip("")
+
+        if profile_name not in workers:
+            if not self.take_over_running_client(profile_name):
+                return
+            workers[profile_name] = WorkerThread(profile_name, options)
+            workers[profile_name].start()
+        else:
+            logging.warning(f"Worker for profile {profile_name} is already running. Please stop it first.")
+            logging.info(f"Running workers: {workers}")
+
+        if "True" not in gui_settings.get("QWebEngine_login"):
+            # Assume GUI runs as AppImage. Force login in external browser as a workaround for #37 .
+            logging.info(f"[GUI] Opening external login window")
+            workers[profile_name].update_credentials.connect(self.show_external_login)
+        else:
+            # Use QT WebEngine for a more convenient login.
+            logging.info(f"[GUI] Opening WebEngine login window")
+            workers[profile_name].update_credentials.connect(self.show_login)
+
+        workers[profile_name].trigger_resync.connect(self.resync_auth_dialog)
+        workers[profile_name].trigger_big_delete.connect(self.big_delete_auth_dialog)
+        workers[profile_name].browser_login_required.connect(self.show_browser_login_notification)
+        workers[profile_name].update_progress_new.connect(self.event_update_progress)
+        workers[profile_name].update_profile_status.connect(self.event_update_profile_status)
+        workers[profile_name].clear_warning.connect(self.clear_warning_handler)
+        workers[profile_name].finalize_stalled_tasks.connect(self.event_finalize_stalled_tasks)
+        workers[profile_name].notify_failed_sync.connect(self.show_failed_sync_notification)
+        workers[profile_name].started.connect(lambda: logging.info(f"started worker {profile_name}"))
+        workers[profile_name].finished.connect(lambda: logging.info(f"finished worker {profile_name}"))
+        try:
+            workers[profile_name].finished.connect(lambda: self.remove_worker(profile_name))
+        except KeyError:
+            logging.info(f"[GUI] The worker for profile {profile_name} is already stopped.")
+
+    def show_browser_login_notification(self, profile_name):
+        if self.tray:
+            self.tray.showMessage(
+                "OneDriveGUI - Login required",
+                f"Please complete the OneDrive login for '{profile_name}' in the web browser window that just opened.",
+                QSystemTrayIcon.Information,
+                10000,
+            )
+
+    def show_failed_sync_notification(self, profile_name, count):
+        """Show a tray balloon when files fail to sync, so the user is informed
+        even when the GUI window is minimized."""
+        if self.tray:
+            self.tray.showMessage(
+                "OneDriveGUI - Sync completed with errors",
+                f"'{profile_name}': {count} file(s) failed to sync.\nUse the failed-files button on the account page to show them in the list.",
+                QSystemTrayIcon.Warning,
+                10000,
+            )
+
+    def resync_auth_dialog(self, profile_name):
+        resync_question = QMessageBox(
+            QMessageBox.Question,
+            f"Resync required for profile {profile_name}",
+            "An application configuration change has been detected where a resync is required. <br><br>"
+            "The use of resync will remove your local 'onedrive' client state, thus no record will exist regarding your current 'sync status'. <br><br>"
+            "This has the potential to overwrite local versions of files with potentially older versions downloaded from OneDrive which can lead to <b>data loss</b>. <br><br>"
+            "If in-doubt, backup your local data first before proceeding with resync.<br><br><br>"
+            f"Would you like to perform resync for profile <b>{profile_name}</b>?",
+            QMessageBox.Yes | QMessageBox.No,
+        )
+        yes_button = resync_question.button(QMessageBox.Yes)
+        yes_button.setEnabled(False)
+        self.countdown_timer = QTimer(self)
+        self.countdown_value = 5
+
+        def update_button_text():
+            yes_button.setText(f"Yes ({self.countdown_value})")
+            self.countdown_value -= 1
+            if self.countdown_value < 0:
+                self.countdown_timer.stop()
+                yes_button.setText("Yes")
+                yes_button.setEnabled(True)
+
+        self.countdown_timer.timeout.connect(update_button_text)
+        self.countdown_timer.start(1000)  # Update every 1 second
+
+        resync_question.setDefaultButton(QMessageBox.No)
+        result = resync_question.exec()
+
+        if result == QMessageBox.Yes:
+            logging.info("Authorize sync: Yes")
+            self.profile_status_pages[profile_name].stop_monitor()
+            self.remove_worker(profile_name)
+            self.start_onedrive_monitor(profile_name, "--resync --resync-auth")
+
+        elif result == QMessageBox.No:
+            logging.info("Authorize sync: No")
+            self.countdown_timer.stop()
+            self.profile_status_pages[profile_name].stop_monitor()
+
+    def big_delete_auth_dialog(self, profile_name):
+        big_delete_question = QMessageBox.question(
+            self,
+            f"Big Delete detected for profile {profile_name}",
+            "An attempt to remove a large volume of data from OneDrive has been detected. <br><br>"
+            "This has the potential to delete a large volume of data from your OneDrive which can lead to <b>data loss</b>. <br><br>"
+            "If in-doubt, backup your OneDrive data first before proceeding with big delete.<br><br><br>"
+            f"Would you like to proceed with big delete for profile <b>{profile_name}</b>?",
+            buttons=QMessageBox.Yes | QMessageBox.No,
+            defaultButton=QMessageBox.No,
+        )
+
+        if big_delete_question == QMessageBox.Yes:
+            logging.info("Authorize big delete: Yes")
+            self.profile_status_pages[profile_name].stop_monitor()
+            self.remove_worker(profile_name)
+            self.start_onedrive_monitor(profile_name, "--force")
+            self.profile_status_pages[profile_name].label_onedrive_status.setText("Big delete approved")
+
+        elif big_delete_question == QMessageBox.No:
+            logging.info("Authorize big delete: No")
+            self.profile_status_pages[profile_name].stop_monitor()
+            self.profile_status_pages[profile_name].label_onedrive_status.setText("Big delete denied")
+
+    def event_update_profile_status(self, data, profile):
+        self.profile_status_pages[profile].label_onedrive_status.setText(data["status_message"])
+        self.profile_status_pages[profile].label_free_space.setText(data["free_space"])
+        self.profile_status_pages[profile].label_account_type.setText(data["account_type"])
+
+        # Persist the account type reported by the client so it survives a
+        # restart; the worker only updates the in-memory config. Saving here
+        # keeps config writes on the main thread.
+        if data["account_type"] and data["account_type"] != self.saved_account_types.get(profile):
+            self.saved_account_types[profile] = data["account_type"]
+            save_global_config(global_config)
+            logging.info(f"[{profile}] Saved account type: {data['account_type']}")
+
+        # Handle error message display
+        if "error_message" in data and data["error_message"]:
+            # Show error icon with full error message in tooltip
+            pixmap_warning = QPixmap(DIR_PATH + "/resources/images/warning.png").scaled(20, 20, Qt.KeepAspectRatio)
+            self.profile_status_pages[profile].label_error_icon.setPixmap(pixmap_warning)
+            self.profile_status_pages[profile].label_error_icon.setToolTip(data["error_message"])
+        else:
+            # Clear error icon
+            self.profile_status_pages[profile].label_error_icon.clear()
+            self.profile_status_pages[profile].label_error_icon.setToolTip("")
+
+    def clear_warning_handler(self, profile_name):
+        """Clear warning icon and tooltip for a profile when a new sync cycle starts."""
+        self.profile_status_pages[profile_name].label_error_icon.clear()
+        self.profile_status_pages[profile_name].label_error_icon.setToolTip("")
+        # Update tray icon to reflect the cleared warning state
+        self.update_tray_icon()
+        logging.debug(f"[{profile_name}] Cleared warning state before or after new sync cycle")
+
+    def event_update_progress(self, data, profile):
+        """
+        data:
+        transfer_progress = {
+            "file_operation": file_operation.group(1),
+            "file_path": file_path.group(1),
+            "progress": progress.group(1),
+            "transfer_complete": transfer_complete,
+            "transfer_failed": transfer_failed
+        }
+        """
+        _sync_dir = os.path.expanduser(global_config[profile]["onedrive"]["sync_dir"].strip('"'))
+
+        logging.debug(data)
+        # Normalise the path: the client prints the same file both with and without
+        # a leading './' depending on the message, and every message about one file
+        # must resolve to the same row.
+        file_path = os.path.normpath(os.path.join(_sync_dir, data["file_path"]))
+        absolute_path = QFileInfo(file_path).absolutePath().replace(" ", "%20")
+        relative_path_display = os.path.relpath(QFileInfo(file_path).absolutePath(), _sync_dir + os.path.sep)
+        parent_dir_match = re.search(r".+/([^/]+)/.+$", file_path)
+        parent_dir = parent_dir_match.group(1) if parent_dir_match else ""
+        file_size = QFileInfo(file_path + ".partial").size() if QFileInfo(file_path).size() == 0 else QFileInfo(file_path).size()
+        file_size_human = humanize_file_size(file_size)
+        file_name = QFileInfo(file_path).fileName()
+        progress = data["progress"]
+        progress_data = file_size / 100 * int(progress)
+        progress_data_human = humanize_file_size(progress_data)
+        file_operation = data["file_operation"]
+        transfer_complete = data["transfer_complete"]
+        transfer_failed = data.get("transfer_failed", False)
+        move_scrollbar = True
+        new_list_item = True
+
+        if transfer_failed:
+            item_state = "Failed"
+        elif transfer_complete or file_operation in ("Deleting", "Moving"):
+            item_state = "Complete"
+        else:
+            item_state = file_operation
+
+        # Find an existing open row (no completion timestamp yet: in-progress or
+        # failed) for the same file. Open rows are tracked in a per-profile map
+        # keyed by full path, so a file that keeps failing across sync cycles
+        # updates its row in place instead of adding a duplicate on every cycle.
+        page = self.profile_status_pages[profile]
+        item = None
+        candidate = page.open_rows.get(file_path)
+        if candidate is not None:
+            if page.listWidget.row(candidate) == -1:
+                # The row was trimmed off the end of the list - drop the stale reference.
+                page.open_rows.pop(file_path, None)
+            else:
+                item = candidate
+
+        if item is not None:
+            item_widget = self.profile_status_pages[profile].listWidget.itemWidget(item)
+            item_file_name = item_widget.get_file_name()
+            previous_state = item_widget.get_state()
+            logging.debug("Updating list item")
+
+            item_widget.set_file_path(file_path)
+            item_widget.set_state(item_state)
+            item_widget.set_progress(int(progress))
+            item_widget.set_icon(file_path)
+            item_widget.hide_progress_bar(transfer_complete or transfer_failed)
+
+            if file_operation == "Deleting" and not transfer_failed:
+                item_widget.set_label_1(f"Deleted from {parent_dir}")
+                item_widget.set_custom_icon(self.trash_icon)
+                item_widget.set_label_2(f"")
+                # Store timestamp and display for deleted files
+                if "timestamp" in data and data["timestamp"]:
+                    item_widget.set_completion_timestamp(data["timestamp"])
+                    relative_time = format_relative_time(data["timestamp"])
+                    item_widget.set_timestamp(relative_time)
+                else:
+                    item_widget.set_timestamp("")
+
+            elif file_operation == "Moving" and not transfer_failed:
+                item_widget.set_label_1(f"Trashed from {parent_dir}")
+                item_widget.set_label_2(f"")
+                # Store timestamp and display for moved files
+                if "timestamp" in data and data["timestamp"]:
+                    item_widget.set_completion_timestamp(data["timestamp"])
+                    relative_time = format_relative_time(data["timestamp"])
+                    item_widget.set_timestamp(relative_time)
+                else:
+                    item_widget.set_timestamp("")
+
+            elif transfer_failed:
+                # The transfer failed - mark the item as failed instead of
+                # leaving it in a perpetual "uploading" state. The path links
+                # to the file's folder so the user can quickly locate and fix
+                # the file; hovering shows the full path. The timestamp
+                # is deliberately left empty so repeated attempts of the
+                # same file update this row rather than adding duplicates,
+                # and a later successful upload flips it back to "Uploaded".
+                failed_operation = FAILED_OPERATION_LABELS.get(file_operation, "Download")
+                shortened_path = shorten_path(relative_path_display, 32)
+                item_widget.set_label_1(f"{failed_operation} failed - <a href=file:///{absolute_path}>{shortened_path}</a>")
+                item_widget.set_label_2(f"")
+                item_widget.set_custom_icon(self.fail_icon)
+                item_widget.set_timestamp("")
+                item_widget.set_tooltip(self._failed_file_tooltip(file_path, data.get("error_message")))
+
+            elif transfer_complete and file_operation == "Uploading":
+                shortened_path = shorten_path(relative_path_display, 32)
+                item_widget.set_label_1(f"Uploaded from <a href=file:///{absolute_path}>{shortened_path}</a>")
+                item_widget.set_label_2(f"{file_size_human}")
+                # Store timestamp and display in separate timestamp label
+                if "timestamp" in data and data["timestamp"]:
+                    item_widget.set_completion_timestamp(data["timestamp"])
+                    relative_time = format_relative_time(data["timestamp"])
+                    item_widget.set_timestamp(relative_time)
+                else:
+                    item_widget.set_timestamp("")
+
+            elif transfer_complete and file_operation == "Downloading":
+                shortened_path = shorten_path(relative_path_display, 32)
+                item_widget.set_label_1(f"Downloaded from <a href=file:///{absolute_path}>{shortened_path}</a>")
+                item_widget.set_label_2(f"{file_size_human}")
+                # Store timestamp and display in separate timestamp label
+                if "timestamp" in data and data["timestamp"]:
+                    item_widget.set_completion_timestamp(data["timestamp"])
+                    relative_time = format_relative_time(data["timestamp"])
+                    item_widget.set_timestamp(relative_time)
+                else:
+                    item_widget.set_timestamp("")
+
+            elif file_operation == "Downloading":
+                # Estimate final size of file before download completes
+                # Adding 5% to progress as the OD client report status 5% behind.
+                item_widget.set_label_1(file_operation)
+                item_widget.set_label_2(f"{humanize_file_size(file_size)} of ~{humanize_file_size(int(file_size) / (int(progress) + 5) * 100)}")
+            else:
+                item_widget.set_label_1(file_operation)
+                item_widget.set_label_2(f"{progress_data_human} of {file_size_human}")
+
+            listWidget = page.listWidget
+            # Keep the open-row map up to date. Read the timestamp before any
+            # move below - _move_list_item replaces the row's widget, after
+            # which the old widget must not be touched.
+            if item_widget.get_timestamp_text() == "":
+                page.open_rows[file_path] = item
+            else:
+                page.open_rows.pop(file_path, None)
+
+            if transfer_failed:
+                # Keep failed entries pinned at the top of the list. The row is
+                # hidden unless the user toggled the failed-files button in the
+                # header, so a large number of failures does not flood the list.
+                if previous_state != "Failed" and listWidget.row(item) != 0:
+                    self._move_list_item(listWidget, item, 0)
+                else:
+                    listWidget.setItemWidget(item, item_widget)
+                listWidget.setRowHidden(listWidget.row(item), not page.show_failed_entries)
+            elif previous_state == "Failed" and item_state != "Failed":
+                # A previously failed entry completed (e.g. the user fixed the
+                # file) - make the row visible again and move it below the block
+                # of failed entries pinned at the top, so the remaining failures
+                # stay together.
+                target_row = self._first_row_below_failed_block(listWidget, exclude_item=item)
+                self._move_list_item(listWidget, item, target_row)
+                listWidget.setRowHidden(listWidget.row(item), False)
+            else:
+                listWidget.setItemWidget(item, item_widget)
+            new_list_item = False
+            if transfer_failed or previous_state == "Failed":
+                page.update_show_errors_button()
+            logging.debug(f"List item updated for file {item_file_name}")
+
+        if new_list_item:
+            logging.debug(f"Adding new list item for file {file_name}")
+            myQCustomQWidget = TaskList()
+            myQCustomQWidget.set_file_name(file_name)
+            myQCustomQWidget.set_file_path(file_path)
+            myQCustomQWidget.set_state(item_state)
+            myQCustomQWidget.set_progress(int(progress))
+            myQCustomQWidget.set_icon(file_path)
+            myQCustomQWidget.hide_progress_bar(transfer_complete or transfer_failed)
+
+            if file_operation == "Deleting" and not transfer_failed:
+                myQCustomQWidget.set_label_1(f"Deleted from {parent_dir}")
+                myQCustomQWidget.set_custom_icon(self.trash_icon)
+                myQCustomQWidget.set_label_2(f"")
+                # Store timestamp and display for deleted files
+                if "timestamp" in data and data["timestamp"]:
+                    myQCustomQWidget.set_completion_timestamp(data["timestamp"])
+                    relative_time = format_relative_time(data["timestamp"])
+                    myQCustomQWidget.set_timestamp(relative_time)
+                else:
+                    myQCustomQWidget.set_timestamp("")
+
+            elif file_operation == "Moving" and not transfer_failed:
+                myQCustomQWidget.set_label_1(f"Trashed from {parent_dir}")
+                myQCustomQWidget.set_label_2(f"")
+                # Store timestamp and display for moved files
+                if "timestamp" in data and data["timestamp"]:
+                    myQCustomQWidget.set_completion_timestamp(data["timestamp"])
+                    relative_time = format_relative_time(data["timestamp"])
+                    myQCustomQWidget.set_timestamp(relative_time)
+                else:
+                    myQCustomQWidget.set_timestamp("")
+
+            elif transfer_failed:
+                # The transfer failed before an item existed - create it in the failed
+                # state so the failure is visible in the file operation list.
+                failed_operation = FAILED_OPERATION_LABELS.get(file_operation, "Download")
+                shortened_path = shorten_path(relative_path_display, 32)
+                myQCustomQWidget.set_label_1(f"{failed_operation} failed - <a href=file:///{absolute_path}>{shortened_path}</a>")
+                myQCustomQWidget.set_label_2(f"")
+                myQCustomQWidget.set_custom_icon(self.fail_icon)
+                myQCustomQWidget.set_tooltip(self._failed_file_tooltip(file_path, data.get("error_message")))
+
+            elif transfer_complete and file_operation == "Uploading":
+                shortened_path = shorten_path(relative_path_display, 32)
+                myQCustomQWidget.set_label_1(f"Uploaded from <a href=file:///{absolute_path}>{shortened_path}</a>")
+                myQCustomQWidget.set_label_2(f"{file_size_human}")
+                # Store timestamp and display in separate timestamp label
+                if "timestamp" in data and data["timestamp"]:
+                    myQCustomQWidget.set_completion_timestamp(data["timestamp"])
+                    relative_time = format_relative_time(data["timestamp"])
+                    myQCustomQWidget.set_timestamp(relative_time)
+                else:
+                    myQCustomQWidget.set_timestamp("")
+
+            elif transfer_complete and file_operation == "Downloading":
+                shortened_path = shorten_path(relative_path_display, 32)
+                myQCustomQWidget.set_label_1(f"Downloaded from <a href=file:///{absolute_path}>{shortened_path}</a>")
+                myQCustomQWidget.set_label_2(f"{file_size_human}")
+                # Store timestamp and display in separate timestamp label
+                if "timestamp" in data and data["timestamp"]:
+                    myQCustomQWidget.set_completion_timestamp(data["timestamp"])
+                    relative_time = format_relative_time(data["timestamp"])
+                    myQCustomQWidget.set_timestamp(relative_time)
+                else:
+                    myQCustomQWidget.set_timestamp("")
+
+            elif file_operation == "Downloading":
+                # Estimate final size of file before download completes
+                # Adding 5% to progress as the OD client report status 5% behind.
+                myQCustomQWidget.set_label_1(file_operation)
+                myQCustomQWidget.set_label_2(f"{humanize_file_size(file_size)} of ~{humanize_file_size(int(file_size) / (int(progress) + 5) * 100)}")
+            else:
+                myQCustomQWidget.set_label_1(file_operation)
+                myQCustomQWidget.set_label_2(f"{progress_data_human} of {file_size_human}")
+
+            # Create QListWidgetItem
+            myQListWidgetItem = QListWidgetItem()
+
+            # Set size hint
+            myQListWidgetItem.setSizeHint(myQCustomQWidget.sizeHint())
+
+            # Add QListWidgetItem into QListWidget. Failed transfers are pinned
+            # at the top so they stay visible; all other entries are inserted
+            # below the block of failed entries.
+            listWidget = page.listWidget
+            insert_row = 0 if transfer_failed else self._first_row_below_failed_block(listWidget)
+            listWidget.insertItem(insert_row, myQListWidgetItem)
+            listWidget.setItemWidget(myQListWidgetItem, myQCustomQWidget)
+
+            # Track open rows (no completion timestamp yet) so later updates of
+            # the same file find this row regardless of how far down the list
+            # it moves.
+            if myQCustomQWidget.get_timestamp_text() == "":
+                page.open_rows[file_path] = myQListWidgetItem
+
+            if transfer_failed:
+                # Hide the new failed entry unless the user chose to show failures.
+                listWidget.setRowHidden(insert_row, not page.show_failed_entries)
+                page.update_show_errors_button()
+
+            # If the list is not scrolled all the way to the top, increment the scroll value so that the list stays in the same spot when new items are added.
+            # Hidden rows do not occupy space in the view, so they must not trigger the compensation.
+            scroll = listWidget.verticalScrollBar()
+            currentScrollValue = scroll.value()
+            if move_scrollbar and (currentScrollValue > 0) and not (transfer_failed and not page.show_failed_entries):
+                scroll.setValue(currentScrollValue + 1)
+
+            # Limit list to 10k items to fix #208.
+            if listWidget.count() > 10_000:
+                listWidget.takeItem(listWidget.count() - 1)
+
+    @staticmethod
+    def _failed_file_tooltip(file_path, error_message):
+        """Build hover text for a failed transfer: full file path and, when known,
+        the error message explaining why the file failed to sync."""
+        tooltip = QFileInfo(file_path).absoluteFilePath()
+        if error_message:
+            # Keep the tooltip readable even for very long API error messages.
+            error_message = error_message.strip()
+            if len(error_message) > 500:
+                error_message = error_message[:500] + "..."
+            tooltip += f"\n\nError: {error_message}"
+        return tooltip
+
+    @staticmethod
+    def _move_list_item(list_widget, item, target_row):
+        """
+        Move an item to the given row within the list. Qt deletes a row's widget
+        when the row is taken out of a QListWidget, so the widget is cloned
+        before the move and the row gets the fresh clone - reusing the old
+        widget would leave a dangling pointer in the view and crash on repaint.
+        """
+        item_widget = list_widget.itemWidget(item)
+        if item_widget is None:
+            return
+        new_widget = item_widget.clone()
+        row = list_widget.row(item)
+        list_widget.takeItem(row)
+        if row < target_row:
+            target_row -= 1
+        target_row = max(0, min(target_row, list_widget.count()))
+        list_widget.insertItem(target_row, item)
+        list_widget.setItemWidget(item, new_widget)
+
+    @staticmethod
+    def _first_row_below_failed_block(list_widget, exclude_item=None):
+        """
+        Index of the first row below the block of failed entries pinned at the
+        top of the list. `exclude_item` is skipped when scanning (used when the
+        row being relocated is itself non-failed and sits inside the block).
+        """
+        for row in range(list_widget.count()):
+            item = list_widget.item(row)
+            if exclude_item is not None and item == exclude_item:
+                continue
+            row_widget = list_widget.itemWidget(item)
+            if row_widget is None or row_widget.get_state() != "Failed":
+                return row
+        return list_widget.count()
+
+    def event_finalize_stalled_tasks(self, profile):
+        """
+        Mark file transfers that never reported completion during a sync cycle as
+        failed, so they do not stay in a perpetual 'uploading' state in the list.
+        Called at sync cycle boundaries (start and end of each cycle).
+        """
+        if profile not in self.profile_status_pages:
+            return
+
+        try:
+            _sync_dir = os.path.expanduser(global_config[profile]["onedrive"]["sync_dir"].strip('"'))
+        except KeyError:
+            return
+
+        page = self.profile_status_pages[profile]
+        list_widget = page.listWidget
+
+        # Collect stalled rows first - they are moved to the top below, which
+        # shifts row indices. Only open rows (no completion timestamp yet) can
+        # still be in a transfer state.
+        stalled_items = []
+        for file_path, item in list(page.open_rows.items()):
+            item_widget = list_widget.itemWidget(item)
+            if item_widget is None or list_widget.row(item) == -1:
+                # The row was trimmed off the end of the list - drop the stale reference.
+                page.open_rows.pop(file_path, None)
+                continue
+            if item_widget.get_state() in ("Uploading", "Downloading"):
+                stalled_items.append(item)
+
+        for item in stalled_items:
+            item_widget = list_widget.itemWidget(item)
+            full_path = item_widget.get_file_path()
+            parent_dir = QFileInfo(full_path).absolutePath()
+            relative_path_display = os.path.relpath(parent_dir, _sync_dir + os.path.sep)
+            failed_operation = "Download" if item_widget.get_state() == "Downloading" else "Upload"
+            shortened_path = shorten_path(relative_path_display, 32)
+
+            item_widget.set_state("Failed")
+            item_widget.hide_progress_bar(True)
+            item_widget.set_label_1(f"{failed_operation} failed - <a href=file:///{parent_dir.replace(' ', '%20')}>{shortened_path}</a>")
+            item_widget.set_label_2("")
+            item_widget.set_custom_icon(self.fail_icon)
+            item_widget.set_timestamp("")
+            sweep_reason = "Transfer did not complete during the sync cycle (no specific error was reported)."
+            item_widget.set_tooltip(self._failed_file_tooltip(full_path, sweep_reason))
+
+        if stalled_items:
+            # Move the failed entries to the top of the list as one batch. Qt
+            # deletes a row's widget when the row is taken out of a QListWidget,
+            # so each row gets a fresh clone of its widget on reinsertion (see
+            # _move_list_item).
+            moved = [(item, list_widget.itemWidget(item).clone()) for item in stalled_items]
+            for item, _ in moved:
+                list_widget.takeItem(list_widget.row(item))
+            for item, widget in reversed(moved):
+                list_widget.insertItem(0, item)
+                list_widget.setItemWidget(item, widget)
+                # Failed entries stay hidden unless the user chose to show them.
+                list_widget.setRowHidden(0, not page.show_failed_entries)
+            logging.info(f"[{profile}] Marked {len(stalled_items)} stalled transfer(s) as failed")
+
+        page.update_show_errors_button()
+
+    def on_list_scrolled(self, value):
+        """
+        Debounced scroll handler - triggers timestamp update after scrolling stops.
+        Called when scrollbar position changes (user scroll or automatic scroll from new items).
+        """
+        # Restart the debounce timer - only triggers after 200ms of no scrolling
+        self.scroll_update_timer.start()
+
+    def update_relative_times(self):
+        """
+        Update relative time display only for visible items in the viewport.
+        Optimized to update only 10-20 visible items instead of all 10,000 items.
+        Called every 60 seconds by QTimer and when user scrolls the list.
+        """
+        for profile in self.profile_status_pages:
+            listWidget = self.profile_status_pages[profile].listWidget
+
+            # Get the visible viewport area
+            rect = listWidget.viewport().contentsRect()
+            top_index = listWidget.indexAt(rect.topLeft())
+
+            # Skip if no items are visible
+            if not top_index.isValid():
+                continue
+
+            # Get the bottom visible index
+            bottom_index = listWidget.indexAt(rect.bottomLeft())
+
+            # Handle case where bottom index is invalid (last item is visible)
+            if not bottom_index.isValid():
+                bottom_row = listWidget.count() - 1
+            else:
+                bottom_row = bottom_index.row()
+
+            # Only iterate through visible rows (typically 10-20 items instead of 10,000)
+            for row in range(top_index.row(), bottom_row + 1):
+                item = listWidget.item(row)
+                if item is not None:
+                    item_widget = listWidget.itemWidget(item)
+                    if item_widget is not None:
+                        # Get the completion timestamp
+                        timestamp = item_widget.get_completion_timestamp()
+
+                        # If item has a timestamp, update the relative time in the timestamp label
+                        if timestamp is not None:
+                            relative_time = format_relative_time(timestamp)
+                            item_widget.set_timestamp(relative_time)
+
+    def _build_login_url(self, profile):
+        application_id = global_config[profile]["onedrive"]["application_id"].strip('"') or "d50ca740-c83f-4d1b-b616-12c519384f0c"
+        azure_tenant_id = global_config[profile]["onedrive"]["azure_tenant_id"].strip('"') or "common"
+        self.login_url = (
+            f"https://login.microsoftonline.com/{azure_tenant_id}/oauth2/v2.0/authorize"
+            f"?client_id={application_id}"
+            f"&scope=Files.ReadWrite%20Files.ReadWrite.All%20Sites.ReadWrite.All%20offline_access"
+            f"&response_type=code&prompt=login"
+            f"&redirect_uri=https://login.microsoftonline.com/{azure_tenant_id}/oauth2/nativeclient"
+        )
+        logging.debug(f"[GUI] Built login URL: {self.login_url}")
+
+    def show_login(self, profile):
+        # Show login window with QT WebEngine
+        self.window1 = QWidget()
+        self.window1.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-cloud-80.png"))
+        self.lw = Ui_LoginWindow()
+        self.lw.setupUi(self.window1)
+        self.window1.show()
+        self.window1.setWindowTitle(f"OneDrive login for profile {profile}")
+
+        self.config_file = global_config[profile]["config_file"].strip('"')
+        self.config_dir = re.search(r"(.+)/.+$", self.config_file).group(1)
+
+        # Build login URL from profile config
+        self._build_login_url(profile)
+        self.lw.loginFrame.setUrl(QUrl(self.login_url))
+
+        # Wait for user to login and obtain response URL
+        self.lw.loginFrame.urlChanged.connect(lambda: self.get_response_url(self.lw.loginFrame.url().toString(), profile))
+
+    def show_external_login(self, profile):
+        # Show external login window
+        self.window2 = QWidget()
+        self.window2.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-cloud-80.png"))
+        self.lw2 = Ui_ExternalLoginWindow()
+        self.lw2.setupUi(self.window2)
+        self.window2.show()
+        self.window2.setWindowTitle(f"OneDrive login for profile {profile}")
+
+        self.config_file = global_config[profile]["config_file"].strip('"')
+        self.config_dir = re.search(r"(.+)/.+$", self.config_file).group(1)
+
+        # Build login URL from profile config and update the label
+        self._build_login_url(profile)
+        self.lw2.label_2.setText(
+            f"<html><head/><body><p>Preferred: press <b>Sign in with web browser</b> above - "
+            f"the OneDrive client opens your browser and completes the login by itself.</p>"
+            f"<p>--- or manually ---</p>"
+            f"<p>1)Login to OneDrive in your browser by "
+            f'<a href="{self.login_url}"><span style=" text-decoration: underline; color:#5e81ac;">clicking this link.</span></a></p>'
+            f"<p>2)If the browser ends up on a 'This page is no longer available' page, copy the address of the <i>previous</i> "
+            f"page from the browser history (Ctrl+Shift+H or F12 &#8594; Network with persisted logs helps). </p>"
+            f"<p>3)Paste the response URI from your browser's address bar to the below field. </p>"
+            f"<p>4)Press Save.</p></body></html>"
+        )
+
+        self.lw2.label_2.setOpenExternalLinks(True)
+        self.lw2.pushButton_login.setEnabled(False)
+
+        self.lw2.lineEdit_response_url.textChanged.connect(self.enable_login_button)
+
+        self.lw2.pushButton_login.clicked.connect(lambda: self.get_response_url(self.lw2.lineEdit_response_url.text(), profile))
+
+        # The client's own login flow (v2.5.11+) opens the default browser and
+        # receives the response on a local loopback listener - no URL copying, and
+        # no "wrongplace" redirect page as with the manual nativeclient redirect.
+        if client_version >= MIN_CLIENT_VERSION:
+            self.lw2.pushButton_browser_login.clicked.connect(lambda: self.browser_login(profile, self.window2))
+        else:
+            self.lw2.pushButton_browser_login.hide()
+
+    def browser_login(self, profile, login_window=None):
+        """
+        Restart the profile's client with --reauth so it opens the default web
+        browser and completes the login with its local loopback listener
+        (client v2.5.11+). No response URL has to be copied manually.
+        """
+        logging.info(f"[{profile}] Logging in via the system browser (client --reauth)")
+        if login_window is not None:
+            login_window.close()
+
+        if profile in workers:
+            # Stop the remains of the worker that reported the login requirement.
+            workers[profile].stop_worker()
+            self.remove_worker(profile)
+
+        self.start_onedrive_monitor(profile, "--reauth")
+
+    def enable_login_button(self):
+        # Enable 'Save' button only when valid URL with login response code is provided.
+        if "nativeclient?code=" in self.lw2.lineEdit_response_url.text():
+            logging.info(f"[GUI] Valid login response code provided. Enabling Save button.")
+            self.lw2.pushButton_login.setEnabled(True)
+        else:
+            logging.info(f"[GUI] Invalid login response code provided. Disabling Save button.")
+            self.lw2.pushButton_login.setEnabled(False)
+
+    def get_response_url(self, response_url, profile):
+        # Get response URL from OneDrive OAuth2
+        if "nativeclient?code=" in response_url:
+            logging.info("Login performed")
+
+            options = f'--reauth --auth-response "{response_url}"'
+            self.login = MaintenanceWorker(profile, options)
+            # Connect before starting, so a fast reply cannot be emitted before
+            # the slot is connected.
+            self.login.update_login_response.connect(self.login_failed_dialog)
+            self.login.start()
+        else:
+            pass
+
+    def login_failed_dialog(self, response: dict):
+        profile_name = response["profile_name"]
+        response_reason = response["response"]
+
+        if response_reason == "success":
+            self.profile_status_pages[profile_name].label_onedrive_status.setText("Login successful. Please, start sync manually.")
+
+            response_dialog = QMessageBox.information(
+                self,
+                "Login successful",
+                f"Login successful!  Please start sync manually.",
+                buttons=QMessageBox.Ok,
+                defaultButton=QMessageBox.Ok,
+            )
+        else:
+            self.profile_status_pages[profile_name].label_onedrive_status.setText("Login failed.")
+
+            response_dialog = QMessageBox.critical(
+                self,
+                "Login failed",
+                f"Login failed!  Please verify your response URL and try again.<br><br> {response_reason}",
+                buttons=QMessageBox.Ok,
+                defaultButton=QMessageBox.Ok,
+            )
+
+        if response_dialog == QMessageBox.Ok:
+            logging.info("[GUI] Login response message acknowledged.")
+
+            if "True " not in gui_settings.get("QWebEngine_login") and response_reason == "success":
+                self.window2.hide()
+            elif response_reason == "success":
+                self.window1.hide()
+
+            else:
+                self.window2.activateWindow()
+                self.window2.raise_()
+
+    def remove_worker(self, profile_name):
+        logging.info(f"[{profile_name}] Removing thread info")
+        workers.pop(profile_name, None)
+        logging.info(f"[GUI] Remaining running workers: {workers}")
+
+    def add_profile(self, profile_name):
+        """
+        Adds a new profile to the main window UI.
+        Called when a new profile is created through the wizard.
+        """
+        logging.info(f"[MAIN_WINDOW] Adding profile {profile_name} to main window UI")
+
+        # Check if profile already exists in UI
+        if profile_name in self.profile_status_pages:
+            logging.info(f"[MAIN_WINDOW] Profile {profile_name} already exists in UI, skipping add")
+            return
+
+        # Create a profile status page and add it to the UI
+        self.comboBox.addItem(profile_name)
+        self.profile_status_pages[profile_name] = ProfileStatusPage(profile_name)
+        self.profile_status_pages[profile_name].start_sync_signal.connect(self.start_onedrive_monitor)
+        self.profile_status_pages[profile_name].stop_sync_signal.connect(self.stop_onedrive_monitor)
+        self.profile_status_pages[profile_name].quit_gui_signal.connect(self.graceful_shutdown)
+        self.stackedLayout.addWidget(self.profile_status_pages[profile_name])
+
+        # Select the newly added profile
+        index = self.comboBox.findText(profile_name)
+        if index >= 0:
+            self.comboBox.setCurrentIndex(index)
+            self.stackedLayout.setCurrentIndex(index)
+            logging.info(f"[MAIN_WINDOW] Selected profile {profile_name} at index {index}")
+
+        # Show comboBox if more than one profile exists
+        if len(self.profile_status_pages) > 1:
+            self.comboBox.show()
+
+        # Force update the UI
+        self.comboBox.update()
+        self.update()
+
+        # Make the profile visible and force a layout refresh
+        self.comboBox.show()
+        self.stackedLayout.update()
+        self.verticalLayout_2.update()
+
+        # Process events to ensure UI updates immediately
+        from PySide6.QtCore import QCoreApplication
+
+        QCoreApplication.processEvents()
+
+    @Slot(str, str)
+    def rename_profile_in_main_window(self, old_name, new_name):
+        """
+        Updates the profile name in the main window UI elements.
+        """
+        logging.info(f"[MAIN_WINDOW] Renaming profile '{old_name}' to '{new_name}' in main window UI.")
+
+        # 1. Update the item text in the comboBox.
+        index = self.comboBox.findText(old_name)
+        if index >= 0:
+            self.comboBox.setItemText(index, new_name)
+            logging.info(f"[MAIN_WINDOW] Updated comboBox item at index {index} from '{old_name}' to '{new_name}'.")
+        else:
+            logging.warning(f"[MAIN_WINDOW] Profile '{old_name}' not found in comboBox.")
+
+        # 2. Update the key in the self.profile_status_pages dictionary.
+        if old_name in self.profile_status_pages:
+            self.profile_status_pages[new_name] = self.profile_status_pages.pop(old_name)
+            # Also update the profile_name attribute within the ProfileStatusPage instance
+            self.profile_status_pages[new_name].profile_name = new_name
+            logging.info(f"[MAIN_WINDOW] Updated profile_status_pages key from '{old_name}' to '{new_name}'.")
+        else:
+            logging.warning(f"[MAIN_WINDOW] Profile '{old_name}' not found in profile_status_pages.")
+
+        # 3. Update the key in the workers dictionary if a worker exists.
+        if old_name in workers:
+            workers[new_name] = workers.pop(old_name)
+            # Also update the profile_name attribute within the WorkerThread instance
+            workers[new_name].profile_name = new_name
+            logging.info(f"[MAIN_WINDOW] Updated workers key from '{old_name}' to '{new_name}'.")
+        else:
+            logging.info(f"[MAIN_WINDOW] No worker found for profile '{old_name}'.")
+
+        # Force update the UI
+        self.comboBox.update()
+        self.update()
+
+        # Process events to ensure UI updates immediately
+        from PySide6.QtCore import QCoreApplication
+
+        QCoreApplication.processEvents()
+
+    def remove_profile(self, profile_name):
+        """
+        Removes onedrive profile from the GUI.
+        """
+        combo_box_index = self.comboBox.findText(profile_name)
+        self.comboBox.removeItem(combo_box_index)
+        self.stackedLayout.setCurrentIndex(0)
+        self.profile_status_pages.pop(profile_name, None)
+        global_config.pop(profile_name, None)
+        logging.info(global_config)
+
+        if len(global_config) < 2:
+            self.comboBox.hide()
+
+    def show_main_window(self):
+        self.show()
+
+    def hide_main_window(self):
+        self.save_window_geometry()
+        self.hide()
+
+
+class ProfileStatusPage(QWidget, Ui_status_page):
+    start_sync_signal = Signal(str)
+    stop_sync_signal = Signal(str)
+    quit_gui_signal = Signal()
+
+    def __init__(self, profile_name):
+        super(ProfileStatusPage, self).__init__()
+
+        self.profile_name = profile_name
+
+        # Set up the user interface from Designer.
+        self.setupUi(self)
+
+        # Configure Icons
+        self.start_icon = QIcon(DIR_PATH + "/resources/images/play.png")
+        self.stop_icon = QIcon(DIR_PATH + "/resources/images/stop.png")
+        self.storage_icon = QPixmap(DIR_PATH + "/resources/images/storage.png").scaled(26, 26, Qt.KeepAspectRatio)
+        self.quit_icon = QIcon(DIR_PATH + "/resources/images/quit.png")
+        self.close_icon = QIcon(DIR_PATH + "/resources/images/close-filled.png")
+
+        self.folder_icon = QIcon(DIR_PATH + "/resources/images/folder.png")
+        self.profile_icon = QIcon(DIR_PATH + "/resources/images/account.png")
+        self.settings_icon = QIcon(DIR_PATH + "/resources/images/gear.png")
+
+        # Show Start/Stop buttons
+        if gui_settings.get("combined_start_stop_button") == "True":
+            self.pushButton_start_stop.show()
+            self.pushButton_start.hide()
+            self.pushButton_stop.hide()
+        else:
+            self.pushButton_start_stop.hide()
+            self.pushButton_start.show()
+            self.pushButton_stop.show()
+
+        # Combined Start/Stop button
+        self.pushButton_start_stop.setIcon(self.start_icon)
+        self.pushButton_start_stop.setText("")
+        self.pushButton_start_stop.clicked.connect(self.start_monitor)
+
+        # Separate start/stop buttons
+        self.pushButton_start.setIcon(self.start_icon)
+        self.pushButton_start.setText("")
+        self.pushButton_start.clicked.connect(self.start_monitor)
+
+        self.pushButton_stop.setIcon(self.stop_icon)
+        self.pushButton_stop.setText("")
+        self.pushButton_stop.clicked.connect(self.stop_monitor)
+
+        # Temp Quit button
+        self.pushButton_quit.setIcon(self.quit_icon)
+        self.pushButton_quit.setText("")
+        self.pushButton_quit.clicked.connect(self.quit_gui)
+
+        # Close Button
+        if gui_settings.get("frameless_window") == "True":
+            self.pushButton_close.setIcon(self.close_icon)
+            self.pushButton_close.setText("")
+            self.pushButton_close.clicked.connect(lambda: self.window().close())
+        else:
+            self.pushButton_close.hide()
+
+        # Free Space Icon
+        self.label_free_space_icon.setPixmap(self.storage_icon)
+        self.label_free_space_icon.hide()
+
+        # Failed file transfers: open rows (no completion timestamp yet) are
+        # tracked by full path so a file that keeps failing across sync cycles
+        # updates its row instead of getting a duplicate on every cycle. Failed
+        # rows are hidden until the user toggles the failed-files button.
+        self.open_rows = {}
+        self.show_failed_entries = False
+
+        # Last monitor-status.json document of the running client (v2.5.12+) and
+        # the high-level state it was last applied for.
+        self.monitor_status = None
+        self.monitor_status_key = None
+        self.pushButton_show_errors.hide()
+        self.pushButton_show_errors.toggled.connect(self.toggle_failed_entries)
+
+        # Open Sync Dir
+        self.pushButton_open_dir.setText("")
+        self.pushButton_open_dir.setIcon(self.folder_icon)
+        self.pushButton_open_dir.clicked.connect(self.open_sync_dir)
+
+        # Open Profiles window
+        self.pushButton_profiles.setText("")
+        self.pushButton_profiles.setIcon(self.profile_icon)
+        self.pushButton_profiles.clicked.connect(lambda: profile_settings_window.show())
+        self.pushButton_profiles.clicked.connect(lambda: profile_settings_window.start_unsaved_changes_timer())
+
+        # Open GUI Settings window
+        self.pushButton_gui_settings.setText("")
+        self.pushButton_gui_settings.setIcon(self.settings_icon)
+        self.pushButton_gui_settings.clicked.connect(self.show_gui_settings_window)
+
+        # Show Account Type on GUI startup (when sync is not running)
+        self.label_account_type.setText(global_config[self.profile_name]["account_type"])
+
+        # Allow hyperlinks in status messages
+        self.label_onedrive_status.setOpenExternalLinks(True)
+
+        # Show last known Free Space on GUI startup (when sync is not running)
+        _free_space = global_config[self.profile_name]["free_space"]
+
+        if _free_space == "0":
+            self.label_free_space.setText("")
+            # self.label_free_space_icon.hide()
+        else:
+            self.label_free_space.setText(global_config[self.profile_name]["free_space"])
+
+    def failed_rows(self):
+        """List items currently in the 'Failed' state (one row per failed file)."""
+        failed = []
+        for item in self.open_rows.values():
+            if self.listWidget.row(item) == -1:
+                continue  # Row was trimmed off the end of the list
+            item_widget = self.listWidget.itemWidget(item)
+            if item_widget is not None and item_widget.get_state() == "Failed":
+                failed.append(item)
+        return failed
+
+    def toggle_failed_entries(self, show):
+        """Show or hide the failed entries pinned at the top of the file operation list."""
+        self.show_failed_entries = show
+        for item in self.failed_rows():
+            self.listWidget.setRowHidden(self.listWidget.row(item), not show)
+
+    def update_show_errors_button(self):
+        """Refresh the failed-files toggle in the header: text with the current
+        number of failed entries, hidden while there are none."""
+        failed_count = len(self.failed_rows())
+        self.pushButton_show_errors.setText(f"{failed_count} failed")
+        self.pushButton_show_errors.setVisible(failed_count > 0)
+
+    def open_sync_dir(self):
+        sync_dir = global_config[self.profile_name]["onedrive"]["sync_dir"].strip('"')
+        sync_dir_path = os.path.expanduser(sync_dir)
+        url = QUrl.fromLocalFile(sync_dir_path)
+        QDesktopServices.openUrl(url)
+
+    def show_gui_settings_window(self):
+        # self.gui_settings_window = GuiSettingsWindow()
+        gui_settings_window.show()
+
+    def stop_monitor(self):
+        self.stop_sync_signal.emit(self.profile_name)
+
+    def start_monitor(self):
+        # self.start_onedrive_monitor(self.profile_name)
+        self.start_sync_signal.emit(self.profile_name)
+
+    def quit_gui(self):
+        self.quit_gui_signal.emit()
+
+
+class AlignDelegate(QStyledItemDelegate):
+    def initStyleOption(self, option, index):
+        super(AlignDelegate, self).initStyleOption(option, index)
+        option.displayAlignment = Qt.AlignRight
