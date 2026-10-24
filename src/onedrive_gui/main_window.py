@@ -1906,7 +1906,7 @@ class ProfileStatusPage(QWidget, Ui_status_page):
         if gui_settings.get("frameless_window") == "True":
             self.pushButton_close.setIcon(self.close_icon)
             self.pushButton_close.setText("")
-            self.pushButton_close.clicked.connect(lambda: self.close())
+            self.pushButton_close.clicked.connect(lambda: self.window().close())
         else:
             self.pushButton_close.hide()
 
