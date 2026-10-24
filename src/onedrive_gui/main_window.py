@@ -912,19 +912,36 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         configuration directory, or None. Such a process is typically left
         behind by a previous OneDriveGUI run or started outside the GUI; the
         client refuses to start a second instance for the same configuration.
+
+        Only the current user's `onedrive` processes count, and their
+        configuration directory must be this profile's: the one given with
+        --confdir, or the client's default ~/.config/onedrive without it.
         """
         config_file = global_config[profile_name]["config_file"].strip('"')
-        config_dir = os.path.expanduser(re.search(r"(.+)/.+$", config_file).group(1))
+        config_dir = os.path.realpath(os.path.expanduser(re.search(r"(.+)/.+$", config_file).group(1)))
+        uid = os.getuid()
 
         for proc_entry in os.listdir("/proc"):
             if not proc_entry.isdigit():
                 continue
             try:
+                if os.stat(f"/proc/{proc_entry}").st_uid != uid:
+                    continue
                 with open(f"/proc/{proc_entry}/cmdline", "rb") as cmdline_file:
-                    cmdline = cmdline_file.read()
+                    args = [os.fsdecode(arg) for arg in cmdline_file.read().split(b"\0") if arg]
             except OSError:
                 continue
-            if b"onedrive" in cmdline and os.fsencode(config_dir) in cmdline:
+            if not args or os.path.basename(args[0]) != "onedrive":
+                continue
+
+            client_config_dir = "~/.config/onedrive"
+            for index, arg in enumerate(args[1:], start=1):
+                if arg.startswith("--confdir="):
+                    client_config_dir = arg.split("=", 1)[1]
+                elif arg == "--confdir" and index + 1 < len(args):
+                    client_config_dir = args[index + 1]
+
+            if os.path.realpath(os.path.expanduser(client_config_dir)) == config_dir:
                 return int(proc_entry)
         return None
 
