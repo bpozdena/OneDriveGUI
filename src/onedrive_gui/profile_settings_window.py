@@ -52,7 +52,7 @@ class ProfileSettingsWindow(QWidget, Ui_profile_settings_window):
         self.unsaved_profiles = []
 
         self.setupUi(self)
-        self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png"))
+        self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-cloud-80.png"))
         self.delegate = ListItemDelegate()
         self.listWidget_profiles.setItemDelegate(self.delegate)
 

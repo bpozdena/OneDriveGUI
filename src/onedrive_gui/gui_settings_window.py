@@ -23,7 +23,7 @@ class GuiSettingsWindow(QWidget, Ui_gui_settings_window):
         super(GuiSettingsWindow, self).__init__()
 
         self.setupUi(self)
-        self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-clouds-80-dark-edge.png"))
+        self.setWindowIcon(QIcon(DIR_PATH + "/resources/images/icons8-cloud-80.png"))
 
         self.checkBox_start_minimized.setChecked(self.get_check_box_state("start_minimized"))
         self.checkBox_start_minimized.stateChanged.connect(self.set_check_box_state)
